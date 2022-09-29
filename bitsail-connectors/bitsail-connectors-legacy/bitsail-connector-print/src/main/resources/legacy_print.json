@@ -1,0 +1,7 @@
+{
+  "name": "bitsail-connector-print",
+  "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink",
+  "libs": [
+    "bitsail-connector-print-${version}.jar"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "bitsail-connector-fake",
+  "classes": [
+    "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource",
+    "com.bytedance.bitsail.connector.legacy.fake.source.FakeFlinkSource"
+  ],
+  "libs": [
+    "bitsail-connector-fake-${version}.jar"
+  ]
+}

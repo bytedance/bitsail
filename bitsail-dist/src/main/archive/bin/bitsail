@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -e
+
+args=$@
+target="$0"
+bin=$(
+  cd $(dirname ${target})
+  pwd
+)
+SYMLINK_RESOLVED_BIN=$(
+  cd $bin
+  pwd -P
+)
+
+BITSAIL_HOME=$(dirname $SYMLINK_RESOLVED_BIN)
+BITSAIL_CONF_DIR=${BITSAIL_HOME}/conf
+BITSAIL_CLIENT_CLASSPATH=${BITSAIL_HOME}/libs/clients
+
+if [ -n "$HADOOP_HOME" ]; then
+  export HADOOP_CLASSPATH=$($HADOOP_HOME/bin/hadoop classpath)
+fi
+export BITSAIL_HOME=${BITSAIL_HOME}
+
+exec java -cp ${HADOOP_CLASSPATH}:${BITSAIL_CLIENT_CLASSPATH}/*:${BITSAIL_CONF_DIR}/* com.bytedance.bitsail.client.entry.Entry ${args}

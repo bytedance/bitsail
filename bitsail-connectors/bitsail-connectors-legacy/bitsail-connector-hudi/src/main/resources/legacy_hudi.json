@@ -1,0 +1,7 @@
+{
+  "name": "bitsail-connector-hudi",
+  "classes": [
+    "com.bytedance.bitsail.connector.legacy.hudi.sink.HudiSinkFunctionDAGBuilder"
+  ],
+  "libs": ["bitsail-connector-hudi-${version}.jar"]
+}
