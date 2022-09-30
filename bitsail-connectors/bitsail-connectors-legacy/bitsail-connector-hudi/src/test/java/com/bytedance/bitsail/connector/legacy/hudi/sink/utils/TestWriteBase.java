@@ -337,19 +337,25 @@ public class TestWriteBase {
         Map<String, String> expected,
         int partitions) throws Exception {
       if (OptionsResolver.isCowTable(conf) || conf.getBoolean(FlinkOptions.COMPACTION_ASYNC_ENABLED)) {
-        TestData.checkWrittenData(this.baseFile, expected, partitions);
+        checkWrittenDataCow(baseFile, expected, partitions);
       } else {
         checkWrittenDataMor(baseFile, expected, partitions);
       }
       return this;
     }
 
-    private void checkWrittenDataMor(File baseFile, Map<String, String> expected, int partitions) throws Exception {
+    public TestHarness checkWrittenDataCow(File baseFile, Map<String, String> expected, int partitions) throws IOException {
+      TestData.checkWrittenData(this.baseFile, expected, partitions);
+      return this;
+    }
+
+    public TestHarness checkWrittenDataMor(File baseFile, Map<String, String> expected, int partitions) throws Exception {
       HoodieTableMetaClient metaClient = StreamerUtil.createMetaClient(basePath, HadoopConfigurations.getHadoopConf(conf));
       Schema schema = new TableSchemaResolver(metaClient).getTableAvroSchema();
       String latestInstant = lastCompleteInstant();
       FileSystem fs = FSUtils.getFs(basePath, new org.apache.hadoop.conf.Configuration());
       TestData.checkWrittenDataMOR(fs, latestInstant, baseFile, expected, partitions, schema);
+      return this;
     }
 
     public TestHarness checkWrittenFullData(Map<String, List<String>> expected) throws IOException {

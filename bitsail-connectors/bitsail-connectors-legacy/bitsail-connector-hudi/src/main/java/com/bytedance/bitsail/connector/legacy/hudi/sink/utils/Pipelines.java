@@ -18,6 +18,11 @@
 
 package com.bytedance.bitsail.connector.legacy.hudi.sink.utils;
 
+import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactFunction;
+import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactionCommitEvent;
+import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactionCommitSink;
+import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactionPlanEvent;
+import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactionPlanOperator;
 import com.bytedance.bitsail.connector.legacy.hudi.configuration.FlinkOptions;
 import com.bytedance.bitsail.connector.legacy.hudi.configuration.OptionsResolver;
 import com.bytedance.bitsail.connector.legacy.hudi.sink.CleanFunction;
@@ -30,11 +35,6 @@ import com.bytedance.bitsail.connector.legacy.hudi.sink.bucket.BucketStreamWrite
 import com.bytedance.bitsail.connector.legacy.hudi.sink.bulk.BulkInsertWriteOperator;
 import com.bytedance.bitsail.connector.legacy.hudi.sink.bulk.RowDataKeyGen;
 import com.bytedance.bitsail.connector.legacy.hudi.sink.common.WriteOperatorFactory;
-import com.bytedance.bitsail.connector.legacy.hudi.sink.compact.CompactFunction;
-import com.bytedance.bitsail.connector.legacy.hudi.sink.compact.CompactionCommitEvent;
-import com.bytedance.bitsail.connector.legacy.hudi.sink.compact.CompactionCommitSink;
-import com.bytedance.bitsail.connector.legacy.hudi.sink.compact.CompactionPlanEvent;
-import com.bytedance.bitsail.connector.legacy.hudi.sink.compact.CompactionPlanOperator;
 import com.bytedance.bitsail.connector.legacy.hudi.sink.partitioner.BucketAssignFunction;
 import com.bytedance.bitsail.connector.legacy.hudi.sink.partitioner.BucketIndexPartitioner;
 import com.bytedance.bitsail.connector.legacy.hudi.sink.transform.RowDataToHoodieFunctions;

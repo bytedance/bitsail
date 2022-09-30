@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.hudi.sink.compact;
+package com.bytedance.bitsail.connector.legacy.hudi.compact;
 
 import org.apache.hudi.client.WriteStatus;
 

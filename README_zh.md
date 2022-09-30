@@ -38,6 +38,12 @@
     <td>✅</td>
   </tr>
   <tr>
+    <td>Hudi</td>
+    <td>-</td>
+    <td>❎</td>
+    <td>✅</td>
+  </tr>
+  <tr>
     <td>Kafka</td>
     <td>-</td>
     <td>✅</td>

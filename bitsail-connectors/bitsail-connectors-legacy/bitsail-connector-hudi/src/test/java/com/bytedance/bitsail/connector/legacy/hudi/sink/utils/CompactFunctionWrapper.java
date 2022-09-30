@@ -18,11 +18,11 @@
 
 package com.bytedance.bitsail.connector.legacy.hudi.sink.utils;
 
-import com.bytedance.bitsail.connector.legacy.hudi.sink.compact.CompactFunction;
-import com.bytedance.bitsail.connector.legacy.hudi.sink.compact.CompactionCommitEvent;
-import com.bytedance.bitsail.connector.legacy.hudi.sink.compact.CompactionCommitSink;
-import com.bytedance.bitsail.connector.legacy.hudi.sink.compact.CompactionPlanEvent;
-import com.bytedance.bitsail.connector.legacy.hudi.sink.compact.CompactionPlanOperator;
+import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactFunction;
+import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactionCommitEvent;
+import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactionCommitSink;
+import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactionPlanEvent;
+import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactionPlanOperator;
 
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.io.disk.iomanager.IOManager;

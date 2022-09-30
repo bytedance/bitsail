@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.hudi.sink.compact;
+package com.bytedance.bitsail.connector.legacy.hudi.compact;
 
 import com.bytedance.bitsail.connector.legacy.hudi.sink.utils.NonThrownExecutor;
 import com.bytedance.bitsail.connector.legacy.hudi.util.CompactionUtil;
@@ -42,7 +42,7 @@ import java.util.List;
  * Function to execute the actual compaction task assigned by the compaction plan task.
  * In order to execute scalable, the input should shuffle by the compact event {@link CompactionPlanEvent}.
  */
-public class CompactFunction extends ProcessFunction<CompactionPlanEvent, CompactionCommitEvent> {
+public class CompactFunction<IN, OUT> extends ProcessFunction<CompactionPlanEvent, CompactionCommitEvent> {
   private static final Logger LOG = LoggerFactory.getLogger(CompactFunction.class);
 
   /**
