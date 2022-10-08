@@ -68,6 +68,6 @@ public class PrintWriterGenerator implements WriterGenerator<Row, String, Intege
 
   @Override
   public BaseEngineTypeInfoConverter createTypeInfoConverter() {
-    return new SimpleTypeInfoConverter("json");
+    return new SimpleTypeInfoConverter("bitsail");
   }
 }

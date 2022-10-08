@@ -71,35 +71,4 @@ public class KafkaContainers extends KafkaContainer {
       throw new IllegalStateException(result.toString());
     }
   }
-
-  public void createTopic(String topicName, int partitionNums, int rf) throws Exception {
-    String command = String.format("/usr/bin/kafka-topics " +
-            "--create " +
-            "--zookeeper %s " +
-            "--replication-factor %d " +
-            "--partitions %d" +
-            " --topic %s",
-        zkHost, rf, partitionNums, topicName);
-    executeCommand(command);
-  }
-
-  public void verifyTopic(String topicName) throws Exception {
-    String command = String.format("/usr/bin/kafka-topics --describe --zookeeper %s --topic %s", zkHost, topicName);
-    executeCommand(command);
-  }
-
-  private void executeCommand(String command) throws Exception {
-    LOG.info(command);
-    Container.ExecResult result = execInContainer(
-        "/bin/sh",
-        "-c",
-        command
-    );
-    LOG.info("stdout: {}", result.getStdout());
-    LOG.info("stderr: {}", result.getStderr());
-
-    if (result.getExitCode() != 0) {
-      throw new IllegalStateException(result.toString());
-    }
-  }
 }
