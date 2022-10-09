@@ -49,11 +49,13 @@ import static org.junit.Assert.assertEquals;
 
 public class BytesParserTest {
 
+  private String timeZone;
+
   @Before
   public void init() {
+    timeZone = ZoneOffset.ofHours(8).getId();
     BitSailConfiguration bitSailConfiguration = BitSailConfiguration.newDefault();
-    bitSailConfiguration.set(CommonOptions.DateFormatOptions.TIME_ZONE,
-        ZoneOffset.ofHours(8).getId());
+    bitSailConfiguration.set(CommonOptions.DateFormatOptions.TIME_ZONE, timeZone);
     ColumnCast.initColumnCast(bitSailConfiguration);
   }
 
@@ -64,7 +66,8 @@ public class BytesParserTest {
     Assert.assertEquals(-1L, (long) column.asLong());
 
     LocalDateTime localDateTime = LocalDateTime.of(2022, 5, 10, 14, 0, 20);
-    LongColumn timestampColumn = (LongColumn) parser.createBasicColumn(PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO, localDateTime);
+    LongColumn timestampColumn =
+        (LongColumn) parser.createBasicColumn(PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO, localDateTime.toEpochSecond(ZoneOffset.of(timeZone)));
     assertEquals(1652162420L, (long) timestampColumn.asLong());
   }
 
