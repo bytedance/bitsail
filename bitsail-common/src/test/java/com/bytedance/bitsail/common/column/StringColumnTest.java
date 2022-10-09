@@ -23,6 +23,7 @@ import com.bytedance.bitsail.common.option.CommonOptions;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -48,7 +49,9 @@ public class StringColumnTest {
     Date dateTime = strColumn.asDate();
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    String dateStr = formatter.format(dateTime.toInstant().atOffset(ZoneOffset.of(timeZone)));
+    String dateStr = formatter.format(dateTime
+        .toInstant()
+        .atZone(ZoneId.of(timeZone)).toOffsetDateTime());
     assertEquals(dateStr, timeStr);
   }
 
