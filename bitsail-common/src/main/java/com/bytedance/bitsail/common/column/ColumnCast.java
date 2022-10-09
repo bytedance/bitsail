@@ -25,8 +25,8 @@ import com.bytedance.bitsail.common.option.CommonOptions;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -107,15 +107,16 @@ public final class ColumnCast {
       return null;
     }
     Date date = column.asDate();
+    DateTime dateTime = new DateTime(date.toInstant().toEpochMilli())
+        .withZone(dateTimeZone);
 
-    LocalDateTime localDateTime = LocalDateTime.fromDateFields(date);
     switch (column.getSubType()) {
       case DATE:
-        return localDateTime.toString(dateFormatter);
+        return dateTime.toString(dateFormatter);
       case TIME:
-        return localDateTime.toString(timeFormatter);
+        return dateTime.toString(timeFormatter);
       case DATETIME:
-        return localDateTime.toString(dateTimeFormatter);
+        return dateTime.toString(dateTimeFormatter);
       default:
         throw BitSailException
             .asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT, "");

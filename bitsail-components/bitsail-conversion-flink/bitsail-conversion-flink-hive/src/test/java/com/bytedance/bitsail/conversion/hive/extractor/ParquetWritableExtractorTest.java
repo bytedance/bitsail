@@ -51,9 +51,9 @@ public class ParquetWritableExtractorTest {
   @Before
   public void initEnv() {
     BitSailConfiguration bitSailConfiguration = BitSailConfiguration.newDefault();
-    ColumnCast.initColumnCast(bitSailConfiguration);
     bitSailConfiguration.set(CommonOptions.DateFormatOptions.TIME_ZONE,
         ZoneOffset.ofHours(8).getId());
+    ColumnCast.initColumnCast(bitSailConfiguration);
   }
 
   @Test
