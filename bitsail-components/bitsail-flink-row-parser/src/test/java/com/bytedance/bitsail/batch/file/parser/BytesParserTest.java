@@ -50,7 +50,7 @@ public class BytesParserTest {
 
   @Before
   public void init() {
-    timeZone = ZoneOffset.ofHours(8).getId();
+    timeZone = ZoneOffset.ofHours(0).getId();
     BitSailConfiguration bitSailConfiguration = BitSailConfiguration.newDefault();
     bitSailConfiguration.set(CommonOptions.DateFormatOptions.TIME_ZONE, timeZone);
     ColumnCast.initColumnCast(bitSailConfiguration);

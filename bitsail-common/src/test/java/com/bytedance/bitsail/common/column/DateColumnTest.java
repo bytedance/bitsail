@@ -34,7 +34,7 @@ public class DateColumnTest {
 
   @Before
   public void before() {
-    timeZone = ZoneOffset.ofHours(1).getId();
+    timeZone = ZoneOffset.ofHours(0).getId();
     BitSailConfiguration bitSailConfiguration = BitSailConfiguration.newDefault();
     bitSailConfiguration.set(CommonOptions.DateFormatOptions.TIME_ZONE, timeZone);
     ColumnCast.initColumnCast(bitSailConfiguration);
