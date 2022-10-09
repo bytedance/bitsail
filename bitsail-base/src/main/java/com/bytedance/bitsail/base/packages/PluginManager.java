@@ -31,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -54,8 +53,6 @@ public class PluginManager {
   private static final String PLUGIN_CLASS_KEY = "class";
   private static final String PLUGIN_CLASS_NAME_LIST_KEY = "classes";
   private static final String PLUGIN_LIB_KEY = "libs";
-  private static final String SEPARATOR = File.separator;
-  private static final String FALL_BACK_JAR_NAME = "bitsail-streaming";
   private final Path directory;
   /**
    * Mapping for the plugin's name and plugin's uri.
@@ -68,16 +65,18 @@ public class PluginManager {
   private final boolean dryRun;
   private final Path pluginLibDir;
   private final Path pluginConfDir;
-  private final boolean canFallback;
 
   @Builder
   PluginManager(Path path, boolean dryRun, boolean dynamicLoad, String pluginLibDir, String pluginConfDir) {
-    log.debug("Starting to load BitSail plugin jar dynamically, current classloader is: [{}], thread context classloader is: [{}]",
+    log.debug("Plugin manager initializing, plugin manager's class loader = {}, thread context class loader = {}",
         getClass().getClassLoader(), Thread.currentThread().getContextClassLoader());
-    directory = path;
-    log.info("User jar directory is {}", directory);
+    if (Files.isRegularFile(path)) {
+      directory = path.getParent();
+    } else {
+      directory = path;
+    }
+    log.info("Plugin manager root plugin dir = {}.", directory);
     this.dryRun = dryRun;
-    this.canFallback = false;
     this.pluginLibDir = Paths.get(pluginLibDir);
     this.pluginConfDir = Paths.get(pluginConfDir);
 
@@ -166,13 +165,8 @@ public class PluginManager {
       if (dryRun) {
         return new ArrayList<>();
       } else {
-        if (canFallback) {
-          log.info("Get config plugin lib fail, we will fallback to {}.", FALL_BACK_JAR_NAME);
-          libs = pluginName2Plugin.get(FALL_BACK_JAR_NAME).getLibs();
-        } else {
-          throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
-              String.format("The config plugin name %s is not found!", name));
-        }
+        throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
+            String.format("The config plugin name %s is not found!", name));
       }
     }
     List<URL> ret = new ArrayList<>(libs.size());

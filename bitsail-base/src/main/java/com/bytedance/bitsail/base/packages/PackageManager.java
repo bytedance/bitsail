@@ -66,7 +66,7 @@ public class PackageManager {
     printClassLoaderUrls = param.getPrintClassLoaderUrls();
 
     String path = StringUtils.isNotEmpty(param.getRootPath()) ? param.getRootPath() :
-        this.getClass().getProtectionDomain().getCodeSource().getLocation().toString();
+        this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
 
     pluginManager = PluginManager.builder()
         .dynamicLoad(param.enableDynamicLoader)
