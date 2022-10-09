@@ -34,8 +34,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-        include:
-          - mvnProfile: "flink-embedded"
+        mvnProfile: 'flink-embedded'
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
