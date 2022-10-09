@@ -34,8 +34,6 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-        mvnProfile: 'flink-embedded'
-
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - run: git config --global core.longpaths true
@@ -48,7 +46,5 @@ jobs:
           architecture: x64
 
       - name: Package Project
-        env:
-          MAVEN_PROFILE: ${{ matrix.mvnProfile }}
         run:
-          mvn clean package -pl bitsail-dist -am -U -P"$MAVEN_PROFILE"
+          mvn clean package -pl bitsail-dist -am -U
