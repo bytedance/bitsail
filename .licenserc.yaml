@@ -5,11 +5,14 @@ header:
 
   paths-ignore:
     - 'docs'
+    - 'bitsail-dist'
     - '**/*.md'
     - 'LICENSE'
     - 'NOTICE'
     - '**/*.json'
     - '**/*.iml'
     - '**/.gitignore'
+    - '**/*.yml'
+    - '**/*.yaml'
 
   comment: on-failure
