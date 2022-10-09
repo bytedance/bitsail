@@ -18,18 +18,26 @@
 package com.bytedance.bitsail.common.column;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import java.time.ZoneOffset;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 public class DateColumnTest {
 
+  private String timeZone;
+
   @Before
   public void before() {
-    ColumnCast.initColumnCast(BitSailConfiguration.newDefault());
+    timeZone = ZoneOffset.ofHours(1).getId();
+    BitSailConfiguration bitSailConfiguration = BitSailConfiguration.newDefault();
+    bitSailConfiguration.set(CommonOptions.DateFormatOptions.TIME_ZONE, timeZone);
+    ColumnCast.initColumnCast(bitSailConfiguration);
   }
 
   @Test

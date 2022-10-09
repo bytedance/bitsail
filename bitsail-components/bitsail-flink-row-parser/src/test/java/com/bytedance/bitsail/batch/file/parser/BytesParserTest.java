@@ -39,13 +39,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-
-import static org.junit.Assert.assertEquals;
 
 public class BytesParserTest {
 
@@ -64,11 +61,6 @@ public class BytesParserTest {
     final TestBytesParser parser = new TestBytesParser();
     final LongColumn column = (LongColumn) parser.createBasicColumn(PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO, "-1.0");
     Assert.assertEquals(-1L, (long) column.asLong());
-
-    LocalDateTime localDateTime = LocalDateTime.of(2022, 5, 10, 14, 0, 20);
-    LongColumn timestampColumn =
-        (LongColumn) parser.createBasicColumn(PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO, localDateTime.toEpochSecond(ZoneOffset.of(timeZone)));
-    assertEquals(1652162420L, (long) timestampColumn.asLong());
   }
 
   @Test
