@@ -26,6 +26,7 @@ import com.bytedance.bitsail.common.column.DoubleColumn;
 import com.bytedance.bitsail.common.column.ListColumn;
 import com.bytedance.bitsail.common.column.LongColumn;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.flink.core.parser.BytesParser;
 import com.bytedance.bitsail.flink.core.typeinfo.ListColumnTypeInfo;
 import com.bytedance.bitsail.flink.core.typeinfo.PrimitiveColumnTypeInfo;
@@ -41,6 +42,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
@@ -49,11 +51,14 @@ public class BytesParserTest {
 
   @Before
   public void init() {
-    ColumnCast.initColumnCast(BitSailConfiguration.newDefault());
+    BitSailConfiguration bitSailConfiguration = BitSailConfiguration.newDefault();
+    bitSailConfiguration.set(CommonOptions.DateFormatOptions.TIME_ZONE,
+        ZoneOffset.ofHours(8).getId());
+    ColumnCast.initColumnCast(bitSailConfiguration);
   }
 
   @Test
-  public void createBasicColumn_long() {
+  public void testCreateLongColumn() {
     final TestBytesParser parser = new TestBytesParser();
     final LongColumn column = (LongColumn) parser.createBasicColumn(PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO, "-1.0");
     Assert.assertEquals(-1L, (long) column.asLong());
@@ -64,7 +69,7 @@ public class BytesParserTest {
   }
 
   @Test
-  public void createColumn_array() {
+  public void testCreateArrayColumn() {
     final TestBytesParser parser = new TestBytesParser();
     boolean[] arr = new boolean[] {true, false};
     final ListColumn column = (ListColumn) parser.createColumn(new ListColumnTypeInfo(PrimitiveColumnTypeInfo.BOOL_COLUMN_TYPE_INFO), arr);
@@ -73,7 +78,7 @@ public class BytesParserTest {
   }
 
   @Test
-  public void createBasicColumn_double() {
+  public void testCreateDoubleColumn() {
     final TestBytesParser parser = new TestBytesParser();
     final DoubleColumn column = (DoubleColumn) parser.createBasicColumn(PrimitiveColumnTypeInfo.DOUBLE_COLUMN_TYPE_INFO, "-1.0");
     Assert.assertEquals(-1.0, column.asDouble(), 0.000001);
