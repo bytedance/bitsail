@@ -36,6 +36,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,7 +71,7 @@ public class PackageManager {
     pluginManager = PluginManager.builder()
         .dynamicLoad(param.enableDynamicLoader)
         .dryRun(param.getDryRun())
-        .path(path)
+        .path(Paths.get(path))
         .pluginLibDir(param.getPluginLibDir())
         .pluginConfDir(param.getPluginConfDir())
         .build();

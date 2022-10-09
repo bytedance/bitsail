@@ -52,7 +52,7 @@ public class PackageManagerTest {
     jobConf.set(CommonOptions.STATIC_LIB_DIR, "plugin");
     jobConf.set(CommonOptions.STATIC_LIB_CONF_FILE, "static_lib.json");
     jobConf.set(CommonOptions.JOB_PLUGIN_ROOT_PATH,
-        Objects.requireNonNull(PackageManager.class.getResource("/classloader/")).toString());
+        Objects.requireNonNull(PackageManager.class.getResource("/classloader/")).getPath());
 
     mockedEnv = Mockito.mock(ExecutionEnviron.class);
     Mockito.doNothing().when(mockedEnv).registerLibraries(Mockito.anyList());
