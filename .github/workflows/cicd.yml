@@ -45,6 +45,6 @@ jobs:
           distribution: 'adopt'
           architecture: x64
 
-      - name: Package Project
+      - name: Maven Package
         run:
           mvn clean package -pl bitsail-dist -am -U
