@@ -15,27 +15,35 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.client.api.engine;
+package com.bytedance.bitsail.component.format.security.kerberos.common;
 
-import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
-import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.exception.ErrorCode;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URLClassLoader;
+public enum KerberosErrorCode implements ErrorCode {
 
-/**
- * Created 2022/8/5
- */
-public interface EngineRunner extends Serializable {
-  default void loadLibrary(URLClassLoader classLoader) {
-    return;
+  JAAS_CONF_NOT_EXIST("Kerberos-00", "Jaas config file does not exist, which is required.");
+
+  private final String code;
+
+  private final String describe;
+
+  KerberosErrorCode(String code, String describe) {
+    this.code = code;
+    this.describe = describe;
   }
 
-  void initializeEngine(BitSailConfiguration sysConfiguration);
+  @Override
+  public String getCode() {
+    return code;
+  }
 
-  ProcessBuilder getProcBuilder(BitSailConfiguration jobConfiguration,
-                                BaseCommandArgs baseCommandArgs) throws IOException;
+  @Override
+  public String getDescription() {
+    return describe;
+  }
 
-  String engineName();
+  @Override
+  public String toString() {
+    return String.format("Code:[%s], Describe:[%s]", code, describe);
+  }
 }

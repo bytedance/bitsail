@@ -53,7 +53,7 @@ public class FlinkRunCommandArgs implements CommandArgs {
 
   @SuppressWarnings("checkstyle:MagicNumber")
   @Parameter(names = "--priority",
-      description = "Specify the job's priority in resource manaegr, eg: yarn.")
+      description = "Specify the job's priority in resource manager, eg: yarn.")
   private int priority = 5;
 
 }

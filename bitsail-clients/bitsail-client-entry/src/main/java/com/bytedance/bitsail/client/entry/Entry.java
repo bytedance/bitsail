@@ -18,11 +18,13 @@
 package com.bytedance.bitsail.client.entry;
 
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
-import com.bytedance.bitsail.client.api.command.BaseCommandArgsWithUnknownOptions;
 import com.bytedance.bitsail.client.api.command.CommandAction;
 import com.bytedance.bitsail.client.api.command.CommandArgsParser;
 import com.bytedance.bitsail.client.api.engine.EngineRunner;
+import com.bytedance.bitsail.client.entry.constants.EntryConstants;
+import com.bytedance.bitsail.client.entry.security.SecurityContextFactory;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.configuration.BitSailSystemConfiguration;
 import com.bytedance.bitsail.common.configuration.ConfigParser;
 
 import com.beust.jcommander.internal.Maps;
@@ -31,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -45,11 +48,13 @@ public class Entry {
   private static final Map<String, EngineRunner> RUNNERS = Maps.newHashMap();
   private static final Class<EngineRunner> ENGINE_SPI_CLASS = EngineRunner.class;
 
-  private static final int ERROR_EXIT_CODE = 1;
-
   private static final Object LOCK = new Object();
   private static Process process;
   private static volatile boolean running;
+
+  private final URLClassLoader classLoader;
+  private final BitSailConfiguration sysConfiguration;
+  private final BaseCommandArgs baseCommandArgs;
 
   private static void loadAllEngines() {
     for (EngineRunner runner : ServiceLoader.load(ENGINE_SPI_CLASS)) {
@@ -59,68 +64,88 @@ public class Entry {
     }
   }
 
-  public static void main(String[] args) {
+  private Entry(BitSailConfiguration sysConfiguration,
+                BaseCommandArgs baseCommandArgs) {
+    this.sysConfiguration = sysConfiguration;
+    this.baseCommandArgs = baseCommandArgs;
+    this.classLoader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
     loadAllEngines();
+  }
 
+  @SuppressWarnings("checkstyle:EmptyLineSeparator")
+  public static void main(String[] args) {
+
+    //load system configuration.
+    BitSailConfiguration sysConfiguration = BitSailSystemConfiguration.loadSysConfiguration();
+
+    //load command arguments.
+    BaseCommandArgs baseCommandArgs = loadCommandArguments(args);
+
+    int exit;
     try {
-      int exit = handleCommand(args);
+      Entry entry = new Entry(sysConfiguration, baseCommandArgs);
+
+      SecurityContextFactory securityContext = SecurityContextFactory
+        .load(entry.sysConfiguration, entry.baseCommandArgs);
+
+      exit = securityContext.doAs(
+        () -> entry.runCommand());
+
       System.exit(exit);
     } catch (Exception e) {
       LOG.error("Exception occurred when run command .", e);
-      System.exit(ERROR_EXIT_CODE);
+      exit = EntryConstants.ERROR_EXIT_CODE_UNKNOWN_FAILED;
+      System.exit(exit);
     }
   }
 
   @SuppressWarnings("checkstyle:RegexpSingleline")
-  private static int handleCommand(String[] args) throws IOException, InterruptedException {
+  public static BaseCommandArgs loadCommandArguments(String[] args) {
     if (args.length < 1) {
       CommandArgsParser.printHelp();
-      System.out.println("Please specify an action. Supported action are " + CommandAction.RUN_COMMAND);
-      return ERROR_EXIT_CODE;
-    }
-    BaseCommandArgsWithUnknownOptions baseCommandArgsWithUnknownOptions = buildCommandArgs(args);
-    ProcessBuilder processBuilder = buildProcessBuilder(baseCommandArgsWithUnknownOptions);
-    return startProcessBuilder(processBuilder, baseCommandArgsWithUnknownOptions.getBaseCommandArgs());
-  }
-
-  static BaseCommandArgsWithUnknownOptions buildCommandArgs(String[] args) {
-    if (args.length < 1) {
-      CommandArgsParser.printHelp();
-      throw new IllegalArgumentException("Please specify an action. Supported action are " + CommandAction.RUN_COMMAND);
+      System.out.println("Please specify an action. Supported action are" + CommandAction.RUN_COMMAND);
+      System.exit(EntryConstants.ERROR_EXIT_CODE_COMMAND_ERROR);
     }
     final String mainCommand = args[0];
     final String[] params = Arrays.copyOfRange(args, 1, args.length);
     BaseCommandArgs baseCommandArgs = new BaseCommandArgs();
-    String[] unknownOptions = CommandArgsParser.parseArguments(params, baseCommandArgs);
+    baseCommandArgs.setUnknownOptions(CommandArgsParser.parseArguments(params, baseCommandArgs));
     baseCommandArgs.setMainAction(mainCommand);
-    return BaseCommandArgsWithUnknownOptions.builder().baseCommandArgs(baseCommandArgs).unknownOptions(unknownOptions).build();
+
+    return baseCommandArgs;
   }
 
-  private static ProcessBuilder buildProcessBuilder(BaseCommandArgsWithUnknownOptions baseCommandArgsWithUnknownOptions) {
-    BaseCommandArgs baseCommandArgs = baseCommandArgsWithUnknownOptions.getBaseCommandArgs();
+  private int runCommand() throws IOException, InterruptedException {
+    ProcessBuilder processBuilder = buildProcessBuilder(sysConfiguration, baseCommandArgs);
+    return startProcessBuilder(processBuilder, baseCommandArgs);
+  }
+
+  private ProcessBuilder buildProcessBuilder(BitSailConfiguration sysConfiguration,
+                                             BaseCommandArgs baseCommandArgs) throws IOException {
     BitSailConfiguration jobConfiguration =
-        ConfigParser.fromRawConfPath(baseCommandArgs.getJobConf());
+      ConfigParser.fromRawConfPath(baseCommandArgs.getJobConf());
 
     String engineName = baseCommandArgs.getEngineName();
-    LOG.info("Input argument engine name: {}.", engineName);
+    LOG.info("Final engine: {}.", engineName);
     EngineRunner engineRunner = RUNNERS.get(StringUtils.upperCase(engineName));
     if (Objects.isNull(engineRunner)) {
       throw new IllegalArgumentException(String.format("Engine %s not support now.", engineName));
     }
-    engineRunner.addEngineClasspath();
+    engineRunner.initializeEngine(sysConfiguration);
+    engineRunner.loadLibrary(classLoader);
 
     ProcessBuilder procBuilder = engineRunner.getProcBuilder(
-        jobConfiguration,
-        baseCommandArgs,
-        baseCommandArgsWithUnknownOptions.getUnknownOptions());
+      jobConfiguration,
+      baseCommandArgs);
     LOG.info("Engine {}'s command: {}.", baseCommandArgs.getEngineName(), procBuilder.command());
     return procBuilder;
   }
 
-  private static int startProcessBuilder(ProcessBuilder procBuilder, BaseCommandArgs runCommandArgs) throws IOException, InterruptedException {
+  private int startProcessBuilder(ProcessBuilder procBuilder,
+                                  BaseCommandArgs baseCommandArgs) throws IOException, InterruptedException {
     procBuilder
-        .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-        .redirectError(ProcessBuilder.Redirect.INHERIT);
+      .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+      .redirectError(ProcessBuilder.Redirect.INHERIT);
 
     Thread hook = new Thread(() -> {
       synchronized (LOCK) {
@@ -134,7 +159,7 @@ public class Entry {
     });
 
     Runtime.getRuntime().addShutdownHook(hook);
-    int i = internalRunProcess(procBuilder, runCommandArgs);
+    int i = internalRunProcess(procBuilder, baseCommandArgs);
     Runtime.getRuntime().removeShutdownHook(hook);
     return i;
   }
@@ -145,10 +170,6 @@ public class Entry {
       running = true;
       process = procBuilder.start();
     }
-
-    if (!runCommandArgs.isDetach()) {
-      return process.waitFor();
-    }
-    return ERROR_EXIT_CODE;
+    return process.waitFor();
   }
 }

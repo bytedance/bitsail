@@ -23,24 +23,32 @@ import com.bytedance.bitsail.client.api.command.CommandArgsParser;
 import com.bytedance.bitsail.client.api.engine.EngineRunner;
 import com.bytedance.bitsail.client.api.utils.PackageResolver;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.configuration.BitSailSystemConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
 import com.bytedance.bitsail.entry.flink.configuration.FlinkRunnerConfigOptions;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory;
 import com.bytedance.bitsail.entry.flink.savepoint.FlinkRunnerSavepointLoader;
+import com.bytedance.bitsail.entry.flink.security.FlinkSecurityHandler;
+import com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver;
 
 import com.google.common.collect.Lists;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created 2022/8/5
@@ -52,56 +60,80 @@ public class FlinkEngineRunner implements EngineRunner {
 
   private DeploymentSupplierFactory deploymentSupplierFactory;
 
-  public FlinkEngineRunner() {
-    deploymentSupplierFactory = new DeploymentSupplierFactory();
+  private BitSailConfiguration sysConfiguration;
+
+  private Path flinkDir;
+
+  @Override
+  public void initializeEngine(BitSailConfiguration sysConfiguration) {
+    this.deploymentSupplierFactory = new DeploymentSupplierFactory();
+    this.sysConfiguration = sysConfiguration;
+    this.flinkDir = Paths.get(sysConfiguration.getNecessaryOption(FlinkRunnerConfigOptions.FLINK_HOME, CommonErrorCode.CONFIG_ERROR));
+    LOG.info("Find flink dir = {} in System configuration.", flinkDir);
+    if (!Files.exists(flinkDir)) {
+      LOG.error("Flink dir = {} not exists in fact, plz check the system configuration.", flinkDir);
+      throw new IllegalArgumentException(String.format("Flink dir %s not exists.", flinkDir));
+    }
   }
 
   @Override
-  public ProcessBuilder getProcBuilder(BitSailConfiguration jobConfiguration, BaseCommandArgs baseCommandArgs, String[] args) {
+  @SneakyThrows
+  public void loadLibrary(URLClassLoader classLoader) {
+    Path flinkLibDir = FlinkPackageResolver.getFlinkLibDir(flinkDir);
+    LOG.info("Load flink library from path: {}.", flinkLibDir);
+
+    try (Stream<Path> libraries = Files.list(flinkLibDir)) {
+      List<Path> flinkRuntimeLibraries = libraries
+        .filter(library -> StringUtils.startsWith(library.getFileName().toString(), FlinkPackageResolver.FLINK_LIB_DIST_JAR_NAME))
+        .collect(Collectors.toList());
+      Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+      method.setAccessible(true);
+      for (Path runtimeLibrary : flinkRuntimeLibraries) {
+        method.invoke(classLoader, runtimeLibrary.toFile().toURL());
+        LOG.info("Load flink runtime library {} to classpath.", runtimeLibrary);
+      }
+    }
+  }
+
+  @Override
+  public ProcessBuilder getProcBuilder(BitSailConfiguration jobConfiguration,
+                                       BaseCommandArgs baseCommandArgs) throws IOException {
     String argsMainAction = baseCommandArgs.getMainAction();
 
     switch (argsMainAction) {
       case CommandAction.RUN_COMMAND:
-        return getRunProcBuilder(jobConfiguration, baseCommandArgs, args);
+        return getRunProcBuilder(jobConfiguration, baseCommandArgs);
       default:
         throw new UnsupportedOperationException(String.format("Main action %s not support in flink engine.", argsMainAction));
     }
   }
 
-  ProcessBuilder getRunProcBuilder(BitSailConfiguration jobConfiguration, BaseCommandArgs baseCommandArgs, String[] args) {
+  ProcessBuilder getRunProcBuilder(BitSailConfiguration jobConfiguration,
+                                   BaseCommandArgs baseCommandArgs) throws IOException {
     FlinkRunCommandArgs flinkCommandArgs = new FlinkRunCommandArgs();
-    String[] unknownArgs = CommandArgsParser.parseArguments(args, flinkCommandArgs);
+    CommandArgsParser.parseArguments(baseCommandArgs.getUnknownOptions(), flinkCommandArgs);
 
-    BitSailConfiguration sysConfiguration = BitSailSystemConfiguration.loadSysConfiguration();
     DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(flinkCommandArgs,
-        jobConfiguration);
+      jobConfiguration);
 
     ProcessBuilder flinkProcBuilder = new ProcessBuilder();
     List<String> flinkCommands = Lists.newArrayList();
 
-    String flinkDir = sysConfiguration.getNecessaryOption(FlinkRunnerConfigOptions.FLINK_HOME, CommonErrorCode.CONFIG_ERROR);
-    LOG.info("Find flink dir = {} in System configuration.", flinkDir);
-    if (!Files.exists(Paths.get(flinkDir))) {
-      LOG.error("Flink dir = {} not exists in fact, plz check the system configuration.", flinkDir);
-      throw new IllegalArgumentException(String.format("Flink dir %s not exists.", flinkDir));
-    }
     flinkCommands.add(flinkDir + "/bin/flink");
     flinkCommands.add(flinkCommandArgs.getExecutionMode());
     deploymentSupplier.addDeploymentCommands(baseCommandArgs, flinkCommands);
 
     FlinkRunnerSavepointLoader.loadSavepointPath(sysConfiguration,
-        jobConfiguration,
-        baseCommandArgs,
-        flinkCommandArgs,
-        flinkCommands);
+      jobConfiguration,
+      baseCommandArgs,
+      flinkCommandArgs,
+      flinkCommands);
 
-    flinkCommands.add("-D");
-    flinkCommands.add("execution.attached=" + !baseCommandArgs.isDetach());
     if (!baseCommandArgs.isDetach()) {
       flinkCommands.add("-sae");
+    } else {
+      flinkCommands.add("--detached");
     }
-
-    flinkCommands.addAll(Arrays.asList(unknownArgs));
 
     if (sysConfiguration.fieldExists(FlinkRunnerConfigOptions.FLINK_DEFAULT_PROPERTIES)) {
       for (Map.Entry<String, String> property : sysConfiguration.getFlattenMap(FlinkRunnerConfigOptions.FLINK_DEFAULT_PROPERTIES.key()).entrySet()) {
@@ -122,6 +154,8 @@ public class FlinkEngineRunner implements EngineRunner {
     flinkCommands.add(baseCommandArgs.getJobConf());
 
     flinkProcBuilder.command(flinkCommands);
+
+    FlinkSecurityHandler.processSecurity(sysConfiguration, flinkProcBuilder, flinkDir);
     return flinkProcBuilder;
   }
 
@@ -129,4 +163,5 @@ public class FlinkEngineRunner implements EngineRunner {
   public String engineName() {
     return "flink";
   }
+
 }
