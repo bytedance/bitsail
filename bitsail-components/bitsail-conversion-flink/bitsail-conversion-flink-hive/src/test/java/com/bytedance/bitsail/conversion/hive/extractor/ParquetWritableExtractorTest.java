@@ -24,6 +24,7 @@ import com.bytedance.bitsail.common.column.DateColumn;
 import com.bytedance.bitsail.common.column.MapColumn;
 import com.bytedance.bitsail.common.column.StringColumn;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.conversion.hive.ConvertToHiveObjectOptions;
 
 import com.bytedance.bitsail.shaded.hive.client.HiveMetaClientUtil;
@@ -38,6 +39,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.time.ZoneOffset;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -47,7 +50,10 @@ public class ParquetWritableExtractorTest {
 
   @Before
   public void initEnv() {
-    ColumnCast.initColumnCast(BitSailConfiguration.newDefault());
+    BitSailConfiguration bitSailConfiguration = BitSailConfiguration.newDefault();
+    bitSailConfiguration.set(CommonOptions.DateFormatOptions.TIME_ZONE,
+        ZoneOffset.ofHours(8).getId());
+    ColumnCast.initColumnCast(bitSailConfiguration);
   }
 
   @Test
