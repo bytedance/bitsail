@@ -36,4 +36,4 @@ jobs:
         env:
           MAVEN_PROFILE: ${{ matrix.mvnProfile }}
         run:
-          mvn clean package -am -Dmaven.test.skip=true -U -P"$MAVEN_PROFILE"
+          mvn clean package -pl bitsail-dist -am -U -P"$MAVEN_PROFILE"
