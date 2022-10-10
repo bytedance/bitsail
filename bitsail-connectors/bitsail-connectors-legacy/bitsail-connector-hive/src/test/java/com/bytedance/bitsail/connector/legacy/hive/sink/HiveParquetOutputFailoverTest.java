@@ -45,9 +45,7 @@ import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -77,9 +75,6 @@ import static org.mockito.ArgumentMatchers.any;
 public class HiveParquetOutputFailoverTest {
   static final BitSailConfiguration DEFAULT_CONF;
 
-  @Rule
-  public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-
   static {
     try {
       DEFAULT_CONF =
@@ -102,10 +97,12 @@ public class HiveParquetOutputFailoverTest {
     if (!testDir.exists()) {
       testDir.mkdirs();
     }
-    environmentVariables.set("HADOOP_HOME", "/tmp");
-    environmentVariables.set("HADOOP_USER_NAME", "root");
 
-    System.setProperty("HADOOP_HOME", "/tmp");
+    String hadoopHome = Paths.get(HiveParquetOutputFailoverTest.class
+        .getClassLoader().getResource("hadoop").toURI()).toString();
+
+    System.setProperty("HADOOP_HOME", hadoopHome);
+    System.setProperty("hadoop.home.dir", hadoopHome);
     System.setProperty("HADOOP_USER_NAME", "root");
     PowerMockito.mockStatic(HiveMetaClientUtil.class);
     PowerMockito.mockStatic(ColumnMappingUtil.class);
