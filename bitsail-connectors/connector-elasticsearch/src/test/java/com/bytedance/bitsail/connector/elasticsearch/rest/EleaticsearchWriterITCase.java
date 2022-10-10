@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class EsRestClientTest {
+public class EleaticsearchWriterITCase {
 
   private final String docString = "{\n" +
       "    \"date\":\"20220810\",\n" +

@@ -28,6 +28,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -42,7 +44,7 @@ public class PackageManagerTest {
   private ExecutionEnviron mockedEnv;
 
   @Before
-  public void init() {
+  public void init() throws URISyntaxException {
     jobConf = BitSailConfiguration.newDefault();
     jobConf.set(CommonOptions.DRY_RUN, false);
     jobConf.set(CommonOptions.PRINT_LOADED_URLS, false);
@@ -52,7 +54,7 @@ public class PackageManagerTest {
     jobConf.set(CommonOptions.STATIC_LIB_DIR, "plugin");
     jobConf.set(CommonOptions.STATIC_LIB_CONF_FILE, "static_lib.json");
     jobConf.set(CommonOptions.JOB_PLUGIN_ROOT_PATH,
-        Objects.requireNonNull(PackageManager.class.getResource("/classloader/")).toString());
+        Objects.requireNonNull(Paths.get(PackageManager.class.getResource("/classloader/").toURI()).toString()));
 
     mockedEnv = Mockito.mock(ExecutionEnviron.class);
     Mockito.doNothing().when(mockedEnv).registerLibraries(Mockito.anyList());

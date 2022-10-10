@@ -52,11 +52,11 @@ public class FlinkEngineRunnerTest {
 
   @Before
   public void before() throws URISyntaxException, IOException {
-    variables.set("BITSAIL_CONF_DIR", FlinkEngineRunnerTest.class.getClassLoader().getResource("").toURI().getPath());
+    variables.set("BITSAIL_CONF_DIR", Paths.get(FlinkEngineRunnerTest.class.getClassLoader().getResource("").toURI()).toString());
 
     baseCommandArgs = new BaseCommandArgs();
     baseCommandArgs.setMainAction("run");
-    baseCommandArgs.setJobConf(FlinkEngineRunnerTest.class.getClassLoader().getResource("examples/Fake_Print_Example.json").toURI().getPath());
+    baseCommandArgs.setJobConf(Paths.get(FlinkEngineRunnerTest.class.getClassLoader().getResource("examples/Fake_Print_Example.json").toURI()).toString());
     HashMap<String, String> properties = Maps.newHashMap();
     properties.put("blob.fetch.num-concurrent", "32");
     baseCommandArgs.setProperties(properties);

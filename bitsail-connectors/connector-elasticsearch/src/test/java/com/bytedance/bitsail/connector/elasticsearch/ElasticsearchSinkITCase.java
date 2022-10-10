@@ -37,7 +37,7 @@ import org.junit.Test;
 
 import java.util.Collections;
 
-public class ElasticsearchWriterTest {
+public class ElasticsearchSinkITCase {
 
   private final int totalCount = 300;
   private final String index = "es_index_test";

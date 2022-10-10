@@ -21,6 +21,8 @@ package com.bytedance.bitsail.core;
 
 import org.junit.Test;
 
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.Base64;
 
 import static org.junit.Assert.assertFalse;
@@ -41,8 +43,8 @@ public class EngineTest {
   }
 
   @Test
-  public void testConfPathToConfig() {
-    String confPath = this.getClass().getResource("/conf.json").getPath();
+  public void testConfPathToConfig() throws URISyntaxException {
+    String confPath = Paths.get(this.getClass().getResource("/conf.json").toURI()).toString();
     Engine engine = new Engine(
         new String[] {
             "-xjob_conf", confPath

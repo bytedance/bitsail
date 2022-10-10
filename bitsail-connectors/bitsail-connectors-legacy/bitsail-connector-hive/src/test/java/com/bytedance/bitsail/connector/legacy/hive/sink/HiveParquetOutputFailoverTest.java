@@ -98,7 +98,11 @@ public class HiveParquetOutputFailoverTest {
       testDir.mkdirs();
     }
 
-    System.setProperty("HADOOP_HOME", "/tmp");
+    String hadoopHome = Paths.get(HiveParquetOutputFailoverTest.class
+        .getClassLoader().getResource("hadoop").toURI()).toString();
+
+    System.setProperty("HADOOP_HOME", hadoopHome);
+    System.setProperty("hadoop.home.dir", hadoopHome);
     System.setProperty("HADOOP_USER_NAME", "root");
     PowerMockito.mockStatic(HiveMetaClientUtil.class);
     PowerMockito.mockStatic(ColumnMappingUtil.class);

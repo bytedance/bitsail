@@ -41,8 +41,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created 2022/8/31
  */
-public class KafkaSourceFunctionDAGBuilderTest {
-  private static final Logger LOG = LoggerFactory.getLogger(KafkaSourceFunctionDAGBuilderTest.class);
+public class KafkaSourceITCase {
+  private static final Logger LOG = LoggerFactory.getLogger(KafkaSourceITCase.class);
   private static final int TOTAL_SEND_COUNT = 300;
   private final String topicName = "testTopic";
   private final KafkaCluster kafkaCluster = new KafkaCluster();

@@ -21,8 +21,11 @@ import com.bytedance.bitsail.common.column.ColumnCast;
 import com.bytedance.bitsail.common.column.DateColumn;
 import com.bytedance.bitsail.common.column.StringColumn;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 
 import org.junit.Test;
+
+import java.time.ZoneOffset;
 
 import static org.junit.Assert.assertEquals;
 
@@ -34,10 +37,13 @@ public class StringToDateTest {
 
   @Test
   public void testStringToDate2() {
+    BitSailConfiguration bitSailConfiguration = BitSailConfiguration.newDefault();
+    bitSailConfiguration.set(CommonOptions.DateFormatOptions.TIME_ZONE, ZoneOffset.ofHours(8).getId());
+    ColumnCast.initColumnCast(bitSailConfiguration);
+
     String timeStr = "20190401";
     String retStr = "2019-04-01 00:00:00";
     StringColumn strColumn = new StringColumn(timeStr);
-    ColumnCast.initColumnCast(BitSailConfiguration.newDefault());
 
     DateColumn dateColumn = null;
     try {

@@ -350,6 +350,14 @@
                     <artifactId>commons-net</artifactId>
                     <groupId>commons-net</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>avatica</artifactId>
+                    <groupId>org.apache.calcite.avatica</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>calcite-druid</artifactId>
+                    <groupId>org.apache.calcite</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 

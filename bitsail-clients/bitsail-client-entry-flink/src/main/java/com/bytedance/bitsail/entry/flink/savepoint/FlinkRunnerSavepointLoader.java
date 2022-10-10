@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -149,7 +150,7 @@ public class FlinkRunnerSavepointLoader {
         if (fileSystem.exists(new org.apache.hadoop.fs.Path(checkpointDir.toString(), CHECKPOINT_METADATA_NAME))) {
           if (checkpointId > maxCheckpointId) {
             maxCheckpointId = checkpointId;
-            latestCheckpointPath = checkpointDir.toString();
+            latestCheckpointPath = Paths.get(checkpointDir.toUri()).toString();
           }
         }
       }

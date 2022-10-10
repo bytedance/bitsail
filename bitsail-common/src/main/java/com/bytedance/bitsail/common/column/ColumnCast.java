@@ -25,19 +25,25 @@ import com.bytedance.bitsail.common.option.CommonOptions;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.List;
 
 public final class ColumnCast {
+
   private static final Logger LOG = LoggerFactory.getLogger(ColumnCast.class);
 
   private static String dateTimePattern;
@@ -50,7 +56,7 @@ public final class ColumnCast {
   private static DateTimeFormatter dateFormatter;
   private static DateTimeFormatter timeFormatter;
   private static List<DateTimeFormatter> formatters;
-  private static DateTimeZone dateTimeZone;
+  private static ZoneId dateTimeZone;
   private static volatile boolean enabled = false;
 
   public static void initColumnCast(BitSailConfiguration commonConfiguration) {
@@ -62,7 +68,7 @@ public final class ColumnCast {
     } else {
       zoneIdContent = commonConfiguration.get(CommonOptions.DateFormatOptions.TIME_ZONE);
     }
-    dateTimeZone = DateTimeZone.forID(zoneIdContent);
+    dateTimeZone = ZoneId.of(zoneIdContent);
     dateTimePattern = commonConfiguration.get(CommonOptions.DateFormatOptions
         .DATE_TIME_PATTERN);
     datePattern = commonConfiguration.get(CommonOptions.DateFormatOptions
@@ -72,10 +78,11 @@ public final class ColumnCast {
     encoding = commonConfiguration.get(CommonOptions.DateFormatOptions.COLUMN_ENCODING);
 
     formatters = Lists.newArrayList();
-    dateTimeFormatter = DateTimeFormat.forPattern(dateTimePattern);
-    dateFormatter = DateTimeFormat.forPattern(datePattern);
-    timeFormatter = DateTimeFormat.forPattern(timePattern);
-    commonConfiguration.get(CommonOptions.DateFormatOptions.EXTRA_FORMATS).forEach(pattern -> formatters.add(DateTimeFormat.forPattern(pattern)));
+    dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimePattern);
+    dateFormatter = DateTimeFormatter.ofPattern(datePattern);
+    timeFormatter = DateTimeFormatter.ofPattern(timePattern);
+    commonConfiguration.get(CommonOptions.DateFormatOptions.EXTRA_FORMATS)
+        .forEach(pattern -> formatters.add(DateTimeFormatter.ofPattern(pattern)));
     formatters.add(dateTimeFormatter);
     formatters.add(dateFormatter);
     enabled = true;
@@ -90,9 +97,19 @@ public final class ColumnCast {
 
     for (DateTimeFormatter formatter : formatters) {
       try {
-        return formatter.parseDateTime(dateStr)
-            .withZone(DateTimeZone.forID(zoneIdContent))
-            .toDate();
+        TemporalAccessor parse = formatter.parse(dateStr);
+        LocalDateTime localDateTime = null;
+        LocalDate localDate = LocalDate.from(parse);
+        if (parse.isSupported(ChronoField.HOUR_OF_DAY)
+            || parse.isSupported(ChronoField.HOUR_OF_DAY)
+            || parse.isSupported(ChronoField.MINUTE_OF_HOUR)
+            || parse.isSupported(ChronoField.SECOND_OF_MINUTE)
+            || parse.isSupported(ChronoField.MICRO_OF_SECOND)) {
+          localDateTime = LocalDateTime.of(localDate, LocalTime.from(parse));
+        } else {
+          localDateTime = localDate.atStartOfDay();
+        }
+        return Date.from(localDateTime.atZone(dateTimeZone).toInstant());
       } catch (Exception e) {
         LOG.debug("Formatter = {} parse string {} failed.", formatter, dateStr, e);
         //ignore
@@ -107,16 +124,16 @@ public final class ColumnCast {
       return null;
     }
     Date date = column.asDate();
-    DateTime dateTime = new DateTime(date.toInstant().toEpochMilli())
-        .withZone(dateTimeZone);
+    OffsetDateTime offsetDateTime = Instant.ofEpochMilli(date.toInstant().toEpochMilli())
+        .atZone(dateTimeZone).toOffsetDateTime();
 
     switch (column.getSubType()) {
       case DATE:
-        return dateTime.toString(dateFormatter);
+        return dateFormatter.format(offsetDateTime);
       case TIME:
-        return dateTime.toString(timeFormatter);
+        return timeFormatter.format(offsetDateTime);
       case DATETIME:
-        return dateTime.toString(dateTimeFormatter);
+        return dateTimeFormatter.format(offsetDateTime);
       default:
         throw BitSailException
             .asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT, "");
@@ -131,6 +148,10 @@ public final class ColumnCast {
 
     return new String(column.asBytes(), encoding);
 
+  }
+
+  public static void refresh() {
+    enabled = false;
   }
 
   private static void checkState() {

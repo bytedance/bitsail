@@ -31,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -54,9 +53,7 @@ public class PluginManager {
   private static final String PLUGIN_CLASS_KEY = "class";
   private static final String PLUGIN_CLASS_NAME_LIST_KEY = "classes";
   private static final String PLUGIN_LIB_KEY = "libs";
-  private static final String SEPARATOR = File.separator;
-  private static final String FALL_BACK_JAR_NAME = "bitsail-streaming";
-  private final String directory;
+  private final Path directory;
   /**
    * Mapping for the plugin's name and plugin's uri.
    */
@@ -66,20 +63,22 @@ public class PluginManager {
   private final Map<String, Plugin> className2Plugin = new HashMap<>();
   private final Map<String, Plugin> pluginName2Plugin = new HashMap<>();
   private final boolean dryRun;
-  private final String pluginLibDir;
-  private final String pluginConfDir;
-  private final boolean canFallback;
+  private final Path pluginLibDir;
+  private final Path pluginConfDir;
 
   @Builder
-  PluginManager(String path, boolean dryRun, boolean dynamicLoad, String pluginLibDir, String pluginConfDir) {
-    log.debug("Starting to load BitSail plugin jar dynamically, current classloader is: [{}], thread context classloader is: [{}]",
+  PluginManager(Path path, boolean dryRun, boolean dynamicLoad, String pluginLibDir, String pluginConfDir) {
+    log.debug("Plugin manager initializing, plugin manager's class loader = {}, thread context class loader = {}",
         getClass().getClassLoader(), Thread.currentThread().getContextClassLoader());
-    directory = path.substring(0, path.lastIndexOf(SEPARATOR) + 1);
-    log.info("User jar directory is {}", directory);
+    if (Files.isRegularFile(path)) {
+      directory = path.getParent();
+    } else {
+      directory = path;
+    }
+    log.info("Plugin manager root plugin dir = {}.", directory);
     this.dryRun = dryRun;
-    canFallback = false;
-    this.pluginLibDir = pluginLibDir;
-    this.pluginConfDir = pluginConfDir;
+    this.pluginLibDir = Paths.get(pluginLibDir);
+    this.pluginConfDir = Paths.get(pluginConfDir);
 
     if (dynamicLoad) {
       this.loadPluginsFromConf();
@@ -107,8 +106,7 @@ public class PluginManager {
 
   @SneakyThrows
   private Stream<Path> getConfFiles() {
-    URL url = new URL(directory + pluginConfDir);
-    Path pluginConfPath = Paths.get(url.toURI());
+    Path pluginConfPath = directory.resolve(pluginConfDir);
     if (!Files.exists(pluginConfPath)) {
       log.warn("Cannot find plugins directory!");
       return Collections.EMPTY_LIST.stream();
@@ -167,23 +165,17 @@ public class PluginManager {
       if (dryRun) {
         return new ArrayList<>();
       } else {
-        if (canFallback) {
-          log.info("Get config plugin lib fail, we will fallback to {}.", FALL_BACK_JAR_NAME);
-          libs = pluginName2Plugin.get(FALL_BACK_JAR_NAME).getLibs();
-        } else {
-          throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
-              String.format("The config plugin name %s is not found!", name));
-        }
+        throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
+            String.format("The config plugin name %s is not found!", name));
       }
     }
     List<URL> ret = new ArrayList<>(libs.size());
     for (String lib : libs) {
-      URL url = new URL(directory + pluginLibDir + SEPARATOR + lib);
-      Path myPath = Paths.get(url.toURI());
-      if (!Files.exists(myPath)) {
-        throw new RuntimeException("Cannot find library: " + url);
+      Path resolve = directory.resolve(pluginLibDir).resolve(lib);
+      if (!Files.exists(resolve)) {
+        throw new RuntimeException("Cannot find library: " + resolve);
       }
-      ret.add(url);
+      ret.add(resolve.toFile().toURL());
     }
     log.info("Dynamic lib is " + JSONObject.toJSONString(ret));
     return ret;

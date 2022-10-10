@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * Created 2022/7/26
  */
-public class KafkaOutputFormatTest {
+public class KafkaSinkITCase {
   private static final int TOTAL_SEND_COUNT = 300;
   private final String topicName = "testTopic";
 

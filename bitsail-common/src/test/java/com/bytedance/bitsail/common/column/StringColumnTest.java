@@ -17,15 +17,31 @@
 
 package com.bytedance.bitsail.common.column;
 
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
+
+import org.junit.Before;
 import org.junit.Test;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 
 public class StringColumnTest {
+
+  private String timeZone;
+
+  @Before
+  public void before() {
+    timeZone = ZoneOffset.ofHours(0).getId();
+    BitSailConfiguration bitSailConfiguration = BitSailConfiguration.newDefault();
+    bitSailConfiguration.set(CommonOptions.DateFormatOptions.TIME_ZONE, timeZone);
+    ColumnCast.refresh();
+    ColumnCast.initColumnCast(bitSailConfiguration);
+  }
 
   @Test
   public void asDate() {
@@ -33,10 +49,11 @@ public class StringColumnTest {
     StringColumn strColumn = new StringColumn(timeStr);
     Date dateTime = strColumn.asDate();
 
-    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    String dateStr = dateFormat.format(dateTime);
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    String dateStr = formatter.format(dateTime
+        .toInstant()
+        .atZone(ZoneId.of(timeZone)).toOffsetDateTime());
     assertEquals(dateStr, timeStr);
-
   }
 
   @Test

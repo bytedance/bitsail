@@ -38,11 +38,14 @@
     <properties>
         <!--    maven properties    -->
         <maven.deploy.skip>false</maven.deploy.skip>
+        <skipITCase>true</skipITCase>
+        <skipUT>false</skipUT>
         <maven.complie.plugin.version>3.10.1</maven.complie.plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
         <maven.source.plugin.version>3.1.0</maven.source.plugin.version>
         <maven.shade.plugin.version>3.2.4</maven.shade.plugin.version>
         <maven.checkstyle.plugin.version>3.1.2</maven.checkstyle.plugin.version>
+        <maven.failsafe.plugin.version>2.22.2</maven.failsafe.plugin.version>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.source.encoding>UTF-8</project.source.encoding>
         <project.build.source.encoding>UTF-8</project.build.source.encoding>
@@ -160,18 +163,21 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
                 <version>${logback.classic.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${logback.classic.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-access</artifactId>
                 <version>${logback.access.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -993,6 +999,27 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.classic.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.classic.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-access</artifactId>
+            <version>${logback.access.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -1111,6 +1138,30 @@
                         <version>${maven.surefire.plugin.version}</version>
                     </dependency>
                 </dependencies>
+                <configuration>
+                    <skipTests>${skipUT}</skipTests>
+                    <excludes>
+                        <exclude>**/*ITCase.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven.failsafe.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>integration-tests</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <skipTests>${skipITCase}</skipTests>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
