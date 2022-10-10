@@ -39,10 +39,10 @@ public class PackageResolverTest {
         .getLocation().toURI()).getParent().getParent().resolve("./libs").toString();
     assertEquals(libraryDir, expectLibDir);
 
-    String bitSailHome = "/test/";
+    String bitSailHome = Paths.get("/test/").toString();
     PowerMockito.mockStatic(System.class);
     PowerMockito.when(System.getenv(PackageResolver.BITSAIL_HOME_KEY)).thenReturn(bitSailHome);
     libraryDir = PackageResolver.getLibraryDir().toString();
-    assertEquals(libraryDir, bitSailHome + "./libs");
+    assertEquals(libraryDir, Paths.get(bitSailHome).resolve("./libs").toString());
   }
 }

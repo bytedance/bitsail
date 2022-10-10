@@ -39,13 +39,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
-
-import static org.junit.Assert.assertEquals;
 
 public class BytesParserTest {
 
@@ -53,9 +50,10 @@ public class BytesParserTest {
 
   @Before
   public void init() {
-    timeZone = ZoneOffset.ofHours(8).getId();
+    timeZone = ZoneOffset.ofHours(0).getId();
     BitSailConfiguration bitSailConfiguration = BitSailConfiguration.newDefault();
     bitSailConfiguration.set(CommonOptions.DateFormatOptions.TIME_ZONE, timeZone);
+    ColumnCast.refresh();
     ColumnCast.initColumnCast(bitSailConfiguration);
   }
 
@@ -64,11 +62,6 @@ public class BytesParserTest {
     final TestBytesParser parser = new TestBytesParser();
     final LongColumn column = (LongColumn) parser.createBasicColumn(PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO, "-1.0");
     Assert.assertEquals(-1L, (long) column.asLong());
-
-    LocalDateTime localDateTime = LocalDateTime.of(2022, 5, 10, 14, 0, 20);
-    LongColumn timestampColumn =
-        (LongColumn) parser.createBasicColumn(PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO, localDateTime.toEpochSecond(ZoneOffset.of(timeZone)));
-    assertEquals(1652162420L, (long) timestampColumn.asLong());
   }
 
   @Test
@@ -151,13 +144,9 @@ public class BytesParserTest {
     final TestBytesParser parser = new TestBytesParser();
 
     String str = "2018-10-28 02:02:10";
-    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-    Date date = new Date();
-    try {
-      date = ft.parse(str);
-    } catch (ParseException e) {
-      ;
-    }
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    ZonedDateTime zonedDateTime = ZonedDateTime.parse(str, formatter.withZone(ZoneOffset.of(timeZone)));
+    Date date = Date.from(zonedDateTime.toInstant());
 
     TypeInformation typeInformation = PrimitiveColumnTypeInfo.DATE_COLUMN_TYPE_INFO;
     DateColumn strColumn = (DateColumn) (parser.createBasicColumn(typeInformation, str));

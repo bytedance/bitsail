@@ -22,7 +22,9 @@ import com.bytedance.bitsail.common.BitSailException;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -32,9 +34,9 @@ public class PluginManagerTest {
   PluginManager pluginManager;
 
   @Before
-  public void init() {
-    String confPathRoot = PluginManagerTest.class.getResource("/classloader/").toString();
-    pluginManager = new PluginManager(confPathRoot, false, true, "plugin", "plugin_conf");
+  public void init() throws URISyntaxException {
+    String confPathRoot = Paths.get(PluginManagerTest.class.getResource("/classloader/").toURI()).toString();
+    pluginManager = new PluginManager(Paths.get(confPathRoot), false, true, "plugin", "plugin_conf");
   }
 
   @Test

@@ -28,6 +28,7 @@ import com.bytedance.bitsail.entry.flink.engine.FlinkEngineRunnerTest;
 
 import com.beust.jcommander.internal.Lists;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -57,9 +58,13 @@ public class FlinkRunnerSavepointLoaderTest {
 
   @Before
   public void before() throws URISyntaxException, IOException {
-    variables.set("BITSAIL_CONF_DIR", FlinkEngineRunnerTest.class.getClassLoader().getResource("").toURI().getPath());
-
-    String path = FlinkEngineRunnerTest.class.getClassLoader().getResource("examples/Fake_Print_Example.json").toURI().getPath();
+    variables.set("BITSAIL_CONF_DIR", Paths.get(FlinkEngineRunnerTest.class.getClassLoader().getResource("").toURI()).toString());
+    if (SystemUtils.IS_OS_WINDOWS) {
+      String dll = Paths.get(FlinkEngineRunnerTest.class.getClassLoader().getResource("hadoop/bin/hadoop.dll")
+          .toURI()).toString();
+      System.load(dll);
+    }
+    String path = Paths.get(FlinkEngineRunnerTest.class.getClassLoader().getResource("examples/Fake_Print_Example.json").toURI()).toString();
     jobConfiguration = ConfigParser.fromRawConfPath(path);
     jobConfiguration.set(CommonOptions.JOB_TYPE, "streaming");
     String jobName = jobConfiguration.get(CommonOptions.JOB_NAME);

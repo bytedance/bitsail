@@ -18,7 +18,9 @@
 package com.bytedance.bitsail.base.packages;
 
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.util.JsonSerializer;
 
@@ -36,6 +38,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,13 +67,21 @@ public class PackageManager {
     enableDynamicLoader = param.getEnableDynamicLoader();
     printClassLoaderUrls = param.getPrintClassLoaderUrls();
 
-    String path = StringUtils.isNotEmpty(param.getRootPath()) ? param.getRootPath() :
-        this.getClass().getProtectionDomain().getCodeSource().getLocation().toString();
+    String path;
+    if (StringUtils.isNotEmpty(param.getRootPath())) {
+      path = param.getRootPath();
+    } else {
+      try {
+        path = Paths.get(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).toString();
+      } catch (Exception e) {
+        throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR, e);
+      }
+    }
 
     pluginManager = PluginManager.builder()
         .dynamicLoad(param.enableDynamicLoader)
         .dryRun(param.getDryRun())
-        .path(path)
+        .path(Paths.get(path))
         .pluginLibDir(param.getPluginLibDir())
         .pluginConfDir(param.getPluginConfDir())
         .build();
