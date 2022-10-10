@@ -40,8 +40,8 @@ import java.util.stream.Stream;
 /**
  * Created 2022/7/26
  */
-public class JDBCOutputFormatTest {
-  private static final Logger LOG = LoggerFactory.getLogger(JDBCOutputFormatTest.class);
+public class JdbcSinkITCase {
+  private static final Logger LOG = LoggerFactory.getLogger(JdbcSinkITCase.class);
 
   private static final String MYSQL_DOCKER_IMAGER = "mysql:8.0.29";
 
