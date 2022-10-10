@@ -50,24 +50,24 @@ jobs:
           mvn clean verify -pl bitsail-dist -am -U -DskipUT=false -DskipITCase=true
 
     # This workflow contains a single job called "integration-tests"
-    integration-tests:
-      name: Integration Test
-      # The type of runner that the job will run on
-      runs-on: ${{ matrix.os }}
-      strategy:
-        matrix:
-          os: [ ubuntu-latest]
-      # Steps represent a sequence of tasks that will be executed as part of the job
-      steps:
-        - run: git config --global core.longpaths true
-        - uses: actions/checkout@v3
-        - name: Set up JDK 8
-          uses: actions/setup-java@v3
-          with:
-            java-version: '8'
-            distribution: 'adopt'
-            architecture: x64
+  integration-tests:
+    name: Integration Test
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - run: git config --global core.longpaths true
+      - uses: actions/checkout@v3
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          architecture: x64
 
-        - name: Maven Verify Integration Test
-          run:
-            mvn clean verify -pl bitsail-dist -am -U -DskipUT=true -DskipITCase=false
+      - name: Maven Verify Integration Test
+        run:
+          mvn clean verify -pl bitsail-dist -am -U -DskipUT=true -DskipITCase=false
