@@ -57,9 +57,10 @@ public class FlinkRunnerSavepointLoaderTest {
 
   @Before
   public void before() throws URISyntaxException, IOException {
-    variables.set("BITSAIL_CONF_DIR", FlinkEngineRunnerTest.class.getClassLoader().getResource("").toURI().getPath());
+    variables.set("BITSAIL_CONF_DIR", Paths.get(FlinkEngineRunnerTest.class.getClassLoader().getResource("").toURI()).toString());
+    variables.set("HADOOP_HOME", Paths.get(FlinkEngineRunnerTest.class.getClassLoader().getResource("hadoop").toURI()).toString());
 
-    String path = FlinkEngineRunnerTest.class.getClassLoader().getResource("examples/Fake_Print_Example.json").toURI().getPath();
+    String path = Paths.get(FlinkEngineRunnerTest.class.getClassLoader().getResource("examples/Fake_Print_Example.json").toURI()).toString();
     jobConfiguration = ConfigParser.fromRawConfPath(path);
     jobConfiguration.set(CommonOptions.JOB_TYPE, "streaming");
     String jobName = jobConfiguration.get(CommonOptions.JOB_NAME);

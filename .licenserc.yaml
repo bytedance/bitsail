@@ -16,6 +16,7 @@ header:
     - '**/*.yaml'
     - '**/*.yaml'
     - '**/*.exe'
+    - '**/*.dll'
     - 'build.sh'
     - 'bitsail-connectors/bitsail-connectors-legacy/bitsail-connector-hudi/src/test/resources/'
     - 'bitsail-base/src/test/resources/'

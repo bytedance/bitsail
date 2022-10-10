@@ -345,6 +345,16 @@
             <artifactId>bitsail-conversion-flink-hive</artifactId>
             <version>${revision}</version>
             <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>avatica</artifactId>
+                    <groupId>org.apache.calcite.avatica</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>calcite-druid</artifactId>
+                    <groupId>org.apache.calcite</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!--   test     -->
