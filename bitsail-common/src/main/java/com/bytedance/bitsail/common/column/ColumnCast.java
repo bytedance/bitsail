@@ -150,6 +150,10 @@ public final class ColumnCast {
 
   }
 
+  public static void refresh() {
+    enabled = false;
+  }
+
   private static void checkState() {
     Preconditions.checkState(enabled, "Column cast in disabled from now.");
   }

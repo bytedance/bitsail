@@ -39,6 +39,7 @@ public class StringColumnTest {
     timeZone = ZoneOffset.ofHours(0).getId();
     BitSailConfiguration bitSailConfiguration = BitSailConfiguration.newDefault();
     bitSailConfiguration.set(CommonOptions.DateFormatOptions.TIME_ZONE, timeZone);
+    ColumnCast.refresh();
     ColumnCast.initColumnCast(bitSailConfiguration);
   }
 
