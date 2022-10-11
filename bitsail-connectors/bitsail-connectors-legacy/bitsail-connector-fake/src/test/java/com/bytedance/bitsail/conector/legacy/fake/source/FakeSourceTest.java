@@ -20,6 +20,7 @@
 package com.bytedance.bitsail.conector.legacy.fake.source;
 
 import com.bytedance.bitsail.connector.legacy.fake.source.FakeSource;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -58,7 +59,7 @@ public class FakeSourceTest {
     existValues.add("1234");
 
     long actualValue = FakeSource.constructRandomValue(existValues,
-      () -> (constructCount.getAndIncrement() == 0) ? 1234L : 5678);
+        () -> (constructCount.getAndIncrement() == 0) ? 1234L : 5678);
 
     Assert.assertEquals(5678, actualValue);
     Assert.assertTrue(existValues.contains("5678"));

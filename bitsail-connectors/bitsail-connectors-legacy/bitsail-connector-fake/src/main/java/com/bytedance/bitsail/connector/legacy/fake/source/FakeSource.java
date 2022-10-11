@@ -202,7 +202,7 @@ public class FakeSource extends InputFormatPlugin<Row, InputSplit> implements Re
     T value;
     do {
       value = constructor.get();
-    } while(ifNeedReconstruct(existValues, value));
+    } while (ifNeedReconstruct(existValues, value));
     return value;
   }
 
