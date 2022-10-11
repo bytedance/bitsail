@@ -99,6 +99,7 @@ public class ElasticsearchCluster implements AutoCloseable {
     RestClient client = builder.build();
 
     client.performRequest(new Request("POST", "/_flush"));
+    LOG.info("Flush all indices in cluster.");
   }
 
   private RestClientBuilder getRestClientBuilder() {
