@@ -39,6 +39,9 @@ import static com.bytedance.bitsail.connector.elasticsearch.base.EsConstants.ILL
 public class EsBulkListener implements BulkProcessor.Listener {
   private static final Logger LOGGER = LoggerFactory.getLogger(EsBulkListener.class);
 
+  private static final int FAILURE_RESPONSE_IDENTIFIER = 0;
+  private static final int SUCCESS_RESPONSE_IDENTIFIER = 1;
+
   private final EsBulkRequestFailureHandler failureHandler;
   private final AtomicReference<Throwable> failureThrowable;
   private final AtomicInteger pendingActions;
@@ -90,9 +93,9 @@ public class EsBulkListener implements BulkProcessor.Listener {
       RestStatus restStatus = response.getFailure().getStatus();
       int restStatusCode = Objects.isNull(restStatus) ? ILLEGAL_REST_STATUS_CODE : restStatus.getStatus();
       handleFailedRequest(actionRequest, failure, restStatusCode);
-      return 0;
+      return FAILURE_RESPONSE_IDENTIFIER;
     }
-    return 1;
+    return SUCCESS_RESPONSE_IDENTIFIER;
   }
 
   private void handleFailedRequest(DocWriteRequest<?> actionRequest, Throwable failure, int restStatusCode) throws Throwable {
