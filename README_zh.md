@@ -40,7 +40,7 @@
   <tr>
     <td>Hudi</td>
     <td>-</td>
-    <td>❎</td>
+    <td>✅</td>
     <td>✅</td>
   </tr>
   <tr>

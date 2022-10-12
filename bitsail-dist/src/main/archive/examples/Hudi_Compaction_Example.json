@@ -11,7 +11,7 @@
     },
     "reader":{
       "path":"/path/to/table",
-      "class":"com.bytedance.bitsail.connector.legacy.hudi.source.HudiCompactSourceDAGBuilder"
+      "class":"com.bytedance.bitsail.connector.legacy.hudi.dag.HudiCompactSourceDAGBuilder"
     },
     "writer":{
       "hoodie":{
@@ -25,7 +25,7 @@
           "path":"/path/to/table/test_read_schema.avsc"
         }
       },
-      "class":"com.bytedance.bitsail.connector.legacy.hudi.sink.HudiCompactSinkDAGBuilder"
+      "class":"com.bytedance.bitsail.connector.legacy.hudi.dag.HudiCompactSinkDAGBuilder"
     }
   }
 }
