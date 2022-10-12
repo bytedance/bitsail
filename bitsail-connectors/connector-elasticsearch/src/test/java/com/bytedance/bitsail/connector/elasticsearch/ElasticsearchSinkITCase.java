@@ -75,6 +75,7 @@ public class ElasticsearchSinkITCase {
 
     EmbeddedFlinkCluster.submitJob(jobConf);
 
+    esCluster.flush();
     CountResponse countResponse = client.count(countRequest, RequestOptions.DEFAULT);
     Assert.assertEquals(totalCount, countResponse.getCount());
   }
@@ -92,6 +93,7 @@ public class ElasticsearchSinkITCase {
 
     EmbeddedFlinkCluster.submitJob(jobConf);
 
+    esCluster.flush();
     CountResponse countResponse = client.count(countRequest, RequestOptions.DEFAULT);
     Assert.assertEquals(totalCount, countResponse.getCount());
   }

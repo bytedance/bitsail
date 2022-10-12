@@ -39,6 +39,9 @@ import static com.bytedance.bitsail.connector.elasticsearch.base.EsConstants.ILL
 public class EsBulkListener implements BulkProcessor.Listener {
   private static final Logger LOGGER = LoggerFactory.getLogger(EsBulkListener.class);
 
+  private static final int FAILURE_RESPONSE_IDENTIFIER = 0;
+  private static final int SUCCESS_RESPONSE_IDENTIFIER = 1;
+
   private final EsBulkRequestFailureHandler failureHandler;
   private final AtomicReference<Throwable> failureThrowable;
   private final AtomicInteger pendingActions;
@@ -51,15 +54,18 @@ public class EsBulkListener implements BulkProcessor.Listener {
   @Override
   public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
     if (response.hasFailures()) {
+      int successCount = 0;
       try {
         for (int i = 0; i < response.getItems().length; ++i) {
-          handleBulkItemResponse(response.getItems()[i], request.requests().get(i));
+          successCount += handleBulkItemResponse(response.getItems()[i], request.requests().get(i));
         }
       } catch (Throwable t) {
         failureThrowable.compareAndSet(null, t);
       }
+      pendingActions.getAndAdd(-successCount);
+    } else {
+      pendingActions.getAndAdd(-request.numberOfActions());
     }
-    pendingActions.getAndAdd(-request.numberOfActions());
   }
 
   @Override
@@ -74,13 +80,22 @@ public class EsBulkListener implements BulkProcessor.Listener {
     pendingActions.getAndAdd(-request.numberOfActions());
   }
 
-  private void handleBulkItemResponse(BulkItemResponse response, DocWriteRequest<?> actionRequest) throws Throwable {
+  /**
+   * Handle each response.
+   * @param response A response of a bulk requests.
+   * @param actionRequest The corresponding request.
+   * @return Returns 0 if it is a failure response. Otherwise 1.
+   * @throws Throwable Exceptions thrown when handling failure response.
+   */
+  private int handleBulkItemResponse(BulkItemResponse response, DocWriteRequest<?> actionRequest) throws Throwable {
     if (response.isFailed() && Objects.nonNull(response.getFailure().getCause())) {
       Throwable failure = response.getFailure().getCause();
       RestStatus restStatus = response.getFailure().getStatus();
       int restStatusCode = Objects.isNull(restStatus) ? ILLEGAL_REST_STATUS_CODE : restStatus.getStatus();
       handleFailedRequest(actionRequest, failure, restStatusCode);
+      return FAILURE_RESPONSE_IDENTIFIER;
     }
+    return SUCCESS_RESPONSE_IDENTIFIER;
   }
 
   private void handleFailedRequest(DocWriteRequest<?> actionRequest, Throwable failure, int restStatusCode) throws Throwable {
