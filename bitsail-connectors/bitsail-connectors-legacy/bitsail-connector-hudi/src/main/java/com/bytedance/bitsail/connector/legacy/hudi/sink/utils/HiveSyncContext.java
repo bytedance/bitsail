@@ -20,7 +20,7 @@ package com.bytedance.bitsail.connector.legacy.hudi.sink.utils;
 
 import com.bytedance.bitsail.connector.legacy.hudi.configuration.FlinkOptions;
 import com.bytedance.bitsail.connector.legacy.hudi.configuration.HadoopConfigurations;
-import com.bytedance.bitsail.connector.legacy.hudi.table.format.FilePathUtils;
+import com.bytedance.bitsail.connector.legacy.hudi.source.format.FilePathUtils;
 
 import org.apache.flink.annotation.VisibleForTesting;
 import org.apache.flink.configuration.Configuration;

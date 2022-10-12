@@ -38,7 +38,7 @@ import com.bytedance.bitsail.connector.legacy.hudi.sink.common.WriteOperatorFact
 import com.bytedance.bitsail.connector.legacy.hudi.sink.partitioner.BucketAssignFunction;
 import com.bytedance.bitsail.connector.legacy.hudi.sink.partitioner.BucketIndexPartitioner;
 import com.bytedance.bitsail.connector.legacy.hudi.sink.transform.RowDataToHoodieFunctions;
-import com.bytedance.bitsail.connector.legacy.hudi.table.format.FilePathUtils;
+import com.bytedance.bitsail.connector.legacy.hudi.source.format.FilePathUtils;
 
 import org.apache.flink.api.common.functions.Partitioner;
 import org.apache.flink.api.common.typeinfo.TypeInformation;

@@ -95,6 +95,25 @@ public class TestData {
           TimestampData.fromEpochMillis(8), StringData.fromString("par4"))
   );
 
+  public static List<RowData> DATA_SET_INSERT_SIMPLE = Arrays.asList(
+      insertRowSimple(StringData.fromString("id1"), StringData.fromString("Danny"), 23,
+          1L, StringData.fromString("par1")),
+      insertRowSimple(StringData.fromString("id2"), StringData.fromString("Stephen"), 33,
+          2L, StringData.fromString("par1")),
+      insertRowSimple(StringData.fromString("id3"), StringData.fromString("Julian"), 53,
+          3L, StringData.fromString("par2")),
+      insertRowSimple(StringData.fromString("id4"), StringData.fromString("Fabian"), 31,
+          4L, StringData.fromString("par2")),
+      insertRowSimple(StringData.fromString("id5"), StringData.fromString("Sophia"), 18,
+          5L, StringData.fromString("par3")),
+      insertRowSimple(StringData.fromString("id6"), StringData.fromString("Emma"), 20,
+          6L, StringData.fromString("par3")),
+      insertRowSimple(StringData.fromString("id7"), StringData.fromString("Bob"), 44,
+          7L, StringData.fromString("par4")),
+      insertRowSimple(StringData.fromString("id8"), StringData.fromString("Han"), 56,
+          8L, StringData.fromString("par4"))
+  );
+
   public static List<RowData> DATA_SET_UPDATE_INSERT = Arrays.asList(
       // advance the age by 1
       insertRow(StringData.fromString("id1"), StringData.fromString("Danny"), 24,
@@ -115,6 +134,28 @@ public class TestData {
           TimestampData.fromEpochMillis(7), StringData.fromString("par4")),
       insertRow(StringData.fromString("id11"), StringData.fromString("Phoebe"), 52,
           TimestampData.fromEpochMillis(8), StringData.fromString("par4"))
+  );
+
+  public static List<RowData> DATA_SET_UPDATE_INSERT_SIMPLE = Arrays.asList(
+      // advance the age by 1
+      insertRowSimple(StringData.fromString("id1"), StringData.fromString("Danny"), 24,
+          1L, StringData.fromString("par1")),
+      insertRowSimple(StringData.fromString("id2"), StringData.fromString("Stephen"), 34,
+          2L, StringData.fromString("par1")),
+      insertRowSimple(StringData.fromString("id3"), StringData.fromString("Julian"), 54,
+          3L, StringData.fromString("par2")),
+      insertRowSimple(StringData.fromString("id4"), StringData.fromString("Fabian"), 32,
+          4L, StringData.fromString("par2")),
+      // same with before
+      insertRowSimple(StringData.fromString("id5"), StringData.fromString("Sophia"), 18,
+          5L, StringData.fromString("par3")),
+      // new data
+      insertRowSimple(StringData.fromString("id9"), StringData.fromString("Jane"), 19,
+          6L, StringData.fromString("par3")),
+      insertRowSimple(StringData.fromString("id10"), StringData.fromString("Ella"), 38,
+          7L, StringData.fromString("par4")),
+      insertRowSimple(StringData.fromString("id11"), StringData.fromString("Phoebe"), 52,
+          8L, StringData.fromString("par4"))
   );
 
   public static List<RowData> DATA_SET_INSERT_SEPARATE_PARTITION = Arrays.asList(
@@ -719,6 +760,10 @@ public class TestData {
     }
     writer.complete();
     return row;
+  }
+
+  public static BinaryRowData insertRowSimple(Object... fields) {
+    return insertRow(TestConfigurations.ROW_TYPE_SIMPLE, fields);
   }
 
   private static BinaryRowData deleteRow(Object... fields) {

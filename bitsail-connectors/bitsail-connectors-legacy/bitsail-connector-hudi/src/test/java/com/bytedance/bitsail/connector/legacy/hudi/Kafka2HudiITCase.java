@@ -140,7 +140,7 @@ public class Kafka2HudiITCase {
   }
 
   protected void setWriterConfiguration(BitSailConfiguration jobConfiguration) {
-    jobConfiguration.set(WriterOptions.WRITER_CLASS, "com.bytedance.bitsail.connector.legacy.hudi.sink" +
+    jobConfiguration.set(WriterOptions.WRITER_CLASS, "com.bytedance.bitsail.connector.legacy.hudi.dag" +
         ".HudiSinkFunctionDAGBuilder");
 
     jobConfiguration.set(SchemaOptions.SOURCE_SCHEMA, TEST_SCHEMA);

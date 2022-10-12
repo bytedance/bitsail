@@ -67,12 +67,12 @@ public class HudiCompactionITCase extends TestWriteBase {
     jobConfiguration.set(CommonOptions.ENABLE_DYNAMIC_LOADER, true);
 
     // set reader
-    jobConfiguration.set(ReaderOptions.READER_CLASS, "com.bytedance.bitsail.connector.legacy.hudi.source" +
+    jobConfiguration.set(ReaderOptions.READER_CLASS, "com.bytedance.bitsail.connector.legacy.hudi.dag" +
         ".HudiCompactSourceDAGBuilder");
     jobConfiguration.set(READER_PREFIX + FlinkOptions.PATH.key(), tempFile.getAbsolutePath());
 
     // set writer
-    jobConfiguration.set(WriterOptions.WRITER_CLASS, "com.bytedance.bitsail.connector.legacy.hudi.sink" +
+    jobConfiguration.set(WriterOptions.WRITER_CLASS, "com.bytedance.bitsail.connector.legacy.hudi.dag" +
         ".HudiCompactSinkDAGBuilder");
     jobConfiguration.set(WRITER_PREFIX + FlinkOptions.PATH.key(), tempFile.getAbsolutePath());
     jobConfiguration.set(WRITER_PREFIX + FlinkOptions.TABLE_NAME.key(), "TestHoodieTable");
@@ -84,20 +84,20 @@ public class HudiCompactionITCase extends TestWriteBase {
   public void testCompaction() throws Exception {
     // write test data and schedule a compaction
     TestHarness.instance().preparePipeline(tempFile, conf)
-      .consume(TestData.DATA_SET_INSERT)
-      .assertEmptyDataFiles()
-      .checkpoint(1)
-      .assertNextEvent()
-      .checkpointComplete(1)
-      // upsert another data buffer
-      .consume(TestData.DATA_SET_UPDATE_INSERT)
-      // the data is not flushed yet
-      .checkWrittenData(EXPECTED1)
-      .checkpoint(2)
-      .assertNextEvent()
-      .checkpointComplete(2)
-      .checkWrittenData(EXPECTED2)
-      .end();
+        .consume(TestData.DATA_SET_INSERT)
+        .assertEmptyDataFiles()
+        .checkpoint(1)
+        .assertNextEvent()
+        .checkpointComplete(1)
+        // upsert another data buffer
+        .consume(TestData.DATA_SET_UPDATE_INSERT)
+        // the data is not flushed yet
+        .checkWrittenData(EXPECTED1)
+        .checkpoint(2)
+        .assertNextEvent()
+        .checkpointComplete(2)
+        .checkWrittenData(EXPECTED2)
+        .end();
 
     // run BitSail job to execute the compaction
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
@@ -107,7 +107,7 @@ public class HudiCompactionITCase extends TestWriteBase {
     // delta_commit -> compaction -> delta_commit
     // check data written as expected
     TestHarness.instance().preparePipeline(tempFile, conf)
-      .checkWrittenDataCow(tempFile, EXPECTED1, 4)
-      .checkWrittenDataMor(tempFile, EXPECTED2, 4);
+        .checkWrittenDataCow(tempFile, EXPECTED1, 4)
+        .checkWrittenDataMor(tempFile, EXPECTED2, 4);
   }
 }

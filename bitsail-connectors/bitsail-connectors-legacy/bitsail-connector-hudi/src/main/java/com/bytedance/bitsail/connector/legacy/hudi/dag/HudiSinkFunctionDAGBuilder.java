@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.hudi.sink;
+package com.bytedance.bitsail.connector.legacy.hudi.dag;
 
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
@@ -102,6 +102,6 @@ public class HudiSinkFunctionDAGBuilder<OUT extends Row> extends FlinkDataWriter
 
   @Override
   public String getWriterName() {
-    return "hudi";
+    return "hudi_sink";
   }
 }

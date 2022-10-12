@@ -25,6 +25,7 @@ import com.bytedance.bitsail.connector.legacy.hudi.sink.bootstrap.BootstrapOpera
 import com.bytedance.bitsail.connector.legacy.hudi.sink.event.WriteMetadataEvent;
 import com.bytedance.bitsail.connector.legacy.hudi.sink.partitioner.BucketAssignFunction;
 import com.bytedance.bitsail.connector.legacy.hudi.sink.transform.RowDataToHoodieFunction;
+import com.bytedance.bitsail.connector.legacy.hudi.util.AvroSchemaConverter;
 import com.bytedance.bitsail.connector.legacy.hudi.util.StreamerUtil;
 import com.bytedance.bitsail.connector.legacy.hudi.utils.TestConfigurations;
 
@@ -45,6 +46,7 @@ import org.apache.flink.streaming.api.operators.collect.utils.MockOperatorEventG
 import org.apache.flink.streaming.util.MockStreamTask;
 import org.apache.flink.streaming.util.MockStreamTaskBuilder;
 import org.apache.flink.table.data.RowData;
+import org.apache.flink.table.types.logical.RowType;
 import org.apache.flink.util.Collector;
 import org.apache.hudi.common.model.HoodieKey;
 import org.apache.hudi.common.model.HoodieRecord;
@@ -129,7 +131,12 @@ public class StreamWriteFunctionWrapper<I> implements TestFunctionWrapper<I> {
   public void openFunction() throws Exception {
     this.coordinator.start();
     this.coordinator.setExecutor(new MockCoordinatorExecutor(coordinatorContext));
-    toHoodieFunction = new RowDataToHoodieFunction<>(TestConfigurations.ROW_TYPE, conf);
+    RowType rowType = TestConfigurations.ROW_TYPE;
+    if (conf.contains(FlinkOptions.SOURCE_AVRO_SCHEMA)) {
+      rowType = (RowType) AvroSchemaConverter.convertToDataType(StreamerUtil.getSourceSchema(conf))
+        .getLogicalType();
+    }
+    toHoodieFunction = new RowDataToHoodieFunction<>(rowType, conf);
     toHoodieFunction.setRuntimeContext(runtimeContext);
     toHoodieFunction.open(conf);
 
