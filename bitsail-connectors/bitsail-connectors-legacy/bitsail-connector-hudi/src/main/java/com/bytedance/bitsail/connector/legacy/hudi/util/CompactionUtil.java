@@ -19,7 +19,6 @@
 package com.bytedance.bitsail.connector.legacy.hudi.util;
 
 import com.bytedance.bitsail.connector.legacy.hudi.configuration.FlinkOptions;
-import com.bytedance.bitsail.connector.legacy.hudi.sink.compact.FlinkCompactionConfig;
 
 import org.apache.avro.Schema;
 import org.apache.flink.configuration.Configuration;
@@ -39,7 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Locale;
 
 /**
  * Utilities for flink hudi compaction.
@@ -200,12 +198,5 @@ public class CompactionUtil {
         table.getMetaClient().reloadActiveTimeline();
       }
     }
-  }
-
-  /**
-   * Returns whether the execution sequence is LIFO.
-   */
-  public static boolean isLIFO(String seq) {
-    return seq.toUpperCase(Locale.ROOT).equals(FlinkCompactionConfig.SEQ_LIFO);
   }
 }

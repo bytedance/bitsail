@@ -50,7 +50,7 @@ public class TestWriteCopyOnWrite extends TestWriteBase {
   protected Configuration conf;
 
   @TempDir
-  File tempFile;
+  public File tempFile;
 
   @BeforeEach
   public void before() {

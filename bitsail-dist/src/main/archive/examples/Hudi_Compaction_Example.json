@@ -1,0 +1,31 @@
+{
+  "job":{
+    "common":{
+      "job_type":"BATCH",
+      "job_plugin_lib_dir":"plugin",
+      "enable_dynamic_loader":false,
+      "job_plugin_conf_dir":"plugin_conf",
+      "job_id":-1,
+      "sync_ddl":false,
+      "dry_run":true
+    },
+    "reader":{
+      "path":"/path/to/table",
+      "class":"com.bytedance.bitsail.connector.legacy.hudi.source.HudiCompactSourceDAGBuilder"
+    },
+    "writer":{
+      "hoodie":{
+        "table":{
+          "name":"TestHoodieTable"
+        }
+      },
+      "path":"/path/to/table",
+      "source":{
+        "avro-schema":{
+          "path":"/path/to/table/test_read_schema.avsc"
+        }
+      },
+      "class":"com.bytedance.bitsail.connector.legacy.hudi.sink.HudiCompactSinkDAGBuilder"
+    }
+  }
+}

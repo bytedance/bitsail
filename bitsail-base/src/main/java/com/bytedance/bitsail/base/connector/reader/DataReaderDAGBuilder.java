@@ -39,6 +39,13 @@ public interface DataReaderDAGBuilder extends Serializable {
   }
 
   /**
+   * Run the validation process before submitting the job.
+   */
+  default boolean validate() throws Exception {
+    return true;
+  }
+
+  /**
    * @return The name of reader operator.
    */
   String getReaderName();
