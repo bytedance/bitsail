@@ -88,7 +88,6 @@ public class FlinkSecurityHandlerTest {
         .getClassLoader()
         .getResource(resource)
         .toURI()
-        .getPath()
     );
   }
 }

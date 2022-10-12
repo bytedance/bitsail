@@ -85,7 +85,7 @@ public class FlinkEngineRunnerTest {
   @Test
   public void testLoadLibrary() throws URISyntaxException {
     FlinkEngineRunner flinkEngineRunner = new FlinkEngineRunner();
-    String path = Paths.get(FlinkEngineRunnerTest.class.getClassLoader().getResource("").toURI().getPath()).toString();
+    String path = Paths.get(FlinkEngineRunnerTest.class.getClassLoader().getResource("").toURI()).toString();
     BitSailConfiguration sysConfiguration = BitSailConfiguration.newDefault();
     sysConfiguration.set(FlinkRunnerConfigOptions.FLINK_HOME, path);
     flinkEngineRunner.initializeEngine(sysConfiguration);
