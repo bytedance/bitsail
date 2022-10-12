@@ -137,8 +137,7 @@ public class TestWriteBase {
       this.baseFile = basePath;
       this.basePath = this.baseFile.getAbsolutePath();
       this.conf = conf;
-      this.pipeline = append ?
-          new InsertFunctionWrapper<>(this.basePath, conf)
+      this.pipeline = append ? new InsertFunctionWrapper<>(this.basePath, conf)
           : new StreamWriteFunctionWrapper<>(this.basePath, conf);
       // open the function and ingest data
       this.pipeline.openFunction();
