@@ -76,7 +76,7 @@ public class FlinkEngineRunnerTest {
     FlinkEngineRunner flinkEngineRunner = new FlinkEngineRunner();
     flinkEngineRunner.initializeEngine(sysConfiguration);
     ProcessBuilder runProcBuilder = flinkEngineRunner
-      .getRunProcBuilder(jobConfiguration, baseCommandArgs);
+        .getRunProcBuilder(jobConfiguration, baseCommandArgs);
 
     List<String> command = runProcBuilder.command();
     Assert.assertEquals(62, command.size());
@@ -86,7 +86,7 @@ public class FlinkEngineRunnerTest {
   public void testLoadLibrary() {
     FlinkEngineRunner flinkEngineRunner = new FlinkEngineRunner();
     String path = FlinkEngineRunnerTest.class.getClassLoader().getResource("")
-      .getPath();
+        .getPath();
     BitSailConfiguration sysConfiguration = BitSailConfiguration.newDefault();
     sysConfiguration.set(FlinkRunnerConfigOptions.FLINK_HOME, path);
     flinkEngineRunner.initializeEngine(sysConfiguration);

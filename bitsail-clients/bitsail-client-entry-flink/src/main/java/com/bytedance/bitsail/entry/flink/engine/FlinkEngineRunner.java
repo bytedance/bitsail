@@ -84,8 +84,8 @@ public class FlinkEngineRunner implements EngineRunner {
 
     try (Stream<Path> libraries = Files.list(flinkLibDir)) {
       List<Path> flinkRuntimeLibraries = libraries
-        .filter(library -> StringUtils.startsWith(library.getFileName().toString(), FlinkPackageResolver.FLINK_LIB_DIST_JAR_NAME))
-        .collect(Collectors.toList());
+          .filter(library -> StringUtils.startsWith(library.getFileName().toString(), FlinkPackageResolver.FLINK_LIB_DIST_JAR_NAME))
+          .collect(Collectors.toList());
       Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
       method.setAccessible(true);
       for (Path runtimeLibrary : flinkRuntimeLibraries) {
@@ -114,7 +114,7 @@ public class FlinkEngineRunner implements EngineRunner {
     CommandArgsParser.parseArguments(baseCommandArgs.getUnknownOptions(), flinkCommandArgs);
 
     DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(flinkCommandArgs,
-      jobConfiguration);
+        jobConfiguration);
 
     ProcessBuilder flinkProcBuilder = new ProcessBuilder();
     List<String> flinkCommands = Lists.newArrayList();
@@ -124,10 +124,10 @@ public class FlinkEngineRunner implements EngineRunner {
     deploymentSupplier.addDeploymentCommands(baseCommandArgs, flinkCommands);
 
     FlinkRunnerSavepointLoader.loadSavepointPath(sysConfiguration,
-      jobConfiguration,
-      baseCommandArgs,
-      flinkCommandArgs,
-      flinkCommands);
+        jobConfiguration,
+        baseCommandArgs,
+        flinkCommandArgs,
+        flinkCommands);
 
     if (!baseCommandArgs.isDetach()) {
       flinkCommands.add("-sae");

@@ -92,8 +92,8 @@ public class FlinkSecurityHandler {
     File tmpDir = Files.createTempDir();
 
     File tmpFlinkConf = Paths.get(tmpDir.getPath(),
-      UUID.randomUUID().toString(),
-      FlinkPackageResolver.FLINK_CONF_FILE).toFile();
+        UUID.randomUUID().toString(),
+        FlinkPackageResolver.FLINK_CONF_FILE).toFile();
 
     if (tmpFlinkConf.exists()) {
       FileUtils.deleteQuietly(tmpFlinkConf);
@@ -127,8 +127,8 @@ public class FlinkSecurityHandler {
     Path flinkConfDir = FlinkPackageResolver.getFlinkConfDir(flinkDir);
     try (Stream<Path> flinkLogConfPath = java.nio.file.Files.list(flinkConfDir)) {
       List<Path> flinkLogConfPaths = flinkLogConfPath.filter(file -> file.getFileName().toString()
-        .startsWith(FlinkPackageResolver.FLINK_LOG_FILE_PREFIX))
-        .collect(Collectors.toList());
+          .startsWith(FlinkPackageResolver.FLINK_LOG_FILE_PREFIX))
+          .collect(Collectors.toList());
       for (Path flinkLogConf : flinkLogConfPaths) {
         Path resolve = tmpFlinkConfDir.resolve(flinkLogConf.getFileName());
         LOG.info("Create flink log symbolic link from {} to {}.", flinkLogConf, resolve);

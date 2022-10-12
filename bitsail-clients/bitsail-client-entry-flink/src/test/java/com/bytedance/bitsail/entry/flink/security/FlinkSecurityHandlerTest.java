@@ -37,7 +37,7 @@ public class FlinkSecurityHandlerTest {
   @Test
   public void testDefaultConf() {
     String path = FlinkSecurityHandlerTest.class
-      .getClassLoader().getResource("conf").getPath();
+        .getClassLoader().getResource("conf").getPath();
     Configuration flinkConfiguration = FlinkSecurityHandler.loadFlinkConfiguration(Paths.get(path));
     Assert.assertEquals("1", flinkConfiguration.getString("parallelism.default", null));
   }
@@ -52,7 +52,7 @@ public class FlinkSecurityHandlerTest {
   @Test
   public void testWriteFlinkConf() throws IOException {
     String path = FlinkSecurityHandlerTest.class
-      .getClassLoader().getResource("conf").getPath();
+        .getClassLoader().getResource("conf").getPath();
     Configuration conf = FlinkSecurityHandler.loadFlinkConfiguration(Paths.get(path));
     Path tmpConfDir = FlinkSecurityHandler.writeConfToTmpFile(conf);
 
@@ -78,8 +78,8 @@ public class FlinkSecurityHandlerTest {
     Files.exists(flinkConfDir);
     Configuration flinkConfiguration = FlinkSecurityHandler.loadFlinkConfiguration(flinkConfDir);
     Assert.assertEquals(flinkConfiguration.getString(SecurityOptions.KERBEROS_LOGIN_KEYTAB),
-      sysConfiguration.get(KerberosOptions.KERBEROS_KEYTAB_PATH));
+        sysConfiguration.get(KerberosOptions.KERBEROS_KEYTAB_PATH));
     Assert.assertEquals(flinkConfiguration.getString(SecurityOptions.KERBEROS_LOGIN_PRINCIPAL),
-      sysConfiguration.get(KerberosOptions.KERBEROS_PRINCIPAL));
+        sysConfiguration.get(KerberosOptions.KERBEROS_PRINCIPAL));
   }
 }
