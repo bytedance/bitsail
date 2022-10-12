@@ -86,7 +86,7 @@ public class Entry {
       Entry entry = new Entry(sysConfiguration, baseCommandArgs);
 
       SecurityContextFactory securityContext = SecurityContextFactory
-        .load(entry.sysConfiguration, entry.baseCommandArgs);
+          .load(entry.sysConfiguration, entry.baseCommandArgs);
 
       exit = securityContext.doAs(
         () -> entry.runCommand());
@@ -123,7 +123,7 @@ public class Entry {
   private ProcessBuilder buildProcessBuilder(BitSailConfiguration sysConfiguration,
                                              BaseCommandArgs baseCommandArgs) throws IOException {
     BitSailConfiguration jobConfiguration =
-      ConfigParser.fromRawConfPath(baseCommandArgs.getJobConf());
+        ConfigParser.fromRawConfPath(baseCommandArgs.getJobConf());
 
     String engineName = baseCommandArgs.getEngineName();
     LOG.info("Final engine: {}.", engineName);
@@ -135,17 +135,16 @@ public class Entry {
     engineRunner.loadLibrary(classLoader);
 
     ProcessBuilder procBuilder = engineRunner.getProcBuilder(
-      jobConfiguration,
-      baseCommandArgs);
+        jobConfiguration,
+        baseCommandArgs);
     LOG.info("Engine {}'s command: {}.", baseCommandArgs.getEngineName(), procBuilder.command());
     return procBuilder;
   }
 
   private int startProcessBuilder(ProcessBuilder procBuilder,
                                   BaseCommandArgs baseCommandArgs) throws IOException, InterruptedException {
-    procBuilder
-      .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-      .redirectError(ProcessBuilder.Redirect.INHERIT);
+    procBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
+        .redirectError(ProcessBuilder.Redirect.INHERIT);
 
     Thread hook = new Thread(() -> {
       synchronized (LOCK) {
