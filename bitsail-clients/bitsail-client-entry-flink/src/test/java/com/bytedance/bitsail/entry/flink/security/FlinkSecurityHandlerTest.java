@@ -20,6 +20,7 @@ package com.bytedance.bitsail.entry.flink.security;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.component.format.security.kerberos.option.KerberosOptions;
 
+import lombok.SneakyThrows;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.SecurityOptions;
 import org.junit.Assert;
@@ -36,24 +37,22 @@ public class FlinkSecurityHandlerTest {
 
   @Test
   public void testDefaultConf() {
-    String path = FlinkSecurityHandlerTest.class
-        .getClassLoader().getResource("conf").getPath();
-    Configuration flinkConfiguration = FlinkSecurityHandler.loadFlinkConfiguration(Paths.get(path));
+    Path path = getResourcePath("conf");
+    Configuration flinkConfiguration = FlinkSecurityHandler.loadFlinkConfiguration(path);
     Assert.assertEquals("1", flinkConfiguration.getString("parallelism.default", null));
   }
 
   @Test
   public void testUserDefinedConf() {
-    String path = FlinkSecurityHandlerTest.class.getClassLoader().getResource("test_dir/conf").getPath();
-    Configuration flinkConfiguration = FlinkSecurityHandler.loadFlinkConfiguration(Paths.get(path));
+    Path path = getResourcePath("test_dir/conf");
+    Configuration flinkConfiguration = FlinkSecurityHandler.loadFlinkConfiguration(path);
     Assert.assertEquals("2", flinkConfiguration.getString("parallelism.default", null));
   }
 
   @Test
   public void testWriteFlinkConf() throws IOException {
-    String path = FlinkSecurityHandlerTest.class
-        .getClassLoader().getResource("conf").getPath();
-    Configuration conf = FlinkSecurityHandler.loadFlinkConfiguration(Paths.get(path));
+    Path path = getResourcePath("conf");
+    Configuration conf = FlinkSecurityHandler.loadFlinkConfiguration(path);
     Path tmpConfDir = FlinkSecurityHandler.writeConfToTmpFile(conf);
 
     File tmpConfFile = tmpConfDir.resolve("flink-conf.yaml").toFile();
@@ -62,7 +61,7 @@ public class FlinkSecurityHandlerTest {
 
   @Test
   public void testHandleGlobal() throws IOException {
-    String workingDir = FlinkSecurityHandlerTest.class.getResource("/").getPath();
+    String workingDir = getResourcePath("").toString();
 
     BitSailConfiguration sysConfiguration = BitSailConfiguration.newDefault();
     sysConfiguration.set(KerberosOptions.KERBEROS_ENABLE, true);
@@ -81,5 +80,15 @@ public class FlinkSecurityHandlerTest {
         sysConfiguration.get(KerberosOptions.KERBEROS_KEYTAB_PATH));
     Assert.assertEquals(flinkConfiguration.getString(SecurityOptions.KERBEROS_LOGIN_PRINCIPAL),
         sysConfiguration.get(KerberosOptions.KERBEROS_PRINCIPAL));
+  }
+
+  @SneakyThrows
+  private Path getResourcePath(String resource) {
+    return Paths.get(FlinkSecurityHandlerTest.class
+        .getClassLoader()
+        .getResource(resource)
+        .toURI()
+        .getPath()
+    );
   }
 }
