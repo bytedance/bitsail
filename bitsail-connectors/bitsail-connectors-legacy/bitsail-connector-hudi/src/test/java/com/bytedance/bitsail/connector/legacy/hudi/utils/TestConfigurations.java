@@ -70,6 +70,15 @@ public class TestConfigurations {
       .notNull();
   public static final RowType ROW_TYPE_DATE = (RowType) ROW_DATA_TYPE_DATE.getLogicalType();
 
+  public static final DataType ROW_DATA_SIMPLE = DataTypes.ROW(
+      DataTypes.FIELD("uuid", DataTypes.VARCHAR(20)), // record key
+      DataTypes.FIELD("name", DataTypes.VARCHAR(10)),
+      DataTypes.FIELD("age", DataTypes.INT()),
+      DataTypes.FIELD("ts", DataTypes.BIGINT()), // precombine field
+      DataTypes.FIELD("partition", DataTypes.VARCHAR(10)))
+      .notNull();
+  public static final RowType ROW_TYPE_SIMPLE = (RowType) ROW_DATA_SIMPLE.getLogicalType();
+
   private TestConfigurations() {
   }
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.hudi.table.format;
+package com.bytedance.bitsail.connector.legacy.hudi.source.format;
 
 import com.bytedance.bitsail.connector.legacy.hudi.configuration.FlinkOptions;
 

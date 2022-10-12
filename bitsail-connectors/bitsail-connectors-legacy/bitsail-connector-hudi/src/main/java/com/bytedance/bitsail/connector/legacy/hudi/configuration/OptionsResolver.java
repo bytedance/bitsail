@@ -18,7 +18,7 @@
 
 package com.bytedance.bitsail.connector.legacy.hudi.configuration;
 
-import com.bytedance.bitsail.connector.legacy.hudi.table.format.FilePathUtils;
+import com.bytedance.bitsail.connector.legacy.hudi.source.format.FilePathUtils;
 
 import org.apache.flink.configuration.Configuration;
 import org.apache.hudi.common.model.DefaultHoodieRecordPayload;

@@ -19,6 +19,7 @@
 package com.bytedance.bitsail.connector.legacy.hudi.sink;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.connector.legacy.hudi.dag.HudiSinkFunctionDAGBuilder;
 
 import org.junit.Test;
 
