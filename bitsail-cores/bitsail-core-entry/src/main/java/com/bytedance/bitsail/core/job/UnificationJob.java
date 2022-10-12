@@ -87,9 +87,15 @@ public class UnificationJob<T> implements Serializable {
 
   public void start() throws Exception {
     prepare();
-    process();
+    if (validate()) {
+      process();
+    }
   }
 
+  /**
+   * Prepare the job DAG and configure runtime configuration.
+   * @throws Exception
+   */
   private void prepare() throws Exception {
 
     dataReaderDAGBuilders = DataReaderBuilderFactory
@@ -108,6 +114,28 @@ public class UnificationJob<T> implements Serializable {
     LOG.info("Final bitsail configuration: {}", execution.getGlobalConfiguration().desensitizedBeautify());
   }
 
+  /**
+   * Run the validation process before submitting the job to the cluster.
+   * @return
+   */
+  private boolean validate() throws Exception {
+    for (DataReaderDAGBuilder readerDAG : dataReaderDAGBuilders) {
+      if (!readerDAG.validate()) {
+        return false;
+      }
+    }
+    for (DataWriterDAGBuilder writerDAG : dataWriterDAGBuilders) {
+      if (!writerDAG.validate()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Run the job.
+   * @throws Exception
+   */
   private void process() throws Exception {
     execution.run(dataReaderDAGBuilders,
         dataTransformDAGBuilder,

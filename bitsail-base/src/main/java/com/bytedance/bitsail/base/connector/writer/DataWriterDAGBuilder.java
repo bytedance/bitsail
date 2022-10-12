@@ -38,6 +38,13 @@ public interface DataWriterDAGBuilder extends Serializable {
   }
 
   /**
+   * Run the validation process before submitting the job.
+   */
+  default boolean validate() throws Exception {
+    return true;
+  }
+
+  /**
    * @return The name of writer operator.
    */
   String getWriterName();

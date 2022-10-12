@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.hudi.sink.compact;
+package com.bytedance.bitsail.connector.legacy.hudi.compact;
 
 import org.apache.flink.api.common.functions.AbstractRichFunction;
 import org.apache.flink.configuration.Configuration;
@@ -47,7 +47,7 @@ import static java.util.stream.Collectors.toList;
  *   as the instant time.</li>
  * </ul>
  */
-public class CompactionPlanSourceFunction extends AbstractRichFunction implements SourceFunction<CompactionPlanEvent> {
+public class CompactionPlanSourceFunction<T> extends AbstractRichFunction implements SourceFunction<CompactionPlanEvent> {
 
   protected static final Logger LOG = LoggerFactory.getLogger(CompactionPlanSourceFunction.class);
 

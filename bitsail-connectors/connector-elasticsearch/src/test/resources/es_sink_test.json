@@ -15,6 +15,7 @@
       "total_count": 300,
       "rate": 10,
       "random_null_rate": 0,
+      "unique_fields": "id",
       "columns": [
         {
           "index": 0,

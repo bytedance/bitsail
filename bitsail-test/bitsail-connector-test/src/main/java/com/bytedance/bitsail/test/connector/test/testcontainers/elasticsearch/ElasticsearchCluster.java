@@ -91,6 +91,17 @@ public class ElasticsearchCluster implements AutoCloseable {
     client.indices().create(new CreateIndexRequest(indexName), RequestOptions.DEFAULT);
   }
 
+  /**
+   * Flush all indices in the cluster.
+   */
+  public void flush() throws IOException {
+    RestClientBuilder builder = getRestClientBuilder();
+    RestClient client = builder.build();
+
+    client.performRequest(new Request("POST", "/_flush"));
+    LOG.info("Flush all indices in cluster.");
+  }
+
   private RestClientBuilder getRestClientBuilder() {
     return RestClient.builder(HttpHost.create(esContainer.getHttpHostAddress()));
   }

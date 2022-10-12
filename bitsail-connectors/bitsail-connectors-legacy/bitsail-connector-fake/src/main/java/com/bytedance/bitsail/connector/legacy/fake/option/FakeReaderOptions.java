@@ -39,4 +39,8 @@ public interface FakeReaderOptions extends ReaderOptions.BaseReaderOptions {
   ConfigOption<Double> RANDOM_NULL_RATE =
       key(READER_PREFIX + "random_null_rate")
           .defaultValue(0.1);
+
+  ConfigOption<String> UNIQUE_FIELDS =
+      key(READER_PREFIX + "unique_fields")
+          .noDefaultValue(String.class);
 }
