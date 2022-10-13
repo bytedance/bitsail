@@ -147,6 +147,7 @@ public class Kafka2HudiITCase {
     jobConfiguration.set(SchemaOptions.SINK_SCHEMA, TEST_SCHEMA);
     jobConfiguration.set(WRITER_PREFIX + FlinkOptions.RECORD_KEY_FIELD.key(), "id");
     jobConfiguration.set(WRITER_PREFIX + FlinkOptions.INDEX_KEY_FIELD.key(), "id");
+    jobConfiguration.set(WRITER_PREFIX + FlinkOptions.PRECOMBINE_FIELD.key(), "timestamp");
     jobConfiguration.set(WRITER_PREFIX + FlinkOptions.PATH.key(), tempFile.getAbsolutePath());
     jobConfiguration.set(WRITER_PREFIX + FlinkOptions.TABLE_NAME.key(), "test_table");
     jobConfiguration.set(WRITER_PREFIX + FlinkOptions.TABLE_TYPE.key(), "MERGE_ON_READ");

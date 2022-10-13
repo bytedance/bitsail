@@ -3,10 +3,11 @@
     "common": {
       "job_id": 312,
       "instance_id": 3124,
-      "job_name": "BitSail_fake_to_print_test",
+      "job_name": "BitSail_fake_to_hudi_test",
       "user_name": "test"
     },
     "writer":{
+      "writer_parallelism_num": 1,
       "hoodie":{
         "bucket":{
           "index":{
@@ -29,12 +30,12 @@
           "name":"test_table"
         }
       },
-      "path":"/path/to/table",
+      "path":"/yanjia/test_table",
       "format_type":"json",
       "index":{
         "type":"BUCKET"
       },
-      "class":"com.bytedance.bitsail.connector.legacy.hudi.sink.HudiSinkFunctionDAGBuilder",
+      "class":"com.bytedance.bitsail.connector.legacy.hudi.dag.HudiSinkFunctionDAGBuilder",
       "write":{
         "operation":"upsert"
       },
@@ -53,6 +54,14 @@
         {
           "name": "id",
           "type": "int"
+        },
+        {
+          "name": "test",
+          "type": "string"
+        },
+        {
+          "name": "timestamp",
+          "type": "string"
         }
       ]
     }

@@ -310,11 +310,11 @@ public class Pipelines {
    * and flushes the data set to disk.
    *
    * @param conf               The configuration
-   * @param defaultParallelism The default parallelism
+   * @param parallelism The default parallelism
    * @param dataStream         The input data stream
    * @return the stream write data stream pipeline
    */
-  public static DataStream<Object> hoodieStreamWrite(Configuration conf, int defaultParallelism, DataStream<HoodieRecord> dataStream) {
+  public static DataStream<Object> hoodieStreamWrite(Configuration conf, int parallelism, DataStream<HoodieRecord> dataStream) {
     if (OptionsResolver.isBucketIndexType(conf)) {
       WriteOperatorFactory<HoodieRecord> operatorFactory = BucketStreamWriteOperator.getFactory(conf);
       int bucketNum = conf.getInteger(FlinkOptions.BUCKET_INDEX_NUM_BUCKETS);
@@ -323,7 +323,7 @@ public class Pipelines {
       return dataStream.partitionCustom(partitioner, HoodieRecord::getKey)
           .transform(writeOpIdentifier("bucket_write", conf), TypeInformation.of(Object.class), operatorFactory)
           .uid("uid_bucket_write" + conf.getString(FlinkOptions.TABLE_NAME))
-          .setParallelism(conf.getInteger(FlinkOptions.WRITE_TASKS));
+          .setParallelism(parallelism);
     } else {
       WriteOperatorFactory<HoodieRecord> operatorFactory = StreamWriteOperator.getFactory(conf);
       return dataStream
@@ -334,12 +334,12 @@ public class Pipelines {
               TypeInformation.of(HoodieRecord.class),
               new KeyedProcessOperator<>(new BucketAssignFunction<>(conf)))
           .uid("uid_bucket_assigner_" + conf.getString(FlinkOptions.TABLE_NAME))
-          .setParallelism(conf.getOptional(FlinkOptions.BUCKET_ASSIGN_TASKS).orElse(defaultParallelism))
+          .setParallelism(conf.getOptional(FlinkOptions.BUCKET_ASSIGN_TASKS).orElse(parallelism))
           // shuffle by fileId(bucket id)
           .keyBy(record -> record.getCurrentLocation().getFileId())
           .transform(writeOpIdentifier("stream_write", conf), TypeInformation.of(Object.class), operatorFactory)
           .uid("uid_stream_write" + conf.getString(FlinkOptions.TABLE_NAME))
-          .setParallelism(conf.getInteger(FlinkOptions.WRITE_TASKS));
+          .setParallelism(parallelism);
     }
   }
 
