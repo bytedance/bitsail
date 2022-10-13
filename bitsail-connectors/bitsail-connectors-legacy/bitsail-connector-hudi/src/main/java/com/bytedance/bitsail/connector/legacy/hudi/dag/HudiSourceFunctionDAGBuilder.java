@@ -21,6 +21,7 @@ package com.bytedance.bitsail.connector.legacy.hudi.dag;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.connector.legacy.hudi.configuration.FlinkOptions;
 import com.bytedance.bitsail.connector.legacy.hudi.configuration.HadoopConfigurations;
 import com.bytedance.bitsail.connector.legacy.hudi.format.RowDataToRowFunction;
@@ -121,7 +122,7 @@ public class HudiSourceFunctionDAGBuilder<T extends Row> extends FlinkDataReader
   @Override
   public void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration) throws Exception {
     this.jobConf = execution.getGlobalConfiguration();
-    Map<String, String> properties = jobConf.getFlattenMap("job.reader.");
+    Map<String, String> properties = jobConf.getFlattenMap(ReaderOptions.READER_PREFIX);
     this.conf = FlinkOptions.fromMap(properties);
     this.path = new Path(conf.get(FlinkOptions.PATH));
     this.maxCompactionMemoryInBytes = StreamerUtil.getMaxCompactionMemoryInBytes(conf);
@@ -151,10 +152,12 @@ public class HudiSourceFunctionDAGBuilder<T extends Row> extends FlinkDataReader
   }
 
   @Override
-  public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConf, BitSailConfiguration selfConf, ParallelismAdvice upstreamAdvice) throws Exception {
-    // set to 1 for testing
+  public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConf, BitSailConfiguration readerConf, ParallelismAdvice upstreamAdvice) throws Exception {
+    //TODO: Advice parallelism based on file stats
+    Integer userConfigReaderParallelism = readerConf.getUnNecessaryOption(ReaderOptions.BaseReaderOptions.READER_PARALLELISM_NUM, 1);
+
     return ParallelismAdvice.builder()
-      .adviceParallelism(1)
+      .adviceParallelism(userConfigReaderParallelism)
       .enforceDownStreamChain(false)
       .build();
   }
