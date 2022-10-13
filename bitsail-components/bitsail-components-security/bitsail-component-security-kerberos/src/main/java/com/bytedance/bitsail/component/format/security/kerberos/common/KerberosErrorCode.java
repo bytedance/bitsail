@@ -15,14 +15,35 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.client.api.command;
+package com.bytedance.bitsail.component.format.security.kerberos.common;
 
-import lombok.Builder;
-import lombok.Getter;
+import com.bytedance.bitsail.common.exception.ErrorCode;
 
-@Builder
-@Getter
-public class BaseCommandArgsWithUnknownOptions {
-  private BaseCommandArgs baseCommandArgs;
-  private String[] unknownOptions;
+public enum KerberosErrorCode implements ErrorCode {
+
+  JAAS_CONF_NOT_EXIST("Kerberos-00", "Jaas config file does not exist, which is required.");
+
+  private final String code;
+
+  private final String describe;
+
+  KerberosErrorCode(String code, String describe) {
+    this.code = code;
+    this.describe = describe;
+  }
+
+  @Override
+  public String getCode() {
+    return code;
+  }
+
+  @Override
+  public String getDescription() {
+    return describe;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("Code:[%s], Describe:[%s]", code, describe);
+  }
 }

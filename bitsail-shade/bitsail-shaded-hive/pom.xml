@@ -211,6 +211,10 @@
                     <groupId>org.eclipse.jetty</groupId>
                 </exclusion>
                 <exclusion>
+                    <artifactId>commons-net</artifactId>
+                    <groupId>commons-net</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>calcite-druid</artifactId>
                     <groupId>org.apache.calcite</groupId>
                 </exclusion>

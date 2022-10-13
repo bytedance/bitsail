@@ -35,8 +35,7 @@ under the License.
             <unpack>false</unpack>
             <useProjectArtifact>false</useProjectArtifact>
             <useProjectAttachments>false</useProjectAttachments>
-            <useTransitiveDependencies>true</useTransitiveDependencies>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <useTransitiveDependencies>false</useTransitiveDependencies>
             <scope>provided</scope>
             <includes>
                 <include>com.bytedance.bitsail:bitsail-client-entry-*</include>

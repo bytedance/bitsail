@@ -20,19 +20,22 @@ package com.bytedance.bitsail.client.api.engine;
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.URLClassLoader;
 
 /**
  * Created 2022/8/5
  */
 public interface EngineRunner extends Serializable {
-  default void addEngineClasspath() {
+  default void loadLibrary(URLClassLoader classLoader) {
     return;
   }
 
+  void initializeEngine(BitSailConfiguration sysConfiguration);
+
   ProcessBuilder getProcBuilder(BitSailConfiguration jobConfiguration,
-                                BaseCommandArgs baseCommandArgs,
-                                String[] args);
+                                BaseCommandArgs baseCommandArgs) throws IOException;
 
   String engineName();
 }

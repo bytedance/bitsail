@@ -46,4 +46,18 @@ public class BaseCommandArgs implements CommandArgs {
 
   @Parameter(names = {"--conf"})
   private String jobConf;
+
+  @Parameter(names = {"--enable-kerberos"})
+  private boolean enableKerberos = false;
+
+  @Parameter(names = {"--keytab-path"})
+  private String keytabPath;
+
+  @Parameter(names = {"--principal"})
+  private String principal;
+
+  @Parameter(names = {"--krb5-conf-path"})
+  private String krb5ConfPath;
+
+  private String[] unknownOptions;
 }

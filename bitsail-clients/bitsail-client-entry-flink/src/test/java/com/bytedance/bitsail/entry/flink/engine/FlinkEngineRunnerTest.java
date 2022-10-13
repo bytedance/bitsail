@@ -19,7 +19,9 @@ package com.bytedance.bitsail.entry.flink.engine;
 
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.configuration.BitSailSystemConfiguration;
 import com.bytedance.bitsail.common.configuration.ConfigParser;
+import com.bytedance.bitsail.entry.flink.configuration.FlinkRunnerConfigOptions;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -32,6 +34,8 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +49,7 @@ public class FlinkEngineRunnerTest {
   public EnvironmentVariables variables = new EnvironmentVariables();
 
   private BaseCommandArgs baseCommandArgs;
-  private BitSailConfiguration globalConfiguration;
+  private BitSailConfiguration jobConfiguration;
 
   @Before
   public void before() throws URISyntaxException, IOException {
@@ -58,20 +62,36 @@ public class FlinkEngineRunnerTest {
     properties.put("blob.fetch.num-concurrent", "32");
     baseCommandArgs.setProperties(properties);
 
-    globalConfiguration = ConfigParser.fromRawConfPath(baseCommandArgs.getJobConf());
+    jobConfiguration = ConfigParser.fromRawConfPath(baseCommandArgs.getJobConf());
 
     File file = new File("/tmp/embedded/flink/bin/flink");
     Files.createParentDirs(file);
   }
 
   @Test
-  public void testGetFlinkProcBuilder() {
+  public void testGetFlinkProcBuilder() throws IOException {
     String[] flinkRunCommandArgs = new String[] {"--execution-mode", "run", "--queue", "default", "--deployment-mode", "yarn-per-job"};
+    baseCommandArgs.setUnknownOptions(flinkRunCommandArgs);
+    BitSailConfiguration sysConfiguration = BitSailSystemConfiguration.loadSysConfiguration();
     FlinkEngineRunner flinkEngineRunner = new FlinkEngineRunner();
+    flinkEngineRunner.initializeEngine(sysConfiguration);
     ProcessBuilder runProcBuilder = flinkEngineRunner
-        .getRunProcBuilder(globalConfiguration, baseCommandArgs, flinkRunCommandArgs);
+        .getRunProcBuilder(jobConfiguration, baseCommandArgs);
 
     List<String> command = runProcBuilder.command();
-    Assert.assertEquals(64, command.size());
+    Assert.assertEquals(62, command.size());
+  }
+
+  @Test
+  public void testLoadLibrary() throws URISyntaxException {
+    FlinkEngineRunner flinkEngineRunner = new FlinkEngineRunner();
+    String path = Paths.get(FlinkEngineRunnerTest.class.getClassLoader().getResource("").toURI()).toString();
+    BitSailConfiguration sysConfiguration = BitSailConfiguration.newDefault();
+    sysConfiguration.set(FlinkRunnerConfigOptions.FLINK_HOME, path);
+    flinkEngineRunner.initializeEngine(sysConfiguration);
+    URLClassLoader urlClassLoader = new URLClassLoader(new URL[] {});
+    flinkEngineRunner.loadLibrary(urlClassLoader);
+    URL[] urLs = urlClassLoader.getURLs();
+    Assert.assertNotNull(urLs);
   }
 }

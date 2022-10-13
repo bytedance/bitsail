@@ -347,6 +347,10 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
+                    <artifactId>commons-net</artifactId>
+                    <groupId>commons-net</groupId>
+                </exclusion>
+                <exclusion>
                     <artifactId>avatica</artifactId>
                     <groupId>org.apache.calcite.avatica</groupId>
                 </exclusion>
