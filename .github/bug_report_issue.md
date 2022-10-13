@@ -22,7 +22,9 @@ We can reproduce the bug as follows (use screenshots if necessary):
 
 2. The test data is: '....'
 
-3. The error can be seen in: '....'
+3. Bitsail run command: '....' 
+
+4. The error can be seen in: '....'
 
 (Note that the above sentences are not necessary for each bug report issue.)
 
@@ -50,6 +52,7 @@ Describe the environment where the test project ran.
 
 - OS [e.g. Debain 11.0]
 - JDK [e.g. 1.8.0_301]
+- Deployment [e.g. Yarn | CDH 6.3.x]
 - ...
 
 
