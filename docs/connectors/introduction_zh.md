@@ -11,6 +11,8 @@
 
 - [Hive连接器](./hive/hive_zh.md)
 
+- [Hudi连接器](./hudi/hudi_zh.md)
+
 - [Kafka连接器](./kafka/kafka_zh.md)
 
 - [StreamingFile连接器](./StreamingFile/StreamingFile_zh.md)

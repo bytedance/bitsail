@@ -11,6 +11,8 @@
 
 - [Hive connector](./hive/hive.md)
 
+- [Hudi connector](./hudi/hudi.md)
+
 - [Kafka connector](./kafka/kafka.md)
 
 - [StreamingFile connector](./StreamingFile/StreamingFile.md)
