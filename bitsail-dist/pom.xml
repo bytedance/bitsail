@@ -97,7 +97,7 @@
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>btisail-connector-hudi</artifactId>
+            <artifactId>bitsail-connector-hudi</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>
