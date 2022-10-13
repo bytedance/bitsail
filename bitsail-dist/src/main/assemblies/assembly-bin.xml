@@ -45,9 +45,6 @@ under the License.
                 <include>ch.qos.logback:logback-classic</include>
                 <include>org.slf4j:slf4j-api</include>
             </includes>
-            <excludes>
-                <exclude>com.bytedance.bitsail:bitsail-component-security-*</exclude>
-            </excludes>
         </dependencySet>
 
         <!--  Legacy & Unified Connector Jars   -->
