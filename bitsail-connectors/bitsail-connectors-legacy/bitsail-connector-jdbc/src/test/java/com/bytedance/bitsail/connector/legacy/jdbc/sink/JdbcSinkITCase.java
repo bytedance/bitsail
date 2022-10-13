@@ -51,7 +51,7 @@ public class JdbcSinkITCase {
   @Before
   public void before() {
     container = new MySQLContainerMariadbAdapter<>(DockerImageName.parse(MYSQL_DOCKER_IMAGER))
-        .withUrlParam("additionalUrlParams", "true")
+        .withUrlParam("permitMysqlScheme", null)
         .withInitScript("scripts/fake_to_sink.sql")
         .withLogConsumer(new Slf4jLogConsumer(LOG));
 

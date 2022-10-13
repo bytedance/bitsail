@@ -156,7 +156,7 @@ SqlServer 支持以下数据类型：
 
 ## Jdbc Source
 
-> 在使用MySQL相关功能时，需要再连接参数中增加`additionalUrlParams`选项。
+> 在使用MySQL相关功能时，需要再连接参数中增加`permitMysqlScheme`选项。
 
 ### 主要功能
 
@@ -184,7 +184,7 @@ SqlServer 支持以下数据类型：
 | password              | -     | 是      | string | password                                                                                                                                                                                                                                                                                 | Jdbc 连接密码          |
 | query_timeout_seconds | 300   | 否      | int    | 300                                                                                                                                                                                                                                                                                      | 连接 jdbc timeout 时间 |
 | query_retry_times     | 3     | 否      | int    | 3                                                                                                                                                                                                                                                                                        | Jdbc 重试次数          |
-| connections           | -     | 是      |        | [ { "slaves": [ {"db_url": "jdbc:mysql://address=(protocol=tcp)(host=192.168.1.202)(port=3306)/test?additionalUrlParams&rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false"} ]} ] | 连接 Jdbc 的信息        |
+| connections           | -     | 是      |        | [ { "slaves": [ {"db_url": "jdbc:mysql://address=(protocol=tcp)(host=192.168.1.202)(port=3306)/test?permitMysqlScheme&rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false"} ]} ] | 连接 Jdbc 的信息        |
 
 表同步配置参数
 
@@ -212,7 +212,7 @@ SQL 同步配置参数
 
 ## Jdbc Sink
 
-> 在使用MySQL相关功能时，需要再连接参数中增加`additionalUrlParams`选项。
+> 在使用MySQL相关功能时，需要再连接参数中增加`permitMysqlScheme`选项。
 
 ### 主要功能
 
