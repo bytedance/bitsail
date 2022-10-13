@@ -40,7 +40,7 @@ At present, ***BitSail*** is mainly designed with the ELT model, which have EB d
   <tr>
     <td>Hudi</td>
     <td>-</td>
-    <td>❎</td>
+    <td>✅</td>
     <td>✅</td>
   </tr>
   <tr>
