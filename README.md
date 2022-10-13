@@ -16,6 +16,14 @@ At present, ***BitSail*** is mainly designed with the ELT model, which have EB d
 - In Streaming mode, auto-detect the exists checkpoint and apply when job restart.
 - ...
 
+## Requirements
+
+The latest version of bitsail has the following minimal requirements:
+
+- Java 8 and higher for the build is required. For usage Java 8 is a minimum requirement;
+- Maven 3.6 and higher;
+- Operating system: no specific requirements (tested on Windows and Linux).
+
 ## Support Connectors
 
 <table>
