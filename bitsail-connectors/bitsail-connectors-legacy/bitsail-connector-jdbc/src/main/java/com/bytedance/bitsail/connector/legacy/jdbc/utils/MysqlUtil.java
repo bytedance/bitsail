@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class MysqlUtil extends AbstractJdbcUtil {
-  public static final String DRIVER_NAME = "com.mysql.jdbc.Driver";
+  public static final String DRIVER_NAME = "org.mariadb.jdbc.Driver";
   public static final String DB_QUOTE = "`";
   public static final String VALUE_QUOTE = "\"";
   private static final Logger LOG = LoggerFactory.getLogger(MysqlUtil.class);

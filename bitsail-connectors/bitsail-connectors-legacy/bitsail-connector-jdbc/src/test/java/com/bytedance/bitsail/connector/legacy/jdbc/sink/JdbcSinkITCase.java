@@ -19,6 +19,7 @@ package com.bytedance.bitsail.connector.legacy.jdbc.sink;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.legacy.jdbc.options.JdbcWriterOptions;
+import com.bytedance.bitsail.connector.legacy.jdbc.sink.container.MySQLContainerMariadbAdapter;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
@@ -49,7 +50,8 @@ public class JdbcSinkITCase {
 
   @Before
   public void before() {
-    container = new MySQLContainer<>(DockerImageName.parse(MYSQL_DOCKER_IMAGER))
+    container = new MySQLContainerMariadbAdapter<>(DockerImageName.parse(MYSQL_DOCKER_IMAGER))
+        .withUrlParam("additionalUrlParams", "true")
         .withInitScript("scripts/fake_to_sink.sql")
         .withLogConsumer(new Slf4jLogConsumer(LOG));
 

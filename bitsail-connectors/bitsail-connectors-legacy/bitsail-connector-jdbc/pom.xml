@@ -26,19 +26,20 @@
     <artifactId>bitsail-connector-jdbc</artifactId>
 
     <properties>
+        <maridb.version>3.0.8</maridb.version>
         <mysql.version>5.1.47</mysql.version>
         <oracle.version>12.2.0.1</oracle.version>
         <postgresql.version>42.2.14</postgresql.version>
-        <sql-server.version>7.2.2.jre8</sql-server.version>
+        <sqlserver.version>7.2.2.jre8</sqlserver.version>
         <db2.version>11.5.0.0</db2.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql.version}</version>
+                <groupId>org.mariadb.jdbc</groupId>
+                <artifactId>mariadb-java-client</artifactId>
+                <version>${maridb.version}</version>
             </dependency>
 
             <dependency>
@@ -56,7 +57,7 @@
             <dependency>
                 <groupId>com.microsoft.sqlserver</groupId>
                 <artifactId>mssql-jdbc</artifactId>
-                <version>${sql-server.version}</version>
+                <version>${sqlserver.version}</version>
             </dependency>
 
             <dependency>
@@ -75,8 +76,8 @@
 
         <!-- Mysql -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
         </dependency>
 
         <!-- Postgresql -->
