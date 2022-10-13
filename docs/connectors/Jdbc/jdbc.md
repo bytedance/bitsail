@@ -156,6 +156,8 @@ Currently, supports reading and writing three kinds of data sources including My
 
 ## Jdbc Source
 
+> Please add property `permitMysqlScheme in connection url when use MySQL.
+
 ### Main function
 
  - Supports multiple sharding algorithms
@@ -176,13 +178,13 @@ Currently, supports reading and writing three kinds of data sources including My
 
 #### Database connection configuration
 
-| Param name            | Default value | Required | Parameter type | Recommended value / Example value                                                                                                                                                                                                                                    | Description                    |
-|-----------------------|---------------|----------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------|
-| user_name             | -             | Yes      | string         | abc                                                                                                                                                                                                                                                                  | Jdbc username                  |
-| password              | -             | Yes      | string         | password                                                                                                                                                                                                                                                             | Jdbc password                  |
-| query_timeout_seconds | 300           | No       | int            | 300                                                                                                                                                                                                                                                                  | Jdbc connection timeout (s)    |
-| query_retry_times     | 3             | No       | int            | 3                                                                                                                                                                                                                                                                    | Max retry times for Jdbc query |
-| connections           | -             | Yes      |                | [ { "slaves": [ {"db_url": "jdbc:mysql://address=(protocol=tcp)(host=192.168.1.202)(port=3306)/test?rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false"} ]} ] | Jdbc connection urls           |
+| Param name            | Default value | Required | Parameter type | Recommended value / Example value                                                                                                                                                                                                                                                        | Description                    |
+|-----------------------|---------------|----------|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------|
+| user_name             | -             | Yes      | string         | abc                                                                                                                                                                                                                                                                                      | Jdbc username                  |
+| password              | -             | Yes      | string         | password                                                                                                                                                                                                                                                                                 | Jdbc password                  |
+| query_timeout_seconds | 300           | No       | int            | 300                                                                                                                                                                                                                                                                                      | Jdbc connection timeout (s)    |
+| query_retry_times     | 3             | No       | int            | 3                                                                                                                                                                                                                                                                                        | Max retry times for Jdbc query |
+| connections           | -             | Yes      |                | [ { "slaves": [ {"db_url": "jdbc:mysql://address=(protocol=tcp)(host=192.168.1.202)(port=3306)/test?permitMysqlScheme&rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false"} ]} ] | Jdbc connection urls           |
 
 #### Table synchronization configuration parameters
 
@@ -212,6 +214,8 @@ Currently, supports reading and writing three kinds of data sources including My
 ----
 
 ## Jdbc Sink
+
+> Please add property `permitMysqlScheme in connection url when use MySQL.
 
 ### Main function
 
