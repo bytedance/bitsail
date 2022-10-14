@@ -210,6 +210,6 @@ alink_core_flink,
 Apache Flink,
 Apache HBase,
 apache/hudi,
-datax-common,
 guava-retrying,
 Guava: Google Core Libraries for Java
+Files from these projects have notices at  the top of each file.

@@ -14,6 +14,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Original Files: apache/hudi (https://github.com/apache/hudi)
+ * Copyright: Copyright 2019-2020 The Apache Software Foundation
+ * SPDX-License-Identifier: Apache License 2.0
+ *
+ * This file may have been modified by ByteDance Ltd. and/or its affiliates.
  */
 
 package com.bytedance.bitsail.connector.legacy.hudi.util;
