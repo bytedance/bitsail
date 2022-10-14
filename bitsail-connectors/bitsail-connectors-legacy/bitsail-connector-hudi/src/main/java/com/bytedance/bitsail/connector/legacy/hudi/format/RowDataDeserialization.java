@@ -102,14 +102,9 @@ public class RowDataDeserialization<I extends Row, O extends RowData> extends Ri
   @Override
   public void flatMap(I inputRow, Collector<O> output) throws IOException {
     try {
-      if (inputRow.getArity() > 3 && (Boolean) inputRow.getField(3)) {
-        LOG.info("Skip the end message!!");
-        return;
-      }
-
       byte[] record = (byte[]) inputRow.getField(1);
       O outputRow;
-      int sourceIndex = (int) inputRow.getField(5);
+      int sourceIndex = (int) inputRow.getField(4);
       outputRow = deserializationSchema.get(sourceIndex).deserialize(record);
       if (Objects.isNull(outputRow)) {
         metrics.reportRecord(0, MessageType.FAILED);

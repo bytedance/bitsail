@@ -20,6 +20,7 @@ package com.bytedance.bitsail.connector.legacy.hudi.dag;
 
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.connector.legacy.hudi.common.SchemaOptions;
 import com.bytedance.bitsail.connector.legacy.hudi.configuration.FlinkOptions;
 import com.bytedance.bitsail.connector.legacy.hudi.format.RowDataDeserialization;
@@ -67,7 +68,7 @@ public class HudiSinkFunctionDAGBuilder<OUT extends Row> extends FlinkDataWriter
   private RowType sinkRowType;
 
   public static Map<String, String> extractHudiProperties(BitSailConfiguration jobConf) {
-    Map<String, String> connectorConf = jobConf.getFlattenMap("job.writer.");
+    Map<String, String> connectorConf = jobConf.getFlattenMap(WriterOptions.WRITER_PREFIX);
     LOG.info("Final properties: {}", connectorConf);
     return connectorConf;
   }
