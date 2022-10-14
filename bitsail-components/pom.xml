@@ -32,7 +32,7 @@
         <module>bitsail-component-clients</module>
         <module>bitsail-component-progress</module>
         <module>bitsail-component-formats-flink</module>
-        <module>bitsail-components-security</module>
+        <module>bitsail-component-security</module>
     </modules>
 
     <dependencies>
