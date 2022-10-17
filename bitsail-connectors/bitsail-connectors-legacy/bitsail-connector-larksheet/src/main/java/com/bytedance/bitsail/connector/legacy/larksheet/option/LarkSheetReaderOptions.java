@@ -1,0 +1,97 @@
+package com.bytedance.bitsail.connector.legacy.larksheet.option;
+
+import com.alibaba.fastjson.TypeReference;
+import com.bytedance.bitsail.common.option.ConfigOption;
+import com.bytedance.bitsail.common.option.ReaderOptions;
+
+import java.util.List;
+import java.util.Map;
+
+import static com.bytedance.bitsail.common.option.ConfigOptions.key;
+import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
+
+/**
+ * Options for LarkSheet reader.
+ */
+public interface LarkSheetReaderOptions extends ReaderOptions.BaseReaderOptions {
+
+  /**
+   * LarkSheet urls list seperated by comma.<br/>
+   * Single url format is: https://{xxx}.feishu.cn/sheets/{sheetToken}?sheet={sheetId}
+   */
+  ConfigOption<String> SHEET_URL =
+      key(READER_PREFIX + "sheet_url")
+          .noDefaultValue(String.class);
+
+  /**
+   * LarkSheet token.
+   */
+  ConfigOption<String> SHEET_TOKEN =
+      key(READER_PREFIX + "sheet_token")
+          .noDefaultValue(String.class);
+
+  /**
+   * Customized parameters which are appended after request urls.
+   */
+  ConfigOption<Map<String, String>> LARK_PROPERTIES =
+      key(READER_PREFIX + "lark")
+          .onlyReference(new TypeReference<Map<String, String>>() {});
+
+  /**
+   * Number of lines extracted once.
+   * <br>
+   * Api ref: <a href="https://open.feishu.cn/document/ukTMukTMukTM/ugTMzUjL4EzM14COxMTN?lang=en-US">range api</a>
+   */
+  ConfigOption<Integer> BATCH_SIZE =
+      key(READER_PREFIX + "batch_size")
+          .defaultValue(2000);
+
+  /**
+   * Number of lines that are skipped.
+   */
+  ConfigOption<List<Integer>> SKIP_NUMS =
+      key(READER_PREFIX + "skip_nums")
+      .onlyReference(new TypeReference<List<Integer>>(){});
+
+  /**
+   *
+   */
+  ConfigOption<String> APP_ID =
+      key(READER_PREFIX + "lark_app_id")
+          .noDefaultValue(String.class);
+
+  /**
+   *
+   */
+  ConfigOption<String> APP_SECRET =
+      key(READER_PREFIX + "lark_app_secret")
+          .noDefaultValue(String.class);
+
+  /**
+   *
+   */
+  ConfigOption<String> OPEN_API_HOST =
+      key(READER_PREFIX + "lark_open_api_host")
+          .defaultValue("https://open.feishu.cn");
+
+  /**
+   *
+   */
+  ConfigOption<String> APP_ACCESS_TOKEN_API =
+      key(READER_PREFIX + "lark_app_access_token_api")
+          .defaultValue("/open-apis/auth/v3/app_access_token/internal");
+
+  /**
+   *
+   */
+  ConfigOption<String> META_INFO_API_FORMAT =
+      key(READER_PREFIX + "lark_meta_info_api_format")
+          .defaultValue("/open-apis/sheet/v2/spreadsheets/%s/metainfo");
+
+  /**
+   *
+   */
+  ConfigOption<String> SINGLE_RANGE_API_FORMAT =
+      key(READER_PREFIX + "lark_sheet_single_range_api_format")
+          .defaultValue("/open-apis/sheet/v2/spreadsheets/%s/values/%s!%s");
+}

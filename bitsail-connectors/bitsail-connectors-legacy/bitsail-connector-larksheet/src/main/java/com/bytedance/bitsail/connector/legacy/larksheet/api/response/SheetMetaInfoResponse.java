@@ -1,0 +1,104 @@
+package com.bytedance.bitsail.connector.legacy.larksheet.api.response;
+
+
+import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.connector.legacy.larksheet.error.LarkSheetFormatErrorCode;
+import com.bytedance.bitsail.connector.legacy.larksheet.meta.SheetMeta;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
+
+/**
+ * @author yangyun
+ **/
+@lombok.Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString(callSuper = true)
+public class SheetMetaInfoResponse extends OpenApiBaseResponse {
+
+  private Data data;
+
+  @lombok.Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class Data {
+
+    /**
+     * Identifier of sheet.
+     */
+    private String spreadsheetToken;
+
+    /**
+     * Properties of sheet.
+     */
+    private Properties properties;
+
+    /**
+     * Meta data of sheet.
+     */
+    private List<SheetMeta> sheets;
+
+  }
+
+
+  @lombok.Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class Properties {
+    /**
+     * Sheet title
+     */
+    private String title;
+
+    /**
+     * User id of sheet owner
+     */
+    private Long ownerUser;
+
+    /**
+     * Number of sheets included
+     */
+    private int sheetCount;
+
+    /**
+     * Revision
+     */
+    private int revision;
+
+  }
+
+
+  /**
+   * Get meta data of target sheet based on sheet id.
+   *
+   * @param sheetId Id of target sheet. If `sheetId` is null, get meta from the first sheet.
+   * @return Meta data.
+   */
+  public SheetMeta getSheet(String sheetId) {
+    SheetMeta goalSheet = null;
+    boolean useDefault = StringUtils.isBlank(sheetId);
+
+    for (SheetMeta sheetMeta : data.sheets) {
+      if (useDefault && sheetMeta.getIndex() == 0) {
+        goalSheet = sheetMeta;
+        break;
+      }
+
+      if (StringUtils.equals(sheetId, sheetMeta.getSheetId())) {
+        goalSheet = sheetMeta;
+        break;
+      }
+    }
+    if (goalSheet == null) {
+      throw new BitSailException(LarkSheetFormatErrorCode.SHEET_NOT_FOUND,
+          String.format("cannot find sheet, sheet_id:[%s]", sheetId));
+    }
+    return goalSheet;
+  }
+
+}
+
