@@ -42,7 +42,6 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.core.io.InputSplit;
-
 import org.apache.flink.core.io.InputSplitAssigner;
 import org.apache.flink.types.Row;
 import org.slf4j.Logger;
@@ -149,7 +148,7 @@ public class LarkSheetInputFormat extends InputFormatPlugin<Row, InputSplit>
     // **** STEP5: Other initialization ****
     this.rowTypeInfo = buildRowTypeInfo(readerColumns);
     this.batchSize = inputSliceConfig.get(LarkSheetReaderOptions.BATCH_SIZE);
-    this.skipNums = inputSliceConfig.get(LarkSheetReaderOptions.SKIP_NUMS);
+    this.skipNums = inputSliceConfig.getUnNecessaryOption(LarkSheetReaderOptions.SKIP_NUMS, new ArrayList<>());
     fillLarkParams(inputSliceConfig.get(LarkSheetReaderOptions.LARK_PROPERTIES));
   }
 
@@ -343,7 +342,7 @@ public class LarkSheetInputFormat extends InputFormatPlugin<Row, InputSplit>
    * @return An array of splits.
    */
   private static InputSplit[] calculateLarkSheetInputSplits(List<SheetInfo> sheetInfoList, int batchSize,
-                                                            List<Integer>skipNums) {
+                                                            List<Integer> skipNums) {
     int splitCount = 0;
     if(skipNums.isEmpty()) {
       splitCount = sheetInfoList.stream()
@@ -373,8 +372,7 @@ public class LarkSheetInputFormat extends InputFormatPlugin<Row, InputSplit>
       int skipNum = 0;
       if(skipNums.isEmpty()) {
         curCount = (int) Math.ceil((double) (sheetMeta.getRowCount() - 1) / (double) batchSize);
-      }
-      else {
+      } else {
         if(skipNums.size() > i) {
           skipNum = Math.max(skipNums.get(i), 0);
         }
