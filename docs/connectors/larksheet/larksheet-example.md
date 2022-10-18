@@ -1,16 +1,28 @@
+# LarkSheet connector examples
+
+-----
+
+Parent document: [larksheet-connector](./larksheet.md)
+
+## Reader example
+
+The sheets to be read are:
+
+ - [test_sheet_1](https://bytedance.feishu.cn/sheets/shtcncTJGUhZHj3GOX94gLMKxlh?sheet=lAlPxZ)
+ - [test_sheet_2](https://bytedance.feishu.cn/sheets/shtcncTJGUhZHj3GOX94gLMKxlh?sheet=aNSgYr)
+
+Here is the example job configuration:
+
+```json
 {
   "job": {
-    "common": {
-      "cid": 0,
-      "domain": "test",
-      "job_id": -2513,
-      "job_name": "bitsail_larksheet_to_print_itcase",
-      "instance_id": -20513,
-      "user_name": "user"
-    },
     "reader": {
       "class": "com.bytedance.bitsail.connector.legacy.larksheet.source.LarkSheetInputFormat",
       "sheet_urls": "https://bytedance.feishu.cn/sheets/shtcncTJGUhZHj3GOX94gLMKxlh?sheet=lAlPxZ,https://bytedance.feishu.cn/sheets/shtcncTJGUhZHj3GOX94gLMKxlh?sheet=aNSgYr",
+      "app_id": "fake_app_id",
+      "app_secret": "fake_app_secret",
+      "batch_size": 1000,
+      "skip_nums": [100, 200],
       "columns": [
         {
           "name": "id",
@@ -33,9 +45,7 @@
           "type": "string"
         }
       ]
-    },
-    "writer": {
-      "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink"
     }
   }
 }
+```

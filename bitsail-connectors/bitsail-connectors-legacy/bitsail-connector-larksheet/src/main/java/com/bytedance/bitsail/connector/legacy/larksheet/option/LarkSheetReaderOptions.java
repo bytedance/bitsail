@@ -33,11 +33,11 @@ import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
 public interface LarkSheetReaderOptions extends ReaderOptions.BaseReaderOptions {
 
   /**
-   * LarkSheet urls list seperated by comma.<br/>
+   * LarkSheet urls list separated by comma.<br/>
    * Single url format is: https://{xxx}.feishu.cn/sheets/{sheetToken}?sheet={sheetId}
    */
   ConfigOption<String> SHEET_URL =
-      key(READER_PREFIX + "sheet_url")
+      key(READER_PREFIX + "sheet_urls")
           .noDefaultValue(String.class);
 
   /**

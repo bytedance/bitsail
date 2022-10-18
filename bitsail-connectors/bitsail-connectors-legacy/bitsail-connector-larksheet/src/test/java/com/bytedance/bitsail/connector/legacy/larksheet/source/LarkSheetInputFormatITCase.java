@@ -35,7 +35,7 @@ public class LarkSheetInputFormatITCase {
     EmbeddedFlinkCluster.submitJob(conf);
   }
 
-  // todo: add an available app
+  // todo: add an available app for test
   private void addAppInfo(BitSailConfiguration conf) {
     conf.set(LarkSheetReaderOptions.APP_ID, "test_app_id");
     conf.set(LarkSheetReaderOptions.APP_SECRET, "test_app_secret");

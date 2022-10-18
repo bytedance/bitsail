@@ -19,8 +19,6 @@ package com.bytedance.bitsail.connector.legacy.larksheet.source;
 
 import com.bytedance.bitsail.connector.legacy.larksheet.meta.SheetInfo;
 import com.bytedance.bitsail.connector.legacy.larksheet.meta.SheetMeta;
-import com.bytedance.bitsail.connector.legacy.larksheet.source.LarkSheetInputFormat;
-import com.bytedance.bitsail.connector.legacy.larksheet.source.LarkSheetInputSplit;
 
 import org.apache.flink.core.io.InputSplit;
 import org.junit.Assert;

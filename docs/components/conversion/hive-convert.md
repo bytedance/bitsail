@@ -178,8 +178,8 @@ ConvertToHiveObjectOptions options=ConvertToHiveObjectOptions.builder()
 public SettableStructObjectInspector createObjectInspector(final String columnNames,final String columnTypes);
 ```
 
-- `columnNames`: A string consisting of field names in hive, seperated by `','`, in the same order in hive.
-- `columnsType`: A string consisting of data types in hive, seperated by `','`, in the same order in hive.
+- `columnNames`: A string consisting of field names in hive, separated by `','`, in the same order in hive.
+- `columnsType`: A string consisting of data types in hive, separated by `','`, in the same order in hive.
 
 Take the above test table ([hive_example](#hive_example)) as an example:
 
