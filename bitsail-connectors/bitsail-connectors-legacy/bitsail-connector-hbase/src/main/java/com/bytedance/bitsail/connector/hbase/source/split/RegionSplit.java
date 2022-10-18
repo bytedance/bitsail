@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.hbase.source.function;
+package com.bytedance.bitsail.connector.hbase.source.split;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
