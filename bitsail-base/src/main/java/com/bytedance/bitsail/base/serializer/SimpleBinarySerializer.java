@@ -22,7 +22,7 @@ import java.io.IOException;
 /**
  * Created 2022/6/14
  */
-public class DefaultBinarySerializer<T> implements BinarySerializer<T> {
+public class SimpleBinarySerializer<T> implements BinarySerializer<T> {
 
   @Override
   public byte[] serialize(T obj) throws IOException {

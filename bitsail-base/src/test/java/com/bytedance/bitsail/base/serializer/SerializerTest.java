@@ -24,7 +24,7 @@ public class SerializerTest {
 
   @Test
   public void testBinarySerializer() throws Exception {
-    BinarySerializer<String> serializer = new DefaultBinarySerializer<>();
+    BinarySerializer<String> serializer = new SimpleBinarySerializer<>();
     Assert.assertArrayEquals(new byte[0], serializer.serialize("test_str"));
     Assert.assertNull(serializer.deserialize(new byte[] {1, 2, 3}));
   }
