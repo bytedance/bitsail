@@ -61,7 +61,6 @@ public class SheetMetaInfoResponse extends OpenApiBaseResponse {
 
   }
 
-
   @lombok.Data
   @AllArgsConstructor
   @NoArgsConstructor
@@ -87,7 +86,6 @@ public class SheetMetaInfoResponse extends OpenApiBaseResponse {
     private int revision;
 
   }
-
 
   /**
    * Get meta data of target sheet based on sheet id.

@@ -55,7 +55,6 @@ public class SheetHeader implements Serializable {
    */
   private int lastColumnNumber;
 
-
   public SheetHeader(List<Object> firstRow, List<ColumnInfo> columns, String sheetToken, String sheetId) {
     this.columnIndexMap = new LinkedHashMap<>(firstRow.size());
 
@@ -103,7 +102,6 @@ public class SheetHeader implements Serializable {
     LOG.info("sheet header generated! {}", this);
   }
 
-
   /**
    * @return Start column. Always return "A".
    */
@@ -117,7 +115,6 @@ public class SheetHeader implements Serializable {
   public String getEndColumn() {
     return LarkSheetUtil.numberToSequence(lastColumnNumber + 1);
   }
-
 
   /**
    * This method is used for:
@@ -157,7 +154,7 @@ public class SheetHeader implements Serializable {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder("Sheet header is: [");
-    for (Map.Entry<String, Integer> entry: columnIndexMap.entrySet()) {
+    for (Map.Entry<String, Integer> entry : columnIndexMap.entrySet()) {
       if (entry.getValue() > lastColumnNumber) {
         continue;
       }

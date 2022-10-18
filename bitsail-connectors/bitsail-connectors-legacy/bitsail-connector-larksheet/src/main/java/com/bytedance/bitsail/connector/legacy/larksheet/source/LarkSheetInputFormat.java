@@ -171,7 +171,6 @@ public class LarkSheetInputFormat extends InputFormatPlugin<Row, InputSplit>
   public void configure(Configuration parameters) {
     super.configure(parameters);
     this.larkSheetConfig.configure(inputSliceConfig);
-    // configure在open之前会进行调用，确保此时有可用的appAccessToken
     TokenHolder.init(SheetConfig.PRE_DEFINED_SHEET_TOKEN);
   }
 
@@ -344,18 +343,18 @@ public class LarkSheetInputFormat extends InputFormatPlugin<Row, InputSplit>
   private static InputSplit[] calculateLarkSheetInputSplits(List<SheetInfo> sheetInfoList, int batchSize,
                                                             List<Integer> skipNums) {
     int splitCount = 0;
-    if(skipNums.isEmpty()) {
+    if (skipNums.isEmpty()) {
       splitCount = sheetInfoList.stream()
           .mapToInt(sheetInfo -> (int) Math.ceil((double) (sheetInfo.getSheetMeta().getRowCount() - 1) / (double) batchSize))
           .sum();
     } else {
-      for(int i = 0; i < sheetInfoList.size(); i++) {
+      for (int i = 0; i < sheetInfoList.size(); i++) {
         SheetInfo sheetInfo = sheetInfoList.get(i);
         int skipNum = 0;
-        if(skipNums.size() > i) {
+        if (skipNums.size() > i) {
           skipNum = Math.max(skipNums.get(i), 0);
         }
-        splitCount += (int)Math.ceil((double) Math.max(sheetInfo.getSheetMeta().getRowCount() - 1 - skipNum, 0) / (double) batchSize);
+        splitCount += (int) Math.ceil((double) Math.max(sheetInfo.getSheetMeta().getRowCount() - 1 - skipNum, 0) / (double) batchSize);
       }
     }
     InputSplit[] larkSheetInputSplits = new LarkSheetInputSplit[splitCount];
@@ -370,10 +369,10 @@ public class LarkSheetInputFormat extends InputFormatPlugin<Row, InputSplit>
       String sheetToken = sheetInfo.getSheetToken();
       int curCount = 0;
       int skipNum = 0;
-      if(skipNums.isEmpty()) {
+      if (skipNums.isEmpty()) {
         curCount = (int) Math.ceil((double) (sheetMeta.getRowCount() - 1) / (double) batchSize);
       } else {
-        if(skipNums.size() > i) {
+        if (skipNums.size() > i) {
           skipNum = Math.max(skipNums.get(i), 0);
         }
         curCount = (int) Math.ceil((double) Math.max(sheetInfo.getSheetMeta().getRowCount() - 1 - skipNum, 0) / (double) batchSize);

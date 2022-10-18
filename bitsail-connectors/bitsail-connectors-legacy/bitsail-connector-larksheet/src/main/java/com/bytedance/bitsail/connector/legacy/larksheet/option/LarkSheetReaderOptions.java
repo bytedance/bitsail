@@ -17,9 +17,10 @@
 
 package com.bytedance.bitsail.connector.legacy.larksheet.option;
 
-import com.alibaba.fastjson.TypeReference;
 import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.ReaderOptions;
+
+import com.alibaba.fastjson.TypeReference;
 
 import java.util.List;
 import java.util.Map;

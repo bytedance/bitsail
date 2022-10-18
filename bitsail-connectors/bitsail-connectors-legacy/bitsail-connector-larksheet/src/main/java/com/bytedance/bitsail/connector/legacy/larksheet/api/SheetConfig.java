@@ -19,8 +19,8 @@ package com.bytedance.bitsail.connector.legacy.larksheet.api;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.legacy.larksheet.option.LarkSheetReaderOptions;
-import com.google.common.collect.Sets;
 
+import com.google.common.collect.Sets;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
@@ -58,8 +58,7 @@ public class SheetConfig implements Serializable {
   /**
    * Error codes related to illegal token.
    */
-  public static final Set<Integer> INVALID_ACCESS_TOKEN_CODES
-      = Sets.newHashSet(INVALID_TENANT_ACCESS_TOKEN, INVALID_APP_ACCESS_TOKEN, INVALID_ACCESS_TOKEN);
+  public static final Set<Integer> INVALID_ACCESS_TOKEN_CODES = Sets.newHashSet(INVALID_TENANT_ACCESS_TOKEN, INVALID_APP_ACCESS_TOKEN, INVALID_ACCESS_TOKEN);
 
   /**
    * Maximum reader parallelism.<br/>

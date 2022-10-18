@@ -31,7 +31,7 @@ import java.util.List;
 public class LarkSheetInputFormatTest {
 
   @Test
-  public void testCalculateLarkSheetInputSplits() throws Exception{
+  public void testCalculateLarkSheetInputSplits() throws Exception {
     SheetMeta sheetMeta = new SheetMeta(4, 20, 40, "", "", new Object());
     SheetInfo sheetInfo = new SheetInfo(sheetMeta, "", "");
     List<SheetInfo> sheetInfoList = new ArrayList<>();

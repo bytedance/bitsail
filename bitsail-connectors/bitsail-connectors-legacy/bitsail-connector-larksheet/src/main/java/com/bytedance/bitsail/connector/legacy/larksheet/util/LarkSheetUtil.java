@@ -57,10 +57,12 @@ import java.util.regex.Matcher;
 public class LarkSheetUtil {
   private static final Logger LOG = LoggerFactory.getLogger(LarkSheetUtil.class);
 
+  private static final int CHARACTER_NUM = 26;
+
   private LarkSheetUtil() {
   }
 
-  private static final Retryer<OpenApiBaseResponse> retryer = RetryerBuilder.<OpenApiBaseResponse>newBuilder()
+  private static final Retryer<OpenApiBaseResponse> RETRYER = RetryerBuilder.<OpenApiBaseResponse>newBuilder()
       .retryIfRuntimeException()
       .retryIfResult(OpenApiBaseResponse::isFlowLimited)
       .retryIfResult(res -> res.isFailed() && !res.isForbidden())
@@ -119,13 +121,13 @@ public class LarkSheetUtil {
   public static String numberToSequence(int number) {
     StringBuilder sb = new StringBuilder();
     while (number > 0) {
-      int c = number % 26;
+      int c = number % CHARACTER_NUM;
       if (c == 0) {
-        c = 26;
+        c = CHARACTER_NUM;
         number -= 1;
       }
       sb.insert(0, (char) ('A' + c - 1));
-      number /= 26;
+      number /= CHARACTER_NUM;
     }
     return sb.toString();
   }
@@ -144,7 +146,7 @@ public class LarkSheetUtil {
     int ans = 0;
     for (int i = 0; i < s.length(); i++) {
       int num = s.charAt(i) - 'A' + 1;
-      ans = ans * 26 + num;
+      ans = ans * CHARACTER_NUM + num;
     }
     return ans;
   }
@@ -216,7 +218,7 @@ public class LarkSheetUtil {
   public static SheetMetaInfoResponse getMetaInfo(final String sheetToken) {
     SheetMetaInfoResponse response;
     try {
-      response = (SheetMetaInfoResponse) retryer.call(() -> {
+      response = (SheetMetaInfoResponse) RETRYER.call(() -> {
         HttpManager.WrappedResponse wrappedResponse;
         String url = SheetConfig.OPEN_API_HOST + String.format(SheetConfig.META_INFO_API_FORMAT, sheetToken);
         wrappedResponse = HttpManager.sendGet(url, null, genAuthorizationHeader(TokenHolder.getToken()));
@@ -245,7 +247,7 @@ public class LarkSheetUtil {
       String sheetToken = sheetInfo.getSheetToken();
       SheetMeta sheetMeta = sheetInfo.getSheetMeta();
       try {
-        response = (SheetRangeResponse) retryer.call(() -> {
+        response = (SheetRangeResponse) RETRYER.call(() -> {
           HttpManager.WrappedResponse wrappedResponse;
           String url = String.format(SheetConfig.OPEN_API_HOST + SheetConfig.SINGLE_RANGE_API_FORMAT,
               sheetToken,
@@ -286,7 +288,7 @@ public class LarkSheetUtil {
                                             final Map<String, String> paramMap) {
     SheetRangeResponse response;
     try {
-      response = (SheetRangeResponse) retryer.call(() -> {
+      response = (SheetRangeResponse) RETRYER.call(() -> {
         HttpManager.WrappedResponse wrappedResponse;
         String url = String.format(SheetConfig.OPEN_API_HOST + SheetConfig.SINGLE_RANGE_API_FORMAT, sheetToken, sheetId,
             range);

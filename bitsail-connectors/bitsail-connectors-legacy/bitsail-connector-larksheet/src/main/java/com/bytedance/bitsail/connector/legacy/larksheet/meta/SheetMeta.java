@@ -65,7 +65,6 @@ public class SheetMeta implements Serializable {
    */
   private Object merges;
 
-
   /**
    * Get the maximum range of the first row.
    *

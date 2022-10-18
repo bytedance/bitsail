@@ -53,7 +53,7 @@ public class TokenHolder {
   @Getter
   private static volatile boolean generateTokenByApi = false;
 
-  private static final Retryer<OpenApiBaseResponse> retryer = RetryerBuilder.<OpenApiBaseResponse>newBuilder()
+  private static final Retryer<OpenApiBaseResponse> RETRYER = RetryerBuilder.<OpenApiBaseResponse>newBuilder()
       .retryIfException()
       .retryIfResult(OpenApiBaseResponse::isFlowLimited)
       .withStopStrategy(StopStrategies.stopAfterAttempt(SheetConfig.ATTEMPT_NUMBER))
@@ -95,7 +95,6 @@ public class TokenHolder {
     return appAccessToken;
   }
 
-
   /**
    * Generate token by API.<br/>
    * Ref: <a href="https://open.feishu.cn/document/ukTMukTMukTM/uADN14CM0UjLwQTN?lang=en-US">Custom applications get app_access_token</a>
@@ -109,7 +108,7 @@ public class TokenHolder {
     AppAccessTokenResponse response;
 
     try {
-      response = (AppAccessTokenResponse) retryer.call(() -> {
+      response = (AppAccessTokenResponse) RETRYER.call(() -> {
         HttpManager.WrappedResponse wrappedResponse;
         String url = SheetConfig.OPEN_API_HOST + SheetConfig.APP_ACCESS_TOKEN_API;
         wrappedResponse = HttpManager.sendPost(url, null, body, ContentType.APPLICATION_JSON);
