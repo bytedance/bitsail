@@ -34,4 +34,6 @@ public class HBaseConstants {
   public static final String KEY_JAVA_SECURITY_KRB5_CONF = "java.security.krb5.conf";
 
   public static final String KEY_FS_HDFS_IMPL_DISABLE_CACHE = "fs.hdfs.impl.disable.cache";
+
+  public static final int MAX_PARALLELISM_OUTPUT_HBASE = 5;
 }

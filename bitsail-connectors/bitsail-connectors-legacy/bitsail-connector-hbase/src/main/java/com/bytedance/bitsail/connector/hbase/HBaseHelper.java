@@ -23,15 +23,18 @@ import com.bytedance.bitsail.connector.hbase.auth.KerberosAuthenticator;
 import org.apache.commons.collections.MapUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.client.BufferedMutator;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.security.PrivilegedAction;
 import java.util.Map;
+import java.util.Objects;
 
 public class HBaseHelper {
   private static final Logger LOG = LoggerFactory.getLogger(HBaseHelper.class);
@@ -61,7 +64,7 @@ public class HBaseHelper {
    * @param hbaseConfigMap User defined hbase configurations.
    * @return A hadoop configuration.
    */
-  private static Configuration getConfig(Map<String, Object> hbaseConfigMap) {
+  public static Configuration getConfig(Map<String, Object> hbaseConfigMap) {
     Configuration hConfiguration = HBaseConfiguration.create();
     if (MapUtils.isEmpty(hbaseConfigMap)) {
       return hConfiguration;
@@ -73,6 +76,20 @@ public class HBaseHelper {
       }
     }
     return hConfiguration;
+  }
+
+  /**
+   * Close mutator.
+   */
+  public static void closeBufferedMutator(BufferedMutator bufferedMutator) {
+    closeWithException(bufferedMutator);
+  }
+
+  /**
+   * Close hbase connection.
+   */
+  public static void closeConnection(Connection hConnection) {
+    closeWithException(hConnection);
   }
 
   /**
@@ -94,6 +111,19 @@ public class HBaseHelper {
       });
     } catch (Exception e) {
       throw new RuntimeException("Login kerberos error", e);
+    }
+  }
+
+  /**
+   * Close an object and throw exception if failed to close.
+   */
+  private static void closeWithException(Closeable closeable) {
+    try {
+      if (Objects.nonNull(closeable)) {
+        closeable.close();
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to close.", e);
     }
   }
 }

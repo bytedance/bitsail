@@ -108,4 +108,19 @@ public class KerberosAuthenticator {
     }
     return null;
   }
+
+  /**
+   * Check if the cluster enable kerberos.
+   * todo: Should check if sys configuration enables kerberos.
+   */
+  public static boolean enableKerberosConfig() {
+    return false;
+  }
+
+  /**
+   * Add kerberos content in sys configuration into hbase configuration.
+   */
+  public static void addHBaseKerberosConf(Map<String, Object> optionalConfig) {
+    // todo: Fill the code after enableKerberosConfig is completed.
+  }
 }
