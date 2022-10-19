@@ -20,6 +20,7 @@ package com.bytedance.bitsail.connector.hbase.sink;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+
 import org.junit.Ignore;
 import org.junit.Test;
 

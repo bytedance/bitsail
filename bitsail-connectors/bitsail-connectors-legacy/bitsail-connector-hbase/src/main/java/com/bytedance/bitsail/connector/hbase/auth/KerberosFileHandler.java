@@ -53,7 +53,7 @@ public class KerberosFileHandler {
    * 2. java.security.krb5.conf: Path of krb5.conf file.<br/>
    * 3. useLocalFile: If to use local krb files for authentication.
    */
-  public static void adjustHbaseConf (Map<String, Object> hbaseConfigMap) {
+  public static void adjustHbaseConf(Map<String, Object> hbaseConfigMap) {
     boolean useBase64Content = MapUtils.getBooleanValue(hbaseConfigMap, KEY_USE_BASE64_CONTENT);
     if (useBase64Content) {
       hbaseConfigMap.put(KEY_PRINCIPAL_FILE, KEY_KEYTAB_CONTENT_TMP_FILEPATH);
@@ -67,7 +67,7 @@ public class KerberosFileHandler {
    * @param hbaseConfigMap User defined hbase configuration.
    */
   public static void loadConfContent(Map<String, Object> hbaseConfigMap) throws IOException {
-    if(hbaseConfLoaded) {
+    if (hbaseConfLoaded) {
       LOG.info("Hbase kerberos file already loaded.");
     } else {
       handleAuthenticationBase64Content(hbaseConfigMap);
@@ -151,7 +151,7 @@ public class KerberosFileHandler {
     }
 
     // Double locks support singleton mode.
-    if(hbaseConfLoaded) {
+    if (hbaseConfLoaded) {
       LOG.info("Hbase kerberos file already loaded.");
       return;
     }
@@ -177,12 +177,12 @@ public class KerberosFileHandler {
    * @param base64Content Base64 encoded content.
    * @param filePath Path of file.
    */
-  private static void writeBase64ContentToFile(String base64Content, String filePath) throws IOException{
+  private static void writeBase64ContentToFile(String base64Content, String filePath) throws IOException {
     // Write data to a temporary file to prevent write failure and ensure the correctness of file contents.
     String tmpFilePath = filePath + ".tmp";
     createTmpPath(tmpFilePath);
 
-    try (FileOutputStream fileStream = new FileOutputStream(tmpFilePath)){
+    try (FileOutputStream fileStream = new FileOutputStream(tmpFilePath)) {
       fileStream.write(Base64.getDecoder().decode(base64Content));
     } catch (IOException e) {
       LOG.error("Fail to write content to " + filePath);
@@ -200,7 +200,7 @@ public class KerberosFileHandler {
   /**
    * Create temporary files.
    */
-  private static void createTmpPath (String filePath) throws IOException{
+  private static void createTmpPath(String filePath) throws IOException {
     File fp = new File(filePath);
     if (!fp.exists()) {
       fp.getParentFile().mkdirs();

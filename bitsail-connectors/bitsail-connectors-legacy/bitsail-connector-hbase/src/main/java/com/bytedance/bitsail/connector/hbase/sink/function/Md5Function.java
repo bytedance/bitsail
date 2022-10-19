@@ -37,6 +37,7 @@ public class Md5Function implements IFunction {
     }
   }
 
+  @SuppressWarnings("checkstyle:MagicNumber")
   private static String bytes2Hex(final byte[] data) {
     final int l = data.length;
     final char[] out = new char[l << 1];

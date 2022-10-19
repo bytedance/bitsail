@@ -22,6 +22,7 @@ import com.bytedance.bitsail.common.column.LongColumn;
 import com.bytedance.bitsail.common.column.StringColumn;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
+
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.junit.Assert;
 import org.junit.Test;

@@ -19,9 +19,9 @@ package com.bytedance.bitsail.connector.hbase.constant;
 
 public class HBaseConstants {
 
-  public final static String AUTHENTICATION_TYPE = "Kerberos";
-  public final static String KEY_HBASE_SECURITY_AUTHENTICATION = "hbase.security.authentication";
-  public final static String KEY_HBASE_SECURITY_AUTHORIZATION = "hbase.security.authorization";
+  public static final String AUTHENTICATION_TYPE = "Kerberos";
+  public static final String KEY_HBASE_SECURITY_AUTHENTICATION = "hbase.security.authentication";
+  public static final String KEY_HBASE_SECURITY_AUTHORIZATION = "hbase.security.authorization";
 
   public static final String KEY_PRINCIPAL = "principal";
   public static final String KEY_USE_LOCAL_FILE = "useLocalFile";

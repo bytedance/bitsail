@@ -17,7 +17,6 @@
 
 package com.bytedance.bitsail.connector.hbase.option;
 
-
 import com.alibaba.fastjson.TypeReference;
 import com.bytedance.bitsail.common.annotation.Essential;
 import com.bytedance.bitsail.common.option.ConfigOption;

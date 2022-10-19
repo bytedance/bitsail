@@ -137,7 +137,7 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
   private RowBuilder rowBuilder;
 
   /**
-   * HBase charsets，default UTF-8.
+   * HBase charsets, default UTF-8.
    */
   private String encoding = StandardCharsets.UTF_8.name();
 
@@ -281,7 +281,6 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
         .enforceDownStreamChain(false)
         .build();
   }
-
 
   @Override
   public BaseStatistics getStatistics(BaseStatistics baseStatistics) {

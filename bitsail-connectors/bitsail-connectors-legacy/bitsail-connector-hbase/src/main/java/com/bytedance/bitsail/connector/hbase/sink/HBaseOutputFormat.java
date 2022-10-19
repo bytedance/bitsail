@@ -93,7 +93,7 @@ public class HBaseOutputFormat extends OutputFormatPlugin<Row> implements Result
 
   protected List<Integer> rowKeyColumnIndex = Lists.newArrayList();
 
-  private Map<String, Object> hBaseConf;
+  private Map<String, Object> hbaseConf;
 
   private RowTypeInfo rowTypeInfo;
 
@@ -128,7 +128,7 @@ public class HBaseOutputFormat extends OutputFormatPlugin<Row> implements Result
       sleepRandomTime();
       UserGroupInformation ugi;
       if (openUserKerberos) {
-        ugi = KerberosAuthenticator.getUgi(hBaseConf);
+        ugi = KerberosAuthenticator.getUgi(hbaseConf);
       } else {
         ugi = UserGroupInformation.getCurrentUser();
       }
@@ -141,6 +141,7 @@ public class HBaseOutputFormat extends OutputFormatPlugin<Row> implements Result
     }
   }
 
+  @SuppressWarnings("checkstyle:MagicNumber")
   private void sleepRandomTime() {
     try {
       Thread.sleep(5000L + (long) (10000 * Math.random()));
@@ -157,12 +158,12 @@ public class HBaseOutputFormat extends OutputFormatPlugin<Row> implements Result
     timeMillisecondFormatThreadLocal = new ThreadLocal();
 
     try {
-      org.apache.hadoop.conf.Configuration hConfiguration = HBaseHelper.getConfig(hBaseConf);
-      connection = ConnectionFactory.createConnection(hConfiguration);
+      org.apache.hadoop.conf.Configuration hbaseConfiguration = HBaseHelper.getConfig(hbaseConf);
+      connection = ConnectionFactory.createConnection(hbaseConfiguration);
 
       bufferedMutator = connection.getBufferedMutator(
           new BufferedMutatorParams(TableName.valueOf(tableName))
-              .pool(HTable.getDefaultExecutor(hConfiguration))
+              .pool(HTable.getDefaultExecutor(hbaseConfiguration))
               .writeBufferSize(writeBufferSize));
     } catch (Exception e) {
       HBaseHelper.closeBufferedMutator(bufferedMutator);
@@ -247,6 +248,7 @@ public class HBaseOutputFormat extends OutputFormatPlugin<Row> implements Result
     return "HBaseOutputFormat writeRecord error: when converting field[" + columnNames.get(pos) + "] in Row(" + row + ")";
   }
 
+  @SuppressWarnings("checkstyle:MagicNumber")
   private byte[] getRowkey(Row record) throws Exception {
     Map<String, Object> nameValueMap = new HashMap<>((rowKeyColumnIndex.size() << 2) / 3);
     for (Integer keyColumnIndex : rowKeyColumnIndex) {
@@ -260,13 +262,11 @@ public class HBaseOutputFormat extends OutputFormatPlugin<Row> implements Result
     Integer index = versionColumnIndex.intValue();
     long timestamp;
     if (index == null) {
-      //指定时间作为版本
       timestamp = Long.valueOf(versionColumnValue);
       if (timestamp < 0) {
         throw new IllegalArgumentException("Illegal timestamp to construct versionClumn: " + timestamp);
       }
     } else {
-      //指定列作为版本,long/doubleColumn直接record.aslong, 其它类型尝试用yyyy-MM-dd HH:mm:ss,yyyy-MM-dd HH:mm:ss SSS去format
       if (index >= record.getArity() || index < 0) {
         throw new IllegalArgumentException("version column index out of range: " + index);
       }
@@ -380,13 +380,13 @@ public class HBaseOutputFormat extends OutputFormatPlugin<Row> implements Result
       }
     }
 
-    hBaseConf = outputSliceConfig.getNecessaryOption(HBaseWriterOptions.HBASE_CONF, HBasePluginErrorCode.REQUIRED_VALUE);
+    hbaseConf = outputSliceConfig.getNecessaryOption(HBaseWriterOptions.HBASE_CONF, HBasePluginErrorCode.REQUIRED_VALUE);
 
     boolean openPlatformKerberos = KerberosAuthenticator.enableKerberosConfig();
-    openUserKerberos = KerberosAuthenticator.openKerberos(hBaseConf);
+    openUserKerberos = KerberosAuthenticator.openKerberos(hbaseConf);
     enableKerberos = openPlatformKerberos || openUserKerberos;
     if (openPlatformKerberos && !openUserKerberos) {
-      KerberosAuthenticator.addHBaseKerberosConf(hBaseConf);
+      KerberosAuthenticator.addHBaseKerberosConf(hbaseConf);
     }
 
     List<ColumnInfo> columns = outputSliceConfig.getNecessaryOption(HBaseWriterOptions.COLUMNS, HBasePluginErrorCode.REQUIRED_VALUE);

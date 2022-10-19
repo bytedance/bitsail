@@ -51,8 +51,8 @@ public class HBaseHelper {
     }
 
     try {
-      Configuration hConfiguration = getConfig(hbaseConfigMap);
-      return ConnectionFactory.createConnection(hConfiguration);
+      Configuration hbaseConfiguration = getConfig(hbaseConfigMap);
+      return ConnectionFactory.createConnection(hbaseConfiguration);
     } catch (IOException e) {
       LOG.error("Get connection fail with config:{}", hbaseConfigMap);
       throw new RuntimeException(e);
@@ -65,17 +65,17 @@ public class HBaseHelper {
    * @return A hadoop configuration.
    */
   public static Configuration getConfig(Map<String, Object> hbaseConfigMap) {
-    Configuration hConfiguration = HBaseConfiguration.create();
+    Configuration hbaseConfiguration = HBaseConfiguration.create();
     if (MapUtils.isEmpty(hbaseConfigMap)) {
-      return hConfiguration;
+      return hbaseConfiguration;
     }
 
     for (Map.Entry<String, Object> entry : hbaseConfigMap.entrySet()) {
       if (entry.getValue() != null && !(entry.getValue() instanceof Map)) {
-        hConfiguration.set(entry.getKey(), entry.getValue().toString());
+        hbaseConfiguration.set(entry.getKey(), entry.getValue().toString());
       }
     }
-    return hConfiguration;
+    return hbaseConfiguration;
   }
 
   /**
@@ -88,8 +88,8 @@ public class HBaseHelper {
   /**
    * Close hbase connection.
    */
-  public static void closeConnection(Connection hConnection) {
-    closeWithException(hConnection);
+  public static void closeConnection(Connection hbaseConnection) {
+    closeWithException(hbaseConnection);
   }
 
   /**
@@ -102,8 +102,8 @@ public class HBaseHelper {
       UserGroupInformation ugi = KerberosAuthenticator.getUgi(hbaseConfigMap);
       return ugi.doAs((PrivilegedAction<Connection>) () -> {
         try {
-          Configuration hConfiguration = getConfig(hbaseConfigMap);
-          return ConnectionFactory.createConnection(hConfiguration);
+          Configuration hbaseConfiguration = getConfig(hbaseConfigMap);
+          return ConnectionFactory.createConnection(hbaseConfiguration);
         } catch (IOException e) {
           LOG.error("Get connection fail with config:{}", hbaseConfigMap);
           throw new RuntimeException(e);
