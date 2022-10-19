@@ -34,7 +34,6 @@ import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -114,7 +113,6 @@ public abstract class JedisOutputFormat extends OutputFormatPlugin<Row> implemen
 
   public static final int MAX_ATTEMPT_NUM = 5;
 
-
   @Override
   public void configure(Configuration parameters) {
     super.configure(parameters);
@@ -141,7 +139,7 @@ public abstract class JedisOutputFormat extends OutputFormatPlugin<Row> implemen
       Row record;
       while ((record = recordQueue.poll()) != null) {
 
-        //***************** todo:废弃掉这个兜底逻辑*****************
+        //***************** todo: remove this logic *****************
         byte[] key = generateKey((byte[]) record.getField(0));
         byte[] value = (byte[]) record.getField(1);
         byte[] scoreOrHashKey = value;
@@ -178,7 +176,6 @@ public abstract class JedisOutputFormat extends OutputFormatPlugin<Row> implemen
       throw new RuntimeException("Error while init jedis client.", e);
     }
   }
-
 
   /**
    * Gen pipeline processor for jedis commands.
@@ -295,7 +292,6 @@ public abstract class JedisOutputFormat extends OutputFormatPlugin<Row> implemen
     }
     return new JedisCommandDescription(jedisCommand, additionalKey, ttlSeconds);
   }
-
 
   @Override
   public boolean uniformedParallelism() {

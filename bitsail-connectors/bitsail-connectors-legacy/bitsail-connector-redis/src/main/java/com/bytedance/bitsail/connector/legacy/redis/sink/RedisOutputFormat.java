@@ -94,6 +94,7 @@ public class RedisOutputFormat extends JedisOutputFormat {
     LOG.info("log_sample_interval is:[{}]", this.logSampleInterval);
   }
 
+  @SuppressWarnings("checkstyle:MagicNumber")
   @Override
   public void open(int taskNumber, int numTasks) throws IOException {
     super.open(taskNumber, numTasks);
@@ -128,7 +129,6 @@ public class RedisOutputFormat extends JedisOutputFormat {
   protected PipelineProcessor genPipelineProcessor(int commandSize, boolean complexTypeWithTtl) throws ExecutionException, RetryException {
     return new RedisPipelineProcessor(jedisPool, jedisFetcher, commandSize, processorId, logSampleInterval, complexTypeWithTtl);
   }
-
 
   @Override
   protected byte[] generateKey(byte[] key) {

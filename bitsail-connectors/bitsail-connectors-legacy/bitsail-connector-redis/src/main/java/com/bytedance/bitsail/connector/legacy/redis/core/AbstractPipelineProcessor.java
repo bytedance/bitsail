@@ -173,7 +173,6 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
     this.responseSize = complexTypeWithTtl ? 2 : 1;
   }
 
-
   /**
    * Acquire connection from pool.
    */
@@ -194,7 +193,6 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
       LOG.warn("release jedis connection occurs error.", e);
     }
   }
-
 
   @Override
   public void preExecute() throws Exception {
@@ -228,7 +226,7 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
         }
       }
     } catch (Exception e) {
-      LOG.error("pre execute pipeline occurs error，may caused by connection acquiring.", e);
+      LOG.error("pre execute pipeline occurs error, may caused by connection acquiring.", e);
       postExecuteWithRetry(requests, e);
     } finally {
       releaseConnection();
@@ -258,7 +256,6 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
       }
     }
   }
-
 
   @Override
   public void postExecute(List<Command> curRequests, Throwable failure) {
@@ -303,7 +300,6 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
     }
     return needRetry;
   }
-
 
   @Override
   public void addInitialCommand(Command command) {
@@ -355,7 +351,6 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
       this.pipeline.expire(command.getKey(), command.getTtlInSeconds());
     }
   }
-
 
   @Override
   public void close() {
@@ -422,6 +417,5 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
   public boolean hitLogSampling() {
     return (processorId & (logSampleInterval - 1)) == 0;
   }
-
 }
 

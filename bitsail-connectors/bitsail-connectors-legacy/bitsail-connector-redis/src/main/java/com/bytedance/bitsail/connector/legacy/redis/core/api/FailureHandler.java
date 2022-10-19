@@ -52,7 +52,7 @@ public interface FailureHandler {
 
 
   /**
-   * caught unexpected jedis data exception，which mean should fail this job immediately
+   * caught unexpected jedis data exception, which mean should fail this job immediately
    * @param command the failed command
    * @param failure the JedisDataException in pipeline
    * @param processor pipeline processor, to store resolve result

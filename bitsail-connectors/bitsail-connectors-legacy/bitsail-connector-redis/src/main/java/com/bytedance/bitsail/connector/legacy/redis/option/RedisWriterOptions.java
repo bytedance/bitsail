@@ -90,6 +90,6 @@ public interface RedisWriterOptions extends WriterOptions.BaseWriterOptions {
    */
   ConfigOption<Integer> LOG_SAMPLE_INTERVAL =
       key(WRITER_PREFIX + "log_sample_interval")
-          .defaultValue(1 << 8);
+          .defaultValue(256);
 }
 

@@ -20,30 +20,16 @@ package com.bytedance.bitsail.base.enumerate;
 import lombok.Getter;
 
 /**
- * DTS常量类，用于存放各种常量
- *
  * @author yangyun
- * @create 2020-12-15 3:03 下午
  **/
 public enum TtlType {
-  /**
-   * 天
-   */
+
   DAY(60 * 60 * 24),
 
-  /**
-   * 小时
-   */
   HOUR(60 * 60),
 
-  /**
-   * 分钟
-   */
   MINUTE(60),
 
-  /**
-   * 秒
-   */
   SECOND(1);
 
   @Getter
