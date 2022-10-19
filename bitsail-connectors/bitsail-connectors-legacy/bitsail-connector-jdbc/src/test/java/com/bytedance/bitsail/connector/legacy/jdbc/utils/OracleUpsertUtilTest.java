@@ -1,6 +1,8 @@
 package com.bytedance.bitsail.connector.legacy.jdbc.utils;
 
-import com.bytedance.dts.batch.jdbc.OracleOutputFormat;
+import com.bytedance.bitsail.connector.legacy.jdbc.sink.OracleOutputFormat;
+import com.bytedance.bitsail.connector.legacy.jdbc.utils.upsert.OracleUpsertUtil;
+
 import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,10 +26,10 @@ public class OracleUpsertUtilTest extends TestCase {
     cols.add("pk");
     upsertKeys.put("primary_key", cols);
     OracleUpsertUtil upsertUtil = new OracleUpsertUtil(new OracleOutputFormat(), shardKeys, upsertKeys);
-    //测试覆盖写入生成的merge into语句
-    String expectedOverwriteQuery = "MERGE INTO \"dts_test\" T1 USING (SELECT ? \"col0\",? \"col1\" FROM DUAL) T2 ON (T1.\"pk\"=T2.\"pk\") " +
+    // Test overwriting query MERGE INTO
+    String expectedOverwriteQuery = "MERGE INTO \"bitsail_test\" T1 USING (SELECT ? \"col0\",? \"col1\" FROM DUAL) T2 ON (T1.\"pk\"=T2.\"pk\") " +
             "WHEN MATCHED THEN UPDATE SET \"T1\".col0=\"T2\".col0,\"T1\".col1=\"T2\".col1 " +
             "WHEN NOT MATCHED THEN INSERT (\"col0\",\"col1\") VALUES (\"T2\".\"col0\",\"T2\".\"col1\")";
-    Assert.assertEquals(expectedOverwriteQuery, upsertUtil.genUpsertTemplate("dts_test", columns, ""));
+    Assert.assertEquals(expectedOverwriteQuery, upsertUtil.genUpsertTemplate("bitsail_test", columns, ""));
   }
 }

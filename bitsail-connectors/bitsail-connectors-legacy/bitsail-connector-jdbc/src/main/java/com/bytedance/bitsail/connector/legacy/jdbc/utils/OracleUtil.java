@@ -101,6 +101,13 @@ public class OracleUtil extends AbstractJdbcUtil {
     return getTableInfo(url, user, password, schema, tableName, initSql);
   }
 
+  public TableInfo getTableInfo(String url, String user, String password, String tableName, String initSql) throws Exception {
+    String[] splitTableAndDbName = splitTableName(tableName);
+    String db = splitTableAndDbName[0];
+    String table = splitTableAndDbName[1];
+    return getTableInfo(url, user, password, db, table, initSql);
+  }
+
   String parseColumnType(String columnType, String dataScale) {
     int scale = dataScale == null ? Integer.MAX_VALUE : Integer.parseInt(dataScale);
 

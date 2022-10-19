@@ -92,6 +92,12 @@
             <artifactId>mssql-jdbc</artifactId>
         </dependency>
 
+        <!-- Oracle -->
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+        </dependency>
+
         <!--   test     -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
@@ -111,6 +117,13 @@
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-connector-print</artifactId>
             <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <type>jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>

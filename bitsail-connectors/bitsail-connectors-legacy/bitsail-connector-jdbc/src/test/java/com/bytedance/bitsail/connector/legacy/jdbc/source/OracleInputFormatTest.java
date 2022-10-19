@@ -1,6 +1,7 @@
 package com.bytedance.bitsail.connector.legacy.jdbc.source;
 
-import com.bytedance.dts.batch.jdbc.converter.OracleValueConverter;
+import com.bytedance.bitsail.connector.legacy.jdbc.converter.OracleValueConverter;
+
 import oracle.jdbc.OracleResultSet;
 import oracle.jdbc.OracleResultSetMetaData;
 import oracle.jdbc.OracleTypes;
@@ -12,7 +13,7 @@ import org.mockito.Mockito;
 import java.sql.Timestamp;
 
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 
 public class OracleInputFormatTest {
 

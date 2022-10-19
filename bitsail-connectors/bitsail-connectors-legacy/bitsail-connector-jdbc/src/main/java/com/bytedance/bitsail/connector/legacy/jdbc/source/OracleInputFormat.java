@@ -1,13 +1,35 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Original Files: apache/flink(https://github.com/apache/flink)
+ * Copyright: Copyright 2014-2022 The Apache Software Foundation
+ * SPDX-License-Identifier: Apache License 2.0
+ */
+
 package com.bytedance.bitsail.connector.legacy.jdbc.source;
 
-import com.bytedance.dts.batch.jdbc.converter.JdbcValueConverter;
-import com.bytedance.dts.batch.jdbc.converter.OracleValueConverter;
-import com.bytedance.dts.common.configuration.DtsConfiguration;
-import com.bytedance.dts.common.configuration.ReaderOptions;
-import com.bytedance.dts.common.ddl.source.SourceEngineConnector;
-import com.bytedance.dts.common.model.ColumnInfo;
-import com.bytedance.dts.common.util.OracleUtil;
-import com.bytedance.dts.common.util.TypeConvertUtil.StorageEngine;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.ddl.source.SourceEngineConnector;
+import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.util.TypeConvertUtil.StorageEngine;
+import com.bytedance.bitsail.connector.legacy.jdbc.converter.JdbcValueConverter;
+import com.bytedance.bitsail.connector.legacy.jdbc.converter.OracleValueConverter;
+import com.bytedance.bitsail.connector.legacy.jdbc.options.OracleReaderOptions;
+import com.bytedance.bitsail.connector.legacy.jdbc.utils.OracleUtil;
+
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -24,7 +46,8 @@ public class OracleInputFormat extends JDBCInputFormat {
   @Override
   public void initPlugin() throws ExecutionException, InterruptedException {
     super.initPlugin();
-    this.intervalHandlingMode = inputSliceConfig.getUnNecessaryOption(ReaderOptions.OracleReaderOptions.INTERVAL_HANDLE_MODE, ReaderOptions.OracleReaderOptions.INTERVAL_HANDLE_MODE.defaultValue());
+    this.intervalHandlingMode = inputSliceConfig.getUnNecessaryOption(
+            OracleReaderOptions.INTERVAL_HANDLE_MODE, OracleReaderOptions.INTERVAL_HANDLE_MODE.defaultValue());
   }
 
   @Override
@@ -39,9 +62,9 @@ public class OracleInputFormat extends JDBCInputFormat {
     for (ColumnInfo column : columns) {
       String columnName = column.getName();
       String columnType = column.getType();
-      // xmltype 当作 clob 类型处理
-      // sql 语句类似 select t."DOC".getClobVal() as "DOC", "TEST" from po_xml_tab t
-      // 详见 Oracle xmltype 文档 https://docs.oracle.com/cd/B14117_01/appdev.101/b10790/xdb11jav.htm
+      // xmltype is handled as clob
+      // SQL example: 'select t."DOC".getClobVal() as "DOC", "TEST" from po_xml_tab t'
+      // Reference: Oracle xmltype document https://docs.oracle.com/cd/B14117_01/appdev.101/b10790/xdb11jav.htm
       if ("xmltype".equalsIgnoreCase(columnType)) {
         sql.append(tableAlias).append(".").append(getQuoteColumn(columnName.toUpperCase())).append(".getClobVal() as ")
           .append(getQuoteColumn(columnName.toUpperCase())).append(",");
@@ -80,8 +103,8 @@ public class OracleInputFormat extends JDBCInputFormat {
   }
 
   @Override
-  public SourceEngineConnector initSourceSchemaManager(DtsConfiguration commonConf, DtsConfiguration readerConf) throws Exception {
-    return new OracleSourceSchemaManagerGenerator().genJdbcSchemaManager(commonConf, readerConf);
+  public SourceEngineConnector initSourceSchemaManager(BitSailConfiguration commonConf, BitSailConfiguration readerConf) throws Exception {
+    return new OracleSourceEngineConnector(commonConf, readerConf);
   }
 
   @Override

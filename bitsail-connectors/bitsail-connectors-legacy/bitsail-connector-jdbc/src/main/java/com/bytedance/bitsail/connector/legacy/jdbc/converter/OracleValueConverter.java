@@ -1,6 +1,28 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Original Files: apache/flink(https://github.com/apache/flink)
+ * Copyright: Copyright 2014-2022 The Apache Software Foundation
+ * SPDX-License-Identifier: Apache License 2.0
+ */
+
 package com.bytedance.bitsail.connector.legacy.jdbc.converter;
 
-import com.bytedance.dts.batch.jdbc.util.MicroIntervalUtil;
+import com.bytedance.bitsail.connector.legacy.jdbc.utils.MicroIntervalUtil;
+
 import oracle.jdbc.OracleResultSet;
 import oracle.jdbc.OracleTypes;
 import oracle.sql.INTERVALDS;
@@ -17,9 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created 2021/4/2
- *
- * @author ke.hao
+ * Created 2022/10/18
  */
 public class OracleValueConverter extends JdbcValueConverter {
 
@@ -96,7 +116,7 @@ public class OracleValueConverter extends JdbcValueConverter {
 
   private Object getIntervalDSValue(OracleResultSet rs,
                                     int columnIndex) throws Exception {
-      return rs.getINTERVALDS(columnIndex);
+    return rs.getINTERVALDS(columnIndex);
   }
 
   private Object getIntervalYMValue(OracleResultSet rs,
@@ -108,18 +128,24 @@ public class OracleValueConverter extends JdbcValueConverter {
     final String intervalStr = interval.toString();
     if (mode.equals(IntervalHandlingMode.STRING)) {
       return intervalStr;
-    } else if (mode.equals(IntervalHandlingMode.NUMERIC)){
+    } else if (mode.equals(IntervalHandlingMode.NUMERIC)) {
       final Matcher m = INTERVAL_DAY_SECOND_PATTERN.matcher(intervalStr);
+      final int secondIdx = 2;
+      final int thirdIdx = 3;
+      final int fourthIdx = 4;
+      final int fifthIdx = 5;
+      final int sixthIdx = 6;
+      final int microsLength = 6;
       if (m.matches()) {
         final int sign = "-".equals(m.group(1)) ? -1 : 1;
         return MicroIntervalUtil.durationMicros(
                 0,
                 0,
-                sign * Integer.valueOf(m.group(2)),
-                sign * Integer.valueOf(m.group(3)),
-                sign * Integer.valueOf(m.group(4)),
-                sign * Integer.valueOf(m.group(5)),
-                sign * Integer.valueOf(MicroIntervalUtil.pad(m.group(6), 6, '0')),
+                sign * Integer.parseInt(m.group(secondIdx)),
+                sign * Integer.parseInt(m.group(thirdIdx)),
+                sign * Integer.parseInt(m.group(fourthIdx)),
+                sign * Integer.parseInt(m.group(fifthIdx)),
+                sign * Integer.parseInt(MicroIntervalUtil.pad(m.group(sixthIdx), microsLength, '0')),
                 MicroIntervalUtil.DAYS_PER_MONTH_AVG);
       }
     }
@@ -131,7 +157,7 @@ public class OracleValueConverter extends JdbcValueConverter {
     final String intervalStr = interval.toString();
     if (mode.equals(IntervalHandlingMode.STRING)) {
       return intervalStr;
-    } else if (mode.equals(IntervalHandlingMode.NUMERIC)){
+    } else if (mode.equals(IntervalHandlingMode.NUMERIC)) {
       int sign = 1;
       int start = 0;
       if (intervalStr.charAt(0) == '-') {
@@ -159,9 +185,9 @@ public class OracleValueConverter extends JdbcValueConverter {
   }
 
   /**
-   * Oracle interval类型的转化模式
-   * NUMERIC: 转化为数值,单位为ms
-   * STRING: 转换为字符串
+   * Oracle interval convert mode:
+   *   NUMERIC: Convert to numeric. Unit: ms
+   *   STRING: Convert to String
    */
   public enum IntervalHandlingMode {
     NUMERIC("numeric"),
@@ -193,7 +219,5 @@ public class OracleValueConverter extends JdbcValueConverter {
     public String getValue() {
       return value;
     }
-
   }
-
 }
