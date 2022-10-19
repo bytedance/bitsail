@@ -35,7 +35,7 @@
   "job": {
     "reader": {
       "class": "com.bytedance.bitsail.connector.legacy.larksheet.source.LarkSheetInputFormat",
-      "sheet_urls": "https://bytedance.feishu.cn/sheets/shtcncTJGUhZHj3GOX94gLMKxlh?sheet=lAlPxZ",
+      "sheet_urls": "https://e4163pj5kq.feishu.cn/sheets/shtcnQmZNlZ9PjZUJKT5oU3Sjjg?sheet=ZbzDHq",
       "columns": [
         {
           "name": "id",

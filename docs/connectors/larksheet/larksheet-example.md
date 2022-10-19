@@ -8,8 +8,8 @@ Parent document: [larksheet-connector](./larksheet.md)
 
 The sheets to be read are:
 
- - [test_sheet_1](https://bytedance.feishu.cn/sheets/shtcncTJGUhZHj3GOX94gLMKxlh?sheet=lAlPxZ)
- - [test_sheet_2](https://bytedance.feishu.cn/sheets/shtcncTJGUhZHj3GOX94gLMKxlh?sheet=aNSgYr)
+ - [test_sheet_1](https://e4163pj5kq.feishu.cn/sheets/shtcnQmZNlZ9PjZUJKT5oU3Sjjg?sheet=ZbzDHq)
+ - [test_sheet_2](https://e4163pj5kq.feishu.cn/sheets/shtcnQmZNlZ9PjZUJKT5oU3Sjjg?sheet=FJhAlN)
 
 Here is the example job configuration:
 
@@ -18,7 +18,7 @@ Here is the example job configuration:
   "job": {
     "reader": {
       "class": "com.bytedance.bitsail.connector.legacy.larksheet.source.LarkSheetInputFormat",
-      "sheet_urls": "https://bytedance.feishu.cn/sheets/shtcncTJGUhZHj3GOX94gLMKxlh?sheet=lAlPxZ,https://bytedance.feishu.cn/sheets/shtcncTJGUhZHj3GOX94gLMKxlh?sheet=aNSgYr",
+      "sheet_urls": "https://e4163pj5kq.feishu.cn/sheets/shtcnQmZNlZ9PjZUJKT5oU3Sjjg?sheet=ZbzDHq,https://e4163pj5kq.feishu.cn/sheets/shtcnQmZNlZ9PjZUJKT5oU3Sjjg?sheet=FJhAlN",
       "app_id": "fake_app_id",
       "app_secret": "fake_app_secret",
       "batch_size": 1000,
