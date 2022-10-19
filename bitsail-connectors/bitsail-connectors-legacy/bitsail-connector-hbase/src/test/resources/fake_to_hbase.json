@@ -25,7 +25,7 @@
         {
           "index": 2,
           "name": "str2",
-          "type": "bigint"
+          "type": "string"
         },
         {
           "index": 3,

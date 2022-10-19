@@ -241,8 +241,10 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
 
   @Override
   public InputSplit[] createSplits(int minNumSplits) throws IOException {
-    return this.tableInputFormat.getSplits(jobContext).stream()
-        .map(split -> new RegionSplit((TableSplit) split)).toArray(InputSplit[]::new);
+    LOG.info("begin to get split, may take some time ...");
+    List<org.apache.hadoop.mapreduce.InputSplit> splits = this.tableInputFormat.getSplits(jobContext);
+    LOG.info("Finally get {} splits from hbase", splits.size());
+    return splits.stream().map(split -> new RegionSplit((TableSplit) split)).toArray(InputSplit[]::new);
   }
 
   /**

@@ -34,6 +34,7 @@ import org.apache.flink.types.Row;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.sql.Date;
 
 public class HBaseRowBuilder implements RowBuilder {
@@ -69,7 +70,7 @@ public class HBaseRowBuilder implements RowBuilder {
       return new BooleanColumn(byteArray == null ? null : Bytes.toBoolean(byteArray));
     } else if (columnTypeClass == Integer.class || columnTypeClass == Short.class) {
       return new LongColumn(byteArray == null ? null : Integer.valueOf(Bytes.toString(byteArray)));
-    } else if (columnTypeClass == Long.class) {
+    } else if (columnTypeClass == Long.class || columnTypeClass == BigInteger.class) {
       return new LongColumn(byteArray == null ? null : Long.valueOf(Bytes.toString(byteArray)));
     } else if (columnTypeClass == Double.class || columnTypeClass == Float.class) {
       return new DoubleColumn(byteArray == null ? null : Double.valueOf(Bytes.toString(byteArray)));
