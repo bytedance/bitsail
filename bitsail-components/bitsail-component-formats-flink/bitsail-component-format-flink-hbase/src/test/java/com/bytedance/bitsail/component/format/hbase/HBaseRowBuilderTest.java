@@ -17,8 +17,8 @@
 
 package com.bytedance.bitsail.component.format.hbase;
 
-
 import com.bytedance.bitsail.common.column.Column;
+
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.junit.Assert;
