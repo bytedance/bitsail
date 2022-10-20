@@ -146,6 +146,13 @@
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-connector-redis</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
             <artifactId>connector-print</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
