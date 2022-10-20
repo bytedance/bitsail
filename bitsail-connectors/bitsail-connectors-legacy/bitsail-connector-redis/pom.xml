@@ -61,12 +61,6 @@
             <artifactId>bitsail-connector-test</artifactId>
             <version>${revision}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.reactivestreams</groupId>
-                    <artifactId>reactive-streams</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
