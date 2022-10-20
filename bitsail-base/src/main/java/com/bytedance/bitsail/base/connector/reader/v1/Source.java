@@ -19,13 +19,21 @@
 
 package com.bytedance.bitsail.base.connector.reader.v1;
 
+import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.type.BaseEngineTypeInfoConverter;
+import com.bytedance.bitsail.common.type.SimpleTypeInfoConverter;
 
 import java.io.Serializable;
 
-public interface Source<T, SplitT extends SourceSplit, StateT> extends Serializable {
+public interface Source<T, SplitT extends SourceSplit, StateT extends Serializable> extends Serializable {
+
+  /**
+   * Run in client side for source initialize;
+   */
+  void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration);
 
   Boundedness getSourceBoundedness();
 
@@ -33,11 +41,11 @@ public interface Source<T, SplitT extends SourceSplit, StateT> extends Serializa
                                        SourceReader.Context readerContext);
 
   SourceSplitCoordinator<SplitT, StateT> createSplitCoordinator(BitSailConfiguration readerConfiguration,
-                                                                SourceSplitCoordinator.Context coordinatorContext);
+                                                                SourceSplitCoordinator.Context<SplitT> coordinatorContext);
 
   SourceSplitCoordinator<SplitT, StateT> restoreSplitCoordinator(BitSailConfiguration readerConfiguration,
-                                                                 SourceSplitCoordinator.Context coordinatorContext,
-                                                                 StateT checkpoint) throws Exception;
+                                                                 SourceSplitCoordinator.Context<SplitT> coordinatorContext,
+                                                                 StateT checkpoint);
 
   default BinarySerializer<SplitT> getSplitSerializer() {
     return new SimpleBinarySerializer<>();
@@ -45,6 +53,10 @@ public interface Source<T, SplitT extends SourceSplit, StateT> extends Serializa
 
   default BinarySerializer<StateT> getEnumeratorCheckpointSerializer() {
     return new SimpleBinarySerializer<>();
+  }
+
+  default BaseEngineTypeInfoConverter createTypeInfoConverter() {
+    return new SimpleTypeInfoConverter("bitsail");
   }
 
   String getReaderName();

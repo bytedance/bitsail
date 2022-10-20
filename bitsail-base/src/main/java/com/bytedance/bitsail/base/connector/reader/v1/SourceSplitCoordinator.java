@@ -21,12 +21,13 @@ package com.bytedance.bitsail.base.connector.reader.v1;
 
 import javax.annotation.Nullable;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-public interface SourceSplitCoordinator<SplitT extends SourceSplit, StateT> extends AutoCloseable {
+public interface SourceSplitCoordinator<SplitT extends SourceSplit, StateT> extends Serializable, AutoCloseable {
 
-  void configure();
+  void start();
 
   void addReader(int subtaskId);
 
@@ -37,7 +38,7 @@ public interface SourceSplitCoordinator<SplitT extends SourceSplit, StateT> exte
   default void handleSourceEvent(int subtaskId, SourceEvent sourceEvent) {
   }
 
-  StateT snapshotState(long checkpointId) throws Exception;
+  StateT snapshotState() throws Exception;
 
   default void notifyCheckpointComplete(long checkpointId) throws Exception {
   }
@@ -52,6 +53,9 @@ public interface SourceSplitCoordinator<SplitT extends SourceSplit, StateT> exte
 
     void assignSplit(int subtaskId, List<SplitT> splits);
 
+    /**
+     * Mainly use in boundedness situation, represents there will no more split will send to source reader.
+     */
     void signalNoMoreSplits(int subtask);
 
     void sendEventToSourceReader(int subtaskId, SourceEvent event);

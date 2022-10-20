@@ -17,20 +17,30 @@
 
 package com.bytedance.bitsail.base.serializer;
 
+import org.apache.commons.lang3.SerializationUtils;
+
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Created 2022/6/14
  */
-public class SimpleBinarySerializer<T> implements BinarySerializer<T> {
+public class SimpleBinarySerializer<T extends Serializable> implements BinarySerializer<T> {
 
   @Override
   public byte[] serialize(T obj) throws IOException {
-    return new byte[0];
+    if (Objects.nonNull(obj)) {
+      return SerializationUtils.serialize(obj);
+    }
+    return null;
   }
 
   @Override
   public T deserialize(byte[] serialized) throws IOException {
-    return null;
+    if (Objects.isNull(serialized)) {
+      return null;
+    }
+    return SerializationUtils.deserialize(serialized);
   }
 }

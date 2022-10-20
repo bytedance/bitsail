@@ -17,13 +17,22 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.base.connector.reader.v1;
+package com.bytedance.bitsail.connector.fake.source;
 
-import java.io.IOException;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.connector.fake.option.FakeReaderOptions;
+import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
+import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
-public interface SourcePipeline<T> {
+import org.junit.Test;
 
-  void output(T record) throws IOException;
+public class FakeSourceTest {
 
-  void output(T record, long timestamp) throws IOException;
+  @Test
+  public void testUnifiedFakeSource() throws Exception {
+    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("bitsail_connector_unified_conf.json");
+    jobConf.set(FakeReaderOptions.TOTAL_COUNT, 10);
+    jobConf.set(FakeReaderOptions.RATE, 1000);
+    EmbeddedFlinkCluster.submitJob(jobConf);
+  }
 }

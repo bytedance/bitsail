@@ -17,13 +17,37 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.base.connector.reader.v1;
+package com.bytedance.bitsail.connector.base.source;
 
-import java.io.IOException;
+import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 
-public interface SourcePipeline<T> {
+import java.util.Collections;
+import java.util.List;
 
-  void output(T record) throws IOException;
+public abstract class SimpleSourceReaderBase<T> implements SourceReader<T, SimpleSourceSplit> {
 
-  void output(T record, long timestamp) throws IOException;
+  @Override
+  public void start() {
+    //ignore
+  }
+
+  @Override
+  public void addSplits(List<SimpleSourceSplit> splits) {
+    //No splits need to add.
+  }
+
+  @Override
+  public List<SimpleSourceSplit> snapshotState(long checkpointId) {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public void notifyCheckpointComplete(long checkpointId) throws Exception {
+    //Ignore
+  }
+
+  @Override
+  public void close() throws Exception {
+    //Ignore
+  }
 }

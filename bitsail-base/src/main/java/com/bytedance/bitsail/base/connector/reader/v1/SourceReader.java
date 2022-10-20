@@ -19,35 +19,53 @@
 
 package com.bytedance.bitsail.base.connector.reader.v1;
 
+import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.model.ColumnInfo;
+
+import java.io.Serializable;
 import java.util.List;
 
-public interface SourceReader<T, SplitT extends SourceSplit> extends AutoCloseable {
+public interface SourceReader<T, SplitT extends SourceSplit> extends Serializable, AutoCloseable {
 
-  void configure();
+  void start();
 
   void pollNext(SourcePipeline<T> pipeline) throws Exception;
 
   void addSplits(List<SplitT> splits);
 
-  void handleNoMoreSplits();
+  /**
+   * Check source reader has more elements or not.
+   */
+  boolean hasMoreElements();
 
+  /**
+   * There will no more split will send to this source reader.
+   * Source reader could be exited after process all assigned split.
+   */
+  default void notifyNoMoreSplits() {
+
+  }
+
+  /**
+   * Process all events which from {@link SourceSplitCoordinator}.
+   */
   default void handleSourceEvent(SourceEvent sourceEvent) {
   }
 
-  List<SplitT> snapshotState(long checkpointId) throws Exception;
+  List<SplitT> snapshotState(long checkpointId);
 
   void notifyCheckpointComplete(long checkpointId) throws Exception;
 
   interface Context {
 
+    TypeInfo<?>[] getTypeInfos();
+
+    List<ColumnInfo> getColumnInfos();
+
     int getIndexOfSubtask();
 
     Boundedness getBoundedness();
 
-    void signalNoMoreElement();
-
     void sendSplitRequest();
-
-    void sendSourceEvent(SourceEvent sourceEvent);
   }
 }

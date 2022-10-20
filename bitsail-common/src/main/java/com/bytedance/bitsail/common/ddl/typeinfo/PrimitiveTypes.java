@@ -35,7 +35,7 @@ public enum PrimitiveTypes {
 
   LONG("long", TypeFactory.LONG_TYPE_INFO),
 
-  BIGINT("bigint", TypeFactory.BIG_INT_TYPE_INFO),
+  BIGINT("bigint", TypeFactory.LONG_TYPE_INFO),
 
   FLOAT("float", TypeFactory.FLOAT_TYPE_INFO),
 

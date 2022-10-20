@@ -17,13 +17,18 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.base.connector.reader.v1;
+package com.bytedance.bitsail.flink.core.delagate.reader.source;
 
-import java.io.IOException;
+import lombok.Getter;
+import org.apache.flink.api.connector.source.SourceEvent;
 
-public interface SourcePipeline<T> {
+@Getter
+public class DelegateSourceEvent implements SourceEvent {
 
-  void output(T record) throws IOException;
+  private com.bytedance.bitsail.base.connector.reader.v1.SourceEvent sourceEvent;
 
-  void output(T record, long timestamp) throws IOException;
+  public DelegateSourceEvent(
+      com.bytedance.bitsail.base.connector.reader.v1.SourceEvent sourceEvent) {
+    this.sourceEvent = sourceEvent;
+  }
 }

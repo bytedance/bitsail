@@ -17,13 +17,9 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.base.connector.reader.v1;
+package com.bytedance.bitsail.connector.base.source;
 
-import java.io.IOException;
+import java.io.Serializable;
 
-public interface SourcePipeline<T> {
-
-  void output(T record) throws IOException;
-
-  void output(T record, long timestamp) throws IOException;
+public class SimpleSourceState implements Serializable {
 }

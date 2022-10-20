@@ -17,13 +17,22 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.base.connector.reader.v1;
+package com.bytedance.bitsail.flink.core.delagate.reader.source;
 
-import java.io.IOException;
+import lombok.Getter;
+import org.apache.flink.api.connector.source.SourceSplit;
 
-public interface SourcePipeline<T> {
+@Getter
+public class DelegateFlinkSourceSplit<SplitT extends com.bytedance.bitsail.base.connector.reader.v1.SourceSplit> implements SourceSplit {
 
-  void output(T record) throws IOException;
+  private SplitT sourceSplit;
 
-  void output(T record, long timestamp) throws IOException;
+  public DelegateFlinkSourceSplit(SplitT sourceSplit) {
+    this.sourceSplit = sourceSplit;
+  }
+
+  @Override
+  public String splitId() {
+    return sourceSplit.uniqSplitId();
+  }
 }

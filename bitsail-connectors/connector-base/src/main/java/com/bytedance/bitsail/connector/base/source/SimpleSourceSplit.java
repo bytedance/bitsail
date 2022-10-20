@@ -17,7 +17,14 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.flink.core.delagate.reader;
+package com.bytedance.bitsail.connector.base.source;
 
-public class DelegateSourceReader {
+import com.bytedance.bitsail.base.connector.reader.v1.SourceSplit;
+
+public class SimpleSourceSplit implements SourceSplit {
+
+  @Override
+  public String uniqSplitId() {
+    return "";
+  }
 }

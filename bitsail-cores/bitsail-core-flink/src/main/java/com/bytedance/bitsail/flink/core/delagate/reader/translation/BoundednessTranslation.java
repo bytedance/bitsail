@@ -17,13 +17,16 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.base.connector.reader.v1;
+package com.bytedance.bitsail.flink.core.delagate.reader.translation;
 
-import java.io.IOException;
+import com.bytedance.bitsail.base.connector.reader.v1.Boundedness;
 
-public interface SourcePipeline<T> {
+public class BoundednessTranslation {
 
-  void output(T record) throws IOException;
-
-  void output(T record, long timestamp) throws IOException;
+  public static org.apache.flink.api.connector.source.Boundedness to(Boundedness boundedness) {
+    if (Boundedness.BOUNDEDNESS.equals(boundedness)) {
+      return org.apache.flink.api.connector.source.Boundedness.BOUNDED;
+    }
+    return org.apache.flink.api.connector.source.Boundedness.CONTINUOUS_UNBOUNDED;
+  }
 }
