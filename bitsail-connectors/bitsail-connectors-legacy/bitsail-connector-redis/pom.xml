@@ -31,6 +31,7 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <commons.pool2.version>2.11.1</commons.pool2.version>
     </properties>
 
     <dependencies>
@@ -53,6 +54,24 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-connector-test</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.reactivestreams</groupId>
+                    <artifactId>reactive-streams</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-connector-fake</artifactId>
+            <version>${revision}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
