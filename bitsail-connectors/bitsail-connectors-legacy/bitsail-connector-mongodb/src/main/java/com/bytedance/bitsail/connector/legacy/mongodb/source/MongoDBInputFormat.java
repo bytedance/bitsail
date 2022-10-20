@@ -17,7 +17,6 @@
 
 package com.bytedance.bitsail.connector.legacy.mongodb.source;
 
-import com.alibaba.fastjson.JSON;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
@@ -34,6 +33,7 @@ import com.bytedance.bitsail.flink.core.constants.TypeSystem;
 import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatPlugin;
 import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.base.Strings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -101,7 +101,6 @@ public class MongoDBInputFormat extends InputFormatPlugin<Row, InputSplit> imple
   private RowTypeInfo rowTypeInfo;
   private int currentSplitNum;
   private Map<Integer, Integer> jobIdOffsetInfo;
-
 
   public MongoDBInputFormat() {
   }
@@ -179,6 +178,7 @@ public class MongoDBInputFormat extends InputFormatPlugin<Row, InputSplit> imple
     super.configure(parameters);
   }
 
+  @SuppressWarnings("checkstyle:MagicNumber")
   private Object parseBasicTypeInfo(Object value, TypeInformation typeInfo) {
     switch (typeInfo.toString()) {
       case "Void":
@@ -238,6 +238,7 @@ public class MongoDBInputFormat extends InputFormatPlugin<Row, InputSplit> imple
     return result;
   }
 
+  @SuppressWarnings("checkstyle:MagicNumber")
   private Object parseBasicType(Object value) {
     if (value instanceof ObjectId) {
       return ((ObjectId) value).toString();
@@ -360,6 +361,7 @@ public class MongoDBInputFormat extends InputFormatPlugin<Row, InputSplit> imple
         .build();
   }
 
+  @SuppressWarnings("checkstyle:MagicNumber")
   @Override
   public void initPlugin() {
     initMongoConnConfig();
@@ -471,6 +473,7 @@ public class MongoDBInputFormat extends InputFormatPlugin<Row, InputSplit> imple
     return range;
   }
 
+  @SuppressWarnings("checkstyle:MagicNumber")
   private synchronized Range getRangeInfo() {
     List<Range> currentTaskGroupRangeList = getTaskRangeInfos();
 

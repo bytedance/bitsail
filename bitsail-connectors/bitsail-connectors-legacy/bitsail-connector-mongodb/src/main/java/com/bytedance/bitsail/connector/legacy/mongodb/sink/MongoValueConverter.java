@@ -23,7 +23,6 @@ import com.bytedance.bitsail.common.util.DateUtil;
 import com.bytedance.bitsail.connector.legacy.mongodb.error.MongoDBPluginsErrorCode;
 
 import com.alibaba.fastjson.JSONObject;
-
 import lombok.Builder;
 import org.bson.BsonDouble;
 import org.bson.BsonJavaScript;
@@ -43,8 +42,8 @@ import java.util.Map;
 
 @Builder
 public class MongoValueConverter implements Serializable {
-  public final static String CUSTOM_DATE_FORMAT_KEY = "customDateFormatKey";
-  public final static String TIME_ZONE = "timeZone";
+  public static final String CUSTOM_DATE_FORMAT_KEY = "customDateFormatKey";
+  public static final String TIME_ZONE = "timeZone";
   private Map<String, Object> options;
 
   public MongoValueConverter(Map<String, Object> options) {

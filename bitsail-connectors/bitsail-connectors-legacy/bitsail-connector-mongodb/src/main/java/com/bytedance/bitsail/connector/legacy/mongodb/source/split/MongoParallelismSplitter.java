@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author ke.hao
  */
+@SuppressWarnings("checkstyle:MagicNumber")
 public class MongoParallelismSplitter extends MongoSplitter {
   private static final Logger LOG = LoggerFactory.getLogger(MongoParallelismSplitter.class);
 
@@ -98,18 +99,14 @@ public class MongoParallelismSplitter extends MongoSplitter {
     }
   }
 
-  /**
-   * 查看mongo是否开启了splitVector的功能。
-   * 如果开启了splitVector，就可以使用mongo提供的能力进行分片。
-   */
   private boolean supportSplitVector() {
     try {
       database.runCommand(new Document("splitVector", mongoConnConfig.getDbName() + "." + mongoConnConfig.getCollectionName())
-        .append("keyPattern", new Document(splitKey, 1))
-        .append("force", true));
+          .append("keyPattern", new Document(splitKey, 1))
+          .append("force", true));
     } catch (MongoCommandException e) {
       if (e.getErrorCode() == MONGO_UNAUTHORIZED_ERR_CODE ||
-        e.getErrorCode() == MONGO_ILLEGALOP_ERR_CODE) {
+          e.getErrorCode() == MONGO_ILLEGALOP_ERR_CODE) {
         return false;
       }
     }
@@ -155,7 +152,6 @@ public class MongoParallelismSplitter extends MongoSplitter {
     LOG.info("Range will be split by splitKey.");
     List<Object> splitPoints = Lists.newArrayList();
     int chunkDocCount = (int) docCount / taskGroupNum;
-    //当doc数量小于并发度时，仅返回单个区间
     if (chunkDocCount == 0) {
       LOG.info("docCount is smaller than parallelism: " + docCount);
       chunkDocCount = (int) docCount - 1;

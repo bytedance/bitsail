@@ -52,6 +52,7 @@ public class MongoSplitterFactory {
         return new MongoPaginatingSplitter(connConfig, splitKey, fetchSize, parallelism);
       case PARALLELISM:
         return new MongoParallelismSplitter(connConfig, parallelism, splitKey);
+      default:
     }
 
     throw new UnsupportedOperationException(String.format("Unsupported split mode %s on mongo.", splitMode));

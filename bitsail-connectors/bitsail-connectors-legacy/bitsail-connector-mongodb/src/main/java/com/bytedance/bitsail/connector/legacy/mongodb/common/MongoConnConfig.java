@@ -34,9 +34,11 @@ public class MongoConnConfig implements Serializable {
   public enum CLIENT_MODE {
     URL, HOST_WITH_CREDENTIAL, HOST_WITHOUT_CREDENTIAL
   }
+
   public enum WRITE_MODE {
     INSERT, OVERWRITE
   }
+
   private CLIENT_MODE clientMode;
   private MongoConnOptions options;
   private String mongoUrl;

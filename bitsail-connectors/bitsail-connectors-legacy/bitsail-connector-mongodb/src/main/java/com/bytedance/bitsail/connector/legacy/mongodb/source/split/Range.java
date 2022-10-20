@@ -19,7 +19,8 @@ package com.bytedance.bitsail.connector.legacy.mongodb.source.split;
 
 import java.io.Serializable;
 
-public class Range implements Serializable{
+public class Range implements Serializable {
+
   Object lowerBound;
   Object upperBound;
 

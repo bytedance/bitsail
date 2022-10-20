@@ -38,6 +38,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("checkstyle:MagicNumber")
 public class MongoDBWriterUtil {
   public static Retryer<MongoClient> retryer = RetryerBuilder.<MongoClient>newBuilder()
       .retryIfResult(Objects::isNull)

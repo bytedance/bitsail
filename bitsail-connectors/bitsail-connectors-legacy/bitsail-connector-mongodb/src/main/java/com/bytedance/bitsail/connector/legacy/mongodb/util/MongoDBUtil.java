@@ -48,6 +48,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("checkstyle:MagicNumber")
 @Slf4j
 public class MongoDBUtil {
   public static Retryer<MongoClient> retryer = RetryerBuilder.<MongoClient>newBuilder()
@@ -71,8 +72,8 @@ public class MongoDBUtil {
       } else {
         addressList = Collections.singletonList(new ServerAddress(mongoConnConfig.getHost(), mongoConnConfig.getPort()));
       }
-      String database = StringUtils.isEmpty(mongoConnConfig.getAuthDbName())
-          ? mongoConnConfig.getDbName()
+      String database = StringUtils.isEmpty(mongoConnConfig.getAuthDbName()) ?
+          mongoConnConfig.getDbName()
           : mongoConnConfig.getAuthDbName();
       return initMongoClient(addressList, mongoConnConfig.getUserName(), mongoConnConfig.getPassword(), database);
     };
@@ -91,17 +92,17 @@ public class MongoDBUtil {
     List<ServerAddress> addresses = new ArrayList<>();
 
     for (String hostPort : hostPorts.split(HOST_SPLIT_REGEX)) {
-      if(hostPort.length() == 0){
+      if (hostPort.length() == 0) {
         continue;
       }
 
       Matcher matcher = HOST_PORT_PATTERN.matcher(hostPort);
-      if(matcher.find()){
+      if (matcher.find()) {
         String host = matcher.group("host");
         String portStr = matcher.group("port");
         int port = portStr == null ? DEFAULT_PORT : Integer.parseInt(portStr);
 
-        ServerAddress serverAddress = new ServerAddress(host,port);
+        ServerAddress serverAddress = new ServerAddress(host, port);
         addresses.add(serverAddress);
       }
     }

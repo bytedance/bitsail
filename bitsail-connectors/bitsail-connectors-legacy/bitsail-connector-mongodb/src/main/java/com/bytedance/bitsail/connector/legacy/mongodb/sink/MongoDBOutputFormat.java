@@ -17,7 +17,6 @@
 
 package com.bytedance.bitsail.connector.legacy.mongodb.sink;
 
-import com.alibaba.fastjson.JSON;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
@@ -31,6 +30,7 @@ import com.bytedance.bitsail.flink.core.constants.TypeSystem;
 import com.bytedance.bitsail.flink.core.legacy.connector.OutputFormatPlugin;
 import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.base.Strings;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
@@ -235,12 +235,12 @@ public class MongoDBOutputFormat extends OutputFormatPlugin<Row> implements Resu
         query = new BasicDBObject();
         List<Object> items = preSqlConf.getList("item", Object.class);
         for (Object con : items) {
-          BitSailConfiguration _conf = BitSailConfiguration.from(con.toString());
-          if (Strings.isNullOrEmpty(_conf.getString("condition"))) {
-            query.put(_conf.getString("name"), _conf.get("value"));
+          BitSailConfiguration tempConf = BitSailConfiguration.from(con.toString());
+          if (Strings.isNullOrEmpty(tempConf.getString("condition"))) {
+            query.put(tempConf.getString("name"), tempConf.get("value"));
           } else {
-            query.put(_conf.getString("name"),
-                new BasicDBObject(_conf.getString("condition"), _conf.get("value")));
+            query.put(tempConf.getString("name"),
+                new BasicDBObject(tempConf.getString("condition"), tempConf.get("value")));
           }
         }
       } else {
@@ -272,6 +272,7 @@ public class MongoDBOutputFormat extends OutputFormatPlugin<Row> implements Resu
     return rowTypeInfo;
   }
 
+  @SuppressWarnings("checkstyle:FallThrough")
   private void initMongoConnConfig() {
     MongoConnConfig.CLIENT_MODE clientMode = MongoConnConfig.CLIENT_MODE.valueOf(outputSliceConfig.get(MongoDBWriterOptions.CLIENT_MODE).toUpperCase());
     LOG.info("Current mongo client mode: " + clientMode);
@@ -296,6 +297,7 @@ public class MongoDBOutputFormat extends OutputFormatPlugin<Row> implements Resu
           port = outputSliceConfig.getNecessaryOption(MongoDBWriterOptions.MONGO_PORT, MongoDBPluginsErrorCode.REQUIRED_VALUE);
         }
         break;
+      default:
     }
     MongoConnConfig.WRITE_MODE writeMode = MongoConnConfig.WRITE_MODE.valueOf(outputSliceConfig.get(MongoDBWriterOptions.WRITE_MODE).toUpperCase());
     String dbName = outputSliceConfig.getNecessaryOption(MongoDBWriterOptions.DB_NAME, MongoDBPluginsErrorCode.REQUIRED_VALUE);
