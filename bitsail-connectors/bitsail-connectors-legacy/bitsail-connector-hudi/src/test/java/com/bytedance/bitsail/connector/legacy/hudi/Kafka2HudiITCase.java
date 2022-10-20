@@ -19,11 +19,11 @@
 package com.bytedance.bitsail.connector.legacy.hudi;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
-import com.bytedance.bitsail.connector.legacy.hudi.common.HudiWriteOptions;
-import com.bytedance.bitsail.connector.legacy.hudi.common.SchemaOptions;
+import com.bytedance.bitsail.common.util.JsonSerializer;
 import com.bytedance.bitsail.connector.legacy.hudi.configuration.FlinkOptions;
 import com.bytedance.bitsail.connector.legacy.messagequeue.source.option.BaseMessageQueueReaderOptions;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
@@ -55,7 +55,7 @@ public class Kafka2HudiITCase {
   private static final Logger LOG = LoggerFactory.getLogger(Kafka2HudiITCase.class);
   private static final String[] COLUMNS = {"id", "text", "timestamp"};
   private static final String TEST_SCHEMA =
-      "[{\"name\":\"id\",\"type\":\"bigint\"},{\"name\":\"test\",\"type\":\"string\"},{\"name\":\"timestamp\",\"type\":\"string\"}]";
+      "[{\"name\":\"id\",\"type\":\"bigint\"},{\"name\":\"text\",\"type\":\"string\"},{\"name\":\"timestamp\",\"type\":\"string\"}]";
   private static final long START_TIME = 1658743200L;
   private static final long SEND_BATCH = 2000L;
   private static final long SEND_INTERVAL = 10L;
@@ -137,14 +137,14 @@ public class Kafka2HudiITCase {
     jobConfiguration.set(ReaderOptions.READER_METRIC_TAG_NAME, "kafka");
     jobConfiguration.set(BaseMessageQueueReaderOptions.ENABLE_COUNT_MODE, true);
     jobConfiguration.set(BaseMessageQueueReaderOptions.COUNT_MODE_RECORD_THRESHOLD, 2000L);
+    jobConfiguration.set(BaseMessageQueueReaderOptions.FORMAT_TYPE.key(), "json");
+    jobConfiguration.set(ReaderOptions.BaseReaderOptions.COLUMNS, JsonSerializer.parseToList(TEST_SCHEMA, ColumnInfo.class));
   }
 
   protected void setWriterConfiguration(BitSailConfiguration jobConfiguration) {
     jobConfiguration.set(WriterOptions.WRITER_CLASS, "com.bytedance.bitsail.connector.legacy.hudi.dag" +
         ".HudiSinkFunctionDAGBuilder");
 
-    jobConfiguration.set(SchemaOptions.SOURCE_SCHEMA, TEST_SCHEMA);
-    jobConfiguration.set(SchemaOptions.SINK_SCHEMA, TEST_SCHEMA);
     jobConfiguration.set(WRITER_PREFIX + FlinkOptions.RECORD_KEY_FIELD.key(), "id");
     jobConfiguration.set(WRITER_PREFIX + FlinkOptions.INDEX_KEY_FIELD.key(), "id");
     jobConfiguration.set(WRITER_PREFIX + FlinkOptions.PRECOMBINE_FIELD.key(), "timestamp");
@@ -154,7 +154,7 @@ public class Kafka2HudiITCase {
     jobConfiguration.set(WRITER_PREFIX + FlinkOptions.OPERATION.key(), "upsert");
     jobConfiguration.set(WRITER_PREFIX + FlinkOptions.INDEX_TYPE.key(), "BUCKET");
     jobConfiguration.set(WRITER_PREFIX + FlinkOptions.BUCKET_INDEX_NUM_BUCKETS.key(), "4");
-    jobConfiguration.set(HudiWriteOptions.FORMAT_TYPE, "json");
+    jobConfiguration.set(WriterOptions.BaseWriterOptions.COLUMNS, JsonSerializer.parseToList(TEST_SCHEMA, ColumnInfo.class));
   }
 
   private void setConnectorProps(BitSailConfiguration jobConfiguration, String key, String value) {
