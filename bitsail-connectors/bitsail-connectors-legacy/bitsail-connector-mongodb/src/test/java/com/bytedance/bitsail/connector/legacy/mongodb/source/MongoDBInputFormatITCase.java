@@ -15,23 +15,25 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.mongodb.sink;
+package com.bytedance.bitsail.connector.legacy.mongodb.source;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.connector.legacy.fake.option.FakeReaderOptions;
-import com.bytedance.bitsail.connector.legacy.mongodb.option.MongoDBWriterOptions;
+import com.bytedance.bitsail.connector.legacy.mongodb.option.MongoDBReaderOptions;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.testcontainers.mongodb.TestMongoDBContainer;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-public class MongoDBOutputFormatITCase {
+public class MongoDBInputFormatITCase {
 
   private static final int TOTAL_COUNT = 300;
   private static final String DB_NAME = "test_db";
@@ -45,22 +47,22 @@ public class MongoDBOutputFormatITCase {
     mongoDBContainer = new TestMongoDBContainer();
     mongoDBContainer.start();
     mongoDBContainer.createCollection(DB_NAME, COLLECTION_NAME);
-    mongodbConnStr = mongoDBContainer.getConnectionStr() + "/" + DB_NAME;
+    mongodbConnStr = mongoDBContainer.getConnectionStr();
   }
 
   @Test
-  public void testFakeToMongoDB() throws Exception {
-    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("fake_to_mongodb.json");
+  public void testMongoDBToPrint() throws Exception {
+    insertDocument();
 
-    jobConf.set(FakeReaderOptions.TOTAL_COUNT, TOTAL_COUNT);
-    jobConf.set(MongoDBWriterOptions.CLIENT_MODE, "url");
-    jobConf.set(MongoDBWriterOptions.MONGO_URL, mongodbConnStr);
-    jobConf.set(MongoDBWriterOptions.DB_NAME, DB_NAME);
-    jobConf.set(MongoDBWriterOptions.COLLECTION_NAME, COLLECTION_NAME);
+    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("mongodb_to_print.json");
+
+    jobConf.set(MongoDBReaderOptions.HOST, "localhost");
+    jobConf.set(MongoDBReaderOptions.PORT, getPort(mongodbConnStr));
+    jobConf.set(MongoDBReaderOptions.DB_NAME, DB_NAME);
+    jobConf.set(MongoDBReaderOptions.COLLECTION_NAME, COLLECTION_NAME);
+    jobConf.set(MongoDBReaderOptions.SPLIT_PK, "_id");
 
     EmbeddedFlinkCluster.submitJob(jobConf);
-
-    Assert.assertEquals(TOTAL_COUNT, mongoDBContainer.countDocuments(DB_NAME, COLLECTION_NAME));
   }
 
   @After
@@ -71,4 +73,18 @@ public class MongoDBOutputFormatITCase {
     }
   }
 
+  private void insertDocument() {
+    List<Map<String, Object>> docFieldList = new ArrayList<>();
+    for (int i = 0; i < TOTAL_COUNT; ++i) {
+      Map<String, Object> docField = new HashMap<>();
+      docField.put("string_field", "str_" + i);
+      docField.put("int_field", i);
+      docFieldList.add(docField);
+    }
+    mongoDBContainer.insertDocuments(DB_NAME, COLLECTION_NAME, docFieldList);
+  }
+
+  private int getPort(String url) {
+    return Integer.parseInt(url.split(":")[2]);
+  }
 }

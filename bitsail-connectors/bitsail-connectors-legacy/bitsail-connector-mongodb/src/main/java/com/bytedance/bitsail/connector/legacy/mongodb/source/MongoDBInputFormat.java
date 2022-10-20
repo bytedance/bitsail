@@ -119,7 +119,7 @@ public class MongoDBInputFormat extends InputFormatPlugin<Row, InputSplit> imple
   @Override
   public void openInputFormat() throws IOException {
     super.openInputFormat();
-    mongoclient = MongoDBUtil.initCredentialMongoClientWithRetry(mongoConnConfig);
+    mongoclient = MongoDBUtil.initMongoClientWithRetry(mongoConnConfig);
     MongoDatabase database = mongoclient.getDatabase(mongoConnConfig.getDbName());
     collection = database.getCollection(mongoConnConfig.getCollectionName());
     jobIdOffsetInfo = new ConcurrentHashMap<>();
@@ -344,8 +344,8 @@ public class MongoDBInputFormat extends InputFormatPlugin<Row, InputSplit> imple
     
     String dbName = inputSliceConfig.getNecessaryOption(MongoDBReaderOptions.DB_NAME, MongoDBPluginsErrorCode.REQUIRED_VALUE);
     String collectionName = inputSliceConfig.getNecessaryOption(MongoDBReaderOptions.COLLECTION_NAME, MongoDBPluginsErrorCode.REQUIRED_VALUE);
-    String userName = inputSliceConfig.getNecessaryOption(MongoDBReaderOptions.USER_NAME, MongoDBPluginsErrorCode.REQUIRED_VALUE);
-    String password = inputSliceConfig.getNecessaryOption(MongoDBReaderOptions.PASSWORD, MongoDBPluginsErrorCode.REQUIRED_VALUE);
+    String userName = inputSliceConfig.get(MongoDBReaderOptions.USER_NAME);
+    String password = inputSliceConfig.get(MongoDBReaderOptions.PASSWORD);
     String authDbName = inputSliceConfig.getUnNecessaryOption(MongoDBReaderOptions.AUTH_DB_NAME, null);
     this.mongoConnConfig = MongoConnConfig
         .builder()
@@ -403,7 +403,7 @@ public class MongoDBInputFormat extends InputFormatPlugin<Row, InputSplit> imple
   }
 
   private boolean isIndexKey() {
-    MongoClient mongoClient = MongoDBUtil.initCredentialMongoClientWithRetry(mongoConnConfig);
+    MongoClient mongoClient = MongoDBUtil.initMongoClientWithRetry(mongoConnConfig);
     MongoCollection<Document> collection = mongoClient.getDatabase(mongoConnConfig.getDbName()).getCollection(mongoConnConfig.getCollectionName());
     Set<String> indexKeys = MongoDBUtil.getCollectionIndexKey(collection);
     LOG.info("Index keys in collection [" + mongoConnConfig.getCollectionName() + "] are: " + indexKeys);

@@ -63,7 +63,7 @@ public class MongoDBUtil {
 
   private static final Integer DEFAULT_PORT = 27017;
 
-  public static MongoClient initCredentialMongoClientWithRetry(MongoConnConfig mongoConnConfig) {
+  public static MongoClient initMongoClientWithRetry(MongoConnConfig mongoConnConfig) {
     Callable<MongoClient> callable = () -> {
       List<ServerAddress> addressList;
       if (StringUtils.isNotEmpty(mongoConnConfig.getHostsStr())) {
@@ -74,7 +74,7 @@ public class MongoDBUtil {
       String database = StringUtils.isEmpty(mongoConnConfig.getAuthDbName())
           ? mongoConnConfig.getDbName()
           : mongoConnConfig.getAuthDbName();
-      return initCredentialMongoClient(addressList, mongoConnConfig.getUserName(), mongoConnConfig.getPassword(), database);
+      return initMongoClient(addressList, mongoConnConfig.getUserName(), mongoConnConfig.getPassword(), database);
     };
 
     try {
@@ -109,16 +109,15 @@ public class MongoDBUtil {
     return addresses;
   }
 
-  public static MongoClient initCredentialMongoClient(List<ServerAddress> addressList, String userName, String password, String dbName) {
-    MongoCredential credential = MongoCredential.createCredential(userName, dbName, password.toCharArray());
+  public static MongoClient initMongoClient(List<ServerAddress> addressList, String userName, String password, String dbName) {
+    MongoClientSettings.Builder settingBuilder = MongoClientSettings.builder()
+        .applyToClusterSettings(builder -> builder.hosts(addressList));
 
-    return MongoClients.create(
-        MongoClientSettings.builder()
-            .applyToClusterSettings(builder ->
-                builder.hosts(addressList))
-            .credential(credential)
-            .build()
-    );
+    if (StringUtils.isNotEmpty(userName) && StringUtils.isNotEmpty(password)) {
+      MongoCredential credential = MongoCredential.createCredential(userName, dbName, password.toCharArray());
+      settingBuilder.credential(credential);
+    }
+    return MongoClients.create(settingBuilder.build());
   }
 
   public static MongoClient initNoCredentialMongoClient(String host, int port) {

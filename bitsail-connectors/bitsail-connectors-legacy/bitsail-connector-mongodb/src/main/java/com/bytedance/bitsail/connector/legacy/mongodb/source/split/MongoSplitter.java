@@ -53,7 +53,7 @@ public abstract class MongoSplitter {
     this.taskGroupNum = taskGroupNum;
     this.mongoConnConfig = mongoConnConfig;
     this.splitKey = splitKey;
-    mongoClient = MongoDBUtil.initCredentialMongoClientWithRetry(mongoConnConfig);
+    mongoClient = MongoDBUtil.initMongoClientWithRetry(mongoConnConfig);
     database = mongoClient.getDatabase(this.mongoConnConfig.getDbName());
     collection = database.getCollection(this.mongoConnConfig.getCollectionName());
     taskGroupInfo = new TaskGroupInfo(taskGroupNum);

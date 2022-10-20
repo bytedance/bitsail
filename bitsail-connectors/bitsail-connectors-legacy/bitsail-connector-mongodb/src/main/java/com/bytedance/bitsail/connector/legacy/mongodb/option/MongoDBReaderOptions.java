@@ -51,10 +51,6 @@ public interface MongoDBReaderOptions extends ReaderOptions.BaseReaderOptions {
       key(READER_PREFIX + "collection_name")
           .noDefaultValue(String.class);
 
-  ConfigOption<Boolean> SELF_BUILT =
-      key(READER_PREFIX + "self_built")
-          .defaultValue(false);
-
   ConfigOption<String> HOSTS_STR =
       key(READER_PREFIX + "hosts_str")
           .noDefaultValue(String.class);
@@ -66,10 +62,6 @@ public interface MongoDBReaderOptions extends ReaderOptions.BaseReaderOptions {
   ConfigOption<Integer> PORT =
       key(READER_PREFIX + "port")
           .noDefaultValue(Integer.class);
-
-  ConfigOption<String> MONGO_PSM =
-      key(READER_PREFIX + "mongo_psm")
-          .noDefaultValue(String.class);
 
   /**
    * Columns for ranging. Must belong to index key(s).
