@@ -97,6 +97,18 @@
         </dependency>
 
         <dependency>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+            <version>6.2.1.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.reactivestreams</groupId>
+                    <artifactId>reactive-streams</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-core-entry</artifactId>
             <version>${revision}</version>

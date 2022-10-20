@@ -44,16 +44,16 @@ import java.util.List;
 import java.util.Objects;
 
 @SuppressWarnings("checkstyle:MagicNumber")
-public class RowDataDeserialization<I extends Row, O extends RowData> extends RichFlatMapFunction<I, O>
+public class RowDataDeserializationFunction<I extends Row, O extends RowData> extends RichFlatMapFunction<I, O>
     implements ResultTypeQueryable {
   public static final RowData FILTERED_ROW = new GenericRowData(0);
-  private static final Logger LOG = LoggerFactory.getLogger(RowDataDeserialization.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RowDataDeserializationFunction.class);
   protected BitSailConfiguration jobConf;
   protected List<DeserializationSchema<O>> deserializationSchema;
   private transient NoOpDirtyCollector dirtyCollector;
   private transient MetricManager metrics;
 
-  public RowDataDeserialization(BitSailConfiguration jobConf, RowType outputSchema) {
+  public RowDataDeserializationFunction(BitSailConfiguration jobConf, RowType outputSchema) {
     this.jobConf = jobConf;
     boolean multiSourceEnabled = jobConf.get(CommonOptions.MULTI_SOURCE_ENABLED);
     if (multiSourceEnabled) {
@@ -64,24 +64,6 @@ public class RowDataDeserialization<I extends Row, O extends RowData> extends Ri
     }
   }
 
-//  private DeserializationSchema<O> getDeserializationSchema(RowType outputType) {
-//    String formatType = jobConf.get(HudiWriteOptions.FORMAT_TYPE);
-//    if (formatType == null || formatType.isEmpty()) {
-//      throw new RuntimeException("Job writer format type is missing.");
-//    }
-//
-//    DeserializationSchema<O> deserializationSchema;
-//    switch (formatType) {
-//      case "json":
-//        deserializationSchema = (DeserializationSchema<O>) ParserFormatFactory.getJsonDeserializationSchema(jobConf, outputType);
-//        break;
-//      default:
-//        throw new RuntimeException("Unsupported format type: " + formatType);
-//    }
-//    return deserializationSchema;
-//  }
-
-  //trick: open() will be called twice for initializing processingTimeService
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
