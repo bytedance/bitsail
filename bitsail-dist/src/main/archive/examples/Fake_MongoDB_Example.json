@@ -33,6 +33,10 @@
     "writer": {
       "class": "com.bytedance.bitsail.connector.legacy.mongodb.sink.MongoDBOutputFormat",
       "unique_key": "id",
+      "client_mode": "url",
+      "mongo_url": "mongodb://localhost:1234/test_db",
+      "db_name": "test_db",
+      "collection_name": "test_collection",
       "columns": [
         {
           "index": 0,

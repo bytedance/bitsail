@@ -17,6 +17,8 @@
 
 - [Redis connector](./redis/redis.md)
 
+- [MongoDB connector](./mongodb/mongodb.md)
+
 - [StreamingFile connector](./StreamingFile/StreamingFile.md)
 
 - [Jdbc connector](./Jdbc/jdbc.md)

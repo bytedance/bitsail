@@ -73,7 +73,7 @@ public interface MongoDBReaderOptions extends ReaderOptions.BaseReaderOptions {
 
   ConfigOption<Integer> READER_FETCH_SIZE =
       key(READER_PREFIX + "reader_fetch_size")
-          .noDefaultValue(Integer.class);
+          .defaultValue(100000);
 
   ConfigOption<String> FILTER =
       key(READER_PREFIX + "filter")
