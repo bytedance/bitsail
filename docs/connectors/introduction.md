@@ -15,6 +15,8 @@
 
 - [Kafka connector](./kafka/kafka.md)
 
+- [Redis connector](./redis/redis.md)
+
 - [StreamingFile connector](./StreamingFile/StreamingFile.md)
 
 - [Jdbc connector](./Jdbc/jdbc.md)

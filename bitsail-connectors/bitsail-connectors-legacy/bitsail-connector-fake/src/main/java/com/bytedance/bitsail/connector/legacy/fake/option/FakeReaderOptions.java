@@ -43,4 +43,8 @@ public interface FakeReaderOptions extends ReaderOptions.BaseReaderOptions {
   ConfigOption<String> UNIQUE_FIELDS =
       key(READER_PREFIX + "unique_fields")
           .noDefaultValue(String.class);
+
+  ConfigOption<Boolean> USE_BITSAIL_TYPE =
+      key(READER_PREFIX + "use_bitsail_type")
+          .defaultValue(true);
 }

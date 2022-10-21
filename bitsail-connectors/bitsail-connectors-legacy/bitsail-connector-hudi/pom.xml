@@ -157,6 +157,56 @@
         <!--            <version>9.4.15.v20190215</version>-->
         <!--        </dependency>-->
 
+        <!-- Hadoop -->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.hadoop</groupId>-->
+<!--            <artifactId>hadoop-common</artifactId>-->
+<!--            <version>3.1.1</version>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.apache.curator</groupId>-->
+<!--                    <artifactId>curator-recipes</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.eclipse.jetty</groupId>-->
+<!--                    <artifactId>jetty-server</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.eclipse.jetty</groupId>-->
+<!--                    <artifactId>jetty-servlet</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.eclipse.jetty</groupId>-->
+<!--                    <artifactId>jetty-util</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.apache.curator</groupId>-->
+<!--                    <artifactId>curator-client</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.apache.avro</groupId>-->
+<!--                    <artifactId>avro</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.apache.htrace</groupId>-->
+<!--                    <artifactId>htrace-core4</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.apache.curator</groupId>-->
+<!--                    <artifactId>curator-framework</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.eclipse.jetty</groupId>-->
+<!--                    <artifactId>jetty-webapp</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>log4j</groupId>-->
+<!--                    <artifactId>log4j</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
+
         <!-- Flink -->
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -617,6 +667,19 @@
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-connector-kafka</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-connector-fake</artifactId>
             <version>${revision}</version>
             <scope>test</scope>
             <exclusions>
