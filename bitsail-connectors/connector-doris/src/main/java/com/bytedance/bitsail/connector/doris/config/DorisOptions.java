@@ -84,17 +84,17 @@ public class DorisOptions implements Serializable {
     /**
      * Doris AGGREGATE Table
      */
-    AGGREGATE("Aggregate"),
+    AGGREGATE("AGGREGATE"),
 
     /**
      * Doris UNIQUE Table
      */
-    UNIQUE("Unique"),
+    UNIQUE("UNIQUE"),
 
     /**
      * Doris DUPLICATE Table
      */
-    DUPLICATE("Duplicate");
+    DUPLICATE("DUPLICATE");
 
     private final String model;
 
