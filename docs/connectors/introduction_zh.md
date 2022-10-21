@@ -17,6 +17,8 @@
 
 - [Kafka连接器](./kafka/kafka_zh.md)
 
+- [Redis连接器](./redis/redis_zh.md)
+
 - [StreamingFile连接器](./StreamingFile/StreamingFile_zh.md)
 
 - [Jdbc连接器](./Jdbc/jdbc_zh.md)

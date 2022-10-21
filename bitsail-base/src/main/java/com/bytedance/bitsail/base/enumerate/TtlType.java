@@ -15,19 +15,27 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.hudi.common;
+package com.bytedance.bitsail.base.enumerate;
 
-import com.bytedance.bitsail.common.option.ConfigOption;
+import lombok.Getter;
 
-import static com.bytedance.bitsail.common.option.ConfigOptions.key;
-import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
+/**
+ * @author yangyun
+ **/
+public enum TtlType {
 
-public interface SchemaOptions {
-  ConfigOption<String> SOURCE_SCHEMA =
-      key(WRITER_PREFIX + "source_schema")
-          .noDefaultValue(String.class);
+  DAY(60 * 60 * 24),
 
-  ConfigOption<String> SINK_SCHEMA =
-      key(WRITER_PREFIX + "sink_schema")
-          .noDefaultValue(String.class);
+  HOUR(60 * 60),
+
+  MINUTE(60),
+
+  SECOND(1);
+
+  @Getter
+  int containSeconds;
+
+  TtlType(int containSeconds) {
+    this.containSeconds = containSeconds;
+  }
 }

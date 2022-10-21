@@ -20,7 +20,6 @@ package com.bytedance.bitsail.connector.legacy.hudi.util;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.util.JsonSerializer;
 
 import org.apache.avro.Schema;
 import org.apache.flink.table.api.DataTypes;
@@ -39,8 +38,7 @@ public class SchemaUtils {
     return new Schema.Parser().parse(schemaStr);
   }
 
-  public static RowType getRowTypeFromColumnInfoStr(String columnInfoStr) {
-    List<ColumnInfo> sourceColumns = JsonSerializer.parseToList(columnInfoStr, ColumnInfo.class);
+  public static RowType getRowTypeFromColumnInfo(List<ColumnInfo> sourceColumns) {
     List<RowType.RowField> fields = getRowFields(sourceColumns);
     return new RowType(false, fields);
   }

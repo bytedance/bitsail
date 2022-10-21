@@ -31,32 +31,47 @@
         }
       },
       "path":"/yanjia/test_table",
-      "format_type":"json",
       "index":{
         "type":"BUCKET"
       },
       "class":"com.bytedance.bitsail.connector.legacy.hudi.dag.HudiSinkFunctionDAGBuilder",
       "write":{
-        "operation":"upsert"
+        "operation":"upsert",
+        "precombine":{
+          "field":"timestamp"
+        }
       },
       "table":{
         "type":"MERGE_ON_READ"
       },
-      "source_schema":"[{\"name\":\"id\",\"type\":\"bigint\"},{\"name\":\"test\",\"type\":\"string\"},{\"name\":\"timestamp\",\"type\":\"string\"}]",
-      "sink_schema":"[{\"name\":\"id\",\"type\":\"bigint\"},{\"name\":\"test\",\"type\":\"string\"},{\"name\":\"timestamp\",\"type\":\"string\"}]"
+      "columns":[
+        {
+          "name":"id",
+          "type":"string"
+        },
+        {
+          "name":"text",
+          "type":"string"
+        },
+        {
+          "name":"timestamp",
+          "type":"string"
+        }
+      ]
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource",
       "total_count": 300,
       "rate": 1000,
-      "random_null_rate": 0.1,
+      "random_null_rate": 0,
+      "use_bitsail_type": false,
       "columns": [
         {
           "name": "id",
-          "type": "int"
+          "type": "string"
         },
         {
-          "name": "test",
+          "name": "text",
           "type": "string"
         },
         {

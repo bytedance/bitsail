@@ -35,6 +35,7 @@
         <module>bitsail-connector-streamingfile</module>
         <module>bitsail-connector-fake</module>
         <module>bitsail-connector-jdbc</module>
+        <module>bitsail-connector-redis</module>
         <module>bitsail-connector-print</module>
     </modules>
 
