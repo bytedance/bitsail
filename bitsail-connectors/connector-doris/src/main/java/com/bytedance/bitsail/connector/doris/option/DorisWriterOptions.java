@@ -70,7 +70,7 @@ public interface DorisWriterOptions extends WriterOptions.BaseWriterOptions {
           .onlyReference(new TypeReference<List<Map<String, Object>>>() {});
 
   ConfigOption<Integer> SINK_FLUSH_INTERVAL_MS =
-      key(WRITER_PREFIX + "SINK_FLUSH_INTERVAL_MS")
+      key(WRITER_PREFIX + "sink_flush_interval_ms")
           .defaultValue(5000);
 
   ConfigOption<Integer> SINK_MAX_RETRIES =
