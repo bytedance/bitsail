@@ -47,8 +47,6 @@ import java.util.stream.Collectors;
 
 /**
  * Wrapping up the native Jedis pipeline, making it retryable.
- *
- * @author yangyun
  **/
 public abstract class AbstractPipelineProcessor implements PipelineProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractPipelineProcessor.class);

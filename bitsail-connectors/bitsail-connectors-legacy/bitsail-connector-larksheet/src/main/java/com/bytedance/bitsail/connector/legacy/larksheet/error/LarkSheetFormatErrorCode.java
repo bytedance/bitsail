@@ -19,9 +19,6 @@ package com.bytedance.bitsail.connector.legacy.larksheet.error;
 
 import com.bytedance.bitsail.common.exception.ErrorCode;
 
-/**
- * @author yangyun
- **/
 public enum LarkSheetFormatErrorCode implements ErrorCode {
 
   REQUIRED_VALUE("LarkSheetPlugin-01",

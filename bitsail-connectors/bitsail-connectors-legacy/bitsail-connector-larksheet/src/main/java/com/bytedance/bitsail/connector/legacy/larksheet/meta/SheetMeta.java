@@ -27,8 +27,6 @@ import java.io.Serializable;
 
 /**
  * Meta information of a sheet.
- *
- * @author yangyun
  **/
 @Data
 @AllArgsConstructor

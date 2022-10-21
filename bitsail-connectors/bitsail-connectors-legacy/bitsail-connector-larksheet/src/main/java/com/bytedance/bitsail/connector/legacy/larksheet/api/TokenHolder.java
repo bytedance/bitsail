@@ -39,9 +39,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author yangyun
- **/
 public class TokenHolder {
   private static final Logger LOG = LoggerFactory.getLogger(TokenHolder.class);
 

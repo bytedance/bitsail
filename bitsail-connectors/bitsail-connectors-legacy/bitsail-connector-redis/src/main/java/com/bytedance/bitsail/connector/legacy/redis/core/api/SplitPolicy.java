@@ -22,9 +22,6 @@ import com.bytedance.bitsail.connector.legacy.redis.core.Command;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author yangyun
- **/
 public interface SplitPolicy {
 
   /**

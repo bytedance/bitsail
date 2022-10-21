@@ -24,9 +24,6 @@ import lombok.Data;
 import lombok.ToString;
 import org.apache.flink.core.io.InputSplit;
 
-/**
- * @author yangyun
- */
 @Data
 @ToString
 @AllArgsConstructor

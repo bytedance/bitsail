@@ -23,9 +23,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/**
- * @author yangyun
- **/
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

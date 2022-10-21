@@ -28,7 +28,6 @@ import static com.bytedance.bitsail.connector.legacy.larksheet.api.SheetConfig.R
 
 /**
  * Ref: <a href="https://open.feishu.cn/document/ukTMukTMukTM/ugjM14COyUjL4ITN">Server Error Codes</a>
- * @author yangyun.
  **/
 @Data
 @AllArgsConstructor
