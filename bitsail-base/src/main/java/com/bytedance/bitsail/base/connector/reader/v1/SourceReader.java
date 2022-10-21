@@ -51,8 +51,14 @@ public interface SourceReader<T, SplitT extends SourceSplit> extends Serializabl
   default void handleSourceEvent(SourceEvent sourceEvent) {
   }
 
+  /**
+   * Store the split to the external system to recover when task failed.
+   */
   List<SplitT> snapshotState(long checkpointId);
 
+  /**
+   * When all tasks finished snapshot, notify checkpoint complete will be invoked.
+   */
   void notifyCheckpointComplete(long checkpointId) throws Exception;
 
   interface Context {

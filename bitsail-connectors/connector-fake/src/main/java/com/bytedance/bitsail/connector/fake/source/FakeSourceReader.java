@@ -29,9 +29,12 @@ import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.base.source.SimpleSourceReaderBase;
 import com.bytedance.bitsail.connector.fake.option.FakeReaderOptions;
 
+import com.google.common.util.concurrent.RateLimiter;
 import net.datafaker.Faker;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -43,8 +46,7 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
 
   private final transient Faker faker;
   private final transient int totalCount;
-  private final transient double fakeGenerateRate;
-  private final transient double fakeNullableRate;
+  private final transient RateLimiter fakeGenerateRate;
   private final transient AtomicLong counter;
 
   public FakeSourceReader(BitSailConfiguration readerConfiguration, Context context) {
@@ -52,15 +54,15 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
     this.typeInfos = context.getTypeInfos();
     this.columnInfos = readerConfiguration.get(ReaderOptions.BaseReaderOptions.COLUMNS);
     this.totalCount = readerConfiguration.get(FakeReaderOptions.TOTAL_COUNT);
-    this.fakeGenerateRate = readerConfiguration.get(FakeReaderOptions.RATE);
-    this.fakeNullableRate = readerConfiguration.get(FakeReaderOptions.RANDOM_NULL_RATE);
+    this.fakeGenerateRate = RateLimiter.create(readerConfiguration.get(FakeReaderOptions.RATE));
     this.faker = new Faker();
     this.counter = new AtomicLong();
   }
 
   @Override
   public void pollNext(SourcePipeline<Row> pipeline) throws Exception {
-    pipeline.output(createRow());
+    fakeGenerateRate.acquire();
+    pipeline.output(fakeNextRecord());
   }
 
   @Override
@@ -68,18 +70,40 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
     return counter.incrementAndGet() <= totalCount;
   }
 
-  private Row createRow() {
+  private Row fakeNextRecord() {
     Row row = new Row(ArrayUtils.getLength(typeInfos));
     for (int index = 0; index < columnInfos.size(); index++) {
-      row.setField(index, createObject(typeInfos[index]));
+      row.setField(index, fakeRawValue(typeInfos[index]));
     }
     return row;
   }
 
-  private Object createObject(TypeInfo<?> typeInfo) {
-    if (PrimitiveTypes.LONG.getTypeInfo() == typeInfo) {
+  @SuppressWarnings("checkstyle:MagicNumber")
+  private Object fakeRawValue(TypeInfo<?> typeInfo) {
+    if (PrimitiveTypes.LONG.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
       return faker.number().randomNumber();
+
+    } else if (PrimitiveTypes.STRING.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
+      return faker.name().fullName();
+
+    } else if (PrimitiveTypes.BOOLEAN.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
+      return faker.bool().bool();
+
+    } else if (PrimitiveTypes.DOUBLE.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
+      return faker.number().randomDouble(5, -1_000_000_000, 1_000_000_000);
+
+    } else if (PrimitiveTypes.BYTE.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
+      return faker.name().fullName().getBytes();
+
+    } else if (PrimitiveTypes.DATE_DATE.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
+      return new java.sql.Date(faker.date().birthday(10, 99).getTime());
+
+    } else if (PrimitiveTypes.DATE_TIME.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
+      return new Time(faker.date().birthday(10, 99).getTime());
+
+    } else if (PrimitiveTypes.DATE_DATE_TIME.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
+      return new Timestamp(faker.date().birthday(10, 99).getTime());
     }
-    return null;
+    throw new RuntimeException("Unsupported type " + typeInfo);
   }
 }

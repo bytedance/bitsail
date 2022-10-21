@@ -16,7 +16,11 @@
       "columns": [
         {
           "name": "id",
-          "type": "bigint"
+          "type": "long"
+        },
+        {
+          "name": "id",
+          "type": "date"
         }
       ]
     },

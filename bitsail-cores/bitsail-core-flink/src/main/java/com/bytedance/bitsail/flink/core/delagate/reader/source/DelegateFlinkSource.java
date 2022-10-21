@@ -76,6 +76,7 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
     return new DelegateFlinkSourceReader<>(
         source::createReader,
         readerContext,
+        source.getReaderName(),
         typeInfos,
         commonConfiguration,
         readerConfiguration

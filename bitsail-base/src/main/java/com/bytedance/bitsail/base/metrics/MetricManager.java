@@ -19,7 +19,9 @@ package com.bytedance.bitsail.base.metrics;
 
 import com.bytedance.bitsail.base.messenger.common.MessageType;
 import com.bytedance.bitsail.base.metrics.manager.CallTracer;
+import com.bytedance.bitsail.base.version.VersionHolder;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.util.Pair;
 
 import com.codahale.metrics.Counter;
@@ -28,6 +30,7 @@ import com.codahale.metrics.Metric;
 import com.codahale.metrics.Timer;
 
 import java.io.Closeable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -39,6 +42,9 @@ import java.util.function.Supplier;
  * <p>A MetricGroup is uniquely identified by its tags and name.
  */
 public interface MetricManager extends Closeable {
+  static final String DEFAULT_DIMENSION_JOB_ID = "job";
+  static final String DEFAULT_DIMENSION_COMMIT_ID = "git_commit";
+  static final String DEFAULT_DIMENSION_VERSION = "version";
 
   void start();
 
@@ -93,16 +99,7 @@ public interface MetricManager extends Closeable {
    *
    * @return metric tag
    */
-  List<Pair<String, String>> getAllMetricTags();
-
-  /**
-   * Init metric tag using configuration
-   *
-   * @param configuration bitSail configuration
-   */
-  List<Pair<String, String>> initMetricTags(BitSailConfiguration configuration);
-
-  void addExtraMetricTags(List<Pair<String, String>> extraMetricTags);
+  List<Pair<String, String>> getAllMetricDimensions();
 
   /**
    * Returns the fully qualified metric name with metric tag
@@ -115,4 +112,20 @@ public interface MetricManager extends Closeable {
   void removeAllMetric();
 
   void removeMetric(String name);
+
+  default List<Pair<String, String>> getDefaultDimensions(BitSailConfiguration jobConfiguration) {
+    String jobId = String.valueOf(jobConfiguration.get(CommonOptions.JOB_ID));
+    List<Pair<String, String>> defaultDimensions = new ArrayList<>();
+    defaultDimensions
+        .add(Pair.newPair(DEFAULT_DIMENSION_JOB_ID, jobId));
+    String commitId = VersionHolder.INSTANCE.getGitCommitId();
+    String buildVersion = VersionHolder.INSTANCE.getBuildVersion();
+    if (VersionHolder.isCommitIdValid(commitId)) {
+      defaultDimensions.add(Pair.newPair(DEFAULT_DIMENSION_COMMIT_ID, commitId));
+    }
+    if (VersionHolder.isBuildVersionValid(buildVersion)) {
+      defaultDimensions.add(Pair.newPair(DEFAULT_DIMENSION_VERSION, buildVersion));
+    }
+    return defaultDimensions;
+  }
 }

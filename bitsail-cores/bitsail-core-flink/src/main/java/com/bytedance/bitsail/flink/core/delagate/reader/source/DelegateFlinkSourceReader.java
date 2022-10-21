@@ -19,15 +19,26 @@
 
 package com.bytedance.bitsail.flink.core.delagate.reader.source;
 
+import com.bytedance.bitsail.base.dirty.AbstractDirtyCollector;
+import com.bytedance.bitsail.base.dirty.DirtyCollectorFactory;
 import com.bytedance.bitsail.base.messenger.Messenger;
+import com.bytedance.bitsail.base.messenger.common.MessageType;
+import com.bytedance.bitsail.base.messenger.common.MessengerGroup;
+import com.bytedance.bitsail.base.messenger.context.SimpleMessengerContext;
 import com.bytedance.bitsail.base.metrics.MetricManager;
+import com.bytedance.bitsail.base.metrics.manager.BitSailMetricManager;
+import com.bytedance.bitsail.base.metrics.manager.CallTracer;
 import com.bytedance.bitsail.base.ratelimit.Channel;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ReaderOptions;
+import com.bytedance.bitsail.common.util.Pair;
 import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConvertSerializer;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.connector.source.ReaderOutput;
 import org.apache.flink.api.connector.source.SourceReader;
@@ -39,6 +50,8 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+import static com.bytedance.bitsail.base.constants.BaseMetricsNames.RECORD_INVOKE_LATENCY;
+
 public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.base.connector.reader.v1.SourceSplit>
     implements SourceReader<T, DelegateFlinkSourceSplit<SplitT>> {
 
@@ -49,19 +62,26 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
   private final BitSailConfiguration readerConfiguration;
   private final TypeInfo<?>[] sourceTypeInfos;
   private final List<ColumnInfo> columnInfos;
+  private final String readerName;
 
   private transient com.bytedance.bitsail.base.connector.reader.v1.SourceReader<T, SplitT> sourceReader;
   private transient DelegateSourcePipeline<T> pipeline;
   private transient FlinkRowConvertSerializer flinkRowConvertSerializer;
   private transient CompletableFuture<Void> available;
+
+  //todo support rate limit.
   private transient Messenger<String> messenger;
   private transient Channel channel;
+  //todo support dirty collector.
+  private transient AbstractDirtyCollector dirtyCollector;
+
   private transient MetricManager metricManager;
 
   public DelegateFlinkSourceReader(
       Function<com.bytedance.bitsail.base.connector.reader.v1.SourceReader.Context,
           com.bytedance.bitsail.base.connector.reader.v1.SourceReader<T, SplitT>> sourceReaderFunction,
       SourceReaderContext sourceReaderContext,
+      String readerName,
       TypeInfo<?>[] typeInfos,
       BitSailConfiguration commonConfiguration,
       BitSailConfiguration readerConfiguration) {
@@ -69,12 +89,29 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
     this.sourceReaderContext = sourceReaderContext;
     this.commonConfiguration = commonConfiguration;
     this.readerConfiguration = readerConfiguration;
+    this.readerName = readerName;
     this.sourceTypeInfos = typeInfos;
     this.columnInfos = readerConfiguration.get(ReaderOptions.BaseReaderOptions.COLUMNS);
-    prepareRuntimePlugins();
+
+    this.metricManager = new BitSailMetricManager(commonConfiguration,
+        "input",
+        false,
+        ImmutableList.of(
+            Pair.newPair("instance", String.valueOf(commonConfiguration.get(CommonOptions.INSTANCE_ID))),
+            Pair.newPair("type", readerName),
+            Pair.newPair("task", String.valueOf(sourceReaderContext.getIndexOfSubtask()))
+        )
+    );
+    this.dirtyCollector = DirtyCollectorFactory.initDirtyCollector(commonConfiguration,
+        SimpleMessengerContext
+            .builder()
+            .messengerGroup(MessengerGroup.READER)
+            .instanceId(commonConfiguration.get(CommonOptions.INTERNAL_INSTANCE_ID))
+            .build());
+    prepareSourceReader();
   }
 
-  private void prepareRuntimePlugins() {
+  private void prepareSourceReader() {
     com.bytedance.bitsail.base.connector.reader.v1.SourceReader.Context context =
         new com.bytedance.bitsail.base.connector.reader.v1.SourceReader.Context() {
           @Override
@@ -104,16 +141,27 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
   @Override
   public void start() {
     this.sourceReader.start();
+    this.metricManager.start();
   }
 
   @Override
   public InputStatus pollNext(ReaderOutput<T> output) throws Exception {
     getOrCreateSourcePipeline(output);
     if (sourceReader.hasMoreElements()) {
-      sourceReader.pollNext(pipeline);
+      pollNext(pipeline);
       return InputStatus.MORE_AVAILABLE;
     }
     return InputStatus.END_OF_INPUT;
+  }
+
+  private void pollNext(DelegateSourcePipeline<T> pipeline) throws Exception {
+    try (CallTracer ignore = metricManager.recordTimer(RECORD_INVOKE_LATENCY).get()) {
+      sourceReader.pollNext(pipeline);
+
+      metricManager.reportRecord(0, MessageType.SUCCESS);
+    } catch (BitSailException e) {
+      metricManager.reportRecord(0, MessageType.FAILED);
+    }
   }
 
   private void getOrCreateSourcePipeline(ReaderOutput<T> output) {
