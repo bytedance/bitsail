@@ -22,11 +22,11 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.doris.committer.DorisCommittable;
+import com.bytedance.bitsail.connector.doris.config.DorisExecutionOptions;
+import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 import com.bytedance.bitsail.connector.doris.error.DorisErrorCode;
 import com.bytedance.bitsail.connector.doris.serialize.DorisRowSerializer;
 import com.bytedance.bitsail.connector.doris.sink.proxy.AbstractDorisWriteModeProxy;
-import com.bytedance.bitsail.connector.doris.config.DorisExecutionOptions;
-import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 import com.bytedance.bitsail.connector.doris.sink.proxy.DorisReplaceProxy;
 import com.bytedance.bitsail.connector.doris.sink.proxy.DorisUpsertProxy;
 

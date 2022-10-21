@@ -20,6 +20,11 @@ package com.bytedance.bitsail.connector.legacy.fake.option;
 import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 
+import com.alibaba.fastjson.TypeReference;
+
+import java.util.List;
+import java.util.Map;
+
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
 
@@ -47,4 +52,8 @@ public interface FakeReaderOptions extends ReaderOptions.BaseReaderOptions {
   ConfigOption<Boolean> USE_BITSAIL_TYPE =
       key(READER_PREFIX + "use_bitsail_type")
           .defaultValue(true);
+
+  ConfigOption<List<Map<String, String>>> FIXED_COLUMNS =
+      key(READER_PREFIX + "fixed_columns")
+          .onlyReference(new TypeReference<List<Map<String, String>>>(){});
 }
