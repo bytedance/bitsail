@@ -25,7 +25,6 @@ import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.flink.core.delagate.reader.translation.BoundednessTranslation;
-import com.bytedance.bitsail.flink.core.delagate.reader.translation.SourceContextTranslation;
 import com.bytedance.bitsail.flink.core.delagate.serializer.DelegateFlinkSourceSplitSerializer;
 import com.bytedance.bitsail.flink.core.delagate.serializer.DelegateSimpleVersionedSerializer;
 import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
@@ -47,15 +46,11 @@ import java.util.List;
 public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends Serializable>
     implements Source<T, DelegateFlinkSourceSplit<SplitT>, StateT>, ResultTypeQueryable<T> {
 
-  public com.bytedance.bitsail.base.connector.reader.v1.Source<T, SplitT, StateT> source;
+  public final com.bytedance.bitsail.base.connector.reader.v1.Source<T, SplitT, StateT> source;
 
-  private BitSailConfiguration commonConfiguration;
-
-  private BitSailConfiguration readerConfiguration;
-
-  private TypeInfo<?>[] typeInfos;
-
-  private List<ColumnInfo> columnInfos;
+  private final BitSailConfiguration commonConfiguration;
+  private final BitSailConfiguration readerConfiguration;
+  private final TypeInfo<?>[] typeInfos;
 
   public DelegateFlinkSource(com.bytedance.bitsail.base.connector.reader.v1.Source<T, SplitT, StateT> source,
                              BitSailConfiguration commonConfiguration,
@@ -63,7 +58,9 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
     this.source = source;
     this.commonConfiguration = commonConfiguration;
     this.readerConfiguration = readerConfiguration;
-    this.columnInfos = readerConfiguration.get(ReaderOptions.BaseReaderOptions.COLUMNS);
+    //todo exception for columns.
+    List<ColumnInfo> columnInfos = readerConfiguration
+        .get(ReaderOptions.BaseReaderOptions.COLUMNS);
     this.typeInfos = ColumnFlinkTypeInfoUtil
         .getTypeInfos(source.createTypeInfoConverter(),
             columnInfos);
@@ -76,15 +73,10 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
 
   @Override
   public SourceReader<T, DelegateFlinkSourceSplit<SplitT>> createReader(SourceReaderContext readerContext) throws Exception {
-    com.bytedance.bitsail.base.connector.reader.v1.SourceReader.Context context =
-        SourceContextTranslation.fromReaderContext(readerContext,
-            source.getSourceBoundedness(),
-            typeInfos,
-            columnInfos);
     return new DelegateFlinkSourceReader<>(
-        source.createReader(readerConfiguration,
-            context),
-        context,
+        source::createReader,
+        readerContext,
+        typeInfos,
         commonConfiguration,
         readerConfiguration
     );
@@ -93,14 +85,13 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
   @Override
   public SplitEnumerator<DelegateFlinkSourceSplit<SplitT>, StateT> createEnumerator(SplitEnumeratorContext<DelegateFlinkSourceSplit<SplitT>> enumContext)
       throws Exception {
-    return new DelegateFlinkSourceSplitEnumerator<>(source.createSplitCoordinator(readerConfiguration, SourceContextTranslation.fromSplitEnumeratorContext(enumContext)));
+    return restoreEnumerator(enumContext, null);
   }
 
   @Override
   public SplitEnumerator<DelegateFlinkSourceSplit<SplitT>, StateT> restoreEnumerator(SplitEnumeratorContext<DelegateFlinkSourceSplit<SplitT>> enumContext,
                                                                                      StateT checkpoint) throws Exception {
-    return new DelegateFlinkSourceSplitEnumerator<>(
-        source.restoreSplitCoordinator(readerConfiguration, SourceContextTranslation.fromSplitEnumeratorContext(enumContext), checkpoint));
+    return new DelegateFlinkSourceSplitEnumerator<>(source::createSplitCoordinator, enumContext, checkpoint);
   }
 
   @Override

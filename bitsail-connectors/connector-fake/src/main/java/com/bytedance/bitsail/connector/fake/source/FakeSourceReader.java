@@ -24,6 +24,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.ddl.typeinfo.PrimitiveTypes;
 import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.base.source.SimpleSourceReaderBase;
 import com.bytedance.bitsail.connector.fake.option.FakeReaderOptions;
@@ -37,9 +38,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
 
   private BitSailConfiguration readerConfiguration;
-
   private TypeInfo<?>[] typeInfos;
-
   private List<ColumnInfo> columnInfos;
 
   private final transient Faker faker;
@@ -51,7 +50,7 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
   public FakeSourceReader(BitSailConfiguration readerConfiguration, Context context) {
     this.readerConfiguration = readerConfiguration;
     this.typeInfos = context.getTypeInfos();
-    this.columnInfos = context.getColumnInfos();
+    this.columnInfos = readerConfiguration.get(ReaderOptions.BaseReaderOptions.COLUMNS);
     this.totalCount = readerConfiguration.get(FakeReaderOptions.TOTAL_COUNT);
     this.fakeGenerateRate = readerConfiguration.get(FakeReaderOptions.RATE);
     this.fakeNullableRate = readerConfiguration.get(FakeReaderOptions.RANDOM_NULL_RATE);

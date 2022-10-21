@@ -19,47 +19,86 @@
 
 package com.bytedance.bitsail.flink.core.delagate.reader.source;
 
+import com.bytedance.bitsail.base.messenger.Messenger;
+import com.bytedance.bitsail.base.metrics.MetricManager;
+import com.bytedance.bitsail.base.ratelimit.Channel;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConvertSerializer;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.connector.source.ReaderOutput;
 import org.apache.flink.api.connector.source.SourceReader;
+import org.apache.flink.api.connector.source.SourceReaderContext;
 import org.apache.flink.core.io.InputStatus;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.base.connector.reader.v1.SourceSplit>
     implements SourceReader<T, DelegateFlinkSourceSplit<SplitT>> {
 
-  private com.bytedance.bitsail.base.connector.reader.v1.SourceReader<T, SplitT> sourceReader;
+  private final Function<com.bytedance.bitsail.base.connector.reader.v1.SourceReader.Context,
+      com.bytedance.bitsail.base.connector.reader.v1.SourceReader<T, SplitT>> sourceReaderFunction;
+  private final SourceReaderContext sourceReaderContext;
+  private final BitSailConfiguration commonConfiguration;
+  private final BitSailConfiguration readerConfiguration;
+  private final TypeInfo<?>[] sourceTypeInfos;
+  private final List<ColumnInfo> columnInfos;
 
-  private BitSailConfiguration commonConfiguration;
-
-  private BitSailConfiguration readerConfiguration;
-
+  private transient com.bytedance.bitsail.base.connector.reader.v1.SourceReader<T, SplitT> sourceReader;
   private transient DelegateSourcePipeline<T> pipeline;
-
   private transient FlinkRowConvertSerializer flinkRowConvertSerializer;
-
   private transient CompletableFuture<Void> available;
+  private transient Messenger<String> messenger;
+  private transient Channel channel;
+  private transient MetricManager metricManager;
 
   public DelegateFlinkSourceReader(
-      com.bytedance.bitsail.base.connector.reader.v1.SourceReader<T, SplitT> sourceReader,
-      com.bytedance.bitsail.base.connector.reader.v1.SourceReader.Context context,
+      Function<com.bytedance.bitsail.base.connector.reader.v1.SourceReader.Context,
+          com.bytedance.bitsail.base.connector.reader.v1.SourceReader<T, SplitT>> sourceReaderFunction,
+      SourceReaderContext sourceReaderContext,
+      TypeInfo<?>[] typeInfos,
       BitSailConfiguration commonConfiguration,
       BitSailConfiguration readerConfiguration) {
-    this.sourceReader = sourceReader;
-    this.available = new CompletableFuture<>();
+    this.sourceReaderFunction = sourceReaderFunction;
+    this.sourceReaderContext = sourceReaderContext;
     this.commonConfiguration = commonConfiguration;
     this.readerConfiguration = readerConfiguration;
+    this.sourceTypeInfos = typeInfos;
+    this.columnInfos = readerConfiguration.get(ReaderOptions.BaseReaderOptions.COLUMNS);
+    prepareRuntimePlugins();
+  }
 
+  private void prepareRuntimePlugins() {
+    com.bytedance.bitsail.base.connector.reader.v1.SourceReader.Context context =
+        new com.bytedance.bitsail.base.connector.reader.v1.SourceReader.Context() {
+          @Override
+          public TypeInfo<?>[] getTypeInfos() {
+            return sourceTypeInfos;
+          }
+
+          @Override
+          public int getIndexOfSubtask() {
+            return sourceReaderContext.getIndexOfSubtask();
+          }
+
+          @Override
+          public void sendSplitRequest() {
+            sourceReaderContext.sendSplitRequest();
+          }
+        };
+    this.sourceReader = sourceReaderFunction
+        .apply(context);
+    this.available = new CompletableFuture<>();
     this.flinkRowConvertSerializer = new FlinkRowConvertSerializer(
-        context.getTypeInfos(),
-        context.getColumnInfos(),
-        this.commonConfiguration);
+        sourceTypeInfos,
+        columnInfos,
+        commonConfiguration);
   }
 
   @Override
@@ -89,7 +128,7 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
 
     List<DelegateFlinkSourceSplit<SplitT>> flinkSourceSplits = Lists.newArrayListWithCapacity(splits.size());
     for (SplitT splitT : splits) {
-      flinkSourceSplits.add(new DelegateFlinkSourceSplit(splitT));
+      flinkSourceSplits.add(new DelegateFlinkSourceSplit<>(splitT));
     }
     return flinkSourceSplits;
   }

@@ -37,15 +37,9 @@ public interface Source<T, SplitT extends SourceSplit, StateT extends Serializab
 
   Boundedness getSourceBoundedness();
 
-  SourceReader<T, SplitT> createReader(BitSailConfiguration readerConfiguration,
-                                       SourceReader.Context readerContext);
+  SourceReader<T, SplitT> createReader(SourceReader.Context readerContext);
 
-  SourceSplitCoordinator<SplitT, StateT> createSplitCoordinator(BitSailConfiguration readerConfiguration,
-                                                                SourceSplitCoordinator.Context<SplitT> coordinatorContext);
-
-  SourceSplitCoordinator<SplitT, StateT> restoreSplitCoordinator(BitSailConfiguration readerConfiguration,
-                                                                 SourceSplitCoordinator.Context<SplitT> coordinatorContext,
-                                                                 StateT checkpoint);
+  SourceSplitCoordinator<SplitT, StateT> createSplitCoordinator(SourceSplitCoordinator.Context<SplitT, StateT> coordinatorContext);
 
   default BinarySerializer<SplitT> getSplitSerializer() {
     return new SimpleBinarySerializer<>();

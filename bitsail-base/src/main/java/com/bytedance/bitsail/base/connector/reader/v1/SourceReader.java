@@ -20,7 +20,6 @@
 package com.bytedance.bitsail.base.connector.reader.v1;
 
 import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
-import com.bytedance.bitsail.common.model.ColumnInfo;
 
 import java.io.Serializable;
 import java.util.List;
@@ -60,11 +59,7 @@ public interface SourceReader<T, SplitT extends SourceSplit> extends Serializabl
 
     TypeInfo<?>[] getTypeInfos();
 
-    List<ColumnInfo> getColumnInfos();
-
     int getIndexOfSubtask();
-
-    Boundedness getBoundedness();
 
     void sendSplitRequest();
   }

@@ -38,7 +38,7 @@ public abstract class SimpleSourceBase<T>
 
   private transient ExecutionEnviron executionEnviron;
 
-  private transient BitSailConfiguration readerConfiguration;
+  private BitSailConfiguration readerConfiguration;
 
   @Override
   public void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration) {
@@ -54,22 +54,14 @@ public abstract class SimpleSourceBase<T>
   }
 
   @Override
-  public SourceSplitCoordinator<SimpleSourceSplit, SimpleSourceState> createSplitCoordinator(BitSailConfiguration readerConfiguration,
-                                                                                             SourceSplitCoordinator.Context<SimpleSourceSplit> coordinatorContext) {
-    return restoreSplitCoordinator(readerConfiguration, coordinatorContext, null);
-  }
-
-  @Override
-  public SourceSplitCoordinator<SimpleSourceSplit, SimpleSourceState> restoreSplitCoordinator(BitSailConfiguration readerConfiguration,
-                                                                                              SourceSplitCoordinator.Context<SimpleSourceSplit> coordinatorContext,
-                                                                                              SimpleSourceState checkpoint) {
+  public SourceSplitCoordinator<SimpleSourceSplit, SimpleSourceState> createSplitCoordinator(
+      SourceSplitCoordinator.Context<SimpleSourceSplit, SimpleSourceState> coordinatorContext) {
     return new SimpleSourceSplitCoordinator(readerConfiguration,
         coordinatorContext);
   }
 
   @Override
-  public SimpleSourceReaderBase<T> createReader(BitSailConfiguration readerConfiguration,
-                                                SourceReader.Context readerContext) {
+  public SimpleSourceReaderBase<T> createReader(SourceReader.Context readerContext) {
     return createSimpleReader(readerConfiguration, readerContext);
   }
 

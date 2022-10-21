@@ -24,22 +24,86 @@ import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 
+import com.google.common.collect.Maps;
 import org.apache.flink.api.connector.source.SourceEvent;
 import org.apache.flink.api.connector.source.SplitEnumerator;
+import org.apache.flink.api.connector.source.SplitEnumeratorContext;
+import org.apache.flink.api.connector.source.SplitsAssignment;
 
 import javax.annotation.Nullable;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DelegateFlinkSourceSplitEnumerator<SplitT extends SourceSplit,
     StateT> implements SplitEnumerator<DelegateFlinkSourceSplit<SplitT>, StateT> {
 
-  private SourceSplitCoordinator<SplitT, StateT> coordinator;
+  private final Function<SourceSplitCoordinator.Context<SplitT, StateT>, SourceSplitCoordinator
+      <SplitT, StateT>> splitCoordinatorFunction;
+  private final SplitEnumeratorContext<DelegateFlinkSourceSplit<SplitT>> splitEnumeratorContext;
+  private final StateT checkpoint;
 
-  public DelegateFlinkSourceSplitEnumerator(SourceSplitCoordinator<SplitT, StateT> coordinator) {
-    this.coordinator = coordinator;
+  private transient SourceSplitCoordinator<SplitT, StateT> coordinator;
+
+  public DelegateFlinkSourceSplitEnumerator(Function<SourceSplitCoordinator
+      .Context<SplitT, StateT>, SourceSplitCoordinator<SplitT, StateT>> coordinatorFunction,
+                                            SplitEnumeratorContext<DelegateFlinkSourceSplit<SplitT>> splitEnumeratorContext,
+                                            StateT checkpoint) {
+    this.splitCoordinatorFunction = coordinatorFunction;
+    this.splitEnumeratorContext = splitEnumeratorContext;
+    this.checkpoint = checkpoint;
+    prepareSplitEnumerator();
+  }
+
+  private void prepareSplitEnumerator() {
+    SourceSplitCoordinator.Context<SplitT, StateT> context = new SourceSplitCoordinator.Context<SplitT, StateT>() {
+
+      @Override
+      public boolean isRestored() {
+        return Objects.nonNull(checkpoint);
+      }
+
+      @Override
+      public StateT getRestoreState() {
+        return checkpoint;
+      }
+
+      @Override
+      public int totalParallelism() {
+        return splitEnumeratorContext.currentParallelism();
+      }
+
+      @Override
+      public Set<Integer> registeredReaders() {
+        return splitEnumeratorContext.registeredReaders()
+            .keySet();
+      }
+
+      @Override
+      public void assignSplit(int subtaskId, List<SplitT> splits) {
+        HashMap<Integer, List<DelegateFlinkSourceSplit<SplitT>>> assignment = Maps.newHashMap();
+        assignment.put(subtaskId, splits.stream()
+            .map(DelegateFlinkSourceSplit::new)
+            .collect(Collectors.toList()));
+        splitEnumeratorContext.assignSplits(new SplitsAssignment<>(assignment));
+      }
+
+      @Override
+      public void signalNoMoreSplits(int subtask) {
+        splitEnumeratorContext.signalNoMoreSplits(subtask);
+      }
+
+      @Override
+      public void sendEventToSourceReader(int subtaskId, com.bytedance.bitsail.base.connector.reader.v1.SourceEvent event) {
+        splitEnumeratorContext.sendEventToSourceReader(subtaskId, new DelegateSourceEvent(event));
+      }
+    };
+    coordinator = splitCoordinatorFunction.apply(context);
   }
 
   @Override

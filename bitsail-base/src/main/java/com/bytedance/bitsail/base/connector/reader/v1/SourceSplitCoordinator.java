@@ -45,7 +45,11 @@ public interface SourceSplitCoordinator<SplitT extends SourceSplit, StateT> exte
 
   void close();
 
-  interface Context<SplitT extends SourceSplit> {
+  interface Context<SplitT extends SourceSplit, StateT> {
+
+    boolean isRestored();
+
+    StateT getRestoreState();
 
     int totalParallelism();
 

@@ -31,10 +31,11 @@ public class SimpleSourceSplitCoordinator
 
   private BitSailConfiguration readerConfiguration;
 
-  private SourceSplitCoordinator.Context<SimpleSourceSplit> coordinatorContext;
+  private SourceSplitCoordinator.Context<SimpleSourceSplit, SimpleSourceState> coordinatorContext;
 
   public SimpleSourceSplitCoordinator(BitSailConfiguration readerConfiguration,
-                                      SourceSplitCoordinator.Context<SimpleSourceSplit> splitContext) {
+                                      SourceSplitCoordinator
+                                          .Context<SimpleSourceSplit, SimpleSourceState> splitContext) {
     this.readerConfiguration = readerConfiguration;
     this.coordinatorContext = splitContext;
   }
