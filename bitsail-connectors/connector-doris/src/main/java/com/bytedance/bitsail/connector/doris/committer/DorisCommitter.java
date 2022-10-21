@@ -19,11 +19,11 @@ package com.bytedance.bitsail.connector.doris.committer;
 
 import com.bytedance.bitsail.base.connector.writer.v1.WriterCommitter;
 import com.bytedance.bitsail.connector.doris.DorisConnectionHolder;
+import com.bytedance.bitsail.connector.doris.config.DorisExecutionOptions;
+import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 import com.bytedance.bitsail.connector.doris.partition.DorisPartition;
 import com.bytedance.bitsail.connector.doris.partition.DorisPartitionManager;
 import com.bytedance.bitsail.connector.doris.sink.ddl.DorisSchemaManagerGenerator;
-import com.bytedance.bitsail.connector.doris.config.DorisExecutionOptions;
-import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 
 import lombok.NoArgsConstructor;
 import org.slf4j.Logger;

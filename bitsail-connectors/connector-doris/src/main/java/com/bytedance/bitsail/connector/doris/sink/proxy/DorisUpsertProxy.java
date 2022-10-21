@@ -19,8 +19,8 @@ package com.bytedance.bitsail.connector.doris.sink.proxy;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.connector.doris.config.DorisExecutionOptions;
-import com.bytedance.bitsail.connector.doris.sink.streamload.DorisStreamLoad;
 import com.bytedance.bitsail.connector.doris.config.DorisOptions;
+import com.bytedance.bitsail.connector.doris.sink.streamload.DorisStreamLoad;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

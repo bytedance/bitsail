@@ -22,6 +22,7 @@ import com.bytedance.bitsail.common.row.RowKind;
 import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 import com.bytedance.bitsail.connector.doris.converter.DorisRowConverter;
 import com.bytedance.bitsail.connector.doris.typeinfo.DorisDataType;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,12 +33,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 
+@SuppressWarnings("checkstyle:LineLength")
 public class DorisRowSerializerTest extends DorisRowSerializer {
 
   private final int columnSize = 16;
   private final String[] fields = {"f_bigint", "f_varchar", "f_null", "f_boolean", "f_decimal", "f_interval_year_mon",
       "f_interval_day_time", "f_float", "f_double", "f_date", "f_timestamp_without_zone",
-      "f_timestamp_with_local_zone", "f_timestamp_with_zone","f_int"};
+      "f_timestamp_with_local_zone", "f_timestamp_with_zone", "f_int"};
   private final DorisDataType[] types = {
       DorisDataType.BIGINT,
       DorisDataType.VARCHAR,

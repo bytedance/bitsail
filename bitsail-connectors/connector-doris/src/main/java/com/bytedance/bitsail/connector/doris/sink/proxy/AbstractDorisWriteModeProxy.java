@@ -17,10 +17,10 @@
 
 package com.bytedance.bitsail.connector.doris.sink.proxy;
 
-import com.bytedance.bitsail.connector.doris.sink.DorisWriterState;
 import com.bytedance.bitsail.connector.doris.committer.DorisCommittable;
 import com.bytedance.bitsail.connector.doris.config.DorisExecutionOptions;
 import com.bytedance.bitsail.connector.doris.config.DorisOptions;
+import com.bytedance.bitsail.connector.doris.sink.DorisWriterState;
 import com.bytedance.bitsail.connector.doris.sink.streamload.DorisStreamLoad;
 
 import java.io.IOException;

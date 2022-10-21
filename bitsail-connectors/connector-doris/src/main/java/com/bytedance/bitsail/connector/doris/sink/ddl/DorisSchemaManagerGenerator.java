@@ -18,9 +18,9 @@
 package com.bytedance.bitsail.connector.doris.sink.ddl;
 
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.connector.doris.partition.DorisPartitionManager;
 import com.bytedance.bitsail.connector.doris.DorisConnectionHolder;
 import com.bytedance.bitsail.connector.doris.config.DorisOptions;
+import com.bytedance.bitsail.connector.doris.partition.DorisPartitionManager;
 
 import org.apache.commons.lang.StringUtils;
 
