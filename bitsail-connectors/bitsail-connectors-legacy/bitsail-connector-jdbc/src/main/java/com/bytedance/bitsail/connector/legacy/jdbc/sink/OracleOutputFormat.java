@@ -33,20 +33,35 @@ import com.bytedance.bitsail.connector.legacy.jdbc.utils.upsert.OracleUpsertUtil
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.apache.commons.lang3.StringUtils.upperCase;
 
 public class OracleOutputFormat extends JDBCOutputFormat {
 
-  protected String primaryKey;
-  protected String tableSchema;
-  protected String tableWithSchema;
+  String primaryKey;
+  String tableSchema;
+  String tableWithSchema;
 
   @Override
   public void initPlugin() throws IOException {
-    primaryKey = outputSliceConfig.getNecessaryOption(OracleWriterOptions.PRIMARY_KEY, JDBCPluginErrorCode.REQUIRED_VALUE);
-    tableSchema = outputSliceConfig.getNecessaryOption(OracleWriterOptions.DB_NAME, JDBCPluginErrorCode.REQUIRED_VALUE);
-    table = outputSliceConfig.getNecessaryOption(OracleWriterOptions.TABLE_NAME, JDBCPluginErrorCode.REQUIRED_VALUE);
+    primaryKey = upperCase(outputSliceConfig.getNecessaryOption(OracleWriterOptions.PRIMARY_KEY, JDBCPluginErrorCode.REQUIRED_VALUE));
+    tableSchema = upperCase(outputSliceConfig.getNecessaryOption(OracleWriterOptions.DB_NAME, JDBCPluginErrorCode.REQUIRED_VALUE));
+    table = upperCase(outputSliceConfig.getNecessaryOption(OracleWriterOptions.TABLE_NAME, JDBCPluginErrorCode.REQUIRED_VALUE));
     tableWithSchema = tableSchema + "." + table;
     super.initPlugin();
+  }
+
+  @Override
+  protected List<ColumnInfo> provideColumns() {
+    return outputSliceConfig.getNecessaryOption(OracleWriterOptions.COLUMNS, JDBCPluginErrorCode.REQUIRED_VALUE).stream()
+        .map(ColumnInfo::toUpperCase)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  protected String providePartitionName() {
+    return upperCase(super.providePartitionName());
   }
 
   /*
@@ -103,10 +118,10 @@ public class OracleOutputFormat extends JDBCOutputFormat {
     // int or string for "yyyyMMdd" format
     if (partitionPatternFormat.equals("yyyyMMdd")) {
       selectQuery = "select " + primaryKeyWithQuote + " from " + tableWithQuote + " where " + getQuoteColumn(partitionName) +
-              compare + wrapPartitionValueWithQuota(partitionValue) + extraPartitionsSql + " and rownum < " + deleteThreshold;
+          compare + wrapPartitionValueWithQuota(partitionValue) + extraPartitionsSql + " and rownum < " + deleteThreshold;
     } else {
       selectQuery = "select " + primaryKeyWithQuote + " from " + tableWithQuote + " where " + getQuoteColumn(partitionName) +
-              compare + getQuoteValue(partitionValue) + extraPartitionsSql + " and rownum < " + deleteThreshold;
+          compare + getQuoteValue(partitionValue) + extraPartitionsSql + " and rownum < " + deleteThreshold;
     }
     return "delete from " + tableWithQuote + " where " + primaryKeyWithQuote + " in (" + selectQuery + ")";
   }

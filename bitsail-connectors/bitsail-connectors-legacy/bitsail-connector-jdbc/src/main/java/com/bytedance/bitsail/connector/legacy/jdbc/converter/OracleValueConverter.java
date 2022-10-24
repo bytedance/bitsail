@@ -1,24 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * Original Files: apache/flink(https://github.com/apache/flink)
- * Copyright: Copyright 2014-2022 The Apache Software Foundation
- * SPDX-License-Identifier: Apache License 2.0
- */
-
 package com.bytedance.bitsail.connector.legacy.jdbc.converter;
 
 import com.bytedance.bitsail.connector.legacy.jdbc.utils.MicroIntervalUtil;
@@ -44,6 +23,12 @@ import java.util.regex.Pattern;
 public class OracleValueConverter extends JdbcValueConverter {
 
   private static final Pattern INTERVAL_DAY_SECOND_PATTERN = Pattern.compile("([+\\-])?(\\d+) (\\d+):(\\d+):(\\d+).(\\d+)");
+  private static final int PATTERN_GROUP_DAYS_IDX = 2;
+  private static final int PATTERN_GROUP_HOURS_IDX = 3;
+  private static final int PATTERN_GROUP_MINUTES_IDX = 4;
+  private static final int PATTERN_GROUP_SECONDS_IDX = 5;
+  private static final int PATTERN_GROUP_MICROSECONDS_IDX = 6;
+  private static final int MICROS_LENGTH = 6;
   private IntervalHandlingMode intervalMode;
 
   public OracleValueConverter(IntervalHandlingMode mode) {
@@ -130,27 +115,20 @@ public class OracleValueConverter extends JdbcValueConverter {
       return intervalStr;
     } else if (mode.equals(IntervalHandlingMode.NUMERIC)) {
       final Matcher m = INTERVAL_DAY_SECOND_PATTERN.matcher(intervalStr);
-      final int secondIdx = 2;
-      final int thirdIdx = 3;
-      final int fourthIdx = 4;
-      final int fifthIdx = 5;
-      final int sixthIdx = 6;
-      final int microsLength = 6;
       if (m.matches()) {
         final int sign = "-".equals(m.group(1)) ? -1 : 1;
         return MicroIntervalUtil.durationMicros(
                 0,
                 0,
-                sign * Integer.parseInt(m.group(secondIdx)),
-                sign * Integer.parseInt(m.group(thirdIdx)),
-                sign * Integer.parseInt(m.group(fourthIdx)),
-                sign * Integer.parseInt(m.group(fifthIdx)),
-                sign * Integer.parseInt(MicroIntervalUtil.pad(m.group(sixthIdx), microsLength, '0')),
+                sign * Integer.parseInt(m.group(PATTERN_GROUP_DAYS_IDX)),
+                sign * Integer.parseInt(m.group(PATTERN_GROUP_HOURS_IDX)),
+                sign * Integer.parseInt(m.group(PATTERN_GROUP_MINUTES_IDX)),
+                sign * Integer.parseInt(m.group(PATTERN_GROUP_SECONDS_IDX)),
+                sign * Integer.parseInt(MicroIntervalUtil.pad(m.group(PATTERN_GROUP_MICROSECONDS_IDX), MICROS_LENGTH, '0')),
                 MicroIntervalUtil.DAYS_PER_MONTH_AVG);
       }
     }
-
-    throw new Exception("Fail to convert interval_day_to_seconds for oracle, mode: " + mode + " value: " + interval.toString());
+    throw new IllegalArgumentException("Fail to convert interval_day_to_seconds for oracle, mode: " + mode + " value: " + interval.toString());
   }
 
   private Object convertIntervalYMValue(INTERVALYM interval, IntervalHandlingMode mode) throws Exception {

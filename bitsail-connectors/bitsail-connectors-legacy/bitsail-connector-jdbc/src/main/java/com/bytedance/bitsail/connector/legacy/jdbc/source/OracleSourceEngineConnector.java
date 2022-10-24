@@ -42,12 +42,12 @@ import org.apache.commons.collections.CollectionUtils;
 import java.util.List;
 
 public class OracleSourceEngineConnector extends SourceEngineConnector {
-  private String url;
-  private String schemaName;
-  private String tableName;
-  private String userName;
-  private String password;
-  private String initSql;
+  private final String url;
+  private final String schemaName;
+  private final String tableName;
+  private final String userName;
+  private final String password;
+  private final String initSql;
 
   public OracleSourceEngineConnector(BitSailConfiguration commonConfiguration,
                                      BitSailConfiguration readerConfiguration) {

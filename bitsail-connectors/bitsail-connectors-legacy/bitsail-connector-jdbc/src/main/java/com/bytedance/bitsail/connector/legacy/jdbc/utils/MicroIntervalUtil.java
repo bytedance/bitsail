@@ -30,7 +30,7 @@ public class MicroIntervalUtil {
   private static final int MONTHS_PER_YEAR = 12;
   private static final int HOURS_PER_DAY = 24;
   private static final int MINUTES_PER_HOUR = 60;
-  private static final long MICROSECONDS_PER_SECOND = (long) 1e6;
+  private static final long MICROSECONDS_PER_SECOND = 1_000_000L;
   /**
    * Converts a number of time units to a duration in microseconds.
    *

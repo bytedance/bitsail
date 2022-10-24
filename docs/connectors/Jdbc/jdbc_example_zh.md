@@ -188,6 +188,139 @@
 
 -----
 
+## Oracle Example
+
+### Oracle source
+
+``` Json
+{
+    "job":{
+        "reader":{
+            "class":"com.bytedance.bitsail.connector.legacy.jdbc.source.OracleInputFormat",
+            "columns": [
+                {
+                  "index": 0,
+                  "name": "id",
+                  "type": "varchar"
+                },
+                {
+                  "index": 1,
+                  "name": "int_type",
+                  "type": "integer"
+                },
+                {
+                  "index": 2,
+                  "name": "bigint_type",
+                  "type": "number"
+                },
+                {
+                  "index": 3,
+                  "name": "float_type",
+                  "type": "float"
+                },
+                {
+                  "index": 4,
+                  "name": "double_type",
+                  "type": "double"
+                },
+                {
+                  "index": 5,
+                  "name": "raw_type",
+                  "type": "raw"
+                },
+                {
+                  "index": 6,
+                  "name": "date_type",
+                  "type": "date"
+                }
+            ],
+            "user_name":"your user name",
+            "password":"your password",
+            "db_name":"your db name",
+            "table_schema":"your schema name",
+            "table_name":"your table name",
+            "primary_key":"id",
+            "connections":[
+                {
+                    "slaves":[
+                        {
+                            "db_url":"jdbc:oracle:thin:@localhost:1521/test?currentSchema=opensource_test&rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
+```
+
+### Oracle sink
+
+``` Json
+{
+    "job":{
+        "writer": {
+      "class": "com.bytedance.bitsail.connector.legacy.jdbc.sink.OracleOutputFormat",
+      "db_name": "your db name",
+      "table_name": "your table name",
+      "primary_key": "id",
+      "connections": [
+      ],
+      "user_name": "your user name",
+      "password": "your password",
+      "write_mode": "insert",
+      "writer_parallelism_num": 1,
+      "partition_name": "datetime",
+      "partition_value": "20220705",
+      "partition_pattern_format": "yyyyMMdd",
+      "columns": [
+        {
+          "index": 0,
+          "name": "id",
+          "type": "varchar"
+        },
+        {
+          "index": 1,
+          "name": "int_type",
+          "type": "integer"
+        },
+        {
+          "index": 2,
+          "name": "bigint_type",
+          "type": "number"
+        },
+        {
+          "index": 3,
+          "name": "float_type",
+          "type": "float"
+        },
+        {
+          "index": 4,
+          "name": "double_type",
+          "type": "double"
+        },
+        {
+          "index": 5,
+          "name": "raw_type",
+          "type": "raw"
+        },
+        {
+          "index": 6,
+          "name": "date_type",
+          "type": "date"
+        }
+      ],
+      "connections":[
+        {
+          "db_url":"jdbc:oracle:thin:@localhost:1521/test?currentSchema=opensource_test&rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull"
+        }
+      ],
+    }
+}
+```
+
+-----
+
 ## PostgreSQL Example
 
 ### PostgreSQL source

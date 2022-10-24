@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static org.apache.commons.lang3.StringUtils.lowerCase;
+
 @Slf4j
 public class OracleUtil extends AbstractJdbcUtil {
 
@@ -76,7 +78,7 @@ public class OracleUtil extends AbstractJdbcUtil {
         if (remarks == null || remarks.equals("")) {
           remarks = colName;
         }
-        String columnType = rs.getString("data_type").toLowerCase();
+        String columnType = lowerCase(rs.getString("data_type"));
         String dataScale = rs.getString("data_scale");
         String parsedColumnType = parseColumnType(columnType, dataScale);
         ColumnInfo oneColumn = new ColumnInfo(colName, parsedColumnType, remarks);

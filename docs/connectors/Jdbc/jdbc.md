@@ -57,6 +57,49 @@ Currently, supports reading and writing three kinds of data sources including My
 * multipolygon
 * set
 
+### Supported by Oracle
+* char
+* varchar
+* interval day
+* interval year
+* intervalds
+* intervalym
+* varchar2
+* nchar
+* nvarchar2
+* long
+* blob
+* clob
+* nclob
+* string
+* character
+* number
+* integer
+* int
+* smallint
+* float
+* double
+* double precision
+* numeric
+* decimal
+* real
+* bit
+* bool
+* date
+* timestamp
+* timestamp with time zone
+* timestamp with local time zone
+* datetime
+* blob
+* bfile
+* raw
+* long raw
+* rowid
+* urowid
+* xmltype
+* binary_float
+* binary_double
+
 ### Supported by PgSQL 
 
 * char
@@ -172,6 +215,7 @@ Currently, supports reading and writing three kinds of data sources including My
 | Param name | Default value | Required | Parameter type           | Recommended value / Example value                                        | Description                                                                                                       |
 |------------|---------------|----------|--------------------------|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
 | class      | -             | Yes      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.JDBCInputFormat       | Reader class name for mysql                                                                                       |
+| class      | -             | Yes      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.OracleInputFormat     | Reader class name for Oracle                                                                                      |
 | class      | -             | Yes      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.PostgresqlInputFormat | Reader class name for Pgsql                                                                                       |
 | class      | -             | Yes      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.SqlServerInputFormat  | Reader class name for  SqlServer                                                                                  |
 | columns    | -             | Yes      | list<map<string,string>> | "[ { "name":"id", "type":"int" }, { "name":"name", "type":"varchar" } ]  | Describing fields' names and types. It needs to be consistent with the number of columns specified by the writer. |
@@ -233,6 +277,7 @@ Currently, supports reading and writing three kinds of data sources including My
 | Param name | Default value | Is necessary | Parameter type           | Recommended value / Example value                                         | Description                                                                                                       |
 |------------|---------------|--------------|--------------------------|---------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
 | class      | -             | Yes          | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.JDBCOutputFormat       | Writer class name for mysql                                                                                       |
+| class      | -             | Yes          | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.OracleOutputFormat     | Writer class name for Oracle                                                                                      |
 | class      | -             | Yes          | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.PostgresqlOutputFormat | Writer class name for Pgsql                                                                                       |
 | class      | -             | Yes          | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.SqlServerOutputFormat  | Writer class name for SqlServer                                                                                   |
 | columns    | -             | Yes          | list<map<string,string>> | "[ { "name":"id", "type":"int" }, { "name":"name", "type":"varchar" } ]   | Describing fields' names and types. It needs to be consistent with the number of columns specified by the reader. |
@@ -290,7 +335,11 @@ In insert mode, data will be deleted according to partition information. The fol
 | delete_threshold_enabled | TRUE          | No           | string         | Truefalse                         | Whether to limit the deletion rate, the default is true, when false, you do not need to provide the primary key                                                                  |
 | is_truncate_mode         | FALSE         | No           | string         | Truefalse                         | Whether it is truncate mode, true will delete the whole table first and no partition column is required; non-truncate mode requires a partition column                           |
 
+#### Parameters for Oracle
 
+| Param name               | Default value | Is necessary | Parameter type | Recommended value / Example value | Description                                                                                                                                                                      |               
+|--------------------------|---------------|--------------|----------------|-----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| primary_key              | -             | No           | string         | id                                | The primary key of the table, if you need to limit the rate when Oracle deletes, you need to use the primary key value to use the select limit statement to limit the delete rate |
 
 ## Related document
 
