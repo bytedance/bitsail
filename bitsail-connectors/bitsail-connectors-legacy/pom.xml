@@ -30,6 +30,7 @@
         <module>bitsail-connector-hive</module>
         <module>bitsail-connector-hudi</module>
         <module>bitsail-connector-kafka</module>
+        <module>bitsail-connector-rocketmq</module>
         <module>bitsail-connector-messagequeue</module>
         <module>bitsail-connector-streamingfile</module>
         <module>bitsail-connector-fake</module>
