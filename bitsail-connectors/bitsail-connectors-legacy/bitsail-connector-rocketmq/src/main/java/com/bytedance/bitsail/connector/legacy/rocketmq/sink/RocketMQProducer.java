@@ -234,8 +234,9 @@ public class RocketMQProducer implements Serializable {
     } else {
       if (enableQueueSelector) {
         producer.send(message, queueSelector, partitionKeys, callBack);
+      } else {
+        producer.send(message, callBack);
       }
-      producer.send(message, callBack);
     }
   }
 
