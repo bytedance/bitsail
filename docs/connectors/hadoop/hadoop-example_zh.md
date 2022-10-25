@@ -35,7 +35,7 @@
         },
         {
           "name": "array_string",
-          "type": "array<string>"
+          "type": "list<string>"
         }
       ]
     }

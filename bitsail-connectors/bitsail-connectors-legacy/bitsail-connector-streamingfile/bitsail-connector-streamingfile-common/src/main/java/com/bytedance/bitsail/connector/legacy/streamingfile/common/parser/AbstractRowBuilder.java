@@ -21,6 +21,7 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 import com.bytedance.bitsail.common.util.FieldPathUtils;
 import com.bytedance.bitsail.common.util.TypeConvertUtil;
 import com.bytedance.bitsail.connector.legacy.streamingfile.common.validator.StreamingFileSystemValidator;
@@ -60,8 +61,7 @@ public abstract class AbstractRowBuilder implements Serializable {
   }
 
   public static RowTypeInfo getBitSailRowTypeInfo(List<ColumnInfo> columns, TypeConvertUtil.StorageEngine storageType) {
-
-    return ColumnFlinkTypeInfoUtil.getRowTypeInformation(storageType.name(), columns);
+    return ColumnFlinkTypeInfoUtil.getRowTypeInformation(new FileMappingTypeInfoConverter(storageType.name()), columns);
   }
 
   /**

@@ -20,6 +20,7 @@ package com.bytedance.bitsail.connector.hadoop.source;
 import com.bytedance.bitsail.batch.parser.row.TextRowBuilder;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.component.format.api.RowBuilder;
 import com.bytedance.bitsail.connector.hadoop.common.TextInputFormatErrorCode;
 import com.bytedance.bitsail.connector.hadoop.option.HadoopReaderOptions;
@@ -27,7 +28,6 @@ import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
 
 import com.google.common.primitives.Ints;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
@@ -100,7 +100,7 @@ public class HadoopInputFormat<K, V> extends
     }
 
     List<ColumnInfo> columnInfos = inputSliceConfig.getNecessaryOption(HadoopReaderOptions.COLUMNS, TextInputFormatErrorCode.REQUIRED_VALUE);
-    this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(StringUtils.lowerCase(getType()), columnInfos);
+    this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(new BitSailTypeInfoConverter(), columnInfos);
     this.fieldIndex = createFieldIndexes(columnInfos);
 
     LOG.info("Row Type Info: " + rowTypeInfo);

@@ -391,9 +391,16 @@ public class SqlType {
           upload.setBytes(index, (byte[]) value);
           break;
         case BigInt:
-          BigInteger bigInteger = (value instanceof String) ? new BigInteger((String) value) : (BigInteger) value;
-          String bigInt = bigInteger.toString();
-          upload.setString(index, bigInt);
+          String setValue;
+          if (value instanceof String) {
+            setValue = new BigInteger((String) value).toString();
+          }
+          if (value instanceof BigInteger) {
+            setValue = ((BigInteger) value).toString();
+          } else {
+            setValue = value.toString();
+          }
+          upload.setString(index, setValue);
           break;
         case BigDecimal:
           BigDecimal bigDecimal = (value instanceof String) ? new BigDecimal((String) value) : (BigDecimal) value;

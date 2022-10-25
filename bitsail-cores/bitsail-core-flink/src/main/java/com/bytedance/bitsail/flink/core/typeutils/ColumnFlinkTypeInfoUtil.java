@@ -20,7 +20,6 @@ package com.bytedance.bitsail.flink.core.typeutils;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.type.EngineTypeInfoFactory;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
@@ -61,12 +60,6 @@ public class ColumnFlinkTypeInfoUtil {
       fieldTypes[index] = typeInfo;
     }
     return fieldTypes;
-  }
-
-  public static RowTypeInfo getRowTypeInformation(String storageEngineName,
-                                                  List<ColumnInfo> columnInfos) {
-    return getRowTypeInformation(EngineTypeInfoFactory
-        .getEngineConverter(storageEngineName), columnInfos);
   }
 
   public static RowTypeInfo getRowTypeInformation(TypeInfoConverter converter,
@@ -193,8 +186,8 @@ public class ColumnFlinkTypeInfoUtil {
     return new MapColumnTypeInfo(desKeyTypeInfo, desValueTypeInfo);
   }
 
-  private static TypeInformation<?> fromNativeFlinkPrimitiveTypeInformation(TypeInformation<?> flinkTypeinfo) {
-    Class<?> typeClass = flinkTypeinfo.getTypeClass();
+  private static TypeInformation<?> fromNativeFlinkPrimitiveTypeInformation(TypeInformation<?> flinkTypeInfo) {
+    Class<?> typeClass = flinkTypeInfo.getTypeClass();
 
     if (typeClass == Integer.class || typeClass == Short.class || typeClass == Long.class || typeClass == BigInteger.class || typeClass == Byte.class) {
       return PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO;

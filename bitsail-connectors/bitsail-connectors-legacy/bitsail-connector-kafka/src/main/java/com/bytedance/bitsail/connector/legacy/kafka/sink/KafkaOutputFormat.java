@@ -94,7 +94,7 @@ public class KafkaOutputFormat extends OutputFormatPlugin<Row> implements Result
       partitionFieldsIndices = getPartitionFieldsIndices(columns, partitionFieldsNames);
     }
 
-    this.rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation("bitsail", columns);
+    this.rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columns);
     log.info("Output Row Type Info: " + rowTypeInfo);
   }
 

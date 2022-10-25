@@ -20,7 +20,7 @@ package com.bytedance.bitsail.flink.core.typeutils;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.type.EngineTypeInfoFactory;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
@@ -40,10 +40,9 @@ import java.util.List;
 
 public class NativeFlinkTypeInfoUtil {
 
-  public static RowTypeInfo getRowTypeInformation(String storageEngineName,
-                                                  List<ColumnInfo> columnInfos) {
+  public static RowTypeInfo getRowTypeInformation(List<ColumnInfo> columnInfos) {
 
-    return getRowTypeInformation(columnInfos, EngineTypeInfoFactory.getEngineConverter(storageEngineName));
+    return getRowTypeInformation(columnInfos, new BitSailTypeInfoConverter());
   }
 
   public static RowTypeInfo getRowTypeInformation(List<ColumnInfo> columnInfos,

@@ -84,7 +84,7 @@ public class RowToHoodieFunction<I extends Row, O extends HoodieRecord>
     super.open(parameters);
     this.avroSchema = StreamerUtil.getSourceSchema(this.config);
     List<ColumnInfo> columnInfos = jobConf.get(WriterOptions.BaseWriterOptions.COLUMNS);
-    RowTypeInfo rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation("bitsail", columnInfos);
+    RowTypeInfo rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columnInfos);
     this.converter = RowToAvroConverters.createConverter(rowTypeInfo);
     this.keyGenerator =
         HoodieAvroKeyGeneratorFactory

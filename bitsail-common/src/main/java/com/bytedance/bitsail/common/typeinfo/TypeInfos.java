@@ -97,12 +97,4 @@ public final class TypeInfos {
               e.getMessage()));
     }
   }
-
-  public static <T> TypeInfo<T> getTypeInformation(Class<?> clazz) {
-    if (!SUPPORTED_CLASS_MAP.containsKey(clazz)) {
-      throw BitSailException.asBitSailException(CommonErrorCode.PLUGIN_ERROR,
-          String.format("[%s] is not supported in custom type system.", clazz.getSimpleName()));
-    }
-    return (TypeInfo<T>) SUPPORTED_CLASS_MAP.get(clazz);
-  }
 }

@@ -35,7 +35,7 @@ The following configuration shows how to organize parameter configuration to rea
         },
         {
           "name": "array_string",
-          "type": "array<string>"
+          "type": "list<string>"
         }
       ]
     }
