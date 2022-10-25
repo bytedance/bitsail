@@ -1,15 +1,22 @@
-# Deployment
+# Deployment on Yarn
 
 > At present, ***BitSail*** only supports flink deployment on Yarn.<br>
 Other platforms like `native kubernetes` will be release recently.
 
 -----
 
-## Deployment on Yarn
+Here are the contents of this part:
 
-### Configure Hadoop Environment
+ - [Configure Hadoop Environment](#jump_configure_hadoop)
+ - [Configure Flink Cluster](#jump_configure_flink)
+ - [Submit to Yarn](#jump_submit_to_yarn)
+ - [Submit an example job](#jump_submit_example)
+ - [Log for Debugging](#jump_log)
 
-Here is a step-by-step guide to help you effectively deploy it on Yarn.
+Below is a step-by-step guide to help you effectively deploy it on Yarn.
+
+## <span id="jump_configure_hadoop">Configure Hadoop Environment</span>
+
 
 To support Yarn deployment, `HADOOP_CLASSPATH` has to be set in system environment properties. There are two ways to set this environment property:
 
@@ -23,9 +30,9 @@ To support Yarn deployment, `HADOOP_CLASSPATH` has to be set in system environme
   fi
   ```
 
-### Configure Flink Cluster
+## <span id="jump_configure_flink">Configure Flink Cluster</span>
 
-As mentioned in [quickstart](./quickstart.md), the project production contains a file [conf/bitsail.conf](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/resources/bitsail.conf).
+After packaging, the project production contains a file [conf/bitsail.conf](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/resources/bitsail.conf).
 This file describes the system configuration of deployment environment, including the flink path and some other default parameters.
 
 Here are some frequently-used options in the configuration file:
@@ -65,7 +72,7 @@ Here are some frequently-used options in the configuration file:
 </table>
 
 
-### Submit to Yarn
+## <span id="jump_submit_to_yarn">Submit to Yarn</span>
 
 > ***BitSail*** only support resource provider `yarn's yarn-per-job` mode until now, others like `native kubernetes` will be release recently.
 
@@ -89,11 +96,16 @@ Parameter description
         * **name**: Property key. Configurable flink parameters that will be transparently transmitted to the flink task.
         * **value**: Property value.
 
+## <span id="jump_submit_example">Submit an example job</span>
+Submit a fake source to print sink test to yarn.
+``` bash
+bash ./bin/bitsail run --engine flink --conf ~/bitsail-archive-1.0.0-SNAPSHOT/examples/Fake_Print_Example.json --execution-mode run -p 1=1  --deployment-mode yarn-per-job  --queue default
+```
 
+## <span id="jump_log">Log for Debugging</span>
 
+### Client side log file
+Please check `${FLINK_HOME}/log/` folder to read the log file of BitSail client.
 
-
-
-
-
-
+### Yarn task log file
+Please go to Yarn WebUI to check the logs of Flink JobManager and TaskManager.

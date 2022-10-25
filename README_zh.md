@@ -34,7 +34,13 @@
   <tr>
     <td>Hadoop</td>
     <td>-</td>
-    <td>❎</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
+    <td>Hbase</td>
+    <td>-</td>
+    <td>✅</td>
     <td>✅</td>
   </tr>
   <tr>
@@ -50,10 +56,40 @@
     <td>✅</td>
   </tr>
   <tr>
-    <td>StreamingFile(Hadoop Streaming mode.)</td>
+    <td>RocketMQ</td>
     <td>-</td>
-    <td>❎</td>
+    <td> </td>
     <td>✅</td>
+  </tr>
+  <tr>
+    <td>StreamingFile (Hadoop Streaming mode.)</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Redis</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Doris</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>MongoDB</td>
+    <td>-</td>
+    <td>✅</td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Doris</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
   </tr>
   <tr>
     <td rowspan="4">JDBC</td>
@@ -74,12 +110,12 @@
     <td>Fake</td>
     <td>-</td>
     <td>✅</td>
-    <td>❎</td>
+    <td> </td>
   </tr>
   <tr>
     <td>Print</td>
     <td>-</td>
-    <td>❎</td>
+    <td> </td>
     <td>✅</td>
   </tr>
 </table>
@@ -99,13 +135,36 @@ mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true
 mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true -Pflink-embedded
 ```
 
-## 快速使用
+打包完成后，产物的目录结构如下:
 
-参考文档[快速开始](docs/quickstart.md)
+``` simple
+bitsail-archive-${version}-SNAPSHOT    
+    /bin  
+        /bitsail #Startup script
+    /conf
+        /bitsail.conf #bitsail system config
+    /embedded
+        /flink #embedded flink
+    /examples #examples configuration files
+        /example-datas #examples data
+        /Fake_xx_Example.json #Fake source to xx examples config files
+        /xx_Print_Example.json #xx to print sink examples config files
+    /libs #jar libs
+        /bitsail-core.jar #entering jar package
+        /connectors #connector plugin jars
+            /mapping #connector plugin config files
+        /components #components jars，such as metric、dirty-collector
+        /clients #bitsail client jar
+```
 
-## 架构
+## 部署
 
-参考文档[架构](docs/introduction.md)
+ - 在本地IDE运行BitSail，请参考[本地集成测试](docs/local_integration_test_zh.md)。
+ - 在Yarn上部署BitSail，请参考[Yarn部署](docs/yarn_deployment_zh.md)。
+
+## 开发
+
+开发者可参考 [开发指南](docs/developer_guide_zh.md) 获取更好地开发指导和体验。
 
 ## 联系方式
 
