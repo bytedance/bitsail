@@ -50,7 +50,7 @@
       "columns": [
         {
           "name": "name",
-          "type": "varchar"
+          "type": "string"
         },
         {
           "name": "int_info",

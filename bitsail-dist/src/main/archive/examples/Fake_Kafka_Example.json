@@ -30,7 +30,7 @@
         {
           "name": "bigint_type",
           "index": 2,
-          "type": "bigint"
+          "type": "long"
         }
       ],
       "class": "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource"
@@ -52,7 +52,7 @@
         {
           "name": "bigint_type",
           "index": 2,
-          "type": "bigint"
+          "type": "long"
         }
       ],
       "topic_name": "testTopic",
