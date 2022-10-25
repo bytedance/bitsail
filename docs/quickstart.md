@@ -17,9 +17,10 @@ bash build.sh
 - maven 3.6+
 - Docker desktop: https://www.docker.com/products/docker-desktop/
 
-Details can be seen [how to run local integration tests?](./local_integration_test.md)
+After the prerequisite package be installed correctly. We will be able to run the integration tests on your Local IDE.
+For example, `com.bytedance.bitsail.connector.legacy.kafka.source.KafkaSourceITCase`. This test simulates a Kafka test container and consume the data into a print sink connector.
 
-## <span id="jump_product_structure">Produced file</span>
+## Produced file
 
 After build the project, the project production file structure is as follows:
 
@@ -45,10 +46,41 @@ bitsail-archive-${version}-SNAPSHOT
 
 ## Submit BitSail job
 
-At present, ***BitSail*** only supports flink deployment on Yarn.
-Other platforms like native kubernetes will be release recently.
+At present, ***BitSail*** only support yarn mode submission, so the following describes how to submit in yarn mode.
 
-Details of deployment can be seen [here](./yarn_deployment.md).
+### Configure Environment Variable
+Before we run the command, please make sure the `HADOOP_HOME` exists in your environment parameters.
+`export HADOOP_HOME=xxx/xxx/xxx`
+
+### Configure BitSail Task configuration
+
+Construct task configuration, see details [config](config.md)。
+
+You can also check the example file under `/examples/XXX_XXX_Example.json`
+
+### Configure flink cluster information
+
+Configure the system configuration in the path `conf/bitsail.conf`, including the flink path and the default parameters used by the system.
+
+### Submit tasks
+> ***BitSail*** only support resource provider `yarn's yarn-per-job` mode until now, others like `native kubernetes` will be release recently.
+
+You can use the startup script `bin/bitsail` to submit flink jobs to yarn. The specific commands are as follows:
+
+``` bash
+bash ./bin/bitsail run --engine flink --conf [job_conf_path] --execution-mode run --queue [queue_name] --deployment-mode yarn-per-job [--priority [yarn_priority] -p/--props [name=value]] 
+```
+
+Parameter description (currently only supports reading parameters in order)
+
+* Required parameters
+  * queue_name: target yarn queue
+  * job_conf_path: Task configuration file address
+* Optional parameters
+  * yarn_priority: yarn priority
+  * name=value: for example classloader.resolve-order=child-first
+    * name: property key. Configurable flink parameters will be transparently transmitted to the flink task
+    * value: property value.
 
 ## Debugging
 ### Client side log file
