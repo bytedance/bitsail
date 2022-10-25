@@ -4,84 +4,63 @@
 
 At present, ***BitSail*** is mainly designed with the ELT model, and bears the data synchronization requirements of Bytedance's internal EB level.
 
-## Download BitSail
-
-***BitSail*** runs in a Unix-like environment, i.e. Linux, Mac OS X. Java 8 needs to be installed locally. Download the latest ***BitSail*** binary distribution and extract the tarball:
-
-``` shell
-tar -xzf bitsail-*.tar.gz
+## Build from source code
+- Run the build script to package
 ```
+bash build.sh
+```
+- After the build completed, you can find the jar file under the path `bitsail-dist/target/bitsail-dist-${version}-SNAPSHOT-bin/bitsail-archive-${version}-SNAPSHOT`
 
-## Project product catalog
+## Run Local Integration Tests
+### Prerequisite
+- JDK8
+- maven 3.6+
+- Docker desktop: https://www.docker.com/products/docker-desktop/
 
-After decompressing the folder, the project product file structure is as follows:
+After the prerequisite package be installed correctly. We will be able to run the integration tests on your Local IDE.
+For example, `com.bytedance.bitsail.connector.legacy.kafka.source.KafkaSourceITCase`. This test simulates a Kafka test container and consume the data into a print sink connector.
+
+## Produced file
+
+After build the project, the project production file structure is as follows:
 
 ``` simple
--- bin  
-    \-- bitsail // Startup script
--- conf
-    \-- bitsail.conf // bitsail system config
--- embedded
-    \-- flink // embedded flink
--- examples // examples config
-    \-- example-datas // examples data
-    \-- Fake_xx_Example.json // Fake source to xx examples config files
-    \-- xx_Print_Example.json // xx to print sink examples config files
--- libs // jar libs
-    \-- bitsail-core.jar // entering jar package
-    \-- connectors // connector plugin jars
-        \-- mapping // connector plugin config files
-    \-- components // components jars，such as metric、dirty-collector
-    \-- clients // bitsail client jar
+bitsail-archive-${version}-SNAPSHOT    
+    /bin  
+        /bitsail #Startup script
+    /conf
+        /bitsail.conf #bitsail system config
+    /embedded
+        /flink #embedded flink
+    /examples #examples configuration files
+        /example-datas #examples data
+        /Fake_xx_Example.json #Fake source to xx examples config files
+        /xx_Print_Example.json #xx to print sink examples config files
+    /libs #jar libs
+        /bitsail-core.jar #entering jar package
+        /connectors #connector plugin jars
+            /mapping #connector plugin config files
+        /components #components jars，such as metric、dirty-collector
+        /clients #bitsail client jar
 ```
 
-## Startup script instructions
+## Submit BitSail job
 
 At present, ***BitSail*** only support yarn mode submission, so the following describes how to submit in yarn mode.
 
-### Configure related component information
-
-Configure the system configuration in the path `conf/bitsail.conf`, including the flink path and the default parameters used by the system.
+### Configure Environment Variable
 Before we run the command, please make sure the `HADOOP_HOME` exists in your environment parameters.
+`export HADOOP_HOME=xxx/xxx/xxx`
 
-``` json
-BITSAIL {
-  sys {
-    flink {
-      flink_home: ${BITSAIL_HOME}/embedded/flink
-      checkpoint_dir: "hdfs://opensource/bitsail/flink-1.11/checkpoints/"
-      flink_default_properties: {
-        classloader.resolve-order: "child-first"
-        akka.framesize: "838860800b"
-        rest.client.max-content-length: 838860800
-        rest.server.max-content-length: 838860800
-        slot.request.timeout: 28800000
-        slotmanager.request-timeout: 28800000
-        heartbeat.timeout: 180000
-        akka.watch.heartbeat.pause: "181s"
-        akka.ask.timeout: "182s"
-        akka.client.timeout: "183s"
-        akka.lookup.timeout: "10min"
-        web.timeout: 600000
-        blob.client.socket.timeout: 60000
-        flink-client-classpath-include-user-jar: "A"
-        blob.fetch.num-concurrent: 32
-        resourcemanager.maximum-workers-failure-rate-ratio: 2
-        resourcemanager.maximum-workers-failure-rate: 50
-        resourcemanager.workers-failure-interval: 28800000
-        taskmanager.network.request-backoff.max: 40000
-        task.cancellation.timeout: 600000
-        taskmanager.network.netty.client.readTimeout.enabled: false
-        yarn.application-attempts: 1
-      }
-    }
-  }
-}
-```
-
-### Task configuration
+### Configure BitSail Task configuration
 
 Construct task configuration, see details [config](config.md)。
+
+You can also check the example file under `/examples/XXX_XXX_Example.json`
+
+### Configure flink cluster information
+
+Configure the system configuration in the path `conf/bitsail.conf`, including the flink path and the default parameters used by the system.
 
 ### Submit tasks
 > ***BitSail*** only support resource provider `yarn's yarn-per-job` mode until now, others like `native kubernetes` will be release recently.
@@ -102,3 +81,15 @@ Parameter description (currently only supports reading parameters in order)
   * name=value: for example classloader.resolve-order=child-first
     * name: property key. Configurable flink parameters will be transparently transmitted to the flink task
     * value: property value.
+
+## Debugging
+### Client side log file
+Please check `embedded/flink/log/` folder to read the log file of BitSail client.
+### Yarn task log file
+Please go to Yarn WebUI to check the logs of Flink JobManager and TaskManager
+
+## Submit an example task
+Submit a fake source to print sink test to yarn.
+``` bash
+bash ./bin/bitsail run --engine flink --conf ~/bitsail-archive-1.0.0-SNAPSHOT/examples/Fake_Hudi_Example.json --execution-mode run -p 1=1  --deployment-mode yarn-per-job  --queue default
+```
