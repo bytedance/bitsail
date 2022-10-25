@@ -80,12 +80,10 @@ public class RocketMQOutputFormatITCase {
 
     Queue<MessageExt> messageQ = new ConcurrentLinkedQueue<>();
 
-    consumer.registerMessageListener(
-        (MessageListenerConcurrently)
-            (msgs, context) -> {
-              messageQ.addAll(msgs);
-              return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
-            });
+    consumer.registerMessageListener((MessageListenerConcurrently) (msgs, context) -> {
+      messageQ.addAll(msgs);
+      return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+    });
     try {
       consumer.start();
     } catch (MQClientException e) {
