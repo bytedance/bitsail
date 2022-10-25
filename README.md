@@ -64,10 +64,13 @@ The latest version of bitsail has the following minimal requirements:
     <td>✅</td>
   </tr>
   <tr>
-    <td rowspan="3">JDBC</td>
+    <td rowspan="4">JDBC</td>
     <td>MySQL</td>
-    <td rowspan="3">✅</td>
-    <td rowspan="3">✅</td>
+    <td rowspan="4">✅</td>
+    <td rowspan="4">✅</td>
+  </tr>
+  <tr>
+    <td>Oracle</td>
   </tr>
   <tr>
     <td>PostgreSQL</td>

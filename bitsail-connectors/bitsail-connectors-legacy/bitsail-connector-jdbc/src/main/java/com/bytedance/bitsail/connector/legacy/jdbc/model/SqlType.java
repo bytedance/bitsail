@@ -34,20 +34,23 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 
+import static org.apache.commons.lang3.StringUtils.lowerCase;
+
 public class SqlType {
 
   public static SqlTypes getSqlType(final String type, final String driveName) throws BitSailException {
+    final String lowerCaseType = lowerCase(type);
     switch (driveName) {
       case MysqlUtil.DRIVER_NAME:
-        return getSqlTypeFromMysql(type);
+        return getSqlTypeFromMysql(lowerCaseType);
       case OracleUtil.DRIVER_NAME:
-        return getSqlTypeFromOracle(type);
+        return getSqlTypeFromOracle(lowerCaseType);
       case PostgresqlUtil.DRIVER_NAME:
-        return getSqlTypeFromPostgresql(type);
+        return getSqlTypeFromPostgresql(lowerCaseType);
       case Db2Util.DRIVER_NAME:
-        return getSqlTypeFromDb2(type);
+        return getSqlTypeFromDb2(lowerCaseType);
       case SqlServerUtil.DRIVER_NAME:
-        return getSqlTypeFromSqlServer(type);
+        return getSqlTypeFromSqlServer(lowerCaseType);
       default:
         throw new UnsupportedOperationException("current drive: " + driveName + " not supported. Only support mysql and oracle");
     }
@@ -102,7 +105,7 @@ public class SqlType {
         return SqlTypes.Bytes;
       default:
         throw BitSailException.asBitSailException(DBUtilErrorCode.UNSUPPORTED_TYPE,
-            String.format("The column data type in your configuration is not support. Column type:[%s]." +
+            String.format("Oracle: The column data type in your configuration is not support. Column type:[%s]." +
                 " Please try to change the column data type or don't transmit this column.", type)
         );
     }
@@ -150,7 +153,7 @@ public class SqlType {
         return SqlTypes.Bytes;
       default:
         throw BitSailException.asBitSailException(DBUtilErrorCode.UNSUPPORTED_TYPE,
-            String.format("The column data type in your configuration is not support. Column type:[%s]." +
+            String.format("SQL: The column data type in your configuration is not support. Column type:[%s]." +
                 " Please try to change the column data type or don't transmit this column.", type)
         );
     }
@@ -199,7 +202,7 @@ public class SqlType {
         return SqlTypes.Bytes;
       default:
         throw BitSailException.asBitSailException(DBUtilErrorCode.UNSUPPORTED_TYPE,
-            String.format("The column data type in your configuration is not support. Column type:[%s]." +
+            String.format("DB2: The column data type in your configuration is not support. Column type:[%s]." +
                 " Please try to change the column data type or don't transmit this column.", type)
         );
     }
@@ -262,7 +265,7 @@ public class SqlType {
         return SqlTypes.Bytes;
       default:
         throw BitSailException.asBitSailException(DBUtilErrorCode.UNSUPPORTED_TYPE,
-            String.format("The column data type in your configuration is not support. Column type:[%s]." +
+            String.format("MySQL: The column data type in your configuration is not support. Column type:[%s]." +
                 " Please try to change the column data type or don't transmit this column.", type)
         );
     }
@@ -325,7 +328,7 @@ public class SqlType {
         return SqlTypes.Bytes;
       default:
         throw BitSailException.asBitSailException(DBUtilErrorCode.UNSUPPORTED_TYPE,
-            String.format("The column data type in your configuration is not support. Column type:[%s]." +
+            String.format("PostgreSQL: The column data type in your configuration is not support. Column type:[%s]." +
                 " Please try to change the column data type or don't transmit this column.", type)
         );
     }
@@ -401,7 +404,7 @@ public class SqlType {
           break;
         default:
           throw BitSailException.asBitSailException(DBUtilErrorCode.UNSUPPORTED_TYPE,
-              String.format("The column data type in your configuration is not support. Column index:[%d], Column type:[%s]." +
+              String.format("Set SQL Value: The column data type in your configuration is not support. Column index:[%d], Column type:[%s]." +
                   " Please try to change the column data type or don't transmit this column.", index, type)
           );
       }

@@ -19,42 +19,48 @@ package com.bytedance.bitsail.connector.legacy.jdbc.sink;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.legacy.jdbc.options.JdbcWriterOptions;
-import com.bytedance.bitsail.connector.legacy.jdbc.sink.container.MySQLContainerMariadbAdapter;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.lifecycle.Startables;
-import org.testcontainers.utility.DockerImageName;
 
 import java.util.Map;
 import java.util.stream.Stream;
 
 /**
- * Created 2022/7/26
+ * Created 2022/10/18
  */
-public class JdbcSinkITCase {
-  private static final Logger LOG = LoggerFactory.getLogger(JdbcSinkITCase.class);
+@Slf4j
+public class OracleSinkITCase {
+  private static final Logger LOG = LoggerFactory.getLogger(OracleSinkITCase.class);
 
-  private static final String MYSQL_DOCKER_IMAGER = "mysql:8.0.29";
+  public static final String ORACLE_DOCKER_IMAGER = "gvenzl/oracle-xe:18.4.0-slim";
 
-  private MySQLContainer<?> container;
+  private OracleContainer container;
 
   @Before
   public void before() {
-    container = new MySQLContainerMariadbAdapter<>(DockerImageName.parse(MYSQL_DOCKER_IMAGER))
-        .withUrlParam("permitMysqlScheme", null)
-        .withInitScript("scripts/fake_to_jdbc_sink.sql")
+    container = new OracleContainer(ORACLE_DOCKER_IMAGER)
+        .withDatabaseName("TEST")
+        .withUsername("TEST")
+        .withPassword("TEST_PASSWORD")
+        .withInitScript("scripts/fake_to_oracle_sink.sql")
         .withLogConsumer(new Slf4jLogConsumer(LOG));
 
+    /*
+     * This test may get Error of 'SP2-0306: Invalid option.' when running on Apple M chips.
+     * Please follow instructions in 'OracleSinkITCaseAppleChipWorkaround.md' for more details.
+     */
     Startables.deepStart(Stream.of(container)).join();
   }
 
@@ -64,8 +70,8 @@ public class JdbcSinkITCase {
   }
 
   @Test
-  public void testInsertModeMySQL() throws Exception {
-    BitSailConfiguration globalConfiguration = JobConfUtils.fromClasspath("scripts/fake_to_jdbc_sink.json");
+  public void testInsertModeOracle() throws Exception {
+    BitSailConfiguration globalConfiguration = JobConfUtils.fromClasspath("scripts/fake_to_oracle_sink.json");
 
     Map<String, Object> connection = Maps.newHashMap();
     connection.put("db_url", container.getJdbcUrl());

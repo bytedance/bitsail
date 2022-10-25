@@ -15,20 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.jdbc.options;
-
-import com.bytedance.bitsail.common.option.ConfigOption;
-
-import static com.bytedance.bitsail.common.option.ConfigOptions.key;
-import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
-
-/**
- * Created 2022/8/16
- */
-public interface OracleWriterOptions extends JdbcWriterOptions {
-
-  ConfigOption<String> PRIMARY_KEY =
-      key(WRITER_PREFIX + "primary_key")
-          .noDefaultValue(String.class);
-
-}
+create table ORACLE_DYNAMIC_TABLE
+(
+    ID          VARCHAR2(1024),
+    DATETIME    NUMBER,
+    INT_TYPE    NUMBER,
+    BIGINT_TYPE NUMBER,
+    FLOAT_TYPE  NUMBER,
+    DOUBLE_TYPE NUMBER,
+    RAW_TYPE    RAW(1024),
+    DATE_TYPE   DATE
+);
