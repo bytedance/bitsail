@@ -535,7 +535,7 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
   }
 
   private void doSingleInsert() throws IOException {
-    log.info("Do single insert");
+    log.info("Do single insert, batchBuffer size " + batchBuffer.size());
     for (int i = 0; i < batchBuffer.size(); i++) {
       Pair<Boolean, String> executeResult = retryExecute(writeRetryTimes, i, (Integer index) -> {
         try {
@@ -557,7 +557,7 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
         }
       });
       if (!executeResult.getFirst()) {
-        throw new IOException("Failed to insert record: " + batchBuffer.get(i).toString() + "ErrMsg: " + executeResult.getSecond());
+        throw new IOException("Failed to insert record: " + batchBuffer.get(i).toString() + " ErrMsg: " + executeResult.getSecond());
       }
     }
     log.info("Finished single insert");

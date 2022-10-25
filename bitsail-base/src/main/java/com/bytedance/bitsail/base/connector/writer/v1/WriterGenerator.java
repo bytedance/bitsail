@@ -44,7 +44,7 @@ public interface WriterGenerator<InputT, CommitT, WriterStateT> extends Serializ
    * @param commonConfiguration Common options.
    * @param writerConfiguration Options for writer.
    */
-  void configure(BitSailConfiguration commonConfiguration, BitSailConfiguration writerConfiguration);
+  void configure(BitSailConfiguration commonConfiguration, BitSailConfiguration writerConfiguration) throws Exception;
 
   /**
    * Create a writer for processing elements.

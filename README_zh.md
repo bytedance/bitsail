@@ -34,7 +34,13 @@
   <tr>
     <td>Hadoop</td>
     <td>-</td>
-    <td>❎</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
+    <td>Hbase</td>
+    <td>-</td>
+    <td>✅</td>
     <td>✅</td>
   </tr>
   <tr>
@@ -50,16 +56,49 @@
     <td>✅</td>
   </tr>
   <tr>
-    <td>StreamingFile(Hadoop Streaming mode.)</td>
+    <td>RocketMQ</td>
     <td>-</td>
-    <td>❎</td>
+    <td> </td>
     <td>✅</td>
   </tr>
   <tr>
-    <td rowspan="3">JDBC</td>
+    <td>StreamingFile (Hadoop Streaming mode.)</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Redis</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Doris</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>MongoDB</td>
+    <td>-</td>
+    <td>✅</td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Doris</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
+    <td rowspan="4">JDBC</td>
     <td>MySQL</td>
-    <td rowspan="3">✅</td>
-    <td rowspan="3">✅</td>
+    <td rowspan="4">✅</td>
+    <td rowspan="4">✅</td>
+  </tr>
+  <tr>
+    <td>Oracle</td>
   </tr>
   <tr>
     <td>PostgreSQL</td>
@@ -71,12 +110,12 @@
     <td>Fake</td>
     <td>-</td>
     <td>✅</td>
-    <td>❎</td>
+    <td> </td>
   </tr>
   <tr>
     <td>Print</td>
     <td>-</td>
-    <td>❎</td>
+    <td> </td>
     <td>✅</td>
   </tr>
 </table>
@@ -96,13 +135,39 @@ mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true
 mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true -Pflink-embedded
 ```
 
-## 快速使用
+打包完成后，产物的目录结构如下:
 
-参考文档[快速开始](docs/quickstart.md)
+``` simple
+bitsail-archive-${version}-SNAPSHOT    
+    /bin  
+        /bitsail #Startup script
+    /conf
+        /bitsail.conf #bitsail system config
+    /embedded
+        /flink #embedded flink
+    /examples #examples configuration files
+        /example-datas #examples data
+        /Fake_xx_Example.json #Fake source to xx examples config files
+        /xx_Print_Example.json #xx to print sink examples config files
+    /libs #jar libs
+        /bitsail-core.jar #entering jar package
+        /connectors #connector plugin jars
+            /mapping #connector plugin config files
+        /components #components jars，such as metric、dirty-collector
+        /clients #bitsail client jar
+```
 
-## 架构
+## 环境配置
 
-参考文档[架构](docs/introduction.md)
+参考 [环境配置](docs/env_setup_zh.md).
+
+## 部署指南
+
+Link to [部署指南](docs/deployment_zh.md).
+
+## 开发指南
+
+Link to [开发指南](docs/developer_guide_zh.md).
 
 ## 联系方式
 

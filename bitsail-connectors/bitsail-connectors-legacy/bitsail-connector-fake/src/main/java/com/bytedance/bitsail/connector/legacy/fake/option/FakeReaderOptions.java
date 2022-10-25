@@ -20,6 +20,11 @@ package com.bytedance.bitsail.connector.legacy.fake.option;
 import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 
+import com.alibaba.fastjson.TypeReference;
+
+import java.util.List;
+import java.util.Map;
+
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
 
@@ -47,4 +52,14 @@ public interface FakeReaderOptions extends ReaderOptions.BaseReaderOptions {
   ConfigOption<Boolean> USE_BITSAIL_TYPE =
       key(READER_PREFIX + "use_bitsail_type")
           .defaultValue(true);
+
+  /**
+   * This option defines the columns with fixed value.<br/>
+   * The format is:<br/>
+   * [{"name":"column_A", "fixed_value":"value_A"}, {"name":"column_B", "fixed_value":"value_B"}, ...]<br/>
+   * Note that the column `name` should appear in `job.writer.columns`.
+   */
+  ConfigOption<List<Map<String, String>>> COLUMNS_WITH_FIXED_VALUE =
+      key(READER_PREFIX + "columns_with_fixed_value")
+          .onlyReference(new TypeReference<List<Map<String, String>>>(){});
 }

@@ -80,6 +80,16 @@ public abstract class JDBCUpsertUtil implements Serializable {
     return updateColumns;
   }
 
+  protected String getUpdateSql(List<String> column, String leftTable, String rightTable) {
+    String prefixLeft = StringUtils.isBlank(leftTable) ? "" : quoteTable(leftTable) + ".";
+    String prefixRight = StringUtils.isBlank(rightTable) ? "" : quoteTable(rightTable) + ".";
+    List<String> list = new ArrayList<>();
+    for (String col : column) {
+      list.add(prefixLeft + col + "=" + prefixRight + col);
+    }
+    return StringUtils.join(list, ",");
+  }
+
   protected String quoteColumns(List<String> column) {
     return quoteColumns(column, null);
   }
@@ -111,5 +121,4 @@ public abstract class JDBCUpsertUtil implements Serializable {
   protected String quoteTable(String col) {
     return this.jdbcOutputFormat.getQuoteTable(col);
   }
-
 }

@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.hudi.sink;
+package com.bytedance.bitsail.connector.legacy.hudi.dag;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.connector.legacy.hudi.dag.HudiSinkFunctionDAGBuilder;
 
 import org.junit.Test;
 
