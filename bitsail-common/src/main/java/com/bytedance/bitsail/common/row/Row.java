@@ -21,7 +21,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Setter
@@ -33,6 +39,11 @@ public class Row implements Serializable {
 
   public Row(Object[] fields) {
     this.fields = fields;
+  }
+
+  public Row(int arity) {
+    this.kind = RowKind.fromByteValue(RowKind.INSERT.toByteValue());
+    this.fields = new Object[arity];
   }
 
   public Row(byte kind, Object[] fields) {
@@ -50,6 +61,10 @@ public class Row implements Serializable {
 
   public Object[] getFields() {
     return fields;
+  }
+
+  public int getArity() {
+    return fields.length;
   }
 
   @Override
@@ -70,4 +85,69 @@ public class Row implements Serializable {
     result = 31 * result + Arrays.hashCode(fields);
     return result;
   }
+
+  public boolean getBoolean(int pos) {
+    return (Boolean) this.fields[pos];
+  }
+
+  public byte getByte(int pos) {
+    return (Byte) this.fields[pos];
+  }
+
+  public short getShort(int pos) {
+    return (Short) this.fields[pos];
+  }
+
+  public int getInt(int pos) {
+    return (Integer) this.fields[pos];
+  }
+
+  public Date getDate(int pos) {
+    return (Date) this.fields[pos];
+  }
+
+  public long getLong(int pos) {
+    return (Long) this.fields[pos];
+  }
+
+  public BigInteger getBigInteger(int pos) {
+    return (BigInteger) this.fields[pos];
+  }
+
+  public float getFloat(int pos) {
+    return (Float) this.fields[pos];
+  }
+
+  public double getDouble(int pos) {
+    return (Double) this.fields[pos];
+  }
+
+  public String getString(int pos) {
+    return (String) this.fields[pos];
+  }
+
+  public BigDecimal getDecimal(int pos, int precision, int scale) {
+    return (BigDecimal) this.fields[pos];
+  }
+
+  public Timestamp getTimestamp(int pos, int precision) {
+    return (Timestamp) this.fields[pos];
+  }
+
+  public byte[] getBinary(int pos) {
+    return ((byte[]) this.fields[pos]);
+  }
+
+  public List getArray(int pos) {
+    return (List) this.fields[pos];
+  }
+
+  public Map getMap(int pos) {
+    return (Map) this.fields[pos];
+  }
+
+  public boolean isNullAt(int pos) {
+    return this.fields[pos] == null;
+  }
+
 }
