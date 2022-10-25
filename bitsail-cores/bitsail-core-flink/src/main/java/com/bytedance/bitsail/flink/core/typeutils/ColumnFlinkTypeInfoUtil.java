@@ -18,12 +18,13 @@
 package com.bytedance.bitsail.flink.core.typeutils;
 
 import com.bytedance.bitsail.common.BitSailException;
-import com.bytedance.bitsail.common.ddl.typeinfo.PrimitiveTypes;
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.type.BaseEngineTypeInfoConverter;
 import com.bytedance.bitsail.common.type.EngineTypeInfoFactory;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 import com.bytedance.bitsail.flink.core.typeinfo.ListColumnTypeInfo;
 import com.bytedance.bitsail.flink.core.typeinfo.MapColumnTypeInfo;
 import com.bytedance.bitsail.flink.core.typeinfo.PrimitiveColumnTypeInfo;
@@ -48,7 +49,7 @@ import java.util.Map;
 
 public class ColumnFlinkTypeInfoUtil {
 
-  public static TypeInfo<?>[] getTypeInfos(BaseEngineTypeInfoConverter converter,
+  public static TypeInfo<?>[] getTypeInfos(TypeInfoConverter converter,
                                            List<ColumnInfo> columnInfos) {
 
     TypeInfo<?>[] fieldTypes = new TypeInfo[columnInfos.size()];
@@ -56,7 +57,7 @@ public class ColumnFlinkTypeInfoUtil {
       String type = StringUtils.lowerCase(columnInfos.get(index).getType());
       String name = columnInfos.get(index).getName();
 
-      TypeInfo<?> typeInfo = converter.toTypeInfo(type);
+      TypeInfo<?> typeInfo = converter.fromTypeString(type);
       fieldTypes[index] = typeInfo;
     }
     return fieldTypes;
@@ -68,7 +69,7 @@ public class ColumnFlinkTypeInfoUtil {
         .getEngineConverter(storageEngineName), columnInfos);
   }
 
-  public static RowTypeInfo getRowTypeInformation(BaseEngineTypeInfoConverter converter,
+  public static RowTypeInfo getRowTypeInformation(TypeInfoConverter converter,
                                                   List<ColumnInfo> columnInfos) {
 
     String[] fieldNames = new String[columnInfos.size()];
@@ -77,7 +78,7 @@ public class ColumnFlinkTypeInfoUtil {
       String type = StringUtils.lowerCase(columnInfos.get(index).getType());
       String name = columnInfos.get(index).getName();
 
-      TypeInfo<?> typeInfo = converter.toTypeInfo(type);
+      TypeInfo<?> typeInfo = converter.fromTypeString(type);
       fieldNames[index] = name;
       fieldTypes[index] = toColumnFlinkTypeInformation(typeInfo);
     }
@@ -87,68 +88,72 @@ public class ColumnFlinkTypeInfoUtil {
 
   private static TypeInformation<?> toColumnFlinkTypeInformation(TypeInfo<?> typeInfo) {
     Class<?> internalTypeClass = typeInfo.getTypeClass();
-    if (internalTypeClass == PrimitiveTypes.SHORT.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.SHORT_TYPE_INFO.getTypeClass()) {
       return PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.INT.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.INT_TYPE_INFO.getTypeClass()) {
       return PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.LONG.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.LONG_TYPE_INFO.getTypeClass()) {
       return PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.BIGINT.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.BIG_INTEGER_TYPE_INFO.getTypeClass()) {
       return PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.FLOAT.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.FLOAT_TYPE_INFO.getTypeClass()) {
       return PrimitiveColumnTypeInfo.DOUBLE_COLUMN_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.DOUBLE.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.DOUBLE_TYPE_INFO.getTypeClass()) {
       return PrimitiveColumnTypeInfo.DOUBLE_COLUMN_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.STRING.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.BIG_DECIMAL_TYPE_INFO.getTypeClass()) {
+      return PrimitiveColumnTypeInfo.DOUBLE_COLUMN_TYPE_INFO;
+    }
+
+    if (internalTypeClass == TypeInfos.STRING_TYPE_INFO.getTypeClass()) {
       return PrimitiveColumnTypeInfo.STRING_COLUMN_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.BOOLEAN.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass()) {
       return PrimitiveColumnTypeInfo.BOOL_COLUMN_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.DATE_DATE.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass()) {
       return PrimitiveColumnTypeInfo.DATE_COLUMN_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.DATE_TIME.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.SQL_TIME_TYPE_INFO.getTypeClass()) {
       return PrimitiveColumnTypeInfo.DATE_COLUMN_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.DATE_DATE_TIME.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass()) {
       return PrimitiveColumnTypeInfo.DATE_COLUMN_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.BYTE.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.BYTE_TYPE_INFO.getTypeClass()) {
       throw new UnsupportedOperationException("Byte is not support in Column type system.");
     }
 
-    if (internalTypeClass == PrimitiveTypes.BINARY.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == BasicArrayTypeInfo.BINARY_TYPE_INFO.getTypeClass()) {
       return PrimitiveColumnTypeInfo.BYTES_COLUMN_TYPE_INFO;
     }
 
-    if (typeInfo instanceof com.bytedance.bitsail.common.ddl.typeinfo.MapTypeInfo) {
-      com.bytedance.bitsail.common.ddl.typeinfo.MapTypeInfo<?, ?> mapTypeInfo = (com.bytedance.bitsail.common.ddl.typeinfo.MapTypeInfo<?, ?>) typeInfo;
+    if (typeInfo instanceof com.bytedance.bitsail.common.typeinfo.MapTypeInfo) {
+      com.bytedance.bitsail.common.typeinfo.MapTypeInfo<?, ?> mapTypeInfo = (com.bytedance.bitsail.common.typeinfo.MapTypeInfo<?, ?>) typeInfo;
       TypeInfo<?> keyTypeInfo = mapTypeInfo.getKeyTypeInfo();
       TypeInfo<?> valueTypeInfo = mapTypeInfo.getValueTypeInfo();
       return new MapColumnTypeInfo(toColumnFlinkTypeInformation(keyTypeInfo),
           toColumnFlinkTypeInformation(valueTypeInfo));
     }
 
-    if (typeInfo instanceof com.bytedance.bitsail.common.ddl.typeinfo.ListTypeInfo) {
-      com.bytedance.bitsail.common.ddl.typeinfo.ListTypeInfo<?> listTypeInfo = (com.bytedance.bitsail.common.ddl.typeinfo.ListTypeInfo<?>) typeInfo;
+    if (typeInfo instanceof com.bytedance.bitsail.common.typeinfo.ListTypeInfo) {
+      com.bytedance.bitsail.common.typeinfo.ListTypeInfo<?> listTypeInfo = (com.bytedance.bitsail.common.typeinfo.ListTypeInfo<?>) typeInfo;
       TypeInfo<?> elementTypeInfo = listTypeInfo.getElementTypeInfo();
       return new ListColumnTypeInfo(toColumnFlinkTypeInformation(elementTypeInfo));
     }

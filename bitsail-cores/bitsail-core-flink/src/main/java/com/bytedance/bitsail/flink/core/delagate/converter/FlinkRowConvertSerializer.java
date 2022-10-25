@@ -23,24 +23,24 @@ import com.bytedance.bitsail.common.column.Column;
 import com.bytedance.bitsail.common.column.ListColumn;
 import com.bytedance.bitsail.common.column.MapColumn;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.ddl.typeinfo.ListTypeInfo;
-import com.bytedance.bitsail.common.ddl.typeinfo.MapTypeInfo;
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.types.Row;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static com.bytedance.bitsail.common.typeinfo.TypeInfos.STRING_TYPE_INFO;
 
 /**
  * Created 2022/6/21
@@ -145,38 +145,34 @@ public class FlinkRowConvertSerializer implements RowSerializer<Row> {
       return null;
     }
 
-    if (typeInfoTypeClass == String.class) {
+    if (STRING_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
       return column.asString();
-    } else if (typeInfoTypeClass == Boolean.class) {
+    } else if (TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
       return column.asBoolean();
-    } else if (typeInfoTypeClass == byte[].class) {
-      return column.asBytes();
-    } else if (typeInfoTypeClass == Byte[].class) {
-      return ArrayUtils.toObject(column.asBytes());
-    } else if (typeInfoTypeClass == Short.class) {
-      return column.asLong().shortValue();
-    } else if (typeInfoTypeClass == Integer.class) {
-      return column.asLong().intValue();
-    } else if (typeInfoTypeClass == Long.class) {
-      return column.asLong();
-    } else if (typeInfoTypeClass == BigInteger.class) {
-      return column.asBigInteger();
-    } else if (typeInfoTypeClass == Byte.class) {
+    } else if (TypeInfos.BYTE_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
       return column.asLong().byteValue();
-    } else if (typeInfoTypeClass == Date.class) {
-      return column.asDate();
-    } else if (typeInfoTypeClass == java.sql.Date.class) {
-      return new java.sql.Date(column.asDate().getTime());
-    } else if (typeInfoTypeClass == java.sql.Time.class) {
-      return new java.sql.Time(column.asDate().getTime());
-    } else if (typeInfoTypeClass == java.sql.Timestamp.class) {
-      return new java.sql.Timestamp(column.asDate().getTime());
-    } else if (typeInfoTypeClass == Float.class) {
+    } else if (TypeInfos.INT_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      return column.asLong().intValue();
+    } else if (TypeInfos.SHORT_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      return column.asLong().shortValue();
+    } else if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      return column.asLong();
+    } else if (TypeInfos.BIG_INTEGER_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      return column.asBigInteger();
+    } else if (TypeInfos.FLOAT_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
       return column.asDouble().floatValue();
-    } else if (typeInfoTypeClass == Double.class) {
+    } else if (TypeInfos.DOUBLE_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
       return column.asDouble();
-    } else if (typeInfoTypeClass == BigDecimal.class) {
+    } else if (TypeInfos.BIG_DECIMAL_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
       return column.asBigDecimal();
+    } else if (TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      return new java.sql.Date(column.asDate().getTime());
+    } else if (TypeInfos.SQL_TIME_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      return new java.sql.Time(column.asDate().getTime());
+    } else if (TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      return new java.sql.Timestamp(column.asDate().getTime());
+    } else if (BasicArrayTypeInfo.BINARY_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      return column.asBytes();
     } else {
       throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
           "Flink basic data type " + typeInfoTypeClass + " is not supported!");

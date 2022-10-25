@@ -21,8 +21,8 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.ddl.source.SourceEngineConnector;
 import com.bytedance.bitsail.common.exception.FrameworkErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.type.BaseEngineTypeInfoConverter;
-import com.bytedance.bitsail.common.type.HiveTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.type.filemapping.HiveTypeInfoConverter;
 import com.bytedance.bitsail.common.util.TypeConvertUtil.StorageEngine;
 import com.bytedance.bitsail.connector.legacy.hive.option.HiveReaderOptions;
 
@@ -58,7 +58,7 @@ public class HiveSourceEngineConnector extends SourceEngineConnector {
   }
 
   @Override
-  public BaseEngineTypeInfoConverter createTypeInfoConverter() {
+  public TypeInfoConverter createTypeInfoConverter() {
     return new HiveTypeInfoConverter();
   }
 

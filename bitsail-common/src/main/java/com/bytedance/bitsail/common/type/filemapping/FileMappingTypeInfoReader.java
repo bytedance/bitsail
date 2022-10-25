@@ -1,26 +1,26 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
-package com.bytedance.bitsail.common.type;
+package com.bytedance.bitsail.common.type.filemapping;
 
-import com.bytedance.bitsail.common.ddl.typeinfo.ListTypeInfo;
-import com.bytedance.bitsail.common.ddl.typeinfo.MapTypeInfo;
-import com.bytedance.bitsail.common.ddl.typeinfo.PrimitiveTypes;
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.type.BitSailTypeParser;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
 import com.esotericsoftware.yamlbeans.YamlReader;
 import com.google.common.collect.Maps;
@@ -41,8 +41,8 @@ import java.util.Objects;
 /**
  * Created 2022/5/6
  */
-public class TypeConverterReader implements Serializable {
-  private static final Logger LOG = LoggerFactory.getLogger(TypeConverterReader.class);
+public class FileMappingTypeInfoReader implements Serializable {
+  private static final Logger LOG = LoggerFactory.getLogger(FileMappingTypeInfoReader.class);
   private static final String ENGINE_CONVERTER_TEMPLATE_NAME = "{0}-type-converter.yaml";
 
   private static final String ENGINE_TO_CUSTOM_KEY = "engine.type.to.bitsail.type.converter";
@@ -55,8 +55,8 @@ public class TypeConverterReader implements Serializable {
   @Getter
   protected Map<TypeInfo<?>, String> fromTypeInformation = Maps.newHashMap();
 
-  public TypeConverterReader(String engine) {
-    LOG.info("Type converter reader read engine: {}.", engine);
+  public FileMappingTypeInfoReader(String engine) {
+    LOG.info("File mapping reader from engine = {}.", engine);
 
     converterFileName = MessageFormat.format(ENGINE_CONVERTER_TEMPLATE_NAME, engine);
     try {
@@ -64,24 +64,6 @@ public class TypeConverterReader implements Serializable {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private static TypeInfo<?> parseCustomTypeInfo(String customType) {
-    if (PrimitiveTypes.isPrimitiveType(customType)) {
-      return PrimitiveTypes.TYPE_STORE.get(customType);
-    }
-
-    if (PrimitiveTypes.isArrayType(customType)) {
-      String elementType = PrimitiveTypes.getArrayElementType(customType);
-      return new ListTypeInfo<>(parseCustomTypeInfo(elementType));
-    }
-
-    if (PrimitiveTypes.isMapType(customType)) {
-      String[] mapKeyValueType = PrimitiveTypes.getMapKeyValueType(customType);
-      return new MapTypeInfo<>(parseCustomTypeInfo(mapKeyValueType[0]), parseCustomTypeInfo(mapKeyValueType[1]));
-    }
-
-    throw new IllegalArgumentException(String.format("Custom type name %s parse failed.", customType));
   }
 
   @SuppressWarnings("unchecked")
@@ -105,7 +87,7 @@ public class TypeConverterReader implements Serializable {
   }
 
   private void read() throws IOException {
-    URL resource = TypeConverterReader.class.getResource("/" + converterFileName);
+    URL resource = FileMappingTypeInfoReader.class.getResource("/" + converterFileName);
     if (Objects.isNull(resource)) {
       throw new IllegalArgumentException(String.format("Resource for the column converter %s not found in classpath.", converterFileName));
     }
@@ -127,7 +109,7 @@ public class TypeConverterReader implements Serializable {
   protected void handleEngineTypeToCustom(Map<String, String> tmpToTypeInformation) {
     for (Map.Entry<String, String> entry : tmpToTypeInformation.entrySet()) {
 
-      TypeInfo<?> customTypeInfo = parseCustomTypeInfo(entry.getValue());
+      TypeInfo<?> customTypeInfo = BitSailTypeParser.fromTypeString(entry.getValue());
 
       if (Objects.isNull(customTypeInfo)) {
         throw new UnsupportedOperationException(String
@@ -140,10 +122,13 @@ public class TypeConverterReader implements Serializable {
 
   protected void handleCustomToEngineType(Map<String, String> tmpFromTypeInformation) {
     for (Map.Entry<String, String> entry : tmpFromTypeInformation.entrySet()) {
-      if (!PrimitiveTypes.TYPE_STORE.containsKey(entry.getKey())) {
+
+      TypeInfo<?> typeInfo = BitSailTypeParser.fromTypeString(entry.getKey());
+      if (Objects.isNull(typeInfo)) {
         throw new IllegalArgumentException(String.format("From Custom type %s is invalid.", entry.getKey()));
       }
-      fromTypeInformation.put(PrimitiveTypes.TYPE_STORE.get(entry.getKey()), entry.getValue());
+
+      fromTypeInformation.put(typeInfo, entry.getValue());
     }
   }
 }

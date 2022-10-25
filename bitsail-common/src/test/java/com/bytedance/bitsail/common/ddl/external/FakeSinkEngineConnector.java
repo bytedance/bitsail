@@ -20,8 +20,8 @@ package com.bytedance.bitsail.common.ddl.external;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.ddl.sink.SinkEngineConnectorBase;
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.type.BaseEngineTypeInfoConverter;
-import com.bytedance.bitsail.common.type.SimpleTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 
 import com.google.common.collect.Lists;
 import lombok.Getter;
@@ -60,8 +60,8 @@ public class FakeSinkEngineConnector extends SinkEngineConnectorBase {
   }
 
   @Override
-  public BaseEngineTypeInfoConverter createTypeInfoConverter() {
-    return new SimpleTypeInfoConverter(getExternalEngineName());
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new FileMappingTypeInfoConverter(getExternalEngineName());
   }
 
   @Override

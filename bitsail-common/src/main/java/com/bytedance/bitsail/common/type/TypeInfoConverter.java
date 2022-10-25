@@ -15,24 +15,21 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.common.ddl.typeinfo;
+package com.bytedance.bitsail.common.type;
 
-import com.bytedance.bitsail.common.util.Preconditions;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import java.io.Serializable;
 
-public class FractionalTypeInfo<T> extends NumericTypeInfo<T> {
+public interface TypeInfoConverter extends Serializable {
 
-  private static final HashSet<Class<?>> FRACTIONAL_TYPES = new HashSet<>(
-      Arrays.asList(
-          Double.class,
-          Float.class));
+  /**
+   * Parse type string to BitSail TypeInfo object.
+   */
+  TypeInfo<?> fromTypeString(String typeString);
 
-  protected FractionalTypeInfo(Class<T> clazz) {
-    super(clazz);
-
-    Preconditions.checkArgument(FRACTIONAL_TYPES.contains(clazz),
-        "The given class %s is not a fractional type.", clazz.getSimpleName());
-  }
+  /**
+   * Parse TypeInfo object to type string.
+   */
+  String fromTypeInfo(TypeInfo<?> typeInfo);
 }

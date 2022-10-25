@@ -18,17 +18,19 @@
 package com.bytedance.bitsail.flink.core.typeutils;
 
 import com.bytedance.bitsail.common.BitSailException;
-import com.bytedance.bitsail.common.ddl.typeinfo.ListTypeInfo;
-import com.bytedance.bitsail.common.ddl.typeinfo.MapTypeInfo;
-import com.bytedance.bitsail.common.ddl.typeinfo.PrimitiveTypes;
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.type.BaseEngineTypeInfoConverter;
 import com.bytedance.bitsail.common.type.EngineTypeInfoFactory;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.common.typeinfo.LocalTimeTypeInfo;
 import org.apache.flink.api.common.typeinfo.PrimitiveArrayTypeInfo;
 import org.apache.flink.api.common.typeinfo.SqlTimeTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -45,7 +47,7 @@ public class NativeFlinkTypeInfoUtil {
   }
 
   public static RowTypeInfo getRowTypeInformation(List<ColumnInfo> columnInfos,
-                                                  BaseEngineTypeInfoConverter baseEngineTypeInfoConverter) {
+                                                  TypeInfoConverter typeInfoConverter) {
 
     String[] fieldNames = new String[columnInfos.size()];
     TypeInformation<?>[] fieldTypes = new TypeInformation[columnInfos.size()];
@@ -54,7 +56,7 @@ public class NativeFlinkTypeInfoUtil {
       String type = StringUtils.lowerCase(columnInfos.get(index).getType());
       String name = columnInfos.get(index).getName();
 
-      TypeInfo<?> typeInfo = baseEngineTypeInfoConverter.toTypeInfo(type);
+      TypeInfo<?> typeInfo = typeInfoConverter.fromTypeString(type);
 
       fieldNames[index] = name;
       fieldTypes[index] = toNativeFlinkTypeInformation(typeInfo);
@@ -63,76 +65,77 @@ public class NativeFlinkTypeInfoUtil {
     return new RowTypeInfo(fieldTypes, fieldNames);
   }
 
-  public static TypeInformation<?> getTypeInformation(String engineName,
-                                                      String engineType) {
-
-    BaseEngineTypeInfoConverter engineConverter = EngineTypeInfoFactory
-        .getEngineConverter(engineName);
-
-    TypeInfo<?> typeInfo = engineConverter.toTypeInfo(engineType);
-
-    return toNativeFlinkTypeInformation(typeInfo);
-  }
-
   private static TypeInformation<?> toNativeFlinkTypeInformation(TypeInfo<?> typeInfo) {
     Class<?> internalTypeClass = typeInfo.getTypeClass();
-    if (internalTypeClass == PrimitiveTypes.SHORT.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.SHORT_TYPE_INFO.getTypeClass()) {
       return BasicTypeInfo.SHORT_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.VOID.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.VOID_TYPE_INFO.getTypeClass()) {
       return BasicTypeInfo.VOID_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.INT.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.INT_TYPE_INFO.getTypeClass()) {
       return BasicTypeInfo.INT_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.LONG.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.LONG_TYPE_INFO.getTypeClass()) {
       return BasicTypeInfo.LONG_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.BIGINT.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.BIG_INTEGER_TYPE_INFO.getTypeClass()) {
       return BasicTypeInfo.BIG_INT_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.FLOAT.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.FLOAT_TYPE_INFO.getTypeClass()) {
       return BasicTypeInfo.FLOAT_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.DOUBLE.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.DOUBLE_TYPE_INFO.getTypeClass()) {
       return BasicTypeInfo.DOUBLE_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.BIG_DECIMAL.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.BIG_DECIMAL_TYPE_INFO.getTypeClass()) {
       return BasicTypeInfo.BIG_DEC_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.STRING.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.STRING_TYPE_INFO.getTypeClass()) {
       return BasicTypeInfo.STRING_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.BOOLEAN.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass()) {
       return BasicTypeInfo.BOOLEAN_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.DATE_DATE.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass()) {
       return SqlTimeTypeInfo.DATE;
     }
 
-    if (internalTypeClass == PrimitiveTypes.DATE_TIME.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.SQL_TIME_TYPE_INFO.getTypeClass()) {
       return SqlTimeTypeInfo.TIME;
     }
 
-    if (internalTypeClass == PrimitiveTypes.DATE_DATE_TIME.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass()) {
       return SqlTimeTypeInfo.TIMESTAMP;
     }
 
-    if (internalTypeClass == PrimitiveTypes.BYTE.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.LOCAL_DATE_TYPE_INFO.getTypeClass()) {
+      return LocalTimeTypeInfo.LOCAL_DATE;
+    }
+
+    if (internalTypeClass == TypeInfos.LOCAL_TIME_TYPE_INFO.getTypeClass()) {
+      return LocalTimeTypeInfo.LOCAL_TIME;
+    }
+
+    if (internalTypeClass == TypeInfos.LOCAL_DATE_TIME_TYPE_INFO.getTypeClass()) {
+      return LocalTimeTypeInfo.LOCAL_DATE_TIME;
+    }
+
+    if (internalTypeClass == TypeInfos.BYTE_TYPE_INFO.getTypeClass()) {
       return BasicTypeInfo.BYTE_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.BINARY.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == BasicArrayTypeInfo.BINARY_TYPE_INFO.getTypeClass()) {
       return PrimitiveArrayTypeInfo.BYTE_PRIMITIVE_ARRAY_TYPE_INFO;
     }
 

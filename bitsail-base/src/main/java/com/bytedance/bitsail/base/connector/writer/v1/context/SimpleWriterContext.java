@@ -18,7 +18,7 @@
 package com.bytedance.bitsail.base.connector.writer.v1.context;
 
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
 /**
  * Created 2022/9/7

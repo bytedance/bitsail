@@ -22,7 +22,6 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.ddl.source.SourceEngineConnector;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.type.EngineTypeInfoFactory;
 import com.bytedance.bitsail.common.util.TypeConvertUtil.StorageEngine;
 import com.bytedance.bitsail.connector.legacy.jdbc.converter.JdbcValueConverter;
 import com.bytedance.bitsail.connector.legacy.jdbc.exception.DBUtilErrorCode;
@@ -45,7 +44,6 @@ import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatPlugin;
 import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.io.DefaultInputSplitAssigner;
@@ -87,8 +85,6 @@ public class JDBCInputFormat extends InputFormatPlugin<Row, InputSplit> implemen
   /**
    * Cache of type convert class
    */
-  private Map<String, Class<?>> typeConvertClassCache = new HashMap<>();
-
   private DbClusterInfo dbClusterInfo;
   private String queryTemplateFormat;
   private RowTypeInfo rowTypeInfo;
@@ -176,13 +172,6 @@ public class JDBCInputFormat extends InputFormatPlugin<Row, InputSplit> implemen
         }
       }
       jobIdOffsetInfo = new ConcurrentHashMap<Integer, Integer>();
-
-      typeConvertClassCache = Maps.newHashMap();
-      EngineTypeInfoFactory.getEngineConverter(getStorageEngine().name())
-          .getReader().getToTypeInformation()
-          .forEach((key, value) -> {
-            typeConvertClassCache.put(StringUtils.upperCase(key), value.getTypeClass());
-          });
     } catch (ClassNotFoundException e) {
       throw new IllegalArgumentException("open() failed." + e.getMessage(), e);
     }
@@ -388,19 +377,6 @@ public class JDBCInputFormat extends InputFormatPlugin<Row, InputSplit> implemen
       for (int i = 0; i < row.getArity(); i++) {
         int columnIndex = i + 1;
         currentColumnName = metaData.getColumnName(columnIndex);
-
-        Class<?> columnTypeClass = typeConvertClassCache.get(metaData.getColumnTypeName(columnIndex).toUpperCase());
-        if (columnTypeClass == null) {
-          throw BitSailException
-              .asBitSailException(
-                  DBUtilErrorCode.UNSUPPORTED_TYPE,
-                  String.format(
-                      "The column data type in your configuration is not support. Column name:[%s], Column type:[%s]," +
-                          " Column Java class type:[%s]. Please try to change the column data type or don't transmit this column.",
-                      metaData.getColumnName(columnIndex),
-                      metaData.getColumnType(columnIndex),
-                      metaData.getColumnClassName(columnIndex)));
-        }
 
         rawData = null;
         rawData = jdbcValueConverter.convert(metaData,

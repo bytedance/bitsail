@@ -25,9 +25,6 @@
 
     <artifactId>bitsail-component-clients</artifactId>
     <packaging>pom</packaging>
-    <modules>
-        <module>bitsail-component-client-kafka</module>
-    </modules>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

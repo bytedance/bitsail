@@ -17,7 +17,7 @@
 
 package com.bytedance.bitsail.base.connector.writer.v1;
 
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
 import java.io.Closeable;
 import java.io.IOException;

@@ -1,32 +1,34 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
-package com.bytedance.bitsail.common.type;
+package com.bytedance.bitsail.common.type.filemapping;
 
 import com.bytedance.bitsail.common.BitSailException;
-import com.bytedance.bitsail.common.ddl.typeinfo.ListTypeInfo;
-import com.bytedance.bitsail.common.ddl.typeinfo.MapTypeInfo;
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
 /**
  * Created 2022/5/11
  */
-public class JdbcTypeInfoConverter extends BaseEngineTypeInfoConverter {
+public class JdbcTypeInfoConverter extends FileMappingTypeInfoConverter {
   private static final String LIST_TYPE_NAME = "list";
   private static final String MAP_TYPE_NAME = "map";
 
@@ -43,16 +45,16 @@ public class JdbcTypeInfoConverter extends BaseEngineTypeInfoConverter {
   }
 
   @Override
-  public TypeInfo<?> toTypeInfo(String engineType) {
-    engineType = getBaseName(engineType);
-    if (isArrayType(engineType)) {
-      return getArrayTypeInfo(engineType);
+  public TypeInfo<?> fromTypeString(String typeString) {
+    typeString = getBaseName(typeString);
+    if (isArrayType(typeString)) {
+      return getArrayTypeInfo(typeString);
 
-    } else if (isMapType(engineType)) {
-      return getMapTypeInfo(engineType);
+    } else if (isMapType(typeString)) {
+      return getMapTypeInfo(typeString);
 
     } else {
-      return reader.getToTypeInformation().get(engineType);
+      return reader.getToTypeInformation().get(typeString);
     }
   }
 
@@ -62,7 +64,7 @@ public class JdbcTypeInfoConverter extends BaseEngineTypeInfoConverter {
           "Source engine " + engineName + ", invalid engine list type: " + engineType);
     }
     String elementType = engineType.substring(LIST_TYPE_NAME.length() + 1, engineType.length() - 1);
-    TypeInfo<?> elementTypeInfo = toTypeInfo(elementType);
+    TypeInfo<?> elementTypeInfo = fromTypeString(elementType);
     return new ListTypeInfo<>(elementTypeInfo);
   }
 
@@ -76,8 +78,8 @@ public class JdbcTypeInfoConverter extends BaseEngineTypeInfoConverter {
     String keyType = parts[0];
     String valueType = parts[1];
 
-    TypeInfo<?> keyTypeInformation = toTypeInfo(keyType);
-    TypeInfo<?> valueTypeInformation = toTypeInfo(valueType);
+    TypeInfo<?> keyTypeInformation = fromTypeString(keyType);
+    TypeInfo<?> valueTypeInformation = fromTypeString(valueType);
     return new MapTypeInfo<>(keyTypeInformation, valueTypeInformation);
 
   }

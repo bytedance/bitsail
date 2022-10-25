@@ -1,25 +1,27 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
-package com.bytedance.bitsail.common.type;
+package com.bytedance.bitsail.common.type.filemapping;
 
-import com.bytedance.bitsail.common.ddl.typeinfo.ListTypeInfo;
-import com.bytedance.bitsail.common.ddl.typeinfo.MapTypeInfo;
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Created 2022/5/11
  */
-public class HiveTypeInfoConverter extends BaseEngineTypeInfoConverter {
+public class HiveTypeInfoConverter extends FileMappingTypeInfoConverter {
   public static final String DEFAULT_STAGE_NAME = "hive";
   private static final String LIST_TYPE_NAME = "array";
   private static final String MAP_TYPE_NAME = "map";
@@ -51,21 +53,21 @@ public class HiveTypeInfoConverter extends BaseEngineTypeInfoConverter {
   }
 
   @Override
-  public TypeInfo<?> toTypeInfo(String engineType) {
-    engineType = trim(getBaseName(engineType));
-    if (isArrayType(engineType)) {
-      return internalRecursion(engineType, Category.LIST);
+  public TypeInfo<?> fromTypeString(String typeString) {
+    typeString = trim(getBaseName(typeString));
+    if (isArrayType(typeString)) {
+      return internalRecursion(typeString, Category.LIST);
     }
 
-    if (isMapType(engineType)) {
-      return internalRecursion(engineType, Category.MAP);
+    if (isMapType(typeString)) {
+      return internalRecursion(typeString, Category.MAP);
     }
 
-    return internalRecursion(engineType, Category.PRIMITIVE);
+    return internalRecursion(typeString, Category.PRIMITIVE);
   }
 
   @Override
-  public String fromTypeInfo(TypeInfo<?> typeInfo, boolean nullable) {
+  public String fromTypeInfo(TypeInfo<?> typeInfo) {
     return reader.getFromTypeInformation().get(typeInfo);
   }
 
@@ -85,7 +87,7 @@ public class HiveTypeInfoConverter extends BaseEngineTypeInfoConverter {
 
         String elementType = trim(StringUtils.substring(engineType, LIST_TYPE_NAME.length() + 1,
             engineType.length() - 1));
-        return new ListTypeInfo<>(toTypeInfo(elementType));
+        return new ListTypeInfo<>(fromTypeString(elementType));
 
       case MAP:
         expect(engineType, MAP_TYPE_NAME.length(), '<');
@@ -95,7 +97,7 @@ public class HiveTypeInfoConverter extends BaseEngineTypeInfoConverter {
 
         String keyType = trim(split[0]);
         String valueType = trim(split[1]);
-        return new MapTypeInfo<>(toTypeInfo(keyType), toTypeInfo(valueType));
+        return new MapTypeInfo<>(fromTypeString(keyType), fromTypeString(valueType));
 
       default:
         throw new IllegalArgumentException(String.format("Non type match for the type: %s.", engineType));

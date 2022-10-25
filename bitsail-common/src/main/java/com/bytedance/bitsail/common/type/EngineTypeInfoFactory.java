@@ -17,6 +17,9 @@
 
 package com.bytedance.bitsail.common.type;
 
+import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
+import com.bytedance.bitsail.common.type.filemapping.HiveTypeInfoConverter;
+
 import com.google.common.annotations.Beta;
 import com.google.common.collect.Maps;
 
@@ -29,19 +32,19 @@ import java.util.Map;
 @Beta
 public class EngineTypeInfoFactory {
 
-  private static volatile Map<String, BaseEngineTypeInfoConverter> CONVERTERS = Maps.newHashMap();
+  private static volatile Map<String, TypeInfoConverter> CONVERTERS = Maps.newHashMap();
 
-  public static synchronized BaseEngineTypeInfoConverter getEngineConverter(String engineName) {
+  public static synchronized TypeInfoConverter getEngineConverter(String engineName) {
     if (CONVERTERS.containsKey(engineName)) {
       return CONVERTERS.get(engineName);
     }
-    BaseEngineTypeInfoConverter converter = null;
+    TypeInfoConverter converter = null;
     switch (engineName) {
       case "hive":
         converter = new HiveTypeInfoConverter(engineName);
         break;
       default:
-        converter = new SimpleTypeInfoConverter(engineName);
+        converter = new FileMappingTypeInfoConverter(engineName);
         break;
     }
     CONVERTERS.put(engineName, converter);
