@@ -213,7 +213,7 @@ public class FakeSource extends InputFormatPlugin<Row, InputSplit> implements Re
       LOG.warn("Unique fields is set and total count is larger than 1000, which may cause OOM problem.");
     }
 
-    this.fixedObjects = initFixedObject(inputSliceConfig.get(FakeReaderOptions.FIXED_COLUMNS), columnInfos,
+    this.fixedObjects = initFixedObject(inputSliceConfig.get(FakeReaderOptions.COLUMNS_WITH_FIXED_VALUE), columnInfos,
         rowTypeInfo, useBitSailType);
   }
 

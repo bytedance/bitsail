@@ -53,7 +53,13 @@ public interface FakeReaderOptions extends ReaderOptions.BaseReaderOptions {
       key(READER_PREFIX + "use_bitsail_type")
           .defaultValue(true);
 
-  ConfigOption<List<Map<String, String>>> FIXED_COLUMNS =
-      key(READER_PREFIX + "fixed_columns")
+  /**
+   * This option defines the columns with fixed value.<br/>
+   * The format is:<br/>
+   * [{"name":"column_A", "fixed_value":"value_A"}, {"name":"column_B", "fixed_value":"value_B"}, ...]<br/>
+   * Note that the column `name` should appear in `job.writer.columns`.
+   */
+  ConfigOption<List<Map<String, String>>> COLUMNS_WITH_FIXED_VALUE =
+      key(READER_PREFIX + "columns_with_fixed_value")
           .onlyReference(new TypeReference<List<Map<String, String>>>(){});
 }

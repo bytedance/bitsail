@@ -12,7 +12,7 @@
       "rate": 100000,
       "random_null_rate": 0,
       "unique_fields": "id",
-      "fixed_columns": [
+      "columns_with_fixed_value": [
         {
           "name": "partition_date",
           "fixed_value": "2022-10-10"
