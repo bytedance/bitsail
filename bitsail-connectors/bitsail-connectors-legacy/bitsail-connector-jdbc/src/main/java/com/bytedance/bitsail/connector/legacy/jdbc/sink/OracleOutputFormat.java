@@ -33,9 +33,6 @@ import com.bytedance.bitsail.connector.legacy.jdbc.utils.upsert.OracleUpsertUtil
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import static org.apache.commons.lang3.StringUtils.upperCase;
 
 public class OracleOutputFormat extends JDBCOutputFormat {
 
@@ -45,23 +42,11 @@ public class OracleOutputFormat extends JDBCOutputFormat {
 
   @Override
   public void initPlugin() throws IOException {
-    primaryKey = upperCase(outputSliceConfig.getNecessaryOption(OracleWriterOptions.PRIMARY_KEY, JDBCPluginErrorCode.REQUIRED_VALUE));
-    tableSchema = upperCase(outputSliceConfig.getNecessaryOption(OracleWriterOptions.DB_NAME, JDBCPluginErrorCode.REQUIRED_VALUE));
-    table = upperCase(outputSliceConfig.getNecessaryOption(OracleWriterOptions.TABLE_NAME, JDBCPluginErrorCode.REQUIRED_VALUE));
+    primaryKey = outputSliceConfig.getNecessaryOption(OracleWriterOptions.PRIMARY_KEY, JDBCPluginErrorCode.REQUIRED_VALUE);
+    tableSchema = outputSliceConfig.getNecessaryOption(OracleWriterOptions.DB_NAME, JDBCPluginErrorCode.REQUIRED_VALUE);
+    table = outputSliceConfig.getNecessaryOption(OracleWriterOptions.TABLE_NAME, JDBCPluginErrorCode.REQUIRED_VALUE);
     tableWithSchema = tableSchema + "." + table;
     super.initPlugin();
-  }
-
-  @Override
-  protected List<ColumnInfo> provideColumns() {
-    return outputSliceConfig.getNecessaryOption(OracleWriterOptions.COLUMNS, JDBCPluginErrorCode.REQUIRED_VALUE).stream()
-        .map(ColumnInfo::toUpperCase)
-        .collect(Collectors.toList());
-  }
-
-  @Override
-  protected String providePartitionName() {
-    return upperCase(super.providePartitionName());
   }
 
   /*

@@ -1,5 +1,3 @@
-use TEST;
-
 create table ORACLE_DYNAMIC_TABLE
 (
     ID          VARCHAR2(1024),
@@ -10,4 +8,4 @@ create table ORACLE_DYNAMIC_TABLE
     DOUBLE_TYPE NUMBER,
     RAW_TYPE    RAW(1024),
     DATE_TYPE   DATE
-)
+);

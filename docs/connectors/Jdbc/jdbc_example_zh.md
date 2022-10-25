@@ -200,37 +200,37 @@
             "columns": [
                 {
                   "index": 0,
-                  "name": "id",
+                  "name": "ID",
                   "type": "varchar"
                 },
                 {
                   "index": 1,
-                  "name": "int_type",
+                  "name": "INT_TYPE",
                   "type": "integer"
                 },
                 {
                   "index": 2,
-                  "name": "bigint_type",
+                  "name": "BIGINT_TYPE",
                   "type": "number"
                 },
                 {
                   "index": 3,
-                  "name": "float_type",
+                  "name": "FLOAT_TYPE",
                   "type": "float"
                 },
                 {
                   "index": 4,
-                  "name": "double_type",
+                  "name": "DOUBLE_TYPE",
                   "type": "double"
                 },
                 {
                   "index": 5,
-                  "name": "raw_type",
+                  "name": "RAW_TYPE",
                   "type": "raw"
                 },
                 {
                   "index": 6,
-                  "name": "date_type",
+                  "name": "DATE_TYPE",
                   "type": "date"
                 }
             ],
@@ -239,7 +239,7 @@
             "db_name":"your db name",
             "table_schema":"your schema name",
             "table_name":"your table name",
-            "primary_key":"id",
+            "primary_key":"ID",
             "connections":[
                 {
                     "slaves":[
@@ -260,61 +260,62 @@
 {
     "job":{
         "writer": {
-      "class": "com.bytedance.bitsail.connector.legacy.jdbc.sink.OracleOutputFormat",
-      "db_name": "your db name",
-      "table_name": "your table name",
-      "primary_key": "id",
-      "connections": [
-      ],
-      "user_name": "your user name",
-      "password": "your password",
-      "write_mode": "insert",
-      "writer_parallelism_num": 1,
-      "partition_name": "datetime",
-      "partition_value": "20220705",
-      "partition_pattern_format": "yyyyMMdd",
-      "columns": [
-        {
-          "index": 0,
-          "name": "id",
-          "type": "varchar"
-        },
-        {
-          "index": 1,
-          "name": "int_type",
-          "type": "integer"
-        },
-        {
-          "index": 2,
-          "name": "bigint_type",
-          "type": "number"
-        },
-        {
-          "index": 3,
-          "name": "float_type",
-          "type": "float"
-        },
-        {
-          "index": 4,
-          "name": "double_type",
-          "type": "double"
-        },
-        {
-          "index": 5,
-          "name": "raw_type",
-          "type": "raw"
-        },
-        {
-          "index": 6,
-          "name": "date_type",
-          "type": "date"
+          "class": "com.bytedance.bitsail.connector.legacy.jdbc.sink.OracleOutputFormat",
+          "db_name": "your db name",
+          "table_name": "your table name",
+          "primary_key": "ID",
+          "connections": [
+          ],
+          "user_name": "your user name",
+          "password": "your password",
+          "write_mode": "insert",
+          "writer_parallelism_num": 1,
+          "partition_name": "DATETIME",
+          "partition_value": "20220705",
+          "partition_pattern_format": "yyyyMMdd",
+          "columns": [
+            {
+              "index": 0,
+              "name": "ID",
+              "type": "varchar"
+            },
+            {
+              "index": 1,
+              "name": "INT_TYPE",
+              "type": "integer"
+            },
+            {
+              "index": 2,
+              "name": "BIGINT_TYPE",
+              "type": "number"
+            },
+            {
+              "index": 3,
+              "name": "FLOAT_TYPE",
+              "type": "float"
+            },
+            {
+              "index": 4,
+              "name": "DOUBLE_TYPE",
+              "type": "double"
+            },
+            {
+              "index": 5,
+              "name": "RAW_TYPE",
+              "type": "raw"
+            },
+            {
+              "index": 6,
+              "name": "DATE_TYPE",
+              "type": "date"
+            }
+          ],
+          "connections":[
+            {
+              "db_url":"jdbc:oracle:thin:@localhost:1521/test?currentSchema=opensource_test&rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull"
+            }
+          ]
         }
-      ],
-      "connections":[
-        {
-          "db_url":"jdbc:oracle:thin:@localhost:1521/test?currentSchema=opensource_test&rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull"
-        }
-      ],
     }
 }
 ```

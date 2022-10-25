@@ -2,9 +2,9 @@
 
 Parent document: [connectors](../introduction.md)
 
-The Jdbc Connector directly connects to the database through JDBC, and imports data into other storages or imports other stored data into the database in a batch manner.
+The Jdbc Connector directly connects to the database through JDBC, and imports data into other storages or imports other stored data into the database in a batch manner. JDBC connectors internally read from slaves to minimize the impact on DB.
 
-Currently, supports reading and writing three kinds of data sources including MySQL, PgSQL, SqlServer.
+Currently, supports reading and writing three kinds of data sources including MySQL, Oracle, PgSQL, SqlServer.
 
 ## Supported data types
 
@@ -339,8 +339,10 @@ In insert mode, data will be deleted according to partition information. The fol
 
 | Param name               | Default value | Is necessary | Parameter type | Recommended value / Example value | Description                                                                                                                                                                      |               
 |--------------------------|---------------|--------------|----------------|-----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| primary_key              | -             | No           | string         | id                                | The primary key of the table, if you need to limit the rate when Oracle deletes, you need to use the primary key value to use the select limit statement to limit the delete rate |
-
+| primary_key              | -             | Yes          | string (case sensitive)        | ID                | The primary key of the table, if you need to limit the rate when Oracle deletes, you need to use the primary key value to use the select limit statement to limit the delete rate |
+| partition_name           | -             | Yes          | string (case sensitive)        | DATETIME                | Same as general parameters except value is case sensitive. |
+| db_name                  | -             | Yes          | string (case sensitive)        | DB                | Same as general parameters except value is case sensitive. |
+| columns.name             | -             | No           | string (case sensitive)        | COLUMN            | Same as general parameters except value is case sensitive. |
 ## Related document
 
 Configuration examples: [jdbc-connector-example](./jdbc_example.md)

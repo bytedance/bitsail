@@ -139,7 +139,7 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
     username = outputSliceConfig.getNecessaryOption(JdbcWriterOptions.USER_NAME, JDBCPluginErrorCode.REQUIRED_VALUE);
     password = outputSliceConfig.getNecessaryOption(JdbcWriterOptions.PASSWORD, JDBCPluginErrorCode.REQUIRED_VALUE);
     table = outputSliceConfig.getNecessaryOption(JdbcWriterOptions.TABLE_NAME, JDBCPluginErrorCode.REQUIRED_VALUE);
-    columns = provideColumns();
+    columns = outputSliceConfig.getNecessaryOption(JdbcWriterOptions.COLUMNS, JDBCPluginErrorCode.REQUIRED_VALUE);
     mysqlDataTtl = outputSliceConfig.get(JdbcWriterOptions.MYSQL_DATA_TTL);
     deleteThreshold = outputSliceConfig.get(JdbcWriterOptions.DELETE_THRESHOLD);
     deleteIntervalMs = outputSliceConfig.get(JdbcWriterOptions.DELETE_INTERVAL_MS);
@@ -162,7 +162,7 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
       jdbcUpsertUtil = initUpsertUtils();
     }
 
-    partitionName = providePartitionName();
+    partitionName = outputSliceConfig.getUnNecessaryOption(JdbcWriterOptions.PARTITION_NAME, null);
     partitionValue = outputSliceConfig.getUnNecessaryOption(JdbcWriterOptions.PARTITION_VALUE, null);
     partitionPatternFormat = outputSliceConfig.getUnNecessaryOption(JdbcWriterOptions.PARTITION_PATTERN_FORMAT, null);
     log.info("Partition Column: " + partitionName + " Partition Value: " + partitionValue + " Partition Format: " + partitionPatternFormat);
@@ -191,14 +191,6 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
     log.info("Clear query generated: " + clearQuery);
     log.info("Insert query generated: " + query);
     log.info("Validate plugin configuration parameters finished.");
-  }
-
-  protected List<ColumnInfo> provideColumns() {
-    return outputSliceConfig.getNecessaryOption(JdbcWriterOptions.COLUMNS, JDBCPluginErrorCode.REQUIRED_VALUE);
-  }
-
-  protected String providePartitionName() {
-    return outputSliceConfig.getUnNecessaryOption(JdbcWriterOptions.PARTITION_NAME, null);
   }
 
   public BaseEngineTypeInfoConverter getTypeConverter() {

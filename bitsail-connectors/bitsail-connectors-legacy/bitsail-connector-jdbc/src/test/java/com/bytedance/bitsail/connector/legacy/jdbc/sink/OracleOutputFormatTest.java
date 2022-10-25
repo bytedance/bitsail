@@ -17,32 +17,32 @@ public class OracleOutputFormatTest extends OracleOutputFormat {
   public void init() {
     this.partitionPatternFormat = "yyyyMMdd";
     this.deleteThreshold = 1000;
-    this.partitionName = "date";
-    this.tableSchema = "bitsail";
-    this.table = "bitsail_test";
-    this.tableWithSchema = "bitsail.bitsail_test";
-    this.primaryKey = "id";
+    this.partitionName = "DATE";
+    this.tableSchema = "BITSAIL";
+    this.table = "BITSAIL_TEST";
+    this.tableWithSchema = "BITSAIL.BITSAIL_TEST";
+    this.primaryKey = "ID";
     this.upsertKeys = new HashMap<>();
     this.extraPartitions = new JDBCOutputExtraPartitions(getDriverName(), getFieldQuote(), getValueQuote());;
     List<String> cols = new ArrayList<>();
-    cols.add("pk");
-    String[] shardKeys = new String[]{"pk"};
+    cols.add("PK");
+    String[] shardKeys = new String[]{"PK"};
     this.upsertKeys.put("primary_key", cols);
     this.jdbcUpsertUtil = new OracleUpsertUtil(this, shardKeys, this.upsertKeys);
   }
 
   @Test
   public void testGenClearQuery() {
-    String expectClearQuery = "delete from \"bitsail\".\"bitsail_test\" where \"id\" in (select \"id\" from \"bitsail\"." +
-            "\"bitsail_test\" where \"date\"=20201229 and rownum < 1000)";
+    String expectClearQuery = "delete from \"BITSAIL\".\"BITSAIL_TEST\" where \"ID\" in (select \"ID\" from \"BITSAIL\"." +
+            "\"BITSAIL_TEST\" where \"DATE\"=20201229 and rownum < 1000)";
     Assert.assertEquals(expectClearQuery, this.genClearQuery("20201229", "=", ""));
   }
 
   @Test
   public void testGenClearQueryWithStringPartition() {
     this.partitionType = "varchar";
-    String expectClearQuery = "delete from \"bitsail\".\"bitsail_test\" where \"id\" in (select \"id\" from \"bitsail\"." +
-            "\"bitsail_test\" where \"date\"='20201229' and rownum < 1000)";
+    String expectClearQuery = "delete from \"BITSAIL\".\"BITSAIL_TEST\" where \"ID\" in (select \"ID\" from \"BITSAIL\"." +
+            "\"BITSAIL_TEST\" where \"DATE\"='20201229' and rownum < 1000)";
     Assert.assertEquals(expectClearQuery, this.genClearQuery("20201229", "=", ""));
   }
 
@@ -50,16 +50,16 @@ public class OracleOutputFormatTest extends OracleOutputFormat {
   public void testGenInsertQuery() {
     List<ColumnInfo> columns = new ArrayList<>();
     for (int i = 0; i < 2; i++) {
-      columns.add(new ColumnInfo("col" + i, null));
+      columns.add(new ColumnInfo("COL" + i, null));
     }
 
     // Test Insert query
-    String expectedInsertQuery = "INSERT INTO bitsail.bitsail_test (\"col0\",\"col1\",\"date\")\n VALUES (?,?,?) ";
-    Assert.assertEquals(expectedInsertQuery, this.genInsertQuery("bitsail_test", columns, WriteModeProxy.WriteMode.insert));
+    String expectedInsertQuery = "INSERT INTO BITSAIL.BITSAIL_TEST (\"COL0\",\"COL1\",\"DATE\")\n VALUES (?,?,?) ";
+    Assert.assertEquals(expectedInsertQuery, this.genInsertQuery("BITSAIL_TEST", columns, WriteModeProxy.WriteMode.insert));
     // Test overwrite query MERGE INTO
-    String expectedOverwriteQuery = "MERGE INTO \"bitsail\".\"bitsail_test\" T1 USING (SELECT ? \"col0\",? \"col1\" FROM DUAL) T2 ON (T1.\"pk\"=T2.\"pk\") " +
-            "WHEN MATCHED THEN UPDATE SET \"T1\".col0=\"T2\".col0,\"T1\".col1=\"T2\".col1 " +
-            "WHEN NOT MATCHED THEN INSERT (\"col0\",\"col1\") VALUES (\"T2\".\"col0\",\"T2\".\"col1\")";
-    Assert.assertEquals(expectedOverwriteQuery, this.genInsertQuery("bitsail.bitsail_test", columns, WriteModeProxy.WriteMode.overwrite));
+    String expectedOverwriteQuery = "MERGE INTO \"BITSAIL\".\"BITSAIL_TEST\" T1 USING (SELECT ? \"COL0\",? \"COL1\" FROM DUAL) T2 ON (T1.\"PK\"=T2.\"PK\") " +
+            "WHEN MATCHED THEN UPDATE SET \"T1\".COL0=\"T2\".COL0,\"T1\".COL1=\"T2\".COL1 " +
+            "WHEN NOT MATCHED THEN INSERT (\"COL0\",\"COL1\") VALUES (\"T2\".\"COL0\",\"T2\".\"COL1\")";
+    Assert.assertEquals(expectedOverwriteQuery, this.genInsertQuery("BITSAIL.BITSAIL_TEST", columns, WriteModeProxy.WriteMode.overwrite));
   }
 }

@@ -17,19 +17,19 @@ public class OracleUpsertUtilTest extends TestCase {
   public void testGenUpsertTemplate() {
     List<String> columns = new ArrayList<>();
     for (int i = 0; i < 2; i++) {
-      columns.add("col" + i);
+      columns.add("COL" + i);
     }
 
     String[] shardKeys = new String[]{"byte"};
     Map<String, List<String>> upsertKeys = new HashMap<>();
     List<String> cols = new ArrayList<>();
-    cols.add("pk");
+    cols.add("PK");
     upsertKeys.put("primary_key", cols);
     OracleUpsertUtil upsertUtil = new OracleUpsertUtil(new OracleOutputFormat(), shardKeys, upsertKeys);
     // Test overwriting query MERGE INTO
-    String expectedOverwriteQuery = "MERGE INTO \"bitsail_test\" T1 USING (SELECT ? \"col0\",? \"col1\" FROM DUAL) T2 ON (T1.\"pk\"=T2.\"pk\") " +
-            "WHEN MATCHED THEN UPDATE SET \"T1\".col0=\"T2\".col0,\"T1\".col1=\"T2\".col1 " +
-            "WHEN NOT MATCHED THEN INSERT (\"col0\",\"col1\") VALUES (\"T2\".\"col0\",\"T2\".\"col1\")";
-    Assert.assertEquals(expectedOverwriteQuery, upsertUtil.genUpsertTemplate("bitsail_test", columns, ""));
+    String expectedOverwriteQuery = "MERGE INTO \"BITSAIL_TEST\" T1 USING (SELECT ? \"COL0\",? \"COL1\" FROM DUAL) T2 ON (T1.\"PK\"=T2.\"PK\") " +
+            "WHEN MATCHED THEN UPDATE SET \"T1\".COL0=\"T2\".COL0,\"T1\".COL1=\"T2\".COL1 " +
+            "WHEN NOT MATCHED THEN INSERT (\"COL0\",\"COL1\") VALUES (\"T2\".\"COL0\",\"T2\".\"COL1\")";
+    Assert.assertEquals(expectedOverwriteQuery, upsertUtil.genUpsertTemplate("BITSAIL_TEST", columns, ""));
   }
 }

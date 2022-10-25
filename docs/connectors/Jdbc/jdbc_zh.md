@@ -2,9 +2,9 @@
 
 上级文档: [connectors](../introduction_zh.md)
 
-Jdbc Connector 通过 JDBC 直连数据库，通过批式的方式，将数据导入到其他存储或者将其他存储的数据导入到数据库中。
+Jdbc Connector 通过 JDBC 直连数据库，通过批式的方式，将数据导入到其他存储或者将其他存储的数据导入到数据库中。JDBC connectors 读取 slaves 以最小化对数据库的影响。
 
-目前支持读取和写入 MySQL、PgSQL、SqlServer 三种数据源。
+目前支持读取和写入 MySQL、Oracle、PgSQL、SqlServer 四种数据源。
 
 ## 支持的数据类型
 
@@ -334,7 +334,10 @@ Oracle 写入的定制参数
 
 | 参数名称                     | 参数默认值 | 参数是否必须 | 参数类型   | 建议值 or 示例值 | 参数含义                                                 |
 |--------------------------|-------|--------|--------|------------|------------------------------------------------------|
-| primary_key              | -     | 否      | string | id         | 表的主键，Oracle 删除时如果需要限制速率需要利用主键值使用 select limit语句限制删除速率 |
+| primary_key              | -     | 是     | string（区分大小写）   | ID         | 表的主键，Oracle 删除时如果需要限制速率需要利用主键值使用 select limit语句限制删除速率 |
+| partition_name           | -     | 是     | string (区分大小写)   | DATETIME   | 跟通用参数相同，除了数值必須区分大小写 |
+| db_name                  | -     | 是     | string (区分大小写)   | DB         | 跟通用参数相同，除了数值必須区分大小写 |
+| columns.name             | -     | 否     | string (区分大小写)   | COLUMN     |  跟通用参数相同，除了数值必須区分大小写 |
 
 ## 相关文档
 

@@ -54,18 +54,18 @@ public class OracleSourceEngineConnectorTest {
   @Test
   public void getTypeInfoMapTest() {
     List<ColumnInfo> columnInfoList = Lists.newArrayList();
-    columnInfoList.add(new ColumnInfo("col1", "varchar"));
-    columnInfoList.add(new ColumnInfo("col2", "number"));
-    columnInfoList.add(new ColumnInfo("col3", "integer"));
-    columnInfoList.add(new ColumnInfo("col4", "int"));
-    columnInfoList.add(new ColumnInfo("col5", "smallint"));
-    columnInfoList.add(new ColumnInfo("col6", "float"));
-    columnInfoList.add(new ColumnInfo("col7", "double"));
-    columnInfoList.add(new ColumnInfo("col8", "decimal"));
-    columnInfoList.add(new ColumnInfo("col9", "bool"));
-    columnInfoList.add(new ColumnInfo("col10", "date"));
-    columnInfoList.add(new ColumnInfo("col11", "timestamp"));
-    columnInfoList.add(new ColumnInfo("col12", "blob"));
+    columnInfoList.add(new ColumnInfo("COL1", "varchar"));
+    columnInfoList.add(new ColumnInfo("COL2", "number"));
+    columnInfoList.add(new ColumnInfo("COL3", "integer"));
+    columnInfoList.add(new ColumnInfo("COL4", "int"));
+    columnInfoList.add(new ColumnInfo("COL5", "smallint"));
+    columnInfoList.add(new ColumnInfo("COL6", "float"));
+    columnInfoList.add(new ColumnInfo("COL7", "double"));
+    columnInfoList.add(new ColumnInfo("COL8", "decimal"));
+    columnInfoList.add(new ColumnInfo("COL9", "bool"));
+    columnInfoList.add(new ColumnInfo("COL10", "date"));
+    columnInfoList.add(new ColumnInfo("COL11", "timestamp"));
+    columnInfoList.add(new ColumnInfo("COL12", "blob"));
     BitSailConfiguration conf = BitSailConfiguration.from(json);
     OracleSourceEngineConnector oracleSourceExternalEngineConnector = new OracleSourceEngineConnector(conf, conf);
 
@@ -77,18 +77,18 @@ public class OracleSourceEngineConnectorTest {
     }
 
     LinkedHashMap<String, TypeInfo<?>> expectTypeInfoMap = new LinkedHashMap<>();
-    expectTypeInfoMap.put("col1", PrimitiveTypes.STRING.getTypeInfo());
-    expectTypeInfoMap.put("col2", PrimitiveTypes.BIGINT.getTypeInfo());
-    expectTypeInfoMap.put("col3", PrimitiveTypes.INT.getTypeInfo());
-    expectTypeInfoMap.put("col4", PrimitiveTypes.INT.getTypeInfo());
-    expectTypeInfoMap.put("col5", PrimitiveTypes.SHORT.getTypeInfo());
-    expectTypeInfoMap.put("col6", PrimitiveTypes.DOUBLE.getTypeInfo());
-    expectTypeInfoMap.put("col7", PrimitiveTypes.DOUBLE.getTypeInfo());
-    expectTypeInfoMap.put("col8", PrimitiveTypes.BIG_DECIMAL.getTypeInfo());
-    expectTypeInfoMap.put("col9", PrimitiveTypes.BOOLEAN.getTypeInfo());
-    expectTypeInfoMap.put("col10", PrimitiveTypes.DATE_DATE.getTypeInfo());
-    expectTypeInfoMap.put("col11", PrimitiveTypes.DATE_DATE_TIME.getTypeInfo());
-    expectTypeInfoMap.put("col12", PrimitiveTypes.BINARY.getTypeInfo());
+    expectTypeInfoMap.put("COL1", PrimitiveTypes.STRING.getTypeInfo());
+    expectTypeInfoMap.put("COL2", PrimitiveTypes.BIGINT.getTypeInfo());
+    expectTypeInfoMap.put("COL3", PrimitiveTypes.INT.getTypeInfo());
+    expectTypeInfoMap.put("COL4", PrimitiveTypes.INT.getTypeInfo());
+    expectTypeInfoMap.put("COL5", PrimitiveTypes.SHORT.getTypeInfo());
+    expectTypeInfoMap.put("COL6", PrimitiveTypes.DOUBLE.getTypeInfo());
+    expectTypeInfoMap.put("COL7", PrimitiveTypes.DOUBLE.getTypeInfo());
+    expectTypeInfoMap.put("COL8", PrimitiveTypes.BIG_DECIMAL.getTypeInfo());
+    expectTypeInfoMap.put("COL9", PrimitiveTypes.BOOLEAN.getTypeInfo());
+    expectTypeInfoMap.put("COL10", PrimitiveTypes.DATE_DATE.getTypeInfo());
+    expectTypeInfoMap.put("COL11", PrimitiveTypes.DATE_DATE_TIME.getTypeInfo());
+    expectTypeInfoMap.put("COL12", PrimitiveTypes.BINARY.getTypeInfo());
     assertEquals(actualTypeInfoMap.toString(), expectTypeInfoMap.toString());
   }
 }
