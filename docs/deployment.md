@@ -1,4 +1,4 @@
-# Deployment on Yarn
+# Deployment Guide
 
 > At present, ***BitSail*** only supports flink deployment on Yarn.<br>
 Other platforms like `native kubernetes` will be release recently.

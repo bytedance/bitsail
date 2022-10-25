@@ -169,15 +169,17 @@ bitsail-archive-${version}-SNAPSHOT
         /clients #bitsail client jar
 ```
 
-## Deployment
+## Environment Setup
 
- - To run BitSail in local IDE, please reference [Local Integration Test](docs/local_integration_test.md).
+Link to [Environment Setup](docs/env_setup.md).
 
- - To deploy BitSail on Yarn, please reference [Deployment on Yarn](docs/yarn_deployment.md).
+## Deployment Guide
 
-## Develop
+Link to [Deployment Guide](docs/deployment.md).
 
-Developers can refer [Developer Guide](docs/developer_guide.md) for better developing experience.
+## Developer Guide
+
+Link to [Developer Guide](docs/developer_guide.md).
 
 ## Contact
 

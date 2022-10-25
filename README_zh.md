@@ -157,14 +157,17 @@ bitsail-archive-${version}-SNAPSHOT
         /clients #bitsail client jar
 ```
 
-## 部署
+## 环境配置
 
- - 在本地IDE运行BitSail，请参考[本地集成测试](docs/local_integration_test_zh.md)。
- - 在Yarn上部署BitSail，请参考[Yarn部署](docs/yarn_deployment_zh.md)。
+参考 [环境配置](docs/env_setup_zh.md).
 
-## 开发
+## 部署指南
 
-开发者可参考 [开发指南](docs/developer_guide_zh.md) 获取更好地开发指导和体验。
+Link to [部署指南](docs/deployment_zh.md).
+
+## 开发指南
+
+Link to [开发指南](docs/developer_guide_zh.md).
 
 ## 联系方式
 

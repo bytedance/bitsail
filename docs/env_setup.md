@@ -1,4 +1,4 @@
-# Run Local Integration Tests
+# Environment Setup
 
 -----
 
