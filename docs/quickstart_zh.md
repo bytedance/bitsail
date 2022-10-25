@@ -8,7 +8,7 @@
 ```
 bash build.sh
 ```
-- 编译完成后，产出文件储存在此目录下 `bitsail-dist/target/bitsail-dist-1.0.0-SNAPSHOT-bin/bitsail-archive-1.0.0-SNAPSHOT`
+- 编译完成后，产出文件储存在此目录下 `bitsail-dist/target/bitsail-dist-${version}-SNAPSHOT-bin/bitsail-archive-${version}-SNAPSHOT`
 
 ## 运行本地集成测试
 ### 前置要求
@@ -27,7 +27,7 @@ After the prerequisite package be installed correctly. We will be able to run th
 解压文件夹后，项目产物文件结构如下：
 
 ``` simple
-bitsail-archive-1.0.0-SNAPSHOT    
+bitsail-archive-${version}-SNAPSHOT    
     /bin  
         /bitsail #提交启动脚本
     /conf

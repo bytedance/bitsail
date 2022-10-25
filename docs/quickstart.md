@@ -9,7 +9,7 @@ At present, ***BitSail*** is mainly designed with the ELT model, and bears the d
 ```
 bash build.sh
 ```
-- After the build completed, you can find the jar file under the path `bitsail-dist/target/bitsail-dist-1.0.0-SNAPSHOT-bin/bitsail-archive-1.0.0-SNAPSHOT`
+- After the build completed, you can find the jar file under the path `bitsail-dist/target/bitsail-dist-${version}-SNAPSHOT-bin/bitsail-archive-${version}-SNAPSHOT`
 
 ## Run Local Integration Tests
 ### Prerequisite
@@ -25,7 +25,7 @@ For example, `com.bytedance.bitsail.connector.legacy.kafka.source.KafkaSourceITC
 After build the project, the project production file structure is as follows:
 
 ``` simple
-bitsail-archive-1.0.0-SNAPSHOT    
+bitsail-archive-${version}-SNAPSHOT    
     /bin  
         /bitsail #Startup script
     /conf
