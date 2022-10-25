@@ -11,14 +11,6 @@ bash build.sh
 ```
 - After the build completed, you can find the jar file under the path `bitsail-dist/target/bitsail-dist-${version}-SNAPSHOT-bin/bitsail-archive-${version}-SNAPSHOT`
 
-## Run Local Integration Tests
-### Prerequisite
-- JDK8
-- maven 3.6+
-- Docker desktop: https://www.docker.com/products/docker-desktop/
-
-Details can be seen [how to run local integration tests?](./local_integration_test.md)
-
 ## <span id="jump_product_structure">Produced file</span>
 
 After build the project, the project production file structure is as follows:
@@ -42,6 +34,14 @@ bitsail-archive-${version}-SNAPSHOT
         /components #components jars，such as metric、dirty-collector
         /clients #bitsail client jar
 ```
+
+## Run Local Integration Tests
+### Prerequisite
+- JDK8
+- maven 3.6+
+- [Docker desktop](https://www.docker.com/products/docker-desktop/)
+
+Details can be seen [how to run local integration tests?](./local_integration_test.md)
 
 ## Submit BitSail job
 
