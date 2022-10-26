@@ -11,6 +11,8 @@
 
 - [Hive连接器](./hive/hive_zh.md)
 
+- [HBase连接器](./hbase/hbase_zh.md)
+
 - [Hudi连接器](./hudi/hudi_zh.md)
 
 - [Kafka连接器](./kafka/kafka_zh.md)
