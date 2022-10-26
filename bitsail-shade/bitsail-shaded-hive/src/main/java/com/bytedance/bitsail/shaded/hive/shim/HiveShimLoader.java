@@ -67,6 +67,6 @@ public class HiveShimLoader {
   }
 
   public static String getHiveVersion() {
-    return HiveVersionInfo.getVersion();
+    return HiveVersionInfo.getShortVersion();
   }
 }

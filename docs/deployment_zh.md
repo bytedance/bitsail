@@ -1,4 +1,4 @@
-## 部署指南
+# 部署指南
 
 > 目前 BitSail 仅支持在Yarn上部署。
 > 其他平台上的部署（例如原生kubernetes）将在不久后支持。
@@ -96,10 +96,10 @@ bash ./bin/bitsail run --engine flink --conf [job_conf_path] --execution-mode ru
 
 ## <span id="jump_submit_example">提交一个示例作业</span>
 
-可以使用如下指令提交一个 Fake2Print 作业到测试队列。
+可以使用如下指令提交一个 Fake2Print 测试作业到default队列。
 
 ``` bash
-bash ./bin/bitsail run --engine flink --conf ~/bitsail-archive-1.0.0-SNAPSHOT/examples/Fake_Proint_Example.json --execution-mode run -p 1=1  --deployment-mode yarn-per-job  --queue default
+bash ./bin/bitsail run --engine flink --conf ~/bitsail-archive-0.1.0-SNAPSHOT/examples/Fake_Proint_Example.json --execution-mode run -p 1=1  --deployment-mode yarn-per-job  --queue default
 ```
 
 ## <span id="jump_log">调试日志</span>

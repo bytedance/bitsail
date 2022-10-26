@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.jdbc.sink;
+package com.bytedance.bitsail.connector.legacy.jdbc.source;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.connector.legacy.jdbc.options.JdbcWriterOptions;
+import com.bytedance.bitsail.connector.legacy.jdbc.model.ClusterInfo;
+import com.bytedance.bitsail.connector.legacy.jdbc.model.ConnectionInfo;
+import com.bytedance.bitsail.connector.legacy.jdbc.options.JdbcReaderOptions;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,14 +34,13 @@ import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.lifecycle.Startables;
 
-import java.util.Map;
 import java.util.stream.Stream;
 
 /**
- * Created 2022/10/18
+ * Created 2022/10/25
  */
-public class OracleSinkITCase {
-  private static final Logger LOG = LoggerFactory.getLogger(OracleSinkITCase.class);
+public class OracleSourceITCase {
+  private static final Logger LOG = LoggerFactory.getLogger(OracleSourceITCase.class);
 
   public static final String ORACLE_DOCKER_IMAGER = "gvenzl/oracle-xe:18.4.0-slim";
 
@@ -49,11 +49,11 @@ public class OracleSinkITCase {
   @Before
   public void before() {
     container = new OracleContainer(ORACLE_DOCKER_IMAGER)
-        .withDatabaseName("TEST")
-        .withUsername("TEST")
-        .withPassword("TEST_PASSWORD")
-        .withInitScript("scripts/fake_to_oracle_sink.sql")
-        .withLogConsumer(new Slf4jLogConsumer(LOG));
+            .withDatabaseName("TEST")
+            .withUsername("TEST")
+            .withPassword("TEST_PASSWORD")
+            .withInitScript("scripts/oracle_source_to_print.sql")
+            .withLogConsumer(new Slf4jLogConsumer(LOG));
 
     /*
      * This test may get Error of 'SP2-0306: Invalid option.' when running on Apple M chips.
@@ -69,13 +69,17 @@ public class OracleSinkITCase {
 
   @Test
   public void testInsertModeOracle() throws Exception {
-    BitSailConfiguration globalConfiguration = JobConfUtils.fromClasspath("scripts/fake_to_oracle_sink.json");
+    BitSailConfiguration globalConfiguration = JobConfUtils.fromClasspath("scripts/oracle_source_to_print.json");
 
-    Map<String, Object> connection = Maps.newHashMap();
-    connection.put("db_url", container.getJdbcUrl());
-    connection.put("host", container.getHost());
-    connection.put("port", container.getFirstMappedPort());
-    globalConfiguration.set(JdbcWriterOptions.CONNECTIONS, Lists.newArrayList(connection));
+    ConnectionInfo connectionInfo = ConnectionInfo.builder()
+            .host(container.getHost())
+            .port(container.getFirstMappedPort())
+            .url(container.getJdbcUrl())
+            .build();
+    ClusterInfo clusterInfo = ClusterInfo.builder()
+            .slaves(connectionInfo)
+            .build();
+    globalConfiguration.set(JdbcReaderOptions.CONNECTIONS, Lists.newArrayList(clusterInfo));
     EmbeddedFlinkCluster.submitJob(globalConfiguration);
   }
 }

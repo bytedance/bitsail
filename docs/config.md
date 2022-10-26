@@ -1,4 +1,5 @@
-# Job configuration description
+# Job Configuration Description
+[Chinese Version](config_zh.md)
 
 ***BitSail*** script configuration is managed by JSON structure, follow scripts show the complete structure:
 
@@ -24,7 +25,7 @@
 | reader/readers | It is mainly responsible for setting relevant parameter information on the source data side. Taking the MySQL data source as an example, you need to set the JDBC connection information and the database table information of the operation under the subdomain of the reader.                     |
 | writer/writers | Mainly responsible for setting the relevant parameters of the target data source, etc. Taking the Hive target data source as an example, you need to set the Hive metastore connection information under the writer's subdomain, and set the Hive database table and partition related information. |
 
-## common Module
+## Common Module
 
 Example：
 
@@ -131,7 +132,7 @@ Common Parameter：
 
 Other parameters please check the [connector](./connectors)
 
-## writer Module
+## Writer Module
 
 ``` json
 {

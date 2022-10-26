@@ -41,7 +41,7 @@ public class EmbeddedFlinkCluster {
       throw new IllegalStateException("Submit failed, configuration is empty");
     }
     overwriteConfiguration(globalConfiguration);
-    LOG.info("Final Configuration: {}.\n", globalConfiguration.beautify());
+    LOG.info("Final Configuration: {}.\n", globalConfiguration.desensitizedBeautify());
     CoreCommandArgs coreCommandArgs = new CoreCommandArgs();
     coreCommandArgs.setEngineName("flink");
     UnificationJob<T> job = new UnificationJob<>(globalConfiguration, coreCommandArgs);

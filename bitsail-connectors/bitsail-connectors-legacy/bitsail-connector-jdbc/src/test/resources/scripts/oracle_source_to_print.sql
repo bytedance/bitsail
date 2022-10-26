@@ -15,20 +15,16 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.flink.core.legacy.connector.transformer;
+create table ORACLE_DYNAMIC_TABLE
+(
+    ID          VARCHAR2(1024),
+    INT_TYPE    NUMBER,
+    BIGINT_TYPE NUMBER,
+    FLOAT_TYPE  NUMBER,
+    DOUBLE_TYPE NUMBER,
+    RAW_TYPE    RAW(1024),
+    DATE_TYPE   DATE
+);
 
-import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-
-import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.types.Row;
-
-public interface TransformInterface {
-  default DataStream<Row> transform(DataStream<Row> input, BitSailConfiguration commonConf) {
-    AbstractTransform transform = getTransform();
-    FlinkTransformWithMessengerCollector flinkTransform = new FlinkTransformWithMessengerCollector(commonConf);
-    flinkTransform.setTransform(transform);
-    return input.process(flinkTransform, flinkTransform.getProducedType()).name(transform.getTransformName());
-  }
-
-  AbstractTransform getTransform();
-}
+insert into ORACLE_DYNAMIC_TABLE (ID, INT_TYPE, BIGINT_TYPE, FLOAT_TYPE, DOUBLE_TYPE, RAW_TYPE, DATE_TYPE)
+values ('id', 123, 1e12, 1.23, 1.2345, '1afe28', '05-JUL-2022');
