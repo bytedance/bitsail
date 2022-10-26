@@ -56,6 +56,6 @@ public class FlinkRunCommandArgs implements CommandArgs {
   private int priority = 5;
 
   @Parameter(names = "--jm-address",
-      description = "Specify the job manager to use, eg: localhost:8001.")
+      description = "Specify the job manager to use, eg: localhost:8081.")
   private String jobManagerAddress;
 }
