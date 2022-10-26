@@ -28,6 +28,7 @@ import com.bytedance.bitsail.entry.flink.deployment.yarn.YarnDeploymentSupplier;
 public class DeploymentSupplierFactory {
 
   private static final String DEPLOYMENT_LOCAL = "local";
+  private static final String DEPLOYMENT_REMOTE = "remote";
   private static final String DEPLOYMENT_YARN_PER_JOB = "yarn-per-job";
   private static final String DEPLOYMENT_YARN_SESSION = "yarn-session";
   private static final String DEPLOYMENT_YARN_APPLICATION = "yarn-application";
@@ -37,6 +38,7 @@ public class DeploymentSupplierFactory {
 
     switch (deploymentMode) {
       case DEPLOYMENT_LOCAL:
+      case DEPLOYMENT_REMOTE:
         return new LocalDeploymentSupplier(flinkCommandArgs);
       case DEPLOYMENT_YARN_PER_JOB:
       case DEPLOYMENT_YARN_SESSION:
