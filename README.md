@@ -1,20 +1,65 @@
 # BitSail
 
-![](docs/images/bitsail.png)
-
 ## Introduce
+BitSail is ByteDance's open source data integration engine which is based on distributed architecture and provides high performance. It supports data synchronization between multiple heterogeneous data sources, and provides global data integration solutions in offline, real-time, and incremental scenarios. At present, it serves almost all business lines in ByteDance, such as Douyin, Toutiao, etc., and synchronizes hundreds of trillions data every day.
 
-***BitSail*** is a data integration framework that is based on the Flink engine and both support streaming and batch mode.
-At present, ***BitSail*** is mainly designed with the ELT model, which have EB data size and use for Bytedance。<br/>
+## Why do we use BitSail
+BitSail has been widely used and supports hundreds of trillions of large traffic. At the same time, it has been verified in various scenarios such as the cloud native environment of the volcano engine and the customer's private cloud environment.
 
-## Feature
+We have accumulated a lot of experience and made a number of optimizations to improve the function of data integration
 
-- Middle Data types, Support convert between the difference data types.
-- plug-in, can implement difference plugins by user according the difference situation.
-- In Batch mode, support the auto alignment the schema between upstream and downstream.
-- In Streaming mode, support alignment the hive schemas automatically.
-- In Streaming mode, auto-detect the exists checkpoint and apply when job restart.
-- ...
+- Global Data Integration, covering offline、streaming and incremental scenarios
+
+- Distributed and cloud-native architecture, supporting horizontal scaling
+
+- High maturity in terms of accuracy、stability and performance
+
+- Rich basic functions, such as type conversion、dirty data processing、flow control、streaming archiving、data lake integration, automatic concurrency inference, etc.
+
+- Task running status monitoring, such as traffic、QPS、dirty data、delay, etc.
+
+## BitSail use scenarios
+- Mass data synchronization in heterogeneous data sources
+
+- Stream-batch integrated data processing capability
+
+- Lake and warehouse integration data processing capability
+
+- High-performance, highly reliable data synchronization
+
+- Distributed, cloud-native architecture data integration engine
+
+## Features of BitSail
+
+- Low start-up cost and high flexibility
+
+- Stream-batch integration and lake-warehouse integration architecture, one framework covers almost all data synchronization scenarios
+
+- High-performance, massive data processing capabilities
+
+- DDL automatic synchronization
+
+- Type system, conversion between different data source types
+
+- Engine-independent read-write interface, low development cost
+
+- Real-time display of task progress percentage, in development
+
+- Real-time monitoring of task status
+
+## Architecture of BitSail
+ ![](docs/images/bitsail_arch.png)
+ 
+ ```
+ Source[Input Sources] -> Framework[Data Transmission] -> Sink[Output Sinks]
+ ```
+The data processing pipeline is as follows. First, pull the source data through Input Sources, then process it through the intermediate framework layer, and finally write the data to the target through Output Sinks
+
+At the framework layer, we provide rich functions and take effect for all synchronization scenarios, such as dirty data collection, auto parallelism calculation, task monitoring, etc.
+
+In data synchronization scenarios, it covers batch, streaming, and incremental data synchronization
+
+In the Runtime layer, it supports multiple execution modes, such as yarn, local, and k8s is under development
 
 ## Requirements
 
@@ -184,17 +229,4 @@ Link to [Developer Guide](docs/developer_guide.md).
 ## Contact
 
 ## License
-
-Apache 2.0 License
-
-## Thanks
-
-This project refers to some excellent codes of open source data integration tools in the industry, and I would like to
-express my thanks to them
-<br/>
-[DataX](https://github.com/alibaba/DataX)<br/>
-[chunjun](https://github.com/DTStack/chunjun)<br/>
-
-
-
-
+[Apache 2.0 License](LICENSE).
