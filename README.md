@@ -130,11 +130,17 @@ Join BitSail Slack channel via this [link](https://join.slack.com/t/slack-ted381
 Currently, BitSail community use Google Group as the mailing list provider.
 You need to subscribe to the mailing list before starting a conversation
 
-Start a conversation: Email to this address `bitsail@googlegroups.com`
-
 Subscribe: Email to this address `bitsail+subscribe@googlegroups.com`
 
+Start a conversation: Email to this address `bitsail@googlegroups.com`
+
 Unsubscribe: Email to this address `bitsail+unsubscribe@googlegroups.com`
+
+### WeChat Group
+If you have WeChat account, please scan this QR code to connect with the BitSail community assistant
+and join the WeChat group chat.
+
+<img src="docs/images/wechat_QR.png" alt="qr" width="100"/>
 
 ## Environment Setup
 Link to [Environment Setup](docs/env_setup.md).
