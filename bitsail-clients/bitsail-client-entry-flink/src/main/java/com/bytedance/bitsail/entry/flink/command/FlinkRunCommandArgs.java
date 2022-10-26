@@ -36,7 +36,6 @@ public class FlinkRunCommandArgs implements CommandArgs {
   private String executionMode;
 
   @Parameter(names = {"--queue"},
-      required = true,
       description = "Yarn queue's name when you use yarn deployment mode.")
   private String queue;
 
@@ -56,4 +55,7 @@ public class FlinkRunCommandArgs implements CommandArgs {
       description = "Specify the job's priority in resource manager, eg: yarn.")
   private int priority = 5;
 
+  @Parameter(names = "--jm-address",
+      description = "Specify the job manager to use, eg: localhost:6123.")
+  private String jobManagerAddress;
 }
