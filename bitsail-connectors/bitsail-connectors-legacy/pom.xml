@@ -27,9 +27,11 @@
     <packaging>pom</packaging>
     <modules>
         <module>bitsail-connector-hadoop</module>
+        <module>bitsail-connector-hbase</module>
         <module>bitsail-connector-hive</module>
         <module>bitsail-connector-hudi</module>
         <module>bitsail-connector-kafka</module>
+        <module>bitsail-connector-rocketmq</module>
         <module>bitsail-connector-messagequeue</module>
         <module>bitsail-connector-streamingfile</module>
         <module>bitsail-connector-fake</module>
@@ -37,6 +39,7 @@
         <module>bitsail-connector-mongodb</module>
         <module>bitsail-connector-redis</module>
         <module>bitsail-connector-print</module>
+        <module>bitsail-connector-larksheet</module>
     </modules>
 
     <dependencyManagement>

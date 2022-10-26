@@ -12,6 +12,8 @@
 
 - [Hive connector](./hive/hive.md)
 
+- [HBase connector](./hbase/hbase.md)
+
 - [Hudi connector](./hudi/hudi.md)
 
 - [Kafka connector](./kafka/kafka.md)
@@ -25,4 +27,6 @@
 - [StreamingFile connector](./StreamingFile/StreamingFile.md)
 
 - [Jdbc connector](./Jdbc/jdbc.md)
+
+- [LarkSheet_connector](./larksheet/larksheet.md)
 
