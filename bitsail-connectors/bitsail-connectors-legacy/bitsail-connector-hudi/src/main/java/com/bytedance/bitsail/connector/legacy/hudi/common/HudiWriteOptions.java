@@ -35,4 +35,12 @@ public interface HudiWriteOptions {
       key(WRITER_PREFIX + "timestamp-format")
           .defaultValue("iso_8601");
 
+  ConfigOption<Integer> COMPACTION_MAX_PARALLELISM =
+      key(WRITER_PREFIX + "compaction-max-parallelism")
+          .defaultValue(50);
+
+  ConfigOption<Integer> COMPACTION_FILE_PER_TASK =
+      key(WRITER_PREFIX + "compaction-file-per-task")
+          .defaultValue(2);
+
 }

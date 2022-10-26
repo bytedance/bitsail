@@ -42,7 +42,13 @@ The latest version of bitsail has the following minimal requirements:
   <tr>
     <td>Hadoop</td>
     <td>-</td>
-    <td>❎</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
+    <td>Hbase</td>
+    <td>-</td>
+    <td>✅</td>
     <td>✅</td>
   </tr>
   <tr>
@@ -58,16 +64,49 @@ The latest version of bitsail has the following minimal requirements:
     <td>✅</td>
   </tr>
   <tr>
-    <td>StreamingFile(Hadoop Streaming mode.)</td>
+    <td>RocketMQ</td>
     <td>-</td>
-    <td>❎</td>
+    <td> </td>
     <td>✅</td>
   </tr>
   <tr>
-    <td rowspan="3">JDBC</td>
+    <td>StreamingFile (Hadoop Streaming mode.)</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Redis</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Doris</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>MongoDB</td>
+    <td>-</td>
+    <td>✅</td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Doris</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
+    <td rowspan="4">JDBC</td>
     <td>MySQL</td>
-    <td rowspan="3">✅</td>
-    <td rowspan="3">✅</td>
+    <td rowspan="4">✅</td>
+    <td rowspan="4">✅</td>
+  </tr>
+  <tr>
+    <td>Oracle</td>
   </tr>
   <tr>
     <td>PostgreSQL</td>
@@ -79,12 +118,12 @@ The latest version of bitsail has the following minimal requirements:
     <td>Fake</td>
     <td>-</td>
     <td>✅</td>
-    <td>❎</td>
+    <td> </td>
   </tr>
   <tr>
     <td>Print</td>
     <td>-</td>
-    <td>❎</td>
+    <td> </td>
     <td>✅</td>
   </tr>
 </table>
@@ -108,9 +147,39 @@ We also prepare a profile for `flink-embedded`, you can use follow command:
 mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true -Pflink-embedded
 ```
 
-## QuickStart & Architecture
+After building the project, the project production file structure is as follows:
 
-Reference [QuickStart](./docs/quickstart.md)
+``` simple
+bitsail-archive-${version}-SNAPSHOT    
+    /bin  
+        /bitsail #Startup script
+    /conf
+        /bitsail.conf #bitsail system config
+    /embedded
+        /flink #embedded flink
+    /examples #examples configuration files
+        /example-datas #examples data
+        /Fake_xx_Example.json #Fake source to xx examples config files
+        /xx_Print_Example.json #xx to print sink examples config files
+    /libs #jar libs
+        /bitsail-core.jar #entering jar package
+        /connectors #connector plugin jars
+            /mapping #connector plugin config files
+        /components #components jars，such as metric、dirty-collector
+        /clients #bitsail client jar
+```
+
+## Environment Setup
+
+Link to [Environment Setup](docs/env_setup.md).
+
+## Deployment Guide
+
+Link to [Deployment Guide](docs/deployment.md).
+
+## Developer Guide
+
+Link to [Developer Guide](docs/developer_guide.md).
 
 ## Contact
 
