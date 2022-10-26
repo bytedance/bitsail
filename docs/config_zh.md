@@ -24,7 +24,7 @@
 | reader/readers | 主要负责设置源数据侧相关参数信息等。以MySQL数据源进行举例，需要在reader的子域下设置JDBC的连接信息，操作的库表信息等。                  |
 | writer/writers | 主要负责设置目标数据源的相关参数等。以Hive目标数据源为例，需要在writer的子域下设置Hive的metastore连接信息，设置Hive库表、分区的相关信息等。 |
 
-## common 模块
+## Common 模块
 
 示例：
 
@@ -74,7 +74,7 @@
 | dirty_records_count_threshold     | FALSE | -1  | 整体脏数据的阈值设置，如果在传输结束后发现脏数据多于该设置，作业失败。        | -1  |
 | dirty_record_percentage_threshold | FALSE | -1  | 整体脏数据占整体传输数据的比例，如果传输结束后发现脏数据的比例大于该阈值，作业失败。 | -1  |
 
-## reader 模块
+## Reader 模块
 
 字节跳动数据集成目前支持多数据源写入的同时读取，在支持多数据源读取的场景下，要求上游数据源的输入数据schema需要保持一致，下面介绍Reader模块的具体信息。
 
@@ -134,7 +134,7 @@
 
 其他参数详情：参考具体 connector 实现参数
 
-## writer 模块
+## Writer 模块
 
 字节跳动数据集成目前支持同时写出到多个目标数据源，多个写出的目标数据源的schema需要保持一致。下面介绍Writer模块的具体组成信息。
 

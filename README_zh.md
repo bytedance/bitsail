@@ -156,11 +156,17 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
 当前，BitSail社区通过谷歌群组作为邮件列表的提供者，邮件列表可以在绝大部分地区正常收发邮件。
 在订阅BitSail小组的邮件列表后可以通过发送邮件发言
 
+订阅: 发送Email到此地址 `bitsail+subscribe@googlegroups.com`，
+你会收到一封回信询问你是否希望加入BitSail群组，`Join This Group`按钮可能因网络原因无法使用，直接回复此封邮件便可确认加入。
+
 开启一个话题: 发送Email到此地址 `bitsail@googlegroups.com`
 
-订阅: 发送Email到此地址 `bitsail+subscribe@googlegroups.com`
-
 取消订阅: 发送Email到此地址 `bitsail+unsubscribe@googlegroups.com`
+
+### 微信群
+欢迎添加小助手好友加入BitSail微信群参与社区讨论与贡献
+
+<img src="docs/images/wechat_QR.png" alt="qr" width="100"/>
 
 ## 环境配置
 跳转[环境配置](docs/env_setup_zh.md).
