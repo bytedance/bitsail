@@ -15,18 +15,27 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.redis.error;
+package com.bytedance.bitsail.connector.legacy.larksheet.source;
 
-/**
- * Job fails when catch this exception.
- **/
-public class UnexpectedException extends RuntimeException {
+import com.bytedance.bitsail.connector.legacy.larksheet.meta.SheetMeta;
 
-  public UnexpectedException(String message) {
-    super(message);
-  }
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.ToString;
+import org.apache.flink.core.io.InputSplit;
 
-  public UnexpectedException(String message, Throwable cause) {
-    super(message, cause);
+@Data
+@ToString
+@AllArgsConstructor
+public class LarkSheetInputSplit implements InputSplit {
+  SheetMeta sheetMeta;
+  String sheetToken;
+  String sheetId;
+  int startRowNumber;
+  int endRowNumber;
+
+  @Override
+  public int getSplitNumber() {
+    return 0;
   }
 }

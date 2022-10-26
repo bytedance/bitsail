@@ -24,3 +24,5 @@
 - [StreamingFile连接器](./StreamingFile/StreamingFile_zh.md)
 
 - [Jdbc连接器](./Jdbc/jdbc_zh.md)
+  
+- [飞书表格连接器](./larksheet/larksheet_zh.md)

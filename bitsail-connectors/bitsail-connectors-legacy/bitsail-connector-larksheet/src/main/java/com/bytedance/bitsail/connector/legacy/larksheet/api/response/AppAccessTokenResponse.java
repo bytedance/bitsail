@@ -15,18 +15,32 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.redis.error;
+package com.bytedance.bitsail.connector.legacy.larksheet.api.response;
 
-/**
- * Job fails when catch this exception.
- **/
-public class UnexpectedException extends RuntimeException {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-  public UnexpectedException(String message) {
-    super(message);
-  }
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString(callSuper = true)
+public class AppAccessTokenResponse extends OpenApiBaseResponse {
 
-  public UnexpectedException(String message, Throwable cause) {
-    super(message, cause);
-  }
+  /**
+   * app_access_token
+   */
+  private String appAccessToken;
+
+  /**
+   * expire time in seconds
+   */
+  private int expire;
+
+  /**
+   * tenant_access_token
+   */
+  private String tenantAccessToken;
+
 }

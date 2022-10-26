@@ -37,6 +37,7 @@
         <module>bitsail-connector-jdbc</module>
         <module>bitsail-connector-redis</module>
         <module>bitsail-connector-print</module>
+        <module>bitsail-connector-larksheet</module>
     </modules>
 
     <dependencyManagement>

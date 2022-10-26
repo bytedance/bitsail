@@ -15,18 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.redis.error;
+package com.bytedance.bitsail.connector.legacy.larksheet.meta;
 
-/**
- * Job fails when catch this exception.
- **/
-public class UnexpectedException extends RuntimeException {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.ToString;
 
-  public UnexpectedException(String message) {
-    super(message);
-  }
+import java.io.Serializable;
 
-  public UnexpectedException(String message, Throwable cause) {
-    super(message, cause);
-  }
+@Data
+@ToString
+@AllArgsConstructor
+public class SheetInfo implements Serializable {
+  SheetMeta sheetMeta;
+  String sheetId;
+  String sheetToken;
 }

@@ -15,18 +15,35 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.redis.error;
+package com.bytedance.bitsail.connector.legacy.larksheet.meta;
 
-/**
- * Job fails when catch this exception.
- **/
-public class UnexpectedException extends RuntimeException {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-  public UnexpectedException(String message) {
-    super(message);
-  }
+import java.util.List;
 
-  public UnexpectedException(String message, Throwable cause) {
-    super(message, cause);
-  }
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class ValueRange {
+
+  private String majorDimension;
+
+  /**
+   * Value range.<br/>
+   * <i>e.g.</i> sheetId!A20:F20.
+   */
+  private String range;
+
+  /**
+   * Revision.
+   */
+  private int revision;
+
+  /**
+   * Two-dimensional array.
+   * From left to right and top to bottom, each element represents a data in a cell.
+   */
+  private List<List<Object>> values;
 }

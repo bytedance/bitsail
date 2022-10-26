@@ -26,8 +26,6 @@ import java.util.List;
 
 /**
  * Jedis command pipeline processor
- *
- * @author yangyun
  **/
 public interface PipelineProcessor extends Closeable {
 
