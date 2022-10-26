@@ -1,4 +1,5 @@
 # Deployment Guide
+[中文版](deployment_zh.md)
 
 > At present, ***BitSail*** only supports flink deployment on Yarn.<br>
 Other platforms like `native kubernetes` will be release recently.
@@ -99,7 +100,7 @@ Parameter description
 ## <span id="jump_submit_example">Submit an example job</span>
 Submit a fake source to print sink test to yarn.
 ``` bash
-bash ./bin/bitsail run --engine flink --conf ~/bitsail-archive-1.0.0-SNAPSHOT/examples/Fake_Print_Example.json --execution-mode run -p 1=1  --deployment-mode yarn-per-job  --queue default
+bash ./bin/bitsail run --engine flink --conf ~/bitsail-archive-0.1.0-SNAPSHOT/examples/Fake_Print_Example.json --execution-mode run -p 1=1  --deployment-mode yarn-per-job  --queue default
 ```
 
 ## <span id="jump_log">Log for Debugging</span>

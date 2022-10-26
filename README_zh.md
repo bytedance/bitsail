@@ -2,7 +2,6 @@
 
 ![](docs/images/bitsail.png)
 
-
 ## 介绍
 
 *BitSail*是一款基于Flink引擎，同时支持流批数据同步的数据集成框架。
@@ -17,7 +16,7 @@
 - 流式场景下托管checkpoint，启动时自动选择符合要求的checkpoint路径。
 - ...
 
-## 支持插件列表
+## 支持连接器列表
 <table>
   <tr>
     <th>DataSource</th>
@@ -120,67 +119,31 @@
   </tr>
 </table>
 
-## 如何编译
+## 社区支持
+### Slack
+通过此链接可以直接下载并加入BitSail的Slack频道 [link](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
 
-下载代码后，可以执行
+### 邮件列表
+当前，BitSail社区通过谷歌群组作为邮件列表的提供者，邮件列表可以在绝大部分地区正常收发邮件。
+在订阅BitSail小组的邮件列表后可以通过发送邮件发言
 
-```
-mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true
-```
+开启一个话题: 发送Email到此地址 `bitsail@googlegroups.com`
 
-然后可以在目录下`bitsail-dist/target/`找到相应的产物。
-默认情况下产物中不会内嵌flink，如需内嵌flink，可以使用命令：
+订阅: 发送Email到此地址 `bitsail+subscribe@googlegroups.com`
 
-```
-mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true -Pflink-embedded
-```
-
-打包完成后，产物的目录结构如下:
-
-``` simple
-bitsail-archive-${version}-SNAPSHOT    
-    /bin  
-        /bitsail #Startup script
-    /conf
-        /bitsail.conf #bitsail system config
-    /embedded
-        /flink #embedded flink
-    /examples #examples configuration files
-        /example-datas #examples data
-        /Fake_xx_Example.json #Fake source to xx examples config files
-        /xx_Print_Example.json #xx to print sink examples config files
-    /libs #jar libs
-        /bitsail-core.jar #entering jar package
-        /connectors #connector plugin jars
-            /mapping #connector plugin config files
-        /components #components jars，such as metric、dirty-collector
-        /clients #bitsail client jar
-```
+取消订阅: 发送Email到此地址 `bitsail+unsubscribe@googlegroups.com`
 
 ## 环境配置
+跳转[环境配置](docs/env_setup_zh.md).
 
-参考 [环境配置](docs/env_setup_zh.md).
+## 如何部署
+跳转[部署指南](docs/deployment_zh.md).
 
-## 部署指南
+## BitSail参数指引
+跳转[参数指引](docs/config_zh.md)
 
-Link to [部署指南](docs/deployment_zh.md).
-
-## 开发指南
-
-Link to [开发指南](docs/developer_guide_zh.md).
-
-## 联系方式
+## 如何贡献
+跳转[贡献者指引](docs/contributing_zh.md)
 
 ## 开源协议
-
 Apache 2.0 License
-
-## 感谢
-
-本项目的中参考了部分业界已经开源数据集成工具的优秀代码，特此向其表示感谢。<br/>
-[DataX](https://github.com/alibaba/DataX)<br/>
-[chunjun](https://github.com/DTStack/chunjun)<br/>
-
-
-
-
