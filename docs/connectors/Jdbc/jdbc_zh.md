@@ -2,9 +2,9 @@
 
 上级文档: [connectors](../introduction_zh.md)
 
-Jdbc Connector 通过 JDBC 直连数据库，通过批式的方式，将数据导入到其他存储或者将其他存储的数据导入到数据库中。
+Jdbc Connector 通过 JDBC 直连数据库，通过批式的方式，将数据导入到其他存储或者将其他存储的数据导入到数据库中。JDBC connectors 读取 slaves 以最小化对数据库的影响。
 
-目前支持读取和写入 MySQL、PgSQL、SqlServer 三种数据源。
+目前支持读取和写入 MySQL、Oracle、PgSQL、SqlServer 四种数据源。
 
 ## 支持的数据类型
 
@@ -56,6 +56,49 @@ MySQL 支持以下数据类型
 * geometry
 * multipolygon
 * set
+
+### Oracle 支持以下数据类型
+* char
+* varchar
+* interval day
+* interval year
+* intervalds
+* intervalym
+* varchar2
+* nchar
+* nvarchar2
+* long
+* blob
+* clob
+* nclob
+* string
+* character
+* number
+* integer
+* int
+* smallint
+* float
+* double
+* double precision
+* numeric
+* decimal
+* real
+* bit
+* bool
+* date
+* timestamp
+* timestamp with time zone
+* timestamp with local time zone
+* datetime
+* blob
+* bfile
+* raw
+* long raw
+* rowid
+* urowid
+* xmltype
+* binary_float
+* binary_double
 
 PgSQL 支持以下数据类型
 
@@ -169,9 +212,10 @@ SqlServer 支持以下数据类型：
 
 通用参数
 
-| 参数名称    | 参数默认值 | 参数是否必须 | 参数类型                     | 建议值 or 示例值                                                               | 参数含义                                    |
-|---------|-------|--------|--------------------------|--------------------------------------------------------------------------|-----------------------------------------|
+| 参数名称  | 参数默认值 | 参数是否必须 | 参数类型           | 建议值 or 示例值                                                            | 参数含义                                    |
+|---------|-------|--------|--------------------------|---------------------------------------------------------------------------|-------------------------------------------|
 | class   | -     | 是      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.JDBCInputFormat       | Mysql 读取 connector class 名称             |
+| class   | -     | 是      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.OracleInputFormat     | Oracle 读取 connector class 名称            |
 | class   | -     | 是      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.PostgresqlInputFormat | Pgsql 读取 connector class 名称             |
 | class   | -     | 是      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.SqlServerInputFormat  | SqlServer 读取 connector class 名称         |
 | columns | -     | 是      | list<map<string,string>> | "[ { "name":"id", "type":"int" }, { "name":"name", "type":"varchar" } ]  | Jdbc 读取的列信息。需要和writer的指定的columns数量保持一致。 |
@@ -225,9 +269,10 @@ SQL 同步配置参数
 
 通用参数
 
-| 参数名称    | 参数默认值 | 参数是否必须 | 参数类型                     | 建议值 or 示例值                                                                | 参数含义                                    |
-|---------|-------|--------|--------------------------|---------------------------------------------------------------------------|-----------------------------------------|
+| 参数名称  | 参数默认值 | 参数是否必须 | 参数类型            | 建议值 or 示例值                                                            | 参数含义                                    |
+|---------|-------|--------|--------------------------|---------------------------------------------------------------------------|--------------------------------------------|
 | class   | -     | 是      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.JDBCOutputFormat       | Mysql 写入 connector class 名称             |
+| class   | -     | 是      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.OracleOutputFormat     | Oracle 写入 connector class 名称            |
 | class   | -     | 是      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.PostgresqlOutputFormat | Pgsql 写入 connector class 名称             |
 | class   | -     | 是      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.SqlServerOutputFormat  | SqlServer 写入 connector class 名称         |
 | columns | -     | 是      | list<map<string,string>> | "[ { "name":"id", "type":"int" }, { "name":"name", "type":"varchar" } ]   | Jdbc 写入的列信息。需要和reader的指定的columns数量保持一致。 |
@@ -284,6 +329,15 @@ PgSql 写入的定制参数
 | upsert_key               | -     | 否      | string | id         | 唯一性索引，支持覆盖写，PG只支持对单个唯一性索引做覆盖写                        |
 | delete_threshold_enabled | TRUE  | 否      | string | Truefalse  | 是否需要限制删除速率，默认为true，false时不需要提供primary key            |
 | is_truncate_mode         | FALSE | 否      | string | Truefalse  | 是否为truncate模式，true会先删除全表同时不需要分区列；非truncate模式需要有分区列   |
+
+Oracle 写入的定制参数
+
+| 参数名称                     | 参数默认值 | 参数是否必须 | 参数类型   | 建议值 or 示例值 | 参数含义                                                 |
+|--------------------------|-------|--------|--------|------------|------------------------------------------------------|
+| primary_key              | -     | 是 (Sink)   | string（区分大小写）   | ID         | 表的主键，Oracle 删除时如果需要限制速率需要利用主键值使用 select limit语句限制删除速率 |
+| partition_name           | -     | 是     | string (区分大小写)   | DATETIME   | 跟通用参数相同，除了数值必須区分大小写 |
+| db_name                  | -     | 是     | string (区分大小写)   | DB         | 跟通用参数相同，除了数值必須区分大小写 |
+| columns.name             | -     | 否     | string (区分大小写)   | COLUMN     |  跟通用参数相同，除了数值必須区分大小写 |
 
 ## 相关文档
 

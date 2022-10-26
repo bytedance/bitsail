@@ -88,17 +88,7 @@ Configuration for compacting the test hudi table:
       "class":"com.bytedance.bitsail.connector.legacy.hudi.dag.HudiCompactSourceDAGBuilder"
     },
     "writer":{
-      "hoodie":{
-        "table":{
-          "name":"TestHoodieTable"
-        }
-      },
       "path":"/path/to/table",
-      "source":{
-        "avro-schema":{
-          "path":"/path/to/table/test_read_schema.avsc"
-        }
-      },
       "class":"com.bytedance.bitsail.connector.legacy.hudi.dag.HudiCompactSinkDAGBuilder"
     }
   }

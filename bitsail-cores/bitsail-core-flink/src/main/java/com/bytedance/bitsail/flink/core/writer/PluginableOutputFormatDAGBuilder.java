@@ -27,7 +27,6 @@ import com.bytedance.bitsail.common.ddl.ExternalEngineConnector;
 import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.flink.core.constants.TypeSystem;
 import com.bytedance.bitsail.flink.core.legacy.connector.OutputFormatPlugin;
-import com.bytedance.bitsail.flink.core.legacy.connector.transformer.TransformInterface;
 import com.bytedance.bitsail.flink.core.option.FlinkCommonOptions;
 import com.bytedance.bitsail.flink.core.plugins.OutputAdapter;
 
@@ -89,14 +88,7 @@ public class PluginableOutputFormatDAGBuilder<OUT extends Row> extends FlinkData
           .name(outputAdapter.getType())
           .setParallelism(source.getParallelism());
     }
-
-    if (outputFormatPlugin instanceof TransformInterface) {
-      TransformInterface transformInterface = (TransformInterface) outputFormatPlugin;
-      source = transformInterface.transform((DataStream) source, commonConfiguration);
-      source.getTransformation().setParallelism(writerParallelism);
-    } else {
-      source = outputFormatPlugin.transform((DataStream) source);
-    }
+    source = outputFormatPlugin.transform((DataStream) source);
 
     source.writeUsingOutputFormat(outputFormatPlugin)
         .name(getWriterName())

@@ -15,27 +15,16 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.base.enumerate;
+create table ORACLE_DYNAMIC_TABLE
+(
+    ID          VARCHAR2(1024),
+    INT_TYPE    NUMBER,
+    BIGINT_TYPE NUMBER,
+    FLOAT_TYPE  NUMBER,
+    DOUBLE_TYPE NUMBER,
+    RAW_TYPE    RAW(1024),
+    DATE_TYPE   DATE
+);
 
-import lombok.Getter;
-
-/**
- * @author yangyun
- **/
-public enum TtlType {
-
-  DAY(60 * 60 * 24),
-
-  HOUR(60 * 60),
-
-  MINUTE(60),
-
-  SECOND(1);
-
-  @Getter
-  int containSeconds;
-
-  TtlType(int containSeconds) {
-    this.containSeconds = containSeconds;
-  }
-}
+insert into ORACLE_DYNAMIC_TABLE (ID, INT_TYPE, BIGINT_TYPE, FLOAT_TYPE, DOUBLE_TYPE, RAW_TYPE, DATE_TYPE)
+values ('id', 123, 1e12, 1.23, 1.2345, '1afe28', '05-JUL-2022');

@@ -1,4 +1,5 @@
 # ***BitSail*** connectors
+[中文版](introduction_zh.md)
 
 -----
 
@@ -18,6 +19,8 @@
 - [Kafka connector](./kafka/kafka.md)
 
 - [Redis connector](./redis/redis.md)
+
+- [Doris connector](./doris/doris.md)
 
 - [StreamingFile connector](./StreamingFile/StreamingFile.md)
 
