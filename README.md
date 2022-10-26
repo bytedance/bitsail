@@ -1,5 +1,5 @@
 # BitSail
-[中文版](README_zh.md)
+[Chinese Version](README_zh.md)
 
 ![](docs/images/bitsail.png)
 
