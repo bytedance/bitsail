@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.base.enumerate;
+package com.bytedance.bitsail.connector.legacy.redis.core;
 
 import lombok.Getter;
 
