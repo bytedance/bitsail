@@ -63,7 +63,7 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <td>Hadoop</td>
     <td>-</td>
     <td>✅</td>
-    <td> </td>
+    <td>✅</td>
   </tr>
   <tr>
     <td>Hbase</td>
@@ -85,12 +85,6 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
   </tr>
   <tr>
     <td>RocketMQ</td>
-    <td>-</td>
-    <td> </td>
-    <td>✅</td>
-  </tr>
-  <tr>
-    <td>StreamingFile (Hadoop Streaming mode.)</td>
     <td>-</td>
     <td> </td>
     <td>✅</td>
