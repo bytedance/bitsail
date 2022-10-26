@@ -1,4 +1,5 @@
 # Job configuration description
+[Chinese Version](config_zh.md)
 
 ***BitSail*** script configuration is managed by JSON structure, follow scripts show the complete structure:
 

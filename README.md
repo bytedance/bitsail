@@ -1,13 +1,14 @@
 # BitSail
+[Chinese Version](README_zh.md)
 
 ![](docs/images/bitsail.png)
 
-## Introduce
+## Introduction
 
 ***BitSail*** is a data integration framework that is based on the Flink engine and both support streaming and batch mode.
 At present, ***BitSail*** is mainly designed with the ELT model, which have EB data size and use for Bytedance。<br/>
 
-## Feature
+## Features
 
 - Middle Data types, Support convert between the difference data types.
 - plug-in, can implement difference plugins by user according the difference situation.
@@ -16,16 +17,7 @@ At present, ***BitSail*** is mainly designed with the ELT model, which have EB d
 - In Streaming mode, auto-detect the exists checkpoint and apply when job restart.
 - ...
 
-## Requirements
-
-The latest version of bitsail has the following minimal requirements:
-
-- Java 8 and higher for the build is required. For usage Java 8 is a minimum requirement;
-- Maven 3.6 and higher;
-- Operating system: no specific requirements (tested on Windows and Linux).
-
-## Support Connectors
-
+## Supported Connectors
 <table>
   <tr>
     <th>DataSource</th>
@@ -128,73 +120,33 @@ The latest version of bitsail has the following minimal requirements:
   </tr>
 </table>
 
-Connector introduce [Connector](./docs/connectors/introduction.md)
+Documentation for [Connectors](./docs/connectors/introduction.md).
 
-## How to build from source code.
+## Community Support
+### Slack
+Join BitSail Slack channel via this [link](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
 
-First, use `git clone` to download the code.
-Then, use follow command to package
+### Mailing List
+Currently, BitSail community use Google Group as the mailing list provider.
+You need to subscribe to the mailing list before starting a conversation
 
-```
-mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true
-```
+Start a conversation: Email to this address `bitsail@googlegroups.com`
 
-Final, you will find output under the folder `bitsail-dist/target/`
+Subscribe: Email to this address `bitsail+subscribe@googlegroups.com`
 
-We also prepare a profile for `flink-embedded`, you can use follow command:
-
-```
-mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true -Pflink-embedded
-```
-
-After building the project, the project production file structure is as follows:
-
-``` simple
-bitsail-archive-${version}-SNAPSHOT    
-    /bin  
-        /bitsail #Startup script
-    /conf
-        /bitsail.conf #bitsail system config
-    /embedded
-        /flink #embedded flink
-    /examples #examples configuration files
-        /example-datas #examples data
-        /Fake_xx_Example.json #Fake source to xx examples config files
-        /xx_Print_Example.json #xx to print sink examples config files
-    /libs #jar libs
-        /bitsail-core.jar #entering jar package
-        /connectors #connector plugin jars
-            /mapping #connector plugin config files
-        /components #components jars，such as metric、dirty-collector
-        /clients #bitsail client jar
-```
+Unsubscribe: Email to this address `bitsail+unsubscribe@googlegroups.com`
 
 ## Environment Setup
-
 Link to [Environment Setup](docs/env_setup.md).
 
 ## Deployment Guide
-
 Link to [Deployment Guide](docs/deployment.md).
 
-## Developer Guide
+## BitSail Configuration
+Link to [configuration guide](docs/config.md)
 
-Link to [Developer Guide](docs/developer_guide.md).
-
-## Contact
+## Contributing Guide
+Link to [Contributing Guide](docs/contributing.md)
 
 ## License
-
 Apache 2.0 License
-
-## Thanks
-
-This project refers to some excellent codes of open source data integration tools in the industry, and I would like to
-express my thanks to them
-<br/>
-[DataX](https://github.com/alibaba/DataX)<br/>
-[chunjun](https://github.com/DTStack/chunjun)<br/>
-
-
-
-

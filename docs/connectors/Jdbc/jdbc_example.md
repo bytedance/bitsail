@@ -238,13 +238,15 @@ Parent document: [Jdbc-connector](./jdbc.md)
             "db_name":"your db name",
             "table_schema":"your schema name",
             "table_name":"your table name",
-            "primary_key":"ID",
+            "split_pk":"ID",
             "connections":[
                 {
                     "slaves":[
                         {
-                            "db_url":"jdbc:oracle:thin:@localhost:1521/test?currentSchema=opensource_test&rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull"
-                        }
+							"db_url":"jdbc:oracle:thin:@localhost:51912/TEST",
+							"host":"localhost",
+							"port":51912
+						}
                     ]
                 }
             ]
