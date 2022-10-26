@@ -17,11 +17,11 @@
 
 package com.bytedance.bitsail.connector.legacy.redis.sink;
 
-import com.bytedance.bitsail.connector.legacy.redis.core.TtlType;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.connector.legacy.redis.core.Command;
+import com.bytedance.bitsail.connector.legacy.redis.core.TtlType;
 import com.bytedance.bitsail.connector.legacy.redis.core.api.PipelineProcessor;
 import com.bytedance.bitsail.connector.legacy.redis.core.jedis.JedisCommand;
 import com.bytedance.bitsail.connector.legacy.redis.core.jedis.JedisCommandDescription;
