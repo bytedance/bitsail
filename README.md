@@ -80,7 +80,7 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <td>Hadoop</td>
     <td>-</td>
     <td>✅</td>
-    <td> </td>
+    <td>✅</td>
   </tr>
   <tr>
     <td>Hbase</td>
@@ -102,12 +102,6 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
   </tr>
   <tr>
     <td>RocketMQ</td>
-    <td>-</td>
-    <td> </td>
-    <td>✅</td>
-  </tr>
-  <tr>
-    <td>StreamingFile (Hadoop Streaming mode.)</td>
     <td>-</td>
     <td> </td>
     <td>✅</td>
