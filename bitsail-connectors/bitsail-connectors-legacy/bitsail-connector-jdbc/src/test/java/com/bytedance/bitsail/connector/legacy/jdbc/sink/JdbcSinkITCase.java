@@ -52,7 +52,7 @@ public class JdbcSinkITCase {
   public void before() {
     container = new MySQLContainerMariadbAdapter<>(DockerImageName.parse(MYSQL_DOCKER_IMAGER))
         .withUrlParam("permitMysqlScheme", null)
-        .withInitScript("scripts/fake_to_sink.sql")
+        .withInitScript("scripts/fake_to_jdbc_sink.sql")
         .withLogConsumer(new Slf4jLogConsumer(LOG));
 
     Startables.deepStart(Stream.of(container)).join();
@@ -65,7 +65,7 @@ public class JdbcSinkITCase {
 
   @Test
   public void testInsertModeMySQL() throws Exception {
-    BitSailConfiguration globalConfiguration = JobConfUtils.fromClasspath("scripts/fake_to_sink.json");
+    BitSailConfiguration globalConfiguration = JobConfUtils.fromClasspath("scripts/fake_to_jdbc_sink.json");
 
     Map<String, Object> connection = Maps.newHashMap();
     connection.put("db_url", container.getJdbcUrl());

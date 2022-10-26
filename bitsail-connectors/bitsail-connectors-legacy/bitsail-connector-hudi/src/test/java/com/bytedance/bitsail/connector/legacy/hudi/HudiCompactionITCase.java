@@ -37,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Objects;
 
 public class HudiCompactionITCase extends TestWriteBase {
 
@@ -76,8 +75,6 @@ public class HudiCompactionITCase extends TestWriteBase {
         ".HudiCompactSinkDAGBuilder");
     jobConfiguration.set(WRITER_PREFIX + FlinkOptions.PATH.key(), tempFile.getAbsolutePath());
     jobConfiguration.set(WRITER_PREFIX + FlinkOptions.TABLE_NAME.key(), "TestHoodieTable");
-    jobConfiguration.set(WRITER_PREFIX + FlinkOptions.SOURCE_AVRO_SCHEMA_PATH.key(), Objects.requireNonNull(Thread.currentThread()
-        .getContextClassLoader().getResource("test_read_schema.avsc")).toString());
   }
 
   @Test

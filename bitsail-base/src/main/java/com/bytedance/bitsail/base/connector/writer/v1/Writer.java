@@ -35,14 +35,14 @@ public interface Writer<InputT, CommT, WriterStateT> extends Serializable, Close
    *
    * @param element Input data from upstream.
    */
-  void write(InputT element);
+  void write(InputT element) throws IOException;
 
   /**
    * Flush buffered input data to target source.
    *
    * @param endOfInput Flag indicates if all input data are delivered.
    */
-  void flush(boolean endOfInput);
+  void flush(boolean endOfInput) throws IOException;
 
   /**
    * Prepare commit information before snapshotting when checkpoint is triggerred.

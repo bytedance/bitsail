@@ -88,17 +88,7 @@
       "class":"com.bytedance.bitsail.connector.legacy.hudi.source.HudiCompactSourceDAGBuilder"
     },
     "writer":{
-      "hoodie":{
-        "table":{
-          "name":"TestHoodieTable"
-        }
-      },
       "path":"/path/to/table",
-      "source":{
-        "avro-schema":{
-          "path":"/path/to/table/test_read_schema.avsc"
-        }
-      },
       "class":"com.bytedance.bitsail.connector.legacy.hudi.sink.HudiCompactSinkDAGBuilder"
     }
   }
