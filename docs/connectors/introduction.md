@@ -18,6 +18,8 @@
 
 - [Kafka connector](./kafka/kafka.md)
 
+- [RocketMQ connector](./rocketmq/rocketmq.md)
+
 - [Redis connector](./redis/redis.md)
 
 - [MongoDB connector](./mongodb/mongodb.md)
