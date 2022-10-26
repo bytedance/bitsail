@@ -118,7 +118,7 @@ public class TokenHolder {
       });
     } catch (ExecutionException | RetryException e) {
       throw new RuntimeException(String.format("Error while get app_access_token from lark open api, caused by: %s",
-          e.getMessage()), e);
+          e.getCause().getMessage()), e.getCause());
     }
 
     if (response == null || response.isFailed() || StringUtils.isBlank(response.getAppAccessToken())) {

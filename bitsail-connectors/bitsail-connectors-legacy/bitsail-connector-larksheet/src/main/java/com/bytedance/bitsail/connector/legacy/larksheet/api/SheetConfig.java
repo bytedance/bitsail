@@ -117,7 +117,6 @@ public class SheetConfig implements Serializable {
   public SheetConfig configure(BitSailConfiguration jobConf) {
     PRE_DEFINED_SHEET_TOKEN = jobConf.get(LarkSheetReaderOptions.SHEET_TOKEN);
 
-    // Required parameters.
     APP_ID = jobConf.get(LarkSheetReaderOptions.APP_ID);
     APP_SECRET = jobConf.get(LarkSheetReaderOptions.APP_SECRET);
     OPEN_API_HOST = jobConf.get(LarkSheetReaderOptions.OPEN_API_HOST);

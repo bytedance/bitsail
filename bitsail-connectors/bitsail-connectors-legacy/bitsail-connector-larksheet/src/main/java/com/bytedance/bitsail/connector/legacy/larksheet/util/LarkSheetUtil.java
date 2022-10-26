@@ -226,7 +226,7 @@ public class LarkSheetUtil {
       });
     } catch (ExecutionException | RetryException e) {
       throw new RuntimeException(String.format("Error while get meta info from lark open api," +
-          " caused by: %s, the sheet token is [%s]", e.getMessage(), sheetToken), e.getCause());
+          " caused by: %s, the sheet token is [%s]", e.getCause().getMessage(), sheetToken), e.getCause());
     }
     if (response == null) {
       throw new RuntimeException(String.format("Fetch sheet meta info from lark open api failed!, response is null, please check sheet token : [%s]", sheetToken));
@@ -258,14 +258,14 @@ public class LarkSheetUtil {
         });
       } catch (ExecutionException | RetryException e) {
         throw new RuntimeException(String.format("Error while get sheet header from lark open api," +
-            " caused by: %s", e.getMessage()), e);
+            " caused by: %s", e.getCause().getMessage()), e.getCause());
       }
       LOG.info("Sheet header response is: {}", response);
       if (response == null || response.getValues() == null || response.getValues().isEmpty()) {
         throw new RuntimeException(String.format("Fetch sheet header from lark open api failed! response is invalid" +
             " please check sheet token : [%s] and sheet id : [%s]", sheetToken, sheetMeta.getSheetId()));
       }
-      //Verify that the target schema is met
+      // Verify that the target schema is met
       sheetHeaders.add(new SheetHeader(response.getValues().get(0), readerColumns, sheetToken, sheetMeta.getSheetId()));
     }
 
@@ -297,7 +297,7 @@ public class LarkSheetUtil {
       });
     } catch (ExecutionException | RetryException e) {
       throw new RuntimeException(String.format("Error while get range[%s] from lark open api," +
-          " caused by: %s, sheet_token:[%s], sheet_id:[%s]", range, e.getMessage(), sheetToken, sheetId), e);
+          " caused by: %s, sheet_token:[%s], sheet_id:[%s]", range, e.getCause().getMessage(), sheetToken, sheetId), e.getCause());
     }
 
     if (response == null || response.getValues() == null) {
