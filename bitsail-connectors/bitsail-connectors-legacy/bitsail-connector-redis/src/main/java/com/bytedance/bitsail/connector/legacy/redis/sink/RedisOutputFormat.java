@@ -17,11 +17,11 @@
 
 package com.bytedance.bitsail.connector.legacy.redis.sink;
 
-import com.bytedance.bitsail.connector.legacy.redis.core.TtlType;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.connector.legacy.redis.RedisPipelineProcessor;
 import com.bytedance.bitsail.connector.legacy.redis.constant.RedisConstants;
+import com.bytedance.bitsail.connector.legacy.redis.core.TtlType;
 import com.bytedance.bitsail.connector.legacy.redis.core.api.PipelineProcessor;
 import com.bytedance.bitsail.connector.legacy.redis.error.RedisPluginErrorCode;
 import com.bytedance.bitsail.connector.legacy.redis.option.RedisWriterOptions;
@@ -99,7 +99,7 @@ public class RedisOutputFormat extends JedisOutputFormat {
   public void open(int taskNumber, int numTasks) throws IOException {
     super.open(taskNumber, numTasks);
 
-    JedisPoolConfig jedisPoolConfig =  new JedisPoolConfig();
+    JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
     jedisPoolConfig.setMaxTotal(RedisConstants.DEFAULT_MAX_TOTAL_CONNECTIONS);
     jedisPoolConfig.setMaxIdle(RedisConstants.DEFAULT_MAX_IDLE_CONNECTIONS);
     jedisPoolConfig.setMinIdle(RedisConstants.DEFAULT_MIN_IDLE_CONNECTIONS);
