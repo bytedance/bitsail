@@ -28,7 +28,6 @@ import com.bytedance.bitsail.common.column.MapColumn;
 import com.bytedance.bitsail.common.column.StringColumn;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.common.util.ColumnMappingUtil;
 import com.bytedance.bitsail.common.util.Pair;
 import com.bytedance.bitsail.connector.legacy.hive.runtime.MockStreamingRuntimeContextForTest;
 
@@ -69,7 +68,7 @@ import static org.mockito.ArgumentMatchers.any;
  * Created 2022/7/22
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({HiveMetaClientUtil.class, ColumnMappingUtil.class})
+@PrepareForTest({HiveMetaClientUtil.class})
 @PowerMockIgnore(value = {"javax.management.*", "org.apache.hive.*"})
 @SuppressStaticInitializationFor("javax.security.auth.kerberos.KeyTab")
 public class HiveParquetOutputFailoverTest {
@@ -105,7 +104,6 @@ public class HiveParquetOutputFailoverTest {
     System.setProperty("hadoop.home.dir", hadoopHome);
     System.setProperty("HADOOP_USER_NAME", "root");
     PowerMockito.mockStatic(HiveMetaClientUtil.class);
-    PowerMockito.mockStatic(ColumnMappingUtil.class);
 
     PowerMockito.when(HiveMetaClientUtil.getTablePath(any(), any(), any(), any())).thenReturn(filePath);
     Pair<String, String> tableSchema = new Pair<>(columnNames, columnTypes);

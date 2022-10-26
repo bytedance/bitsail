@@ -21,6 +21,7 @@ package com.bytedance.bitsail.connector.legacy.hudi.dag;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.connector.legacy.hudi.common.HudiWriteOptions;
 import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactionPlanEvent;
 import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactionPlanSourceFunction;
 import com.bytedance.bitsail.connector.legacy.hudi.configuration.FlinkOptions;
@@ -69,6 +70,12 @@ public class HudiCompactSourceDAGBuilder<T extends CompactionPlanEvent> extends 
    */
   private HoodieFlinkTable<?> table;
 
+  private HoodieCompactionPlan compactionPlan = null;
+
+  private String compactionInstantTime;
+
+  private boolean shouldRun;
+
   @Override
   public void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration) throws Exception {
     jobConf = execution.getGlobalConfiguration();
@@ -80,14 +87,27 @@ public class HudiCompactSourceDAGBuilder<T extends CompactionPlanEvent> extends 
     CompactionUtil.inferChangelogMode(conf, metaClient);
     this.writeClient = StreamerUtil.createWriteClient(conf);
     this.table = writeClient.getHoodieTable();
+    table.getMetaClient().reloadActiveTimeline();
+    HoodieTimeline timeline = table.getActiveTimeline().filterPendingCompactionTimeline();
+    Option<HoodieInstant> requested = timeline.firstInstant();
+    this.shouldRun = requested.isPresent();
+    if (shouldRun) {
+      this.compactionInstantTime = requested.get().getTimestamp();
+
+      HoodieInstant inflightInstant = HoodieTimeline.getCompactionInflightInstant(compactionInstantTime);
+      if (timeline.containsInstant(inflightInstant)) {
+        LOG.info("Rollback inflight compaction instant: [" + compactionInstantTime + "]");
+        table.rollbackInflightCompaction(inflightInstant);
+        table.getMetaClient().reloadActiveTimeline();
+      }
+      this.compactionPlan = CompactionUtils.getCompactionPlan(
+          table.getMetaClient(), compactionInstantTime);
+    }
   }
 
   @Override
   public boolean validate() {
-    table.getMetaClient().reloadActiveTimeline();
-    HoodieTimeline timeline = table.getActiveTimeline().filterPendingCompactionTimeline();
-    Option<HoodieInstant> requested = timeline.firstInstant();
-    if (!requested.isPresent()) {
+    if (!shouldRun) {
       // do nothing.
       LOG.info("No compaction plan scheduled. Skip the job.");
       return false;
@@ -102,29 +122,26 @@ public class HudiCompactSourceDAGBuilder<T extends CompactionPlanEvent> extends 
 
   @Override
   public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConf, BitSailConfiguration selfConf, ParallelismAdvice upstreamAdvice) throws Exception {
+    int parallelism;
+    if (validate() && this.compactionPlan != null) {
+      parallelism = calculateParallelism(this.compactionPlan.getOperations().size(),
+          jobConf.get(HudiWriteOptions.COMPACTION_FILE_PER_TASK),
+          jobConf.get(HudiWriteOptions.COMPACTION_MAX_PARALLELISM));
+    } else {
+      parallelism = 1;
+    }
     return ParallelismAdvice.builder()
-      .adviceParallelism(1)
+      .adviceParallelism(parallelism)
       .enforceDownStreamChain(false)
       .build();
   }
 
+  public static int calculateParallelism(int totalFileSize, int filePerTask, int maxParallelism) {
+    return Math.min((int) Math.ceil(totalFileSize / (float) filePerTask), maxParallelism);
+  }
+
   @Override
   public DataStream<T> addSource(FlinkExecutionEnviron executionEnviron, int readerParallelism) throws Exception {
-    HoodieTimeline timeline = table.getActiveTimeline().filterPendingCompactionTimeline();
-    Option<HoodieInstant> requested = timeline.firstInstant();
-    String compactionInstantTime = requested.get().getTimestamp();
-
-    HoodieInstant inflightInstant = HoodieTimeline.getCompactionInflightInstant(compactionInstantTime);
-    if (timeline.containsInstant(inflightInstant)) {
-      LOG.info("Rollback inflight compaction instant: [" + compactionInstantTime + "]");
-      table.rollbackInflightCompaction(inflightInstant);
-      table.getMetaClient().reloadActiveTimeline();
-    }
-    // generate compaction plan
-    // should support configurable commit metadata
-    HoodieCompactionPlan compactionPlan = CompactionUtils.getCompactionPlan(
-        table.getMetaClient(), compactionInstantTime);
-
     // Mark instant as compaction inflight
     HoodieInstant instant = HoodieTimeline.getCompactionRequestedInstant(compactionInstantTime);
     table.getActiveTimeline().transitionCompactionRequestedToInflight(instant);
@@ -132,6 +149,7 @@ public class HudiCompactSourceDAGBuilder<T extends CompactionPlanEvent> extends 
 
     return executionEnviron.getExecutionEnvironment()
       .addSource(new CompactionPlanSourceFunction(compactionPlan, compactionInstantTime))
+      .setParallelism(1)
       .name("compaction_source")
       .uid("uid_compaction_source")
       .rebalance();

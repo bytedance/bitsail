@@ -151,7 +151,6 @@ The following mentioned parameters should be added to `job.writer` block when us
         }
       },
       "path": "/path/to/table",
-      "format_type": "json",
       "index": {
         "type": "BUCKET"
       },
@@ -208,17 +207,7 @@ Compaction has well-defined reader and writer parameters
       "class":"com.bytedance.bitsail.connector.legacy.hudi.dag.HudiCompactSourceDAGBuilder"
     },
     "writer":{
-      "hoodie":{
-        "table":{
-          "name":"TestHoodieTable"
-        }
-      },
       "path":"/path/to/table",
-      "source":{
-        "avro-schema":{
-          "path":"/path/to/table/test_read_schema.avsc"
-        }
-      },
       "class":"com.bytedance.bitsail.connector.legacy.hudi.dag.HudiCompactSinkDAGBuilder"
     }
   }

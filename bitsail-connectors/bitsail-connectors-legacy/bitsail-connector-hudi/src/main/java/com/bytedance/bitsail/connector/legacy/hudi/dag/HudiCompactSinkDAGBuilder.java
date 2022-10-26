@@ -19,12 +19,16 @@
 package com.bytedance.bitsail.connector.legacy.hudi.dag;
 
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
+import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactFunction;
 import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactionCommitEvent;
 import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactionCommitSink;
 import com.bytedance.bitsail.connector.legacy.hudi.compact.CompactionPlanEvent;
 import com.bytedance.bitsail.connector.legacy.hudi.configuration.FlinkOptions;
+import com.bytedance.bitsail.connector.legacy.hudi.util.CompactionUtil;
+import com.bytedance.bitsail.connector.legacy.hudi.util.StreamerUtil;
 import com.bytedance.bitsail.flink.core.writer.FlinkDataWriterDAGBuilder;
 
 import lombok.Getter;
@@ -32,6 +36,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.operators.ProcessOperator;
+import org.apache.hudi.common.table.HoodieTableMetaClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +56,24 @@ public class HudiCompactSinkDAGBuilder<OUT extends CompactionPlanEvent> extends 
     jobConf = execution.getGlobalConfiguration();
     Map<String, String> properties = jobConf.getFlattenMap("job.writer.");
     conf = FlinkOptions.fromMap(properties);
+    HoodieTableMetaClient metaClient = StreamerUtil.createMetaClient(conf);
+    conf.setString(FlinkOptions.TABLE_NAME, metaClient.getTableConfig().getTableName());
+    CompactionUtil.setAvroSchema(conf, metaClient);
+    CompactionUtil.inferChangelogMode(conf, metaClient);
+  }
+
+  @Override
+  public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConf,
+                                                BitSailConfiguration writerConf,
+                                                ParallelismAdvice upstreamAdvice) {
+    int adviceWriterParallelism = upstreamAdvice.getAdviceParallelism();
+    if (writerConf.fieldExists(WriterOptions.BaseWriterOptions.WRITER_PARALLELISM_NUM) && !upstreamAdvice.isEnforceDownStreamChain()) {
+      adviceWriterParallelism = writerConf.get(WriterOptions.BaseWriterOptions.WRITER_PARALLELISM_NUM);
+    }
+    return ParallelismAdvice.builder()
+        .adviceParallelism(adviceWriterParallelism)
+        .enforceDownStreamChain(false)
+        .build();
   }
 
   @Override

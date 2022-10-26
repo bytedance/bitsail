@@ -34,6 +34,7 @@
         <module>bitsail-connectors-legacy</module>
         <module>connector-print</module>
         <module>connector-elasticsearch</module>
+        <module>connector-doris</module>
     </modules>
 
     <dependencies>

@@ -113,7 +113,7 @@ public class JdbcValueConverter implements Serializable {
             .asBitSailException(
                 DBUtilErrorCode.UNSUPPORTED_TYPE,
                 String.format(
-                    "The column data type in your configuration is not support. Column name:[%s], Column type:[%s]." +
+                    "JDBC extract: The column data type in your configuration is not support. Column name:[%s], Column type:[%s]." +
                         " Please try to change the column data type or don't transmit this column.",
                     columnName,
                     columnTypeName));
@@ -191,7 +191,7 @@ public class JdbcValueConverter implements Serializable {
             .asBitSailException(
                 DBUtilErrorCode.UNSUPPORTED_TYPE,
                 String.format(
-                    "The column data type in your configuration is not support. Column name:[%s], Column type:[%s]." +
+                    "JDBC convert: The column data type in your configuration is not support. Column name:[%s], Column type:[%s]." +
                         " Please try to change the column data type or don't transmit this column.",
                     columnName,
                     columnTypeName));

@@ -15,20 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.flink.core.legacy.connector.transformer;
+package com.bytedance.bitsail.connector.doris.committer;
 
-import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 
-import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.types.Row;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-public interface TransformInterface {
-  default DataStream<Row> transform(DataStream<Row> input, BitSailConfiguration commonConf) {
-    AbstractTransform transform = getTransform();
-    FlinkTransformWithMessengerCollector flinkTransform = new FlinkTransformWithMessengerCollector(commonConf);
-    flinkTransform.setTransform(transform);
-    return input.process(flinkTransform, flinkTransform.getProducedType()).name(transform.getTransformName());
-  }
+import java.io.Serializable;
 
-  AbstractTransform getTransform();
+@Data
+@AllArgsConstructor
+public class DorisCommittable implements Serializable {
+  //TODO support 2PC commit
+  public DorisOptions dorisOptions;
 }

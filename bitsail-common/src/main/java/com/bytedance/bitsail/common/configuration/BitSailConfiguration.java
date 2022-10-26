@@ -390,7 +390,7 @@ public class BitSailConfiguration implements Serializable {
   /**
    * print configuration as format json.
    */
-  public String beautify() {
+  private String beautify() {
     return JSON.toJSONString(this.getInternal(),
         SerializerFeature.PrettyFormat, SerializerFeature.DisableCircularReferenceDetect);
   }
