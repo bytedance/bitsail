@@ -1,22 +1,26 @@
 # 部署指南
 
-> 目前 BitSail 仅支持在Yarn上部署。
-> 其他平台上的部署（例如原生kubernetes）将在不久后支持。
+> 目前 BitSail 仅支持本地和Yarn上部署。
+> 其他平台的部署（例如原生kubernetes）将在不久后支持。
+
+本部分目录:
+
+- [环境配置](#jump_pre_configure)
+   - [配置Hadoop](#jump_configure_hadoop)
+   - [配置Flink](#jump_configure_flink)
+- [提交到Yarn](#jump_submit_to_yarn)
+   - [提交一个示例作业](#jump_submit_example)
+   - [调试日志](#jump_log)
+- [本地提交](#jump_submit_local)
+
+
+下面各部分详细介绍BitSail的部署。
 
 -----
 
-下面是这部分的目录:
+## <span id="jump_pre_configure">环境配置</span>
 
-- [配置Hadoop](#jump_configure_hadoop)
-- [配置Flink](#jump_configure_flink)
-- [提交到Yarn](#jump_submit_to_yarn)
-- [提交一个示例作业](#jump_submit_example)
-- [调试日志](#jump_log)
-
-
-下面各部分详细介绍了如何将BitSail在Yarn上进行部署。
-
-## <span id="jump_configure_hadoop">配置Hadoop</span>
+### <span id="jump_configure_hadoop">配置Hadoop</span>
 
 为了支持Yarn部署，需要在环境变量中配置`HADOOP_CLASSPATH`。目前有两种方式设置:
 
@@ -30,7 +34,7 @@
   fi
   ```
 
-## <span id="jump_configure_flink">配置Flink</span>
+### <span id="jump_configure_flink">配置Flink</span>
 
 打包完成后，产物中包含可配置flink的文件 [conf/bitsail.conf](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/resources/bitsail.conf) 。
 这个文件描述了系统中使用的flink环境，包括flink所在目录以及其他默认参数。
@@ -71,6 +75,7 @@
   </tr>
 </table>
 
+-----
 
 ## <span id="jump_submit_to_yarn">提交到Yarn</span>
  
@@ -94,7 +99,7 @@ bash ./bin/bitsail run --engine flink --conf [job_conf_path] --execution-mode ru
         - **value**: 要添加的属性值
         - 例如 `classloader.resolve-order=child-first`
 
-## <span id="jump_submit_example">提交一个示例作业</span>
+### <span id="jump_submit_example">提交一个示例作业</span>
 
 可以使用如下指令提交一个 Fake2Print 测试作业到default队列。
 
@@ -102,13 +107,65 @@ bash ./bin/bitsail run --engine flink --conf [job_conf_path] --execution-mode ru
 bash ./bin/bitsail run --engine flink --conf ~/bitsail-archive-0.1.0-SNAPSHOT/examples/Fake_Proint_Example.json --execution-mode run -p 1=1  --deployment-mode yarn-per-job  --queue default
 ```
 
-## <span id="jump_log">调试日志</span>
+### <span id="jump_log">调试日志</span>
 
-### client端日志
+#### client端日志
 
 可以在 `${FLINK_HOME}/log/` 中找到BitSail client端的执行日志。
 
-### Yarn作业日志
+#### Yarn作业日志
 
 可以通过Yarn的WebUI来查看Flink JobManager和TaskManager的日志。
+
+-----
+
+## 本地提交
+
+假设BitSail的安装路径为: `${BITSAIL_HOME}`。打包BitSail后，我们可以在如下路径中找到可运行jar包以及示例作业配置文件:
+
+```shell
+cd ${BITSAIL_HOME}/bitsail-dist/target/bitsail-dist-0.1.0-SNAPSHOT-bin/bitsail-archive-0.1.0-SNAPSHOT/
+```
+### 运行Fake_to_Print示例作业
+以 [examples/Fake_Print_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Print_Example.json) 为例来启动一个本地BitSail作业:
+- `<job-manager-address>`: 要连接的的JobManager地址，格式为host:port。
+  
+```shell
+bash bin/bitsail run \
+  --engine flink \
+  --execution-mode run \
+  --deployment-mode local \
+  --conf examples/Fake_Print_Example.json \
+  --jm-address <job-manager-address>
+```
+
+执行命令后，可以在Flink WebUI中查看运行的Fake_to_Print作业。在task manager的stdout文件中可以看到作业输出。
+
+
+### 运行Fake_to_Hive示例作业
+以 [examples/Fake_hive_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Hive_Example.json) 为例:
+- 在运行前补充完整配置文件中的hive信息:
+   - `job.writer.db_name`: 要写入的hive库.
+   - `job.writer.table_name`: 要写入的hive表.
+   - `job.writer.metastore_properties`: hive的连接信息，包括metastore地址等:
+    ```shell
+       {
+          "job": {
+            "writer": {
+              "metastore_properties": "{\"hive.metastore.uris\":\"thrift://localhost:9083\"}"
+            }
+          }
+       }
+    ```
+  
+执行如下命令，便可以在指定的Flink session中启动一个Fake_to_Hive作业:
+
+```shell
+bash bin/bitsail run \
+  --engine flink \
+  --execution-mode run \
+  --deployment-mode local \
+  --conf examples/Fake_Hive_Example.json \
+  --jm-address <job-manager-address>
+  ```
 
