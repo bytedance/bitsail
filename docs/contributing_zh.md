@@ -1,5 +1,7 @@
 # 贡献者指引
 
+[English](contributing.md) | 简体中文
+
 BitSail社区欢迎大家的贡献！
 
 ## 如何参与

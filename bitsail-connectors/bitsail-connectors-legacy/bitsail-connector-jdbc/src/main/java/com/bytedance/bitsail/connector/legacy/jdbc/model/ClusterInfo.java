@@ -40,7 +40,7 @@ public class ClusterInfo {
 
   private ConnectionInfo master;
 
-  @Singular("slaves")
+  @Singular("slave")
   private List<ConnectionInfo> slaves;
 
   @JSONField(name = "table_names")

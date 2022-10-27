@@ -1,5 +1,11 @@
 # BitSail
 
+[English](README.md) | 简体中文
+
+[![Build](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml/badge.svg)](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml)
+[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
+[![加入Slack](https://img.shields.io/badge/slack-%23BitSail-72eff8?logo=slack&color=5DADE2&label=加入%20Slack)](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
+
 ## 介绍
 BitSail是字节跳动开源的基于分布式架构的高性能数据集成引擎, 支持多种异构数据源间的数据同步，并提供离线、实时、全量、增量场景下的全域数据集成解决方案，目前服务于字节内部几乎所有业务线，包括抖音、今日头条等，每天同步数百万亿数据
 
@@ -158,7 +164,7 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
 取消订阅: 发送Email到此地址 `bitsail+unsubscribe@googlegroups.com`
 
 ### 微信群
-欢迎添加小助手好友加入BitSail微信群参与社区讨论与贡献
+欢迎加入BitSail微信群参与社区讨论与贡献
 
 <img src="docs/images/wechat_QR.png" alt="qr" width="100"/>
 

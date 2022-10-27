@@ -77,7 +77,7 @@ public class OracleSourceITCase {
             .url(container.getJdbcUrl())
             .build();
     ClusterInfo clusterInfo = ClusterInfo.builder()
-            .slaves(connectionInfo)
+            .slave(connectionInfo)
             .build();
     globalConfiguration.set(JdbcReaderOptions.CONNECTIONS, Lists.newArrayList(clusterInfo));
     EmbeddedFlinkCluster.submitJob(globalConfiguration);

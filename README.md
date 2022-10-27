@@ -1,10 +1,14 @@
 # BitSail
-[Chinese Version](README_zh.md)
+English | [简体中文](README_zh.md)
+
+[![Build](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml/badge.svg)](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml)
+[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
+[![Join Slack](https://img.shields.io/badge/slack-%23BitSail-72eff8?logo=slack&color=5DADE2&label=Join%20Slack)](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
 
 ## Introduction
 BitSail is ByteDance's open source data integration engine which is based on distributed architecture and provides high performance. It supports data synchronization between multiple heterogeneous data sources, and provides global data integration solutions in batch, streaming, and incremental scenarios. At present, it serves almost all business lines in ByteDance, such as Douyin, Toutiao, etc., and synchronizes hundreds of trillions data every day.
 
-## Why do we use BitSail
+## Why Do We Use BitSail
 BitSail has been widely used and supports hundreds of trillions of large traffic. At the same time, it has been verified in various scenarios such as the cloud native environment of the volcano engine and the on-premises private cloud environment.
 
 We have accumulated a lot of experience and made a number of optimizations to improve the function of data integration
@@ -20,7 +24,7 @@ We have accumulated a lot of experience and made a number of optimizations to im
 
 - Task running status monitoring, such as traffic, QPS, dirty data, latency, etc.
 
-## BitSail use scenarios
+## BitSail Use Scenarios
 - Mass data synchronization in heterogeneous data sources
 
 - Streaming and batch integration data processing capability
@@ -177,8 +181,7 @@ Start a conversation: Email to this address `bitsail@googlegroups.com`
 Unsubscribe: Email to this address `bitsail+unsubscribe@googlegroups.com`
 
 ### WeChat Group
-If you have WeChat account, please scan this QR code to connect with the BitSail community assistant
-and join the WeChat group chat.
+Welcome to scan this QR code and to join the WeChat group chat.
 
 <img src="docs/images/wechat_QR.png" alt="qr" width="100"/>
 
@@ -189,7 +192,7 @@ Link to [Environment Setup](docs/env_setup.md).
 Link to [Deployment Guide](docs/deployment.md).
 
 ## BitSail Configuration
-Link to [configuration guide](docs/config.md).
+Link to [Configuration Guide](docs/config.md).
 
 ## Contributing Guide
 Link to [Contributing Guide](docs/contributing.md).
