@@ -37,12 +37,13 @@ public class Row implements Serializable {
   private final Object[] fields;
   private RowKind kind = RowKind.INSERT;
 
-  public Row(int size) {
-    fields = new Object[size];
-  }
-
   public Row(Object[] fields) {
     this.fields = fields;
+  }
+
+  public Row(int arity) {
+    this.kind = RowKind.fromByteValue(RowKind.INSERT.toByteValue());
+    this.fields = new Object[arity];
   }
 
   public Row(byte kind, Object[] fields) {
