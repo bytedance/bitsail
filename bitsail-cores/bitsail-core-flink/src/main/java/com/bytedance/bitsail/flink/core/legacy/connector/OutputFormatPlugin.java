@@ -153,12 +153,13 @@ public abstract class OutputFormatPlugin<E extends Row> extends RichOutputFormat
 
     int taskId = getRuntimeContext().getIndexOfThisSubtask();
     this.metricManager = new BitSailMetricManager(commonConfig,
-        "batch.output");
-    metricManager.addExtraMetricTags(ImmutableList.of(
-        Pair.newPair("instance", String.valueOf(commonConfig.get(CommonOptions.INSTANCE_ID))),
-        Pair.newPair("type", getType()),
-        Pair.newPair("task", String.valueOf(taskId))
-    ));
+        "batch.output",
+        false,
+        ImmutableList.of(
+            Pair.newPair("instance", String.valueOf(commonConfig.get(CommonOptions.INSTANCE_ID))),
+            Pair.newPair("type", getType()),
+            Pair.newPair("task", String.valueOf(taskId))
+        ));
     metricManager.start();
   }
 

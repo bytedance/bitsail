@@ -62,8 +62,19 @@ public class FlinkRowConvertSerializer implements RowSerializer<Row> {
   }
 
   @Override
-  public Row serialize(com.bytedance.bitsail.common.row.Row obj) throws IOException {
-    throw new UnsupportedOperationException();
+  public Row serialize(com.bytedance.bitsail.common.row.Row row) throws IOException {
+    Object[] fields = row.getFields();
+    int arity = ArrayUtils.getLength(fields);
+    Row flinkRow = new Row(arity);
+    for (int index = 0; index < arity; index++) {
+      TypeInfo<?> typeInfo = typeInfos[index];
+      Object field = row.getField(index);
+      if (field instanceof Column) {
+        field = deserialize((Column) field, typeInfo, columns.get(index).getName());
+      }
+      flinkRow.setField(index, field);
+    }
+    return flinkRow;
   }
 
   @Override

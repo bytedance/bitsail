@@ -2,31 +2,32 @@
 [Chinese Version](README_zh.md)
 
 ## Introduction
-BitSail is ByteDance's open source data integration engine which is based on distributed architecture and provides high performance. It supports data synchronization between multiple heterogeneous data sources, and provides global data integration solutions in offline, real-time, and incremental scenarios. At present, it serves almost all business lines in ByteDance, such as Douyin, Toutiao, etc., and synchronizes hundreds of trillions data every day.
+BitSail is ByteDance's open source data integration engine which is based on distributed architecture and provides high performance. It supports data synchronization between multiple heterogeneous data sources, and provides global data integration solutions in batch, streaming, and incremental scenarios. At present, it serves almost all business lines in ByteDance, such as Douyin, Toutiao, etc., and synchronizes hundreds of trillions data every day.
 
 ## Why do we use BitSail
-BitSail has been widely used and supports hundreds of trillions of large traffic. At the same time, it has been verified in various scenarios such as the cloud native environment of the volcano engine and the customer's private cloud environment.
+BitSail has been widely used and supports hundreds of trillions of large traffic. At the same time, it has been verified in various scenarios such as the cloud native environment of the volcano engine and the on-premises private cloud environment.
 
 We have accumulated a lot of experience and made a number of optimizations to improve the function of data integration
 
-- Global Data Integration, covering offline、streaming and incremental scenarios
+- Global Data Integration, covering batch, streaming and incremental scenarios
 
 - Distributed and cloud-native architecture, supporting horizontal scaling
 
-- High maturity in terms of accuracy、stability and performance
+- High maturity in terms of accuracy, stability and performance
 
-- Rich basic functions, such as type conversion、dirty data processing、flow control、streaming archiving、data lake integration, automatic concurrency inference, etc.
+- Rich basic functions, such as type conversion, dirty data processing, flow control, data lake integration, automatic parallelism calculation
+, etc.
 
-- Task running status monitoring, such as traffic、QPS、dirty data、delay, etc.
+- Task running status monitoring, such as traffic, QPS, dirty data, latency, etc.
 
 ## BitSail use scenarios
 - Mass data synchronization in heterogeneous data sources
 
-- Stream-batch integrated data processing capability
+- Streaming and batch integration data processing capability
 
-- Lake and warehouse integration data processing capability
+- Data lake and warehouse integration data processing capability
 
-- High-performance, highly reliable data synchronization
+- High performance, high reliability data synchronization
 
 - Distributed, cloud-native architecture data integration engine
 
@@ -34,7 +35,7 @@ We have accumulated a lot of experience and made a number of optimizations to im
 
 - Low start-up cost and high flexibility
 
-- Stream-batch integration and lake-warehouse integration architecture, one framework covers almost all data synchronization scenarios
+- Stream-batch integration and Data lake-warehouse integration architecture, one framework covers almost all data synchronization scenarios
 
 - High-performance, massive data processing capabilities
 
@@ -42,9 +43,9 @@ We have accumulated a lot of experience and made a number of optimizations to im
 
 - Type system, conversion between different data source types
 
-- Engine-independent read-write interface, low development cost
+- Engine independent reading and writing interface, low development cost
 
-- Real-time display of task progress percentage, in development
+- Real-time display of task progress, under development
 
 - Real-time monitoring of task status
 
@@ -80,7 +81,7 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <td>Hadoop</td>
     <td>-</td>
     <td>✅</td>
-    <td> </td>
+    <td>✅</td>
   </tr>
   <tr>
     <td>Hbase</td>
@@ -102,12 +103,6 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
   </tr>
   <tr>
     <td>RocketMQ</td>
-    <td>-</td>
-    <td> </td>
-    <td>✅</td>
-  </tr>
-  <tr>
-    <td>StreamingFile (Hadoop Streaming mode.)</td>
     <td>-</td>
     <td> </td>
     <td>✅</td>

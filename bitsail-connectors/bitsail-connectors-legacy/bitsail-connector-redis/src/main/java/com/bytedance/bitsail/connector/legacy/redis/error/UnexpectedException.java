@@ -19,7 +19,6 @@ package com.bytedance.bitsail.connector.legacy.redis.error;
 
 /**
  * Job fails when catch this exception.
- * @author yangyun
  **/
 public class UnexpectedException extends RuntimeException {
 

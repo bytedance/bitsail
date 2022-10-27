@@ -70,7 +70,7 @@ public class NativeFlinkTypeInfoUtil {
       return BasicTypeInfo.SHORT_TYPE_INFO;
     }
 
-    if (internalTypeClass == TypeInfos.VOID_TYPE_INFO.getTypeClass()) {
+    if (internalTypeClass == PrimitiveTypes.VOID.getTypeInfo().getTypeClass()) {
       return BasicTypeInfo.VOID_TYPE_INFO;
     }
 

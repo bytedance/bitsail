@@ -21,7 +21,7 @@ import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.base.connector.writer.v1.WriterCommitter;
 import com.bytedance.bitsail.base.connector.writer.v1.WriterGenerator;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
-import com.bytedance.bitsail.base.serializer.DefaultBinarySerializer;
+import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
@@ -110,7 +110,7 @@ public class DorisWriterGenerator<InputT> implements WriterGenerator<InputT, Dor
 
   @Override
   public Optional<BinarySerializer<DorisWriterState>> getWriteStateSerializer() {
-    return Optional.of(new DefaultBinarySerializer<>());
+    return Optional.of(new SimpleBinarySerializer<DorisWriterState>());
   }
 
   private void initDorisOptions(BitSailConfiguration writerConfiguration) {

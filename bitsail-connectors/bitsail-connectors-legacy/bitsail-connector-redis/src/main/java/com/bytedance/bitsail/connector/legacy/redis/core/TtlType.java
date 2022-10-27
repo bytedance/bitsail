@@ -19,9 +19,6 @@ package com.bytedance.bitsail.connector.legacy.redis.core;
 
 import lombok.Getter;
 
-/**
- * @author yangyun
- **/
 public enum TtlType {
 
   DAY(60 * 60 * 24),

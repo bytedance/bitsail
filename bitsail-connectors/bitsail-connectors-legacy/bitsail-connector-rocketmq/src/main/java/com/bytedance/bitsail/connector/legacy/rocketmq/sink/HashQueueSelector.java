@@ -15,22 +15,35 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.base.serializer;
+package com.bytedance.bitsail.connector.legacy.rocketmq.sink;
 
-import java.io.IOException;
+import org.apache.rocketmq.client.producer.MessageQueueSelector;
+import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.common.message.MessageQueue;
 
-/**
- * Created 2022/6/14
- */
-public class DefaultBinarySerializer<T> implements BinarySerializer<T> {
+import java.util.List;
 
-  @Override
-  public byte[] serialize(T obj) throws IOException {
-    return new byte[0];
+public class HashQueueSelector implements MessageQueueSelector {
+
+  private int nullKeyCount;
+
+  public HashQueueSelector() {
+    super();
+    nullKeyCount = 0;
   }
 
   @Override
-  public T deserialize(byte[] serialized) throws IOException {
-    return null;
+  public MessageQueue select(List<MessageQueue> mqList, Message message, Object partitionKeys) {
+    int queueId;
+
+    if (partitionKeys != null) {
+      queueId = partitionKeys.hashCode() % mqList.size();
+    } else {
+      queueId = nullKeyCount % mqList.size();
+      nullKeyCount = (nullKeyCount + 1) % mqList.size();
+    }
+
+    return mqList.get(queueId);
   }
 }
+

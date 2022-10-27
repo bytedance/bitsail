@@ -34,9 +34,6 @@ import redis.clients.jedis.exceptions.JedisDataException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-/**
- * @author yangyun
- **/
 public class RedisPipelineProcessor extends AbstractPipelineProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(RedisPipelineProcessor.class);
 

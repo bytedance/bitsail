@@ -54,9 +54,10 @@ public class MetricsFactory {
   }
 
   private static synchronized MetricManager getMetricManager(BitSailConfiguration jobConf, Integer taskId) {
-    MetricManager metricManager = new BitSailMetricManager(jobConf, "dump");
-    metricManager.addExtraMetricTags(getDumpExtraMetricTag(jobConf, taskId));
-    return metricManager;
+    List<Pair<String, String>> dumpExtraMetricTag = getDumpExtraMetricTag(jobConf, taskId);
+    return new BitSailMetricManager(jobConf, "dump",
+        false,
+        dumpExtraMetricTag);
   }
 
   // todo: Remove ReaderOption in filesystem sink module.

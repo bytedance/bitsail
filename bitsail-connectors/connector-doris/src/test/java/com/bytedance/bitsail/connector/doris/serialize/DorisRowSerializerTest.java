@@ -19,10 +19,12 @@ package com.bytedance.bitsail.connector.doris.serialize;
 
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.row.RowKind;
+import com.bytedance.bitsail.common.util.FastJsonUtil;
 import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 import com.bytedance.bitsail.connector.doris.converter.DorisRowConverter;
 import com.bytedance.bitsail.connector.doris.typeinfo.DorisDataType;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,15 +33,13 @@ import org.junit.Test;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.Timestamp;
 
 @SuppressWarnings("checkstyle:LineLength")
 public class DorisRowSerializerTest extends DorisRowSerializer {
 
   private final int columnSize = 16;
   private final String[] fields = {"f_bigint", "f_varchar", "f_null", "f_boolean", "f_decimal", "f_interval_year_mon",
-      "f_interval_day_time", "f_float", "f_double", "f_date", "f_timestamp_without_zone",
-      "f_timestamp_with_local_zone", "f_timestamp_with_zone", "f_int"};
+      "f_interval_day_time", "f_float", "f_double", "f_date", "f_int"};
   private final DorisDataType[] types = {
       DorisDataType.BIGINT,
       DorisDataType.VARCHAR,
@@ -51,9 +51,6 @@ public class DorisRowSerializerTest extends DorisRowSerializer {
       DorisDataType.FLOAT,
       DorisDataType.DOUBLE,
       DorisDataType.DATE,
-      DorisDataType.TIMESTAMP_WITHOUT_TIME_ZONE,
-      DorisDataType.TIMESTAMP_WITH_LOCAL_TIME_ZONE,
-      DorisDataType.TIMESTAMP_WITH_TIME_ZONE,
       DorisDataType.INTEGER
   };
 
@@ -70,10 +67,7 @@ public class DorisRowSerializerTest extends DorisRowSerializer {
     dtsRow.setField(7, 1.23123f);
     dtsRow.setField(8, 12.412123d);
     dtsRow.setField(9, 20221203);
-    dtsRow.setField(10, new Timestamp(1660729373));
-    dtsRow.setField(11, new Timestamp(1660729373));
-    dtsRow.setField(12, new Timestamp(1660729373));
-    dtsRow.setField(13, 1);
+    dtsRow.setField(10, 1);
     return dtsRow;
   }
 
@@ -94,29 +88,36 @@ public class DorisRowSerializerTest extends DorisRowSerializer {
 
   @Test
   public void testEnableDeletedJsonSerialize() throws IOException {
-    String expectedSerializedStr = "{\"f_boolean\":\"true\",\"f_interval_year_mon\":\"10\",\"f_varchar\":\"dts\",\"f_float\":\"1.23123\",\"f_timestamp_without_zone\":\"1970-01-20 13:18:49.373\",\"__DORIS_DELETE_SIGN__\":\"0\",\"f_timestamp_with_local_zone\":\"1970-01-20 13:18:49.373\",\"f_date\":\"\\u0000333-10-10\",\"f_bigint\":\"1\",\"f_double\":\"12.412123\",\"f_decimal\":\"102921.2312314\",\"f_null\":null,\"f_interval_day_time\":\"5\",\"f_int\":\"1\",\"f_timestamp_with_zone\":\"1970-01-20 13:18:49.373\"}";
-    Assert.assertEquals(expectedSerializedStr, this.serialize(getDtsRow()));
+    String expectedSerializedStr = "{\"f_boolean\":\"true\",\"f_interval_year_mon\":\"10\",\"f_varchar\":\"dts\",\"f_float\":\"1.23123\",\"__DORIS_DELETE_SIGN__\":\"0\",\"f_date\":\"\\u0000333-10-10\",\"f_bigint\":\"1\",\"f_double\":\"12.412123\",\"f_decimal\":\"102921.2312314\",\"f_null\":null,\"f_interval_day_time\":\"5\",\"f_int\":\"1\"}";
+    Assert.assertTrue(checkJsonStringEqual(expectedSerializedStr, this.serialize(getDtsRow())));
   }
 
   @Test
-  public void testdisableDeletedJsonSerialize() throws IOException {
+  public void testDisableDeletedJsonSerialize() throws IOException {
     this.enableDelete = false;
-    String expectedSerializedStr = "{\"f_boolean\":\"true\",\"f_interval_year_mon\":\"10\",\"f_varchar\":\"dts\",\"f_float\":\"1.23123\",\"f_timestamp_without_zone\":\"1970-01-20 13:18:49.373\",\"f_timestamp_with_local_zone\":\"1970-01-20 13:18:49.373\",\"f_date\":\"\\u0000333-10-10\",\"f_bigint\":\"1\",\"f_double\":\"12.412123\",\"f_decimal\":\"102921.2312314\",\"f_null\":null,\"f_interval_day_time\":\"5\",\"f_int\":\"1\",\"f_timestamp_with_zone\":\"1970-01-20 13:18:49.373\"}";
-    Assert.assertEquals(expectedSerializedStr, this.serialize(getDtsRow()));
+    String expectedSerializedStr = "{\"f_boolean\":\"true\",\"f_interval_year_mon\":\"10\",\"f_varchar\":\"dts\",\"f_float\":\"1.23123\"," +
+        "\"f_date\":\"\\u0000333-10-10\",\"f_bigint\":\"1\",\"f_double\":\"12.412123\",\"f_decimal\":\"102921.2312314\",\"f_null\":null,\"f_interval_day_time\":\"5\",\"f_int\":\"1\"}";
+    Assert.assertTrue(checkJsonStringEqual(expectedSerializedStr, this.serialize(getDtsRow())));
   }
 
   @Test
   public void testEnableDeletedCsvSerialize() throws IOException {
     this.type = DorisOptions.LOAD_CONTENT_TYPE.CSV;
-    String expectedSerializedStr = "1,dts,\\N,true,102921.2312314,10,5,1.23123,12.412123,\u0000333-10-10,1970-01-20 13:18:49.373,1970-01-20 13:18:49.373,1970-01-20 13:18:49.373,1,0";
+    String expectedSerializedStr = "1,dts,\\N,true,102921.2312314,10,5,1.23123,12.412123,\u0000333-10-10,1,0";
     Assert.assertEquals(expectedSerializedStr, this.serialize(getDtsRow()));
   }
 
   @Test
-  public void testdisableDeletedCsvSerialize() throws IOException {
+  public void testDisableDeletedCsvSerialize() throws IOException {
     this.type = DorisOptions.LOAD_CONTENT_TYPE.CSV;
     this.enableDelete = false;
-    String expectedSerializedStr = "1,dts,\\N,true,102921.2312314,10,5,1.23123,12.412123,\u0000333-10-10,1970-01-20 13:18:49.373,1970-01-20 13:18:49.373,1970-01-20 13:18:49.373,1";
+    String expectedSerializedStr = "1,dts,\\N,true,102921.2312314,10,5,1.23123,12.412123,\u0000333-10-10,1";
     Assert.assertEquals(expectedSerializedStr, this.serialize(getDtsRow()));
+  }
+
+  private boolean checkJsonStringEqual(String jsonStr1, String jsonStr2) {
+    JSONObject jsonObject1 = FastJsonUtil.parseObject(jsonStr1);
+    JSONObject jsonObject2 = FastJsonUtil.parseObject(jsonStr2);
+    return jsonObject1.equals(jsonObject2);
   }
 }

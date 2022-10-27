@@ -33,6 +33,7 @@ import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import junit.framework.Assert;
 import org.apache.flink.types.Row;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,9 +66,12 @@ public class FlinkRowConvertSerializerTest {
     flinkRowConvertSerializer = new FlinkRowConvertSerializer(typeInfos, columns, conf);
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void serializeTest() throws IOException {
-    flinkRowConvertSerializer.serialize(new com.bytedance.bitsail.common.row.Row(new Object[] {"test"}));
+    com.bytedance.bitsail.common.row.Row row = new com.bytedance.bitsail.common.row.Row(new Object[] {"test"});
+    Row serialize = flinkRowConvertSerializer.serialize(row);
+    com.bytedance.bitsail.common.row.Row deserialize = flinkRowConvertSerializer.deserialize(serialize);
+    Assert.assertEquals(row.getField(0), deserialize.getField(0));
   }
 
   @Test

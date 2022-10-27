@@ -24,7 +24,6 @@ import redis.clients.jedis.exceptions.JedisDataException;
 /**
  * Failure response handler.
  * Stateless, can use singleton mode.
- * @author yangyun
  **/
 public interface FailureHandler {
 
