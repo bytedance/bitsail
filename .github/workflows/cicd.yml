@@ -1,4 +1,4 @@
-name: CI
+name: CICD
 
 # Controls when the workflow will run
 on:

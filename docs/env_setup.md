@@ -1,5 +1,5 @@
 # Environment Setup
-[Chinese Version](env_setup_zh.md)
+English | [简体中文](env_setup_zh.md)
 
 -----
 
