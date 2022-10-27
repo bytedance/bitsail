@@ -19,6 +19,7 @@ package com.bytedance.bitsail.entry.flink.deployment;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
+import com.bytedance.bitsail.entry.flink.deployment.local.LocalDeploymentSupplier;
 import com.bytedance.bitsail.entry.flink.deployment.yarn.YarnDeploymentSupplier;
 
 /**
@@ -26,7 +27,25 @@ import com.bytedance.bitsail.entry.flink.deployment.yarn.YarnDeploymentSupplier;
  */
 public class DeploymentSupplierFactory {
 
+  private static final String DEPLOYMENT_LOCAL = "local";
+  private static final String DEPLOYMENT_REMOTE = "remote";
+  private static final String DEPLOYMENT_YARN_PER_JOB = "yarn-per-job";
+  private static final String DEPLOYMENT_YARN_SESSION = "yarn-session";
+  private static final String DEPLOYMENT_YARN_APPLICATION = "yarn-application";
+
   public DeploymentSupplier getDeploymentSupplier(FlinkRunCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
-    return new YarnDeploymentSupplier(flinkCommandArgs, jobConfiguration);
+    String deploymentMode = flinkCommandArgs.getDeploymentMode().toLowerCase().trim();
+
+    switch (deploymentMode) {
+      case DEPLOYMENT_LOCAL:
+      case DEPLOYMENT_REMOTE:
+        return new LocalDeploymentSupplier(flinkCommandArgs);
+      case DEPLOYMENT_YARN_PER_JOB:
+      case DEPLOYMENT_YARN_SESSION:
+      case DEPLOYMENT_YARN_APPLICATION:
+        return new YarnDeploymentSupplier(flinkCommandArgs, jobConfiguration);
+      default:
+        throw new UnsupportedOperationException("Unsupported deployment mode: " + deploymentMode);
+    }
   }
 }

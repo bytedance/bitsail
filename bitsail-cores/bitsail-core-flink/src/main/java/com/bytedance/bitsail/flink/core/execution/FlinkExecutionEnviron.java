@@ -152,7 +152,9 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
     buildDAG(readerBuilders, transformDAGBuilder, writerBuilders);
 
     try {
-      JobExecutionResult result = executionEnvironment.execute(flinkJobMode.getJobName());
+      String jobName = commonConfiguration.getUnNecessaryOption(CommonOptions.JOB_NAME,
+          flinkJobMode.getJobName());
+      JobExecutionResult result = executionEnvironment.execute(jobName);
       LOG.info("Flink job finished, execution result: \n{}.", result);
 
       long instanceId = commonConfiguration.getUnNecessaryOption(CommonOptions.INSTANCE_ID, -1L);
