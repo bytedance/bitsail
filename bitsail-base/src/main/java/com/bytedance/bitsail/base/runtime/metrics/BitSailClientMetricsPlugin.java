@@ -56,16 +56,19 @@ public class BitSailClientMetricsPlugin extends RuntimePlugin {
                         List<DataReaderDAGBuilder> dataReaderDAGBuilders,
                         List<DataWriterDAGBuilder> dataWriterDAGBuilders) {
     String groupName = "client";
-    this.metricManager = new BitSailMetricManager(commonConfiguration, groupName, Thread.currentThread().isDaemon());
 
     String inputName = getWrappedName(dataReaderDAGBuilders, DataReaderDAGBuilder::getReaderName);
     String outputName = getWrappedName(dataWriterDAGBuilders, DataWriterDAGBuilder::getWriterName);
-    List<Pair<String, String>> extraMetricTags = ImmutableList.of(
+    List<Pair<String, String>> dimensions = ImmutableList.of(
         Pair.newPair("source", inputName),
         Pair.newPair("target", outputName)
     );
-    metricManager.addExtraMetricTags(extraMetricTags);
 
+    this.metricManager = new BitSailMetricManager(
+        commonConfiguration,
+        groupName,
+        Thread.currentThread().isDaemon(),
+        dimensions);
   }
 
   @Override
@@ -108,6 +111,6 @@ public class BitSailClientMetricsPlugin extends RuntimePlugin {
 
   @VisibleForTesting
   public List<Pair<String, String>> getAllMetricTags() {
-    return metricManager.getAllMetricTags();
+    return metricManager.getAllMetricDimensions();
   }
 }

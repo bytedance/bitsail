@@ -18,6 +18,7 @@
 package com.bytedance.bitsail.core.reader;
 
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
+import com.bytedance.bitsail.base.connector.reader.v1.Source;
 import com.bytedance.bitsail.base.execution.Mode;
 import com.bytedance.bitsail.base.packages.PackageManager;
 import com.bytedance.bitsail.common.BitSailException;
@@ -25,6 +26,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatPlugin;
+import com.bytedance.bitsail.flink.core.reader.FlinkSourceDAGBuilder;
 import com.bytedance.bitsail.flink.core.reader.PluginableInputFormatDAGBuilder;
 
 import org.slf4j.Logger;
@@ -45,7 +47,7 @@ public class DataReaderBuilderFactory {
     return readerConfigurations.stream()
         .map(readerConf -> {
           try {
-            return (DataReaderDAGBuilder) getDataReaderDAGBuilder(mode, readerConf, packageManager);
+            return getDataReaderDAGBuilder(mode, readerConf, packageManager);
           } catch (Exception e) {
             LOG.error("failed to create reader DAG builder");
             throw new RuntimeException(e);
@@ -64,6 +66,10 @@ public class DataReaderBuilderFactory {
     if (InputFormatPlugin.class.isAssignableFrom(readerClass)) {
       return new PluginableInputFormatDAGBuilder((InputFormatPlugin) readerClass.getConstructor().newInstance());
     }
+    if (Source.class.isAssignableFrom(readerClass)) {
+      return new FlinkSourceDAGBuilder((Source) readerClass.getConstructor().newInstance());
+    }
+
     throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
         "Reader " + readerClass.getName() + "class is not supported ");
   }

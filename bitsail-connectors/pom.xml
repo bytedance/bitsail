@@ -34,6 +34,8 @@
         <module>bitsail-connectors-legacy</module>
         <module>connector-print</module>
         <module>connector-elasticsearch</module>
+        <module>connector-fake</module>
+        <module>connector-base</module>
         <module>connector-doris</module>
     </modules>
 

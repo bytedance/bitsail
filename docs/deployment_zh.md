@@ -5,13 +5,18 @@
 
 本部分目录:
 
-- [环境配置](#jump_pre_configure)
-   - [配置Hadoop](#jump_configure_hadoop)
-   - [配置Flink](#jump_configure_flink)
-- [提交到Yarn](#jump_submit_to_yarn)
-   - [提交一个示例作业](#jump_submit_example)
-   - [调试日志](#jump_log)
-- [本地提交](#jump_submit_local)
+- [部署指南](#部署指南)
+  - [<span id="jump_pre_configure">环境配置</span>](#环境配置)
+    - [<span id="jump_configure_hadoop">配置Hadoop</span>](#配置hadoop)
+    - [<span id="jump_configure_flink">配置Flink</span>](#配置flink)
+  - [<span id="jump_submit_to_yarn">提交到Yarn</span>](#提交到yarn)
+    - [<span id="jump_submit_example">提交一个示例作业</span>](#提交一个示例作业)
+    - [<span id="jump_log">调试日志</span>](#调试日志)
+      - [client端日志](#client端日志)
+      - [Yarn作业日志](#yarn作业日志)
+  - [本地提交](#本地提交)
+    - [运行Fake_to_Print示例作业](#运行fake_to_print示例作业)
+    - [运行Fake_to_Hive示例作业](#运行fake_to_hive示例作业)
 
 
 下面各部分详细介绍BitSail的部署。

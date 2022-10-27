@@ -1,5 +1,5 @@
 # Contributor Guide
-[Chinese Version](contributing_zh.md)
+English | [简体中文](contributing_zh.md)
 
 BitSail community welcomes contributions from anyone!
 

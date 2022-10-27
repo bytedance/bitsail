@@ -25,7 +25,9 @@ import com.bytedance.bitsail.base.execution.Mode;
 import com.bytedance.bitsail.base.execution.ProcessResult;
 import com.bytedance.bitsail.base.extension.GlobalCommittable;
 import com.bytedance.bitsail.base.runtime.RuntimePlugin;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.flink.core.FlinkJobMode;
 import com.bytedance.bitsail.flink.core.execution.configurer.BitSailRuntimePluginConfigurer;
@@ -34,6 +36,7 @@ import com.bytedance.bitsail.flink.core.execution.configurer.StreamExecutionEnvi
 import com.bytedance.bitsail.flink.core.execution.utils.ExecutionUtils;
 import com.bytedance.bitsail.flink.core.parallelism.FlinkParallelismAdvisor;
 import com.bytedance.bitsail.flink.core.reader.FlinkDataReaderDAGBuilder;
+import com.bytedance.bitsail.flink.core.reader.FlinkSourceDAGBuilder;
 import com.bytedance.bitsail.flink.core.writer.FlinkDataWriterDAGBuilder;
 
 import com.alibaba.fastjson.JSONObject;
@@ -223,9 +226,23 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
                             List<DataWriterDAGBuilder> writerBuilders) throws Exception {
     List<DataStream> sources = new ArrayList<>();
     for (int i = 0; i < readerBuilders.size(); ++i) {
-      FlinkDataReaderDAGBuilder<T> flinkDataReaderDAGBuilder = (FlinkDataReaderDAGBuilder<T>) readerBuilders.get(i);
-      DataStream<T> dataStream = flinkDataReaderDAGBuilder
-          .addSource(this, parallelismAdvisor.getAdviceReaderParallelism(flinkDataReaderDAGBuilder));
+      DataReaderDAGBuilder dataReaderDAGBuilder = readerBuilders.get(i);
+
+      DataStream<T> dataStream;
+      if (dataReaderDAGBuilder instanceof FlinkDataReaderDAGBuilder) {
+
+        dataStream = ((FlinkDataReaderDAGBuilder<T>) dataReaderDAGBuilder)
+            .addSource(this, parallelismAdvisor.getAdviceReaderParallelism(dataReaderDAGBuilder));
+
+      } else if (dataReaderDAGBuilder instanceof FlinkSourceDAGBuilder) {
+
+        dataStream = ((FlinkSourceDAGBuilder) dataReaderDAGBuilder)
+            .fromSource(this, parallelismAdvisor.getAdviceReaderParallelism(dataReaderDAGBuilder));
+      } else {
+        //todo
+        throw BitSailException.asBitSailException(CommonErrorCode.RUNTIME_ERROR, "");
+      }
+
       dataStream = ExecutionUtils.addExecutionPartitioner(dataStream, commonConfiguration);
       sources.add(dataStream);
     }

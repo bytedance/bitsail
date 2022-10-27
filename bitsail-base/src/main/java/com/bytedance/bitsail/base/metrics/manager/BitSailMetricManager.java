@@ -30,11 +30,9 @@ import com.bytedance.bitsail.base.metrics.MetricReporter;
 import com.bytedance.bitsail.base.metrics.Scheduled;
 import com.bytedance.bitsail.base.metrics.ScheduledMetricReporterWrap;
 import com.bytedance.bitsail.base.metrics.reporter.MetricReporterFactory;
-import com.bytedance.bitsail.base.version.VersionHolder;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
-import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.util.Pair;
 
 import com.codahale.metrics.Counter;
@@ -42,12 +40,10 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.Timer;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -75,7 +71,7 @@ public class BitSailMetricManager implements MetricManager {
   private static final int DEFAULT_MEASUREMENT_WINDOW_SIZE = 65536;
   protected final MetricReporter metricReporter;
   private final ConcurrentMap<String, Metric> metrics = new ConcurrentHashMap<>();
-  private final List<Pair<String, String>> metricTags;
+  private final List<Pair<String, String>> dimensions;
   private final String groupName;
   /**
    * Flag indicating whether this group has been closed.
@@ -86,16 +82,26 @@ public class BitSailMetricManager implements MetricManager {
     this(configuration, groupName, false);
   }
 
-  public BitSailMetricManager(BitSailConfiguration configuration, String groupName, boolean daemon) {
-    MetricReporter metricReporter = MetricReporterFactory.getMetricReporter(configuration);
+  public BitSailMetricManager(BitSailConfiguration configuration,
+                              String groupName,
+                              boolean daemon) {
+    this(configuration, groupName, daemon, Collections.EMPTY_LIST);
+  }
+
+  public BitSailMetricManager(BitSailConfiguration metricConfiguration,
+                              String metricGroup,
+                              boolean daemon,
+                              List<Pair<String, String>> dimensions) {
+    MetricReporter metricReporter = MetricReporterFactory.getMetricReporter(metricConfiguration);
     if (metricReporter instanceof Scheduled) {
       this.metricReporter = new ScheduledMetricReporterWrap(metricReporter, daemon);
     } else {
       this.metricReporter = metricReporter;
     }
-    this.metricReporter.open(configuration);
-    this.metricTags = initMetricTags(configuration);
-    this.groupName = groupName;
+    this.metricReporter.open(metricConfiguration);
+    this.dimensions = getDefaultDimensions(metricConfiguration);
+    this.dimensions.addAll(dimensions);
+    this.groupName = metricGroup;
   }
 
   @Override
@@ -104,38 +110,8 @@ public class BitSailMetricManager implements MetricManager {
   }
 
   @Override
-  public List<Pair<String, String>> initMetricTags(BitSailConfiguration jobConf) {
-    String jobId = String.valueOf(jobConf.get(CommonOptions.JOB_ID));
-    List<Pair<String, String>> metricsTagList = Lists.newArrayList(ImmutableList.of(
-        Pair.newPair("job", jobId)
-    ));
-    metricsTagList.addAll(getCommitInfoTags());
-    return metricsTagList;
-  }
-
-  private List<Pair<String, String>> getCommitInfoTags() {
-    List<Pair<String, String>> result = new ArrayList<>();
-    String commitId = VersionHolder.INSTANCE.getGitCommitId();
-    String buildVersion = VersionHolder.INSTANCE.getBuildVersion();
-    if (VersionHolder.isCommitIdValid(commitId)) {
-      result.add(Pair.newPair("git_commit", commitId));
-    }
-    if (VersionHolder.isBuildVersionValid(buildVersion)) {
-      result.add(Pair.newPair("version", buildVersion));
-    }
-    return result;
-  }
-
-  @Override
-  public void addExtraMetricTags(List<Pair<String, String>> extraMetricTags) {
-    if (extraMetricTags != null) {
-      this.metricTags.addAll(extraMetricTags);
-    }
-  }
-
-  @Override
-  public List<Pair<String, String>> getAllMetricTags() {
-    return metricTags;
+  public List<Pair<String, String>> getAllMetricDimensions() {
+    return dimensions;
   }
 
   @Override
@@ -322,7 +298,7 @@ public class BitSailMetricManager implements MetricManager {
     } else {
       metricNameWithGroup = groupName + "." + metricName;
     }
-    return metricNameWithGroup + getAllMetricTags().stream()
+    return metricNameWithGroup + getAllMetricDimensions().stream()
         .map(metricTag -> metricTag.getFirst() + "=" + metricTag.getSecond())
         .collect(Collectors.joining(",", "{", "}"));
   }

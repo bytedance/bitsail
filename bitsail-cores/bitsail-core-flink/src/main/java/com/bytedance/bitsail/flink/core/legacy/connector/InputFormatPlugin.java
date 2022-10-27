@@ -147,12 +147,13 @@ public abstract class InputFormatPlugin<OT extends Row, T extends InputSplit> ex
       // ignore
     }
     this.metricManager = new BitSailMetricManager(commonConfig,
-        "batch.input");
-    metricManager.addExtraMetricTags(ImmutableList.of(
-        Pair.newPair("instance", String.valueOf(commonConfig.get(CommonOptions.INSTANCE_ID))),
-        Pair.newPair("type", getType()),
-        Pair.newPair("task", String.valueOf(taskId))
-    ));
+        "batch.input",
+        false,
+        ImmutableList.of(
+            Pair.newPair("instance", String.valueOf(commonConfig.get(CommonOptions.INSTANCE_ID))),
+            Pair.newPair("type", getType()),
+            Pair.newPair("task", String.valueOf(taskId))
+        ));
     this.metricManager.start();
   }
 

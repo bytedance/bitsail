@@ -34,7 +34,9 @@ import org.apache.flink.api.common.typeinfo.SqlTimeTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class NativeFlinkTypeInfoUtil {
 
@@ -61,6 +63,18 @@ public class NativeFlinkTypeInfoUtil {
     }
 
     return new RowTypeInfo(fieldTypes, fieldNames);
+  }
+
+  public static TypeInformation<?> getRowTypeInformation(TypeInfo<?>[] typeInfos) {
+    List<? extends TypeInformation<?>> tempTypeInfos = Arrays.stream(typeInfos)
+        .map(NativeFlinkTypeInfoUtil::toNativeFlinkTypeInformation)
+        .collect(Collectors.toList());
+
+    TypeInformation<?>[] types = new TypeInformation<?>[tempTypeInfos.size()];
+    for (int index = 0; index < tempTypeInfos.size(); index++) {
+      types[index] = tempTypeInfos.get(index);
+    }
+    return new RowTypeInfo(types);
   }
 
   public static TypeInformation<?> getTypeInformation(String engineName,

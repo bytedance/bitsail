@@ -17,6 +17,8 @@
 
 package com.bytedance.bitsail.connector.doris.sink;
 
-public class DorisWriterState {
+import java.io.Serializable;
+
+public class DorisWriterState implements Serializable {
   //TODO support 2PC commit
 }
