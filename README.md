@@ -130,12 +130,6 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <td>✅</td>
   </tr>
   <tr>
-    <td>Doris</td>
-    <td>-</td>
-    <td>✅</td>
-    <td> </td>
-  </tr>
-  <tr>
     <td rowspan="4">JDBC</td>
     <td>MySQL</td>
     <td rowspan="4">✅</td>
