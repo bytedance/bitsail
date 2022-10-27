@@ -34,16 +34,8 @@ public class FlinkRunCommandArgsTest {
 
   @Test(expected = ParameterException.class)
   public void requiredParameterTest() {
-    String[] args = new String[] {
-        "--execution-mode", "run",
-        "--deployment-mode", "yarn-per-job"
-    };
     FlinkRunCommandArgs flinkRunCommandArgs = new FlinkRunCommandArgs();
-    String[] ignore = CommandArgsParser.parseArguments(args, flinkRunCommandArgs);
-    exceptionRule.expect(ParameterException.class);
-    exceptionRule.expectMessage("The following option is required: [--queue]");
-
-    args = new String[] {
+    String[] args = new String[] {
         "--queue", "test",
         "--deployment-mode", "yarn-per-job"
     };
