@@ -26,6 +26,7 @@ import com.bytedance.bitsail.connector.legacy.messagequeue.source.option.BaseMes
 import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.formats.json.JsonRowDeserializationSchema;
 import org.apache.flink.streaming.connectors.kafka.KafkaDeserializationSchema;
 import org.apache.flink.types.Row;
@@ -57,8 +58,9 @@ public class DeserializationSchemaFactory {
     }
     if (StringUtils.equalsIgnoreCase(JSON_DESERIALIZATION_SCHEMA_KEY, formatType)) {
       List<ColumnInfo> columnInfos = configuration.get(ReaderOptions.BaseReaderOptions.COLUMNS);
+      RowTypeInfo rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation("bitsail", columnInfos);
       return new CountKafkaDeserializationSchemaWrapper<>(configuration,
-          new JsonRowDeserializationSchema.Builder(NativeFlinkTypeInfoUtil.getRowTypeInformation("bitsail", columnInfos))
+          new JsonRowDeserializationSchema.Builder(rowTypeInfo)
               .build());
     }
 

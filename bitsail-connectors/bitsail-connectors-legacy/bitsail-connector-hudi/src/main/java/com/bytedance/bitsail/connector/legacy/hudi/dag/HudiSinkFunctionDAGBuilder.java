@@ -21,10 +21,8 @@ package com.bytedance.bitsail.connector.legacy.hudi.dag;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.WriterOptions;
-import com.bytedance.bitsail.connector.legacy.hudi.common.SchemaOptions;
 import com.bytedance.bitsail.connector.legacy.hudi.configuration.FlinkOptions;
-import com.bytedance.bitsail.connector.legacy.hudi.format.RowDataDeserialization;
-import com.bytedance.bitsail.connector.legacy.hudi.sink.transform.RowDataToHoodieFunction;
+import com.bytedance.bitsail.connector.legacy.hudi.sink.transform.RowToHoodieFunction;
 import com.bytedance.bitsail.connector.legacy.hudi.sink.utils.Pipelines;
 import com.bytedance.bitsail.connector.legacy.hudi.util.AvroSchemaConverter;
 import com.bytedance.bitsail.connector.legacy.hudi.util.SchemaUtils;
@@ -52,12 +50,6 @@ public class HudiSinkFunctionDAGBuilder<OUT extends Row> extends FlinkDataWriter
   private BitSailConfiguration jobConf;
 
   /**
-   * Flink RowType to parse source to RowData.
-   */
-  @Getter
-  private RowType sourceRowType;
-
-  /**
    * Flink RowType to convert RowData to HoodieRecord.
    * Caution:
    * RowData itself was indexed but do not have any schema info.
@@ -78,9 +70,7 @@ public class HudiSinkFunctionDAGBuilder<OUT extends Row> extends FlinkDataWriter
     jobConf = execution.getGlobalConfiguration();
     Map<String, String> properties = extractHudiProperties(jobConf);
     conf = FlinkOptions.fromMap(properties);
-    sourceRowType = SchemaUtils.getRowTypeFromColumnInfoStr(jobConf.get(SchemaOptions.SOURCE_SCHEMA));
-    sinkRowType = SchemaUtils.getRowTypeFromColumnInfoStr(jobConf.get(SchemaOptions.SINK_SCHEMA));
-    //TODO: check namespace
+    sinkRowType = SchemaUtils.getRowTypeFromColumnInfo(jobConf.get(WriterOptions.BaseWriterOptions.COLUMNS));
     conf.setString(FlinkOptions.SOURCE_AVRO_SCHEMA, AvroSchemaConverter.convertToSchema(sinkRowType).toString());
   }
 
@@ -90,12 +80,8 @@ public class HudiSinkFunctionDAGBuilder<OUT extends Row> extends FlinkDataWriter
         .getCheckpointConfig().getCheckpointTimeout();
     conf.setLong(FlinkOptions.WRITE_COMMIT_ACK_TIMEOUT, ckpTimeout);
 
-    RowDataDeserialization rowDataDeserialization = new RowDataDeserialization<>(jobConf, sourceRowType);
-
     DataStream<HoodieRecord> hoodieDataStream = dataStream
-        .flatMap(rowDataDeserialization)
-        .setParallelism(parallelism)
-        .map(new RowDataToHoodieFunction<>(sinkRowType, conf), TypeInformation.of(HoodieRecord.class))
+        .map(new RowToHoodieFunction<>(conf, jobConf), TypeInformation.of(HoodieRecord.class))
         .setParallelism(parallelism);
 
     Pipelines.hoodieStreamWrite(conf, parallelism, hoodieDataStream);

@@ -19,7 +19,6 @@ package com.bytedance.bitsail.connector.legacy.fake.source;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.column.BytesColumn;
-import com.bytedance.bitsail.common.column.Column;
 import com.bytedance.bitsail.common.column.DateColumn;
 import com.bytedance.bitsail.common.column.DoubleColumn;
 import com.bytedance.bitsail.common.column.LongColumn;
@@ -33,6 +32,7 @@ import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
 
 import com.github.javafaker.Faker;
 import com.google.common.annotations.VisibleForTesting;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.io.DefaultInputSplitAssigner;
 import org.apache.flink.api.common.io.statistics.BaseStatistics;
@@ -47,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -73,6 +74,10 @@ public class FakeSource extends InputFormatPlugin<Row, InputSplit> implements Re
   private transient RateLimiter rateLimiter;
   private Map<String, Set<String>> uniqueFields;
 
+  private boolean useBitSailType;
+
+  private Map<String, Object> fixedObjects;
+
   @Override
   public Row buildRow(Row reuse, String mandatoryEncoding) throws BitSailException {
     rateLimiter.acquire();
@@ -83,29 +88,99 @@ public class FakeSource extends InputFormatPlugin<Row, InputSplit> implements Re
   private Row createRow(Row reuse) {
     for (int index = 0; index < columnInfos.size(); index++) {
       String fieldName = columnInfos.get(index).getName();
-      reuse.setField(index, createColumn(rowTypeInfo.getTypeAt(index), uniqueFields.get(fieldName)));
+      if (fixedObjects.containsKey(fieldName)) {
+        reuse.setField(index, fixedObjects.get(fieldName));
+      } else {
+        reuse.setField(index, createColumn(rowTypeInfo.getTypeAt(index), uniqueFields.get(fieldName), useBitSailType));
+      }
     }
     return reuse;
   }
 
+  private Map<String, Object> initFixedObject(List<Map<String, String>> fixedColumns,
+                                              List<ColumnInfo> columnInfos,
+                                              RowTypeInfo rowTypeInfo,
+                                              boolean useBitSailType) {
+    Map<String, Object> fixedColumnMap = new HashMap<>();
+    if (Objects.isNull(fixedColumns)) {
+      return fixedColumnMap;
+    }
+
+    Map<String, Integer> name2IndexMap = new HashMap<>();
+    for (int i = 0; i < columnInfos.size(); ++i) {
+      name2IndexMap.put(columnInfos.get(i).getName(), i);
+    }
+
+    for (Map<String, String> column : fixedColumns) {
+      String columnName = column.get("name");
+      String fixedValue = column.get("fixed_value");
+      int index = name2IndexMap.get(columnName);
+
+      Object fixedColumn = createFixedColumn(rowTypeInfo.getTypeAt(index), fixedValue, useBitSailType);
+      fixedColumnMap.put(columnName, fixedColumn);
+    }
+    return fixedColumnMap;
+  }
+
+  @SneakyThrows
+  private Object createFixedColumn(TypeInformation<?> typeInformation, String fixedValue, Boolean useBitSailType) {
+    if (PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO.equals(typeInformation)) {
+      return useBitSailType ? new LongColumn(fixedValue) : Long.parseLong(fixedValue);
+    }
+    if (PrimitiveColumnTypeInfo.STRING_COLUMN_TYPE_INFO.equals(typeInformation)) {
+      return useBitSailType ? new StringColumn(fixedValue) : fixedValue;
+    }
+    if (PrimitiveColumnTypeInfo.DOUBLE_COLUMN_TYPE_INFO.equals(typeInformation)) {
+      return useBitSailType ? new DoubleColumn(fixedValue) : Double.parseDouble(fixedValue);
+    }
+    if (PrimitiveColumnTypeInfo.BYTES_COLUMN_TYPE_INFO.equals(typeInformation)) {
+      return useBitSailType ? new BytesColumn(fixedValue.getBytes()) : fixedValue.getBytes();
+    }
+    if (PrimitiveColumnTypeInfo.DATE_COLUMN_TYPE_INFO.equals(typeInformation)) {
+      Date fixedDate = new SimpleDateFormat("yyyy-MM-dd").parse(fixedValue);
+      return useBitSailType ? new DateColumn(fixedDate) : fixedDate;
+    }
+    throw new RuntimeException("Unsupported type " + typeInformation);
+  }
+
   @SuppressWarnings("checkstyle:MagicNumber")
-  private Column createColumn(TypeInformation<?> typeInformation, Set<String> existValues) {
+  private Object createColumn(TypeInformation<?> typeInformation, Set<String> existValues, Boolean useBitSailType) {
     boolean isNull = randomNullInt > random.nextInt(10);
     if (PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO.equals(typeInformation)) {
       long randomNumber = constructRandomValue(existValues, () -> faker.number().randomNumber());
-      return isNull ? new LongColumn() : new LongColumn(randomNumber);
+      if (useBitSailType) {
+        return isNull ? new LongColumn() : new LongColumn(randomNumber);
+      } else {
+        return isNull ? null : randomNumber;
+      }
     } else if (PrimitiveColumnTypeInfo.STRING_COLUMN_TYPE_INFO.equals(typeInformation)) {
       String randomString = constructRandomValue(existValues, () -> faker.letterify("string_test_????"));
-      return isNull ? new StringColumn() : new StringColumn(randomString);
+      if (useBitSailType) {
+        return isNull ? new StringColumn() : new StringColumn(randomString);
+      } else {
+        return isNull ? null : randomString;
+      }
     } else if (PrimitiveColumnTypeInfo.DOUBLE_COLUMN_TYPE_INFO.equals(typeInformation)) {
       double randomDouble = constructRandomValue(existValues, () -> faker.number().randomDouble(5, -1_000_000_000, 1_000_000_000));
-      return isNull ? new DoubleColumn() : new DoubleColumn(randomDouble);
+      if (useBitSailType) {
+        return isNull ? new DoubleColumn() : new DoubleColumn(randomDouble);
+      } else {
+        return isNull ? null : randomDouble;
+      }
     } else if (PrimitiveColumnTypeInfo.BYTES_COLUMN_TYPE_INFO.equals(typeInformation)) {
       String randomString = constructRandomValue(existValues, () -> faker.numerify("test_#####"));
-      return isNull ? new BytesColumn() : new BytesColumn(randomString.getBytes());
+      if (useBitSailType) {
+        return isNull ? new BytesColumn() : new BytesColumn(randomString.getBytes());
+      } else {
+        return isNull ? null : randomString.getBytes();
+      }
     } else if (PrimitiveColumnTypeInfo.DATE_COLUMN_TYPE_INFO.equals(typeInformation)) {
       Date randomDate = constructRandomValue(existValues, () -> faker.date().birthday(10, 30));
-      return isNull ? new DateColumn() : new DateColumn(randomDate);
+      if (useBitSailType) {
+        return isNull ? new DateColumn() : new DateColumn(randomDate);
+      } else {
+        return isNull ? null : randomDate;
+      }
     }
     throw new RuntimeException("Unsupported type " + typeInformation);
   }
@@ -132,10 +207,14 @@ public class FakeSource extends InputFormatPlugin<Row, InputSplit> implements Re
     this.columnInfos = inputSliceConfig.get(ReaderOptions.BaseReaderOptions.COLUMNS);
     this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation("bitsail", columnInfos);
     this.uniqueFields = initUniqueFieldsMapping(inputSliceConfig.get(FakeReaderOptions.UNIQUE_FIELDS));
+    this.useBitSailType = inputSliceConfig.get(FakeReaderOptions.USE_BITSAIL_TYPE);
 
     if (!uniqueFields.isEmpty() && totalCount > 1000) {
       LOG.warn("Unique fields is set and total count is larger than 1000, which may cause OOM problem.");
     }
+
+    this.fixedObjects = initFixedObject(inputSliceConfig.get(FakeReaderOptions.COLUMNS_WITH_FIXED_VALUE), columnInfos,
+        rowTypeInfo, useBitSailType);
   }
 
   @Override

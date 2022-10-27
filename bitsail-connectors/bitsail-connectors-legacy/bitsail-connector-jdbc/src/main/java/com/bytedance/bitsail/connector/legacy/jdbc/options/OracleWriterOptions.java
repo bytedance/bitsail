@@ -27,14 +27,6 @@ import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
  */
 public interface OracleWriterOptions extends JdbcWriterOptions {
 
-  ConfigOption<String> SERVICE_NAME_TYPE =
-      key(WRITER_PREFIX + "service_name_type")
-          .defaultValue("service_name_type");
-
-  ConfigOption<String> SERVICE_NAME =
-      key(WRITER_PREFIX + "service_name")
-          .noDefaultValue(String.class);
-
   ConfigOption<String> PRIMARY_KEY =
       key(WRITER_PREFIX + "primary_key")
           .noDefaultValue(String.class);

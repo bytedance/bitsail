@@ -23,6 +23,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.Singular;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.List;
@@ -39,6 +40,7 @@ public class ClusterInfo {
 
   private ConnectionInfo master;
 
+  @Singular("slaves")
   private List<ConnectionInfo> slaves;
 
   @JSONField(name = "table_names")

@@ -1,31 +1,69 @@
 # BitSail
+[Chinese Version](README_zh.md)
 
-![](docs/images/bitsail.png)
+## Introduction
+BitSail is ByteDance's open source data integration engine which is based on distributed architecture and provides high performance. It supports data synchronization between multiple heterogeneous data sources, and provides global data integration solutions in batch, streaming, and incremental scenarios. At present, it serves almost all business lines in ByteDance, such as Douyin, Toutiao, etc., and synchronizes hundreds of trillions data every day.
 
-## Introduce
+## Why do we use BitSail
+BitSail has been widely used and supports hundreds of trillions of large traffic. At the same time, it has been verified in various scenarios such as the cloud native environment of the volcano engine and the on-premises private cloud environment.
 
-***BitSail*** is a data integration framework that is based on the Flink engine and both support streaming and batch mode.
-At present, ***BitSail*** is mainly designed with the ELT model, which have EB data size and use for Bytedance。<br/>
+We have accumulated a lot of experience and made a number of optimizations to improve the function of data integration
 
-## Feature
+- Global Data Integration, covering batch, streaming and incremental scenarios
 
-- Middle Data types, Support convert between the difference data types.
-- plug-in, can implement difference plugins by user according the difference situation.
-- In Batch mode, support the auto alignment the schema between upstream and downstream.
-- In Streaming mode, support alignment the hive schemas automatically.
-- In Streaming mode, auto-detect the exists checkpoint and apply when job restart.
-- ...
+- Distributed and cloud-native architecture, supporting horizontal scaling
 
-## Requirements
+- High maturity in terms of accuracy, stability and performance
 
-The latest version of bitsail has the following minimal requirements:
+- Rich basic functions, such as type conversion, dirty data processing, flow control, data lake integration, automatic parallelism calculation
+, etc.
 
-- Java 8 and higher for the build is required. For usage Java 8 is a minimum requirement;
-- Maven 3.6 and higher;
-- Operating system: no specific requirements (tested on Windows and Linux).
+- Task running status monitoring, such as traffic, QPS, dirty data, latency, etc.
 
-## Support Connectors
+## BitSail use scenarios
+- Mass data synchronization in heterogeneous data sources
 
+- Streaming and batch integration data processing capability
+
+- Data lake and warehouse integration data processing capability
+
+- High performance, high reliability data synchronization
+
+- Distributed, cloud-native architecture data integration engine
+
+## Features of BitSail
+
+- Low start-up cost and high flexibility
+
+- Stream-batch integration and Data lake-warehouse integration architecture, one framework covers almost all data synchronization scenarios
+
+- High-performance, massive data processing capabilities
+
+- DDL automatic synchronization
+
+- Type system, conversion between different data source types
+
+- Engine independent reading and writing interface, low development cost
+
+- Real-time display of task progress, under development
+
+- Real-time monitoring of task status
+
+## Architecture of BitSail
+ ![](docs/images/bitsail_arch.png)
+ 
+ ```
+ Source[Input Sources] -> Framework[Data Transmission] -> Sink[Output Sinks]
+ ```
+The data processing pipeline is as follows. First, pull the source data through Input Sources, then process it through the intermediate framework layer, and finally write the data to the target through Output Sinks
+
+At the framework layer, we provide rich functions and take effect for all synchronization scenarios, such as dirty data collection, auto parallelism calculation, task monitoring, etc.
+
+In data synchronization scenarios, it covers batch, streaming, and incremental data synchronization
+
+In the Runtime layer, it supports multiple execution modes, such as yarn, local, and k8s is under development
+
+## Supported Connectors
 <table>
   <tr>
     <th>DataSource</th>
@@ -42,7 +80,13 @@ The latest version of bitsail has the following minimal requirements:
   <tr>
     <td>Hadoop</td>
     <td>-</td>
-    <td>❎</td>
+    <td>✅</td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Hbase</td>
+    <td>-</td>
+    <td>✅</td>
     <td>✅</td>
   </tr>
   <tr>
@@ -58,16 +102,43 @@ The latest version of bitsail has the following minimal requirements:
     <td>✅</td>
   </tr>
   <tr>
-    <td>StreamingFile(Hadoop Streaming mode.)</td>
+    <td>RocketMQ</td>
     <td>-</td>
-    <td>❎</td>
+    <td> </td>
     <td>✅</td>
   </tr>
   <tr>
-    <td rowspan="3">JDBC</td>
+    <td>Redis</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Doris</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>MongoDB</td>
+    <td>-</td>
+    <td>✅</td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Doris</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
+    <td rowspan="4">JDBC</td>
     <td>MySQL</td>
-    <td rowspan="3">✅</td>
-    <td rowspan="3">✅</td>
+    <td rowspan="4">✅</td>
+    <td rowspan="4">✅</td>
+  </tr>
+  <tr>
+    <td>Oracle</td>
   </tr>
   <tr>
     <td>PostgreSQL</td>
@@ -79,53 +150,50 @@ The latest version of bitsail has the following minimal requirements:
     <td>Fake</td>
     <td>-</td>
     <td>✅</td>
-    <td>❎</td>
+    <td> </td>
   </tr>
   <tr>
     <td>Print</td>
     <td>-</td>
-    <td>❎</td>
+    <td> </td>
     <td>✅</td>
   </tr>
 </table>
 
-Connector introduce [Connector](./docs/connectors/introduction.md)
+Documentation for [Connectors](./docs/connectors/introduction.md).
 
-## How to build from source code.
+## Community Support
+### Slack
+Join BitSail Slack channel via this [link](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
 
-First, use `git clone` to download the code.
-Then, use follow command to package
+### Mailing List
+Currently, BitSail community use Google Group as the mailing list provider.
+You need to subscribe to the mailing list before starting a conversation
 
-```
-mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true
-```
+Subscribe: Email to this address `bitsail+subscribe@googlegroups.com`
 
-Final, you will find output under the folder `bitsail-dist/target/`
+Start a conversation: Email to this address `bitsail@googlegroups.com`
 
-We also prepare a profile for `flink-embedded`, you can use follow command:
+Unsubscribe: Email to this address `bitsail+unsubscribe@googlegroups.com`
 
-```
-mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true -Pflink-embedded
-```
+### WeChat Group
+If you have WeChat account, please scan this QR code to connect with the BitSail community assistant
+and join the WeChat group chat.
 
-## QuickStart & Architecture
+<img src="docs/images/wechat_QR.png" alt="qr" width="100"/>
 
-Reference [QuickStart](./docs/quickstart.md)
+## Environment Setup
+Link to [Environment Setup](docs/env_setup.md).
 
-## Contact
+## Deployment Guide
+Link to [Deployment Guide](docs/deployment.md).
+
+## BitSail Configuration
+Link to [configuration guide](docs/config.md).
+
+## Contributing Guide
+Link to [Contributing Guide](docs/contributing.md).
 
 ## License
-
-Apache 2.0 License
-
-## Thanks
-
-This project refers to some excellent codes of open source data integration tools in the industry, and I would like to
-express my thanks to them
-<br/>
-[DataX](https://github.com/alibaba/DataX)<br/>
-[chunjun](https://github.com/DTStack/chunjun)<br/>
-
-
-
+[Apache 2.0 License](LICENSE).
 

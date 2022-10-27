@@ -31,6 +31,7 @@ import com.bytedance.bitsail.flink.core.constants.TypeSystem;
 import com.bytedance.bitsail.flink.core.execution.FlinkExecutionEnviron;
 import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatPlugin;
 import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatSourceFunction;
+import com.bytedance.bitsail.flink.core.parallelism.SelfParallelismAdvice;
 import com.bytedance.bitsail.flink.core.parallelism.batch.FlinkBatchReaderParallelismComputer;
 import com.bytedance.bitsail.flink.core.plugins.InputAdapter;
 
@@ -159,6 +160,9 @@ public class PluginableInputFormatDAGBuilder<T extends Row, Split extends InputS
 
     Stopwatch stopwatch = Stopwatch.createStarted();
     try {
+      if (inputFormatPlugin instanceof SelfParallelismAdvice) {
+        return ((SelfParallelismAdvice) inputFormatPlugin).advice();
+      }
 
       FlinkBatchReaderParallelismComputer parallelismComputer = new FlinkBatchReaderParallelismComputer(commonConf);
       int adviceReaderMaxParallelism = inputFormatPlugin.createInputSplits(

@@ -151,7 +151,6 @@
         }
       },
       "path": "/path/to/table",
-      "format_type": "json",
       "index": {
         "type": "BUCKET"
       },
@@ -208,17 +207,7 @@ Compaction参数包含了reader和writer部分。
       "class":"com.bytedance.bitsail.connector.legacy.hudi.dag.HudiCompactSourceDAGBuilder"
     },
     "writer":{
-      "hoodie":{
-        "table":{
-          "name":"TestHoodieTable"
-        }
-      },
       "path":"/path/to/table",
-      "source":{
-        "avro-schema":{
-          "path":"/path/to/table/test_read_schema.avsc"
-        }
-      },
       "class":"com.bytedance.bitsail.connector.legacy.hudi.dag.HudiCompactSinkDAGBuilder"
     }
   }

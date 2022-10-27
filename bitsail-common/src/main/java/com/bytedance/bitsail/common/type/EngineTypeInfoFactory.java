@@ -40,6 +40,9 @@ public class EngineTypeInfoFactory {
       case "hive":
         converter = new HiveTypeInfoConverter(engineName);
         break;
+      case "mongodb":
+        converter = new MongoTypeInfoConverter();
+        break;
       default:
         converter = new SimpleTypeInfoConverter(engineName);
         break;
