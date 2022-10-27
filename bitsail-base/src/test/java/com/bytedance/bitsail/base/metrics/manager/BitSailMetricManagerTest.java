@@ -40,26 +40,20 @@ public class BitSailMetricManagerTest {
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
     jobConf.set(CommonOptions.JOB_ID, jobId);
     jobConf.set(CommonOptions.METRICS_REPORTER_TYPE, "nop");
-    metricManager = new BitSailMetricManager(jobConf, "group");
-  }
-
-  @Test
-  public void testMetricTags() {
-    List<Pair<String, String>> metricTags = metricManager.getAllMetricTags();
-    List<Pair<String, String>> expectedMetricTags =
-        ImmutableList.of(
-            Pair.newPair("job", String.valueOf(jobId))
-        );
-    assertEquals(expectedMetricTags.size() + 2, metricTags.size());
-    assertEquals(expectedMetricTags, metricTags.subList(0, 1));
-
     List<Pair<String, String>> extraMetricTags = ImmutableList.of(
         Pair.newPair("task", String.valueOf(1)),
         Pair.newPair("input", "input0")
     );
-    metricManager.addExtraMetricTags(extraMetricTags);
-    metricTags = metricManager.getAllMetricTags();
-    assertEquals(5, metricTags.size());
+    metricManager = new BitSailMetricManager(jobConf,
+        "group",
+        false,
+        extraMetricTags);
+  }
+
+  @Test
+  public void testMetricTags() {
+    List<Pair<String, String>> allMetricDimensions = metricManager.getAllMetricDimensions();
+    assertEquals(5, allMetricDimensions.size());
   }
 
   @Test

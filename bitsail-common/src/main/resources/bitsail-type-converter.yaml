@@ -25,6 +25,9 @@ engine.type.to.bitsail.type.converter:
   - source.type: int
     target.type: int
 
+  - source.type: long
+    target.type: long
+
   - source.type: bigint
     target.type: bigint
 

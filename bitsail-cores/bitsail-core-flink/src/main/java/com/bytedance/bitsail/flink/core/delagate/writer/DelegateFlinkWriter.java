@@ -141,12 +141,15 @@ public class DelegateFlinkWriter<InputT, CommitT, WriterStateT> extends Abstract
     ColumnCast.initColumnCast(commonConfiguration);
 
     int taskId = getRuntimeContext().getIndexOfThisSubtask();
-    metricManager = new BitSailMetricManager(commonConfiguration, "output");
-    metricManager.addExtraMetricTags(ImmutableList.of(
-        Pair.newPair("instance", String.valueOf(commonConfiguration.get(CommonOptions.INSTANCE_ID))),
-        Pair.newPair("type", writerGenerator.getWriterName()),
-        Pair.newPair("task", String.valueOf(taskId))
-    ));
+    metricManager = new BitSailMetricManager(commonConfiguration,
+        "output",
+        false,
+        ImmutableList.of(
+            Pair.newPair("instance", String.valueOf(commonConfiguration.get(CommonOptions.INSTANCE_ID))),
+            Pair.newPair("type", writerGenerator.getWriterName()),
+            Pair.newPair("task", String.valueOf(taskId))
+        )
+    );
     metricManager.start();
   }
 

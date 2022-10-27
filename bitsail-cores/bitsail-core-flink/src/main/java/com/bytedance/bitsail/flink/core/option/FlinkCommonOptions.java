@@ -53,7 +53,7 @@ public interface FlinkCommonOptions {
    * strategy for computing parallelism of union operator
    */
   ConfigOption<String> FLINK_UNION_PARALLELISM_STRATEGY =
-      key(COMMON_PREFIX + "flink_union_paralellism_strategy")
+      key(COMMON_PREFIX + "flink_union_parallelism_strategy")
           .defaultValue("MAX");
 
   ConfigOption<String>
