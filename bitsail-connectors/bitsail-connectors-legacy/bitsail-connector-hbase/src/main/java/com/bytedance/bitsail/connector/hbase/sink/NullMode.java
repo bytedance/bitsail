@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.base.enumerate;
+package com.bytedance.bitsail.connector.hbase.sink;
 
 public enum NullMode {
   /**
