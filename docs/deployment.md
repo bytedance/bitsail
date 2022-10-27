@@ -164,3 +164,12 @@ Use [examples/Fake_hive_Example.json](https://github.com/bytedance/bitsail/blob/
     ```
 
 Then you can use the similar command to submit a BitSail job to specified Flink session:
+
+```shell
+bash bin/bitsail run \
+  --engine flink \
+  --execution-mode run \
+  --deployment-mode local \
+  --conf examples/Fake_Hive_Example.json \
+  --jm-address <job-manager-address>
+  ```
