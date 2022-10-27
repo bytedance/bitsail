@@ -17,6 +17,8 @@
 
 - [Kafka连接器](./kafka/kafka_zh.md)
 
+- [RocketMQ连接器](./rocketmq/rocketmq_zh.md)
+
 - [Redis连接器](./redis/redis_zh.md)
 
 - [MongoDB连接器](./mongodb/mongodb_zh.md)
