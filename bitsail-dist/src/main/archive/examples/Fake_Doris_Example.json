@@ -47,7 +47,7 @@
         {
           "index": 5,
           "name": "date_type",
-          "type": "date"
+          "type": "date.date"
         },
         {
           "index": 6,
