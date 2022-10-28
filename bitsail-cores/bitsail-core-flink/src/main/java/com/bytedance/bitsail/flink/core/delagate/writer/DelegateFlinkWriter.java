@@ -35,11 +35,11 @@ import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfoUtils;
 import com.bytedance.bitsail.common.util.Pair;
 import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConvertSerializer;
 import com.bytedance.bitsail.flink.core.delagate.serializer.DelegateSimpleVersionedSerializer;
 import com.bytedance.bitsail.flink.core.runtime.RuntimeContextInjectable;
-import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -109,7 +109,7 @@ public class DelegateFlinkWriter<InputT, CommitT, WriterStateT> extends Abstract
     this.writerGenerator = writerGenerator;
 
     List<ColumnInfo> columnInfos = writerConfiguration.get(WriterOptions.BaseWriterOptions.COLUMNS);
-    this.typeInfos = ColumnFlinkTypeInfoUtil
+    this.typeInfos = TypeInfoUtils
         .getTypeInfos(writerGenerator.createTypeInfoConverter(),
             columnInfos);
 

@@ -19,7 +19,7 @@
 
 package com.bytedance.bitsail.base.connector.reader.v1;
 
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
 import java.io.Serializable;
 import java.util.List;

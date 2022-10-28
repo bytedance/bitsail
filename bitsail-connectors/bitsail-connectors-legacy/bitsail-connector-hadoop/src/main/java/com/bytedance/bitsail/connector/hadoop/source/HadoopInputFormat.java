@@ -26,8 +26,6 @@ import com.bytedance.bitsail.connector.hadoop.common.TextInputFormatErrorCode;
 import com.bytedance.bitsail.connector.hadoop.option.HadoopReaderOptions;
 import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
 
-import com.google.common.primitives.Ints;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
@@ -40,8 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -73,13 +69,7 @@ public class HadoopInputFormat<K, V> extends
   }
 
   private static int[] createFieldIndexes(List<ColumnInfo> columnInfos) {
-    if (CollectionUtils.isNotEmpty(columnInfos)
-        && Objects.isNull(columnInfos.get(0).getIndex())) {
-      return IntStream.range(0, columnInfos.size()).toArray();
-    }
-    return Ints.toArray(columnInfos.stream()
-        .map(ColumnInfo::getIndex)
-        .collect(Collectors.toList()));
+    return IntStream.range(0, columnInfos.size()).toArray();
   }
 
   @Override

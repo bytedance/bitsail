@@ -35,11 +35,11 @@ public interface FakeReaderOptions extends ReaderOptions.BaseReaderOptions {
       key(READER_PREFIX + "rate")
           .defaultValue(10);
 
-  ConfigOption<Double> RANDOM_NULL_RATE =
-      key(READER_PREFIX + "random_null_rate")
-          .defaultValue(0.1);
+  ConfigOption<Long> LOWER_LIMIT =
+      key(READER_PREFIX + "lower_limit")
+          .defaultValue(0L);
 
-  ConfigOption<String> UNIQUE_FIELDS =
-      key(READER_PREFIX + "unique_fields")
-          .noDefaultValue(String.class);
+  ConfigOption<Long> UPPER_LIMIT =
+      key(READER_PREFIX + "upper_limit")
+          .defaultValue(100_000_00L);
 }

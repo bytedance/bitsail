@@ -19,14 +19,24 @@
 
 package com.bytedance.bitsail.common.typeinfo;
 
+import com.google.common.collect.Lists;
+
+import java.util.List;
 import java.util.Objects;
 
 public class BasicTypeInfo<T> extends TypeInfo<T> {
 
   private final Class<T> clazz;
 
+  private List<TypeProperty> typeProperties;
+
   public BasicTypeInfo(Class<T> clazz) {
+    this(clazz, Lists.newArrayList());
+  }
+
+  public BasicTypeInfo(Class<T> clazz, List<TypeProperty> typeProperties) {
     this.clazz = clazz;
+    this.typeProperties = typeProperties;
   }
 
   @Override
@@ -48,6 +58,16 @@ public class BasicTypeInfo<T> extends TypeInfo<T> {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public List<TypeProperty> getTypeProperties() {
+    return typeProperties;
+  }
+
+  @Override
+  public void setTypeProperties(List<TypeProperty> typeProperties) {
+    this.typeProperties = typeProperties;
   }
 
   @Override

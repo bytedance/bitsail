@@ -17,32 +17,13 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.common.typeinfo;
+package com.bytedance.bitsail.base.format;
 
 import java.io.Serializable;
-import java.util.List;
 
-public abstract class TypeInfo<T> implements Serializable {
-  /**
-   * Gets the class of the type represented by this type information.
-   *
-   * @return The class of the type represented by this type information.
-   */
-  public abstract Class<T> getTypeClass();
+public interface DeserializationSchema<I, O> extends Serializable {
 
-  /**
-   * Indicate type extension properties, prepare for future.
-   * Extension properties like
-   * <pre>
-   *    nullable;
-   *    not null'
-   *  </pre>
-   */
-  public List<TypeProperty> getTypeProperties() {
-    throw new UnsupportedOperationException();
-  }
+  O deserialize(I message);
 
-  public void setTypeProperties(List<TypeProperty> typeProperties) {
-
-  }
+  boolean isEndOfStream(O nextElement);
 }

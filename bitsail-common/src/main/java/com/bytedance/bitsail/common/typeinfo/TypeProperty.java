@@ -19,57 +19,26 @@
 
 package com.bytedance.bitsail.common.typeinfo;
 
-public enum Types {
-  VOID,
-  SHORT,
-  INT,
-  LONG,
-  FLOAT,
-  DOUBLE,
-  BIGDECIMAL,
-  BIGINTEGER,
-  BYTE,
-  BINARY,
-  DATE,
-  TIME,
-  TIMESTAMP,
-  BOOLEAN,
-  STRING,
-  LIST,
-  MAP,
-  /**
-   * Binary will replace bytes
-   */
-  @Deprecated
-  BYTES,
-  /**
-   * DATE_TIME & DATE_DATE & DATE_DATE_TIME will be deprecated in the future.
-   */
-  @Deprecated
-  DATE_DATE {
-    @Override
-    public String getTypeStringNickName() {
-      return "date.date";
-    }
-  },
+import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 
-  @Deprecated
-  DATE_TIME {
-    @Override
-    public String getTypeStringNickName() {
-      return "date.time";
-    }
-  },
+import java.io.Serializable;
+import java.util.Map;
 
-  @Deprecated
-  DATE_DATE_TIME {
-    @Override
-    public String getTypeStringNickName() {
-      return "date.datetime";
-    }
-  };
+public enum TypeProperty implements Serializable {
 
-  public String getTypeStringNickName() {
-    return null;
+  NULLABLE,
+
+  NOT_NULL,
+
+  UNIQUE;
+
+  public static final Map<String, TypeProperty> PROPERTY_MAP =
+      Maps.newHashMap();
+
+  static {
+    for (TypeProperty property : TypeProperty.values()) {
+      PROPERTY_MAP.put(StringUtils.upperCase(property.name()), property);
+    }
   }
 }

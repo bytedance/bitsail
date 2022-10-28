@@ -28,14 +28,21 @@ import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.flink.core.delagate.reader.source.DelegateFlinkSource;
 import com.bytedance.bitsail.flink.core.execution.FlinkExecutionEnviron;
+import com.bytedance.bitsail.flink.core.plugins.InputAdapter;
 
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
 public class FlinkSourceDAGBuilder<T, SplitT extends SourceSplit, StateT extends Serializable>
     implements DataReaderDAGBuilder, ParallelismComputable {
+  private static final Logger LOG = LoggerFactory.getLogger(FlinkSourceDAGBuilder.class);
 
   private Source<T, SplitT, StateT> source;
 
@@ -54,12 +61,24 @@ public class FlinkSourceDAGBuilder<T, SplitT extends SourceSplit, StateT extends
   }
 
   public DataStream<T> fromSource(FlinkExecutionEnviron executionEnviron,
-                                  int readerParallelism) {
-    return executionEnviron.getExecutionEnvironment()
+                                  int readerParallelism) throws Exception {
+    DataStream<T> dataStream = executionEnviron.getExecutionEnvironment()
         //todo watermark
         .fromSource(delegateFlinkSource, WatermarkStrategy.noWatermarks(), source.getReaderName())
         .setParallelism(readerParallelism)
         .uid(source.getReaderName());
+
+    TypeInformation<T> typeInformation = dataStream.getType();
+
+    //todo remove in future
+    InputAdapter inputAdapter = new InputAdapter();
+    inputAdapter.initFromConf(executionEnviron.getCommonConfiguration(), BitSailConfiguration.newDefault(), (RowTypeInfo) typeInformation);
+    dataStream = dataStream
+        .flatMap((FlatMapFunction) inputAdapter)
+        .name(inputAdapter.getType())
+        .setParallelism(dataStream.getParallelism());
+
+    return dataStream;
   }
 
   @Override

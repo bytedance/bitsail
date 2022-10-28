@@ -26,8 +26,6 @@ import lombok.ToString;
 
 import java.io.Serializable;
 
-import static org.apache.commons.lang3.StringUtils.upperCase;
-
 @EqualsAndHashCode(of = {"name", "type"})
 @NoArgsConstructor
 @Getter
@@ -38,7 +36,7 @@ public class ColumnInfo implements Serializable {
   private String type;
   private String comment;
   private Object defaultValue;
-  private Integer index;
+  private String properties;
 
   @Builder
   public ColumnInfo(String name, String type) {
@@ -61,16 +59,6 @@ public class ColumnInfo implements Serializable {
     this.defaultValue = defaultValue;
   }
 
-  public ColumnInfo(String name,
-                    String type,
-                    String comment,
-                    Object defaultValue,
-                    Integer index) {
-    this(name, type, comment);
-    this.defaultValue = defaultValue;
-    this.index = index;
-  }
-
   public String getComment() {
     return comment;
   }
@@ -83,7 +71,4 @@ public class ColumnInfo implements Serializable {
     return type;
   }
 
-  public ColumnInfo toUpperCase() {
-    return new ColumnInfo(upperCase(name), upperCase(type), upperCase(comment), defaultValue, index);
-  }
 }

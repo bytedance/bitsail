@@ -35,13 +35,13 @@ import org.apache.flink.api.common.typeinfo.PrimitiveArrayTypeInfo;
 import org.apache.flink.api.common.typeinfo.SqlTimeTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
+import org.apache.flink.types.Row;
 
 import java.util.List;
 
 public class NativeFlinkTypeInfoUtil {
 
   public static RowTypeInfo getRowTypeInformation(List<ColumnInfo> columnInfos) {
-
     return getRowTypeInformation(columnInfos, new BitSailTypeInfoConverter());
   }
 
@@ -64,13 +64,24 @@ public class NativeFlinkTypeInfoUtil {
     return new RowTypeInfo(fieldTypes, fieldNames);
   }
 
+  public static TypeInformation<Row> getRowTypeInformation(TypeInfo<?>[] typeInfos) {
+
+    TypeInformation<?>[] fieldTypes = new TypeInformation[typeInfos.length];
+
+    for (int index = 0; index < typeInfos.length; index++) {
+      fieldTypes[index] = toNativeFlinkTypeInformation(typeInfos[index]);
+    }
+
+    return new RowTypeInfo(fieldTypes);
+  }
+
   private static TypeInformation<?> toNativeFlinkTypeInformation(TypeInfo<?> typeInfo) {
     Class<?> internalTypeClass = typeInfo.getTypeClass();
     if (internalTypeClass == TypeInfos.SHORT_TYPE_INFO.getTypeClass()) {
       return BasicTypeInfo.SHORT_TYPE_INFO;
     }
 
-    if (internalTypeClass == PrimitiveTypes.VOID.getTypeInfo().getTypeClass()) {
+    if (internalTypeClass == TypeInfos.VOID_TYPE_INFO.getTypeClass()) {
       return BasicTypeInfo.VOID_TYPE_INFO;
     }
 
@@ -152,7 +163,7 @@ public class NativeFlinkTypeInfoUtil {
       return new org.apache.flink.api.java.typeutils.ListTypeInfo<>(toNativeFlinkTypeInformation(elementTypeInfo));
     }
 
-    throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-        "Custom type info: " + typeInfo + " is not supported in flink!");
+    throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT, String
+        .format("BitSail type info %s not support in flink runtime.", typeInfo));
   }
 }

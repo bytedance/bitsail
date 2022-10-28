@@ -28,6 +28,10 @@ import com.bytedance.bitsail.common.exception.CommonErrorCode;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 
 @SuppressWarnings("checkstyle:MagicNumber")
@@ -58,14 +62,23 @@ public class DateColumn extends Column {
     this.setSubType(DateType.TIME);
   }
 
-  public DateColumn(final java.sql.Timestamp ts) {
-    this(ts == null ? null : ts.getTime());
+  public DateColumn(final LocalDate localDate) {
+    super(localDate == null ? null : localDate, 8);
+    this.setSubType(DateType.DATE);
+  }
+
+  public DateColumn(final LocalTime localTime) {
+    super(localTime == null ? null : localTime, 7);
+    this.setSubType(DateType.TIME);
+  }
+
+  public DateColumn(final LocalDateTime localDateTime) {
+    super(localDateTime == null ? null : localDateTime, 15);
     this.setSubType(DateType.DATETIME);
   }
 
   @Override
   public Long asLong() {
-
     return (Long) this.getRawData();
   }
 
@@ -85,7 +98,12 @@ public class DateColumn extends Column {
     if (null == this.getRawData()) {
       return null;
     }
-
+    if (getRawData() instanceof LocalDate) {
+      return new Date(Instant.from(((LocalDate) getRawData()).atStartOfDay()).toEpochMilli());
+    }
+    if (getRawData() instanceof LocalDateTime) {
+      return new Date(Instant.from(((LocalDateTime) getRawData())).toEpochMilli());
+    }
     return new Date((Long) this.getRawData());
   }
 

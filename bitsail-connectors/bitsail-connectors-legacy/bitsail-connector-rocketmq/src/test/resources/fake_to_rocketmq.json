@@ -62,7 +62,7 @@
         {
           "index": 2,
           "name": "int_field",
-          "type": "bigint"
+          "type": "long"
         },
         {
           "index": 3,

@@ -18,18 +18,19 @@
 package com.bytedance.bitsail.common.type;
 
 import com.bytedance.bitsail.common.BitSailException;
-import com.bytedance.bitsail.common.ddl.typeinfo.ListTypeInfo;
-import com.bytedance.bitsail.common.ddl.typeinfo.MapTypeInfo;
-import com.bytedance.bitsail.common.ddl.typeinfo.PrimitiveTypes;
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
+import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 
 /**
  * Created 2022/5/11
  *
  * @author ke.hao
  */
-public class MongoTypeInfoConverter extends BaseEngineTypeInfoConverter {
+public class MongoTypeInfoConverter extends FileMappingTypeInfoConverter {
 
   private static final String OBJECT_TYPE = "object";
   private static final String ARRAY_TYPE = "array";
@@ -39,7 +40,7 @@ public class MongoTypeInfoConverter extends BaseEngineTypeInfoConverter {
   }
 
   @Override
-  public TypeInfo<?> toTypeInfo(String engineType) {
+  public TypeInfo<?> fromTypeString(String engineType) {
     engineType = trim(engineType);
     if (isBasicType(engineType)) {
       return getBasicTypeInfoFromMongoDBType(engineType);
@@ -67,7 +68,7 @@ public class MongoTypeInfoConverter extends BaseEngineTypeInfoConverter {
 
   public TypeInfo<?> getListTypeInfoFromMongoDBType(String type) {
     if (type.equals(ARRAY_TYPE)) {
-      return new ListTypeInfo<>(PrimitiveTypes.STRING.getTypeInfo());
+      return new ListTypeInfo<>(TypeInfos.STRING_TYPE_INFO);
     }
     if (!type.endsWith(">")) {
       throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
@@ -81,7 +82,7 @@ public class MongoTypeInfoConverter extends BaseEngineTypeInfoConverter {
 
   public TypeInfo<?> getMapTypeInfoFromMongoDBType(String type) {
     if (type.equals(OBJECT_TYPE)) {
-      return new MapTypeInfo<>(PrimitiveTypes.STRING.getTypeInfo(), PrimitiveTypes.STRING.getTypeInfo());
+      return new MapTypeInfo<>(TypeInfos.STRING_TYPE_INFO, TypeInfos.STRING_TYPE_INFO);
     }
     if (!type.endsWith(">") || !type.contains(",")) {
       throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,

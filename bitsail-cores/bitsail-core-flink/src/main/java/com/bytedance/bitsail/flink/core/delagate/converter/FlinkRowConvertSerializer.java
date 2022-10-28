@@ -31,6 +31,7 @@ import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.types.Row;
 
 import java.io.IOException;

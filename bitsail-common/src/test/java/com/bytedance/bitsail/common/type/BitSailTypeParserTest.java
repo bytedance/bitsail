@@ -17,32 +17,30 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.common.typeinfo;
+package com.bytedance.bitsail.common.type;
 
-import java.io.Serializable;
+import com.bytedance.bitsail.common.typeinfo.TypeProperty;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.List;
 
-public abstract class TypeInfo<T> implements Serializable {
-  /**
-   * Gets the class of the type represented by this type information.
-   *
-   * @return The class of the type represented by this type information.
-   */
-  public abstract Class<T> getTypeClass();
+public class BitSailTypeParserTest {
 
-  /**
-   * Indicate type extension properties, prepare for future.
-   * Extension properties like
-   * <pre>
-   *    nullable;
-   *    not null'
-   *  </pre>
-   */
-  public List<TypeProperty> getTypeProperties() {
-    throw new UnsupportedOperationException();
+  @Test
+  public void fromTypePropertyString() {
+    String uniqTypeProperty = "unique";
+
+    List<TypeProperty> typeProperties = BitSailTypeParser.fromTypePropertyString(uniqTypeProperty);
+    Assert.assertEquals(TypeProperty.UNIQUE, typeProperties.get(0));
+
+    String uniqWithNotNullTypeProperty = "unique,not_null";
+
+    List<TypeProperty> uniqWithNotNullTypePropertyProperties = BitSailTypeParser
+        .fromTypePropertyString(uniqWithNotNullTypeProperty);
+    Assert.assertEquals(TypeProperty.UNIQUE, uniqWithNotNullTypePropertyProperties.get(0));
+    Assert.assertEquals(TypeProperty.NOT_NULL, uniqWithNotNullTypePropertyProperties.get(1));
   }
 
-  public void setTypeProperties(List<TypeProperty> typeProperties) {
-
-  }
 }

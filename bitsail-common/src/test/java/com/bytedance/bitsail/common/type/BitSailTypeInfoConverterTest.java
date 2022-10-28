@@ -143,4 +143,10 @@ public class BitSailTypeInfoConverterTest {
     TypeInfo<?> bytesTypeInfo = converter.fromTypeString("bytes");
     Assert.assertEquals(bytesTypeInfo.getTypeClass(), byte[].class);
   }
+
+  @Test
+  public void testVoidType() {
+    TypeInfo<?> voidTypeInfo = converter.fromTypeString("void");
+    Assert.assertEquals(voidTypeInfo.getTypeClass(), void.class);
+  }
 }

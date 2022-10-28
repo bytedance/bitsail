@@ -89,7 +89,7 @@ public class RocketMQOutputFormat extends OutputFormatPlugin<Row> implements Res
     LOG.info("RocketMQ sink format type: " + sinkFormat);
 
     // transform bitsail row to flink row
-    this.rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(RocketMQConstants.CONNECTOR_NAME, columns);
+    this.rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columns);
     LOG.info("Output Row Type Info: " + rowTypeInfo);
 
     // get serialization schema
