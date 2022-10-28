@@ -191,6 +191,13 @@ Link to [Configuration Guide](docs/config.md).
 ## Contributing Guide
 Link to [Contributing Guide](docs/contributing.md).
 
+## Contributors
+**Thanks all contributors**<br>
+
+<a href="https://github.com/bytedance/bitsail/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=bytedance/bitsail" />
+</a>
+
 ## License
 [Apache 2.0 License](LICENSE).
 
