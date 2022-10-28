@@ -95,7 +95,7 @@ public class BitSailTypeParser {
       return TypeInfos.SHORT_TYPE_INFO;
     } else if (equalsTypeString(typeString, Types.INT)) {
       return TypeInfos.INT_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.LONG)) {
+    } else if (equalsTypeString(typeString, Types.LONG) || equalsTypeString(typeString, Types.BIGINT)) {
       return TypeInfos.LONG_TYPE_INFO;
     } else if (equalsTypeString(typeString, Types.FLOAT)) {
       return TypeInfos.FLOAT_TYPE_INFO;

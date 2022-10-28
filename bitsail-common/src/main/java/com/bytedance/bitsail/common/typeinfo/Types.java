@@ -24,6 +24,10 @@ public enum Types {
   SHORT,
   INT,
   LONG,
+  /**
+   * Same with {@link  Types#LONG}, for history compatible.
+   */
+  BIGINT,
   FLOAT,
   DOUBLE,
   BIGDECIMAL,
@@ -38,7 +42,7 @@ public enum Types {
   LIST,
   MAP,
   /**
-   * Binary will replace bytes
+   * Same with {@link Types#BINARY}, for history compatible.
    */
   @Deprecated
   BYTES,
