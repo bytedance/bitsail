@@ -53,7 +53,7 @@
         {
           "index": 6,
           "name": "date_type",
-          "type": "date"
+          "type": "date.date"
         }
       ]
     },
