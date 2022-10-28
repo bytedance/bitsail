@@ -30,6 +30,7 @@ import com.bytedance.bitsail.flink.core.typeinfo.PrimitiveColumnTypeInfo;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.common.typeinfo.PrimitiveArrayTypeInfo;
 import org.apache.flink.api.common.typeinfo.SqlTimeTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.ListTypeInfo;
@@ -234,7 +235,7 @@ public class ColumnFlinkTypeInfoUtil {
       return PrimitiveColumnTypeInfo.DATE_COLUMN_TYPE_INFO;
     }
 
-    if (internalTypeClass == org.apache.flink.api.common.typeinfo.BasicArrayTypeInfo.BYTE_ARRAY_TYPE_INFO.getTypeClass()) {
+    if (internalTypeClass == PrimitiveArrayTypeInfo.BYTE_PRIMITIVE_ARRAY_TYPE_INFO.getTypeClass()) {
       return PrimitiveColumnTypeInfo.BYTES_COLUMN_TYPE_INFO;
     }
 

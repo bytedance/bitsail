@@ -33,7 +33,7 @@
         {
           "index": 2,
           "name": "bigint_type",
-          "type": "bigint"
+          "type": "long"
         },
         {
           "index": 3,
