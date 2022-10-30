@@ -92,7 +92,7 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
     } else if (PrimitiveTypes.DOUBLE.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
       return faker.number().randomDouble(5, -1_000_000_000, 1_000_000_000);
 
-    } else if (PrimitiveTypes.BYTE.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
+    } else if (PrimitiveTypes.BINARY.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
       return faker.name().fullName().getBytes();
 
     } else if (PrimitiveTypes.DATE_DATE.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {

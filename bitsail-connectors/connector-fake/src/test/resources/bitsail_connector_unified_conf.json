@@ -19,8 +19,12 @@
           "type": "long"
         },
         {
-          "name": "id",
+          "name": "c_date",
           "type": "date"
+        },
+        {
+          "name": "c_binary",
+          "type": "binary"
         }
       ]
     },
