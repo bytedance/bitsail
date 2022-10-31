@@ -158,8 +158,8 @@ public class DateColumn extends Column {
     DATE,
     TIME,
     DATETIME,
-    LOCAL_DATE,
     LOCAL_TIME,
+    LOCAL_DATE,
     LOCAL_DATE_TIME
   }
 }

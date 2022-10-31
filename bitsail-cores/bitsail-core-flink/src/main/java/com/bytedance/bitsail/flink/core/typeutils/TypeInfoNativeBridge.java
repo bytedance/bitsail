@@ -35,6 +35,9 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Bridge class for {@link TypeInfo} and {@link BasicTypeInfo}
+ */
 public class TypeInfoNativeBridge {
 
   public static final Map<TypeInfo<?>, TypeInformation<?>> NATIVE_BRIDGE_TYPE_INFO_MAPPING =
@@ -103,7 +106,7 @@ public class TypeInfoNativeBridge {
     return typeInformation;
   }
 
-  public static TypeInfo<?> recoverBridgeTypeInfo(TypeInformation<?> typeInformation) {
+  public static TypeInfo<?> bridgeTypeInfo(TypeInformation<?> typeInformation) {
     TypeInfo<?> bridge = TYPE_INFO_CLASS_MAPPING.get(typeInformation.getTypeClass());
     if (Objects.isNull(bridge)) {
       throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT, String

@@ -52,7 +52,7 @@ public class Entry {
   private static Process process;
   private static volatile boolean running;
 
-  private final URLClassLoader classLoader;
+  private final URLClassLoader classloader;
   private final BitSailConfiguration sysConfiguration;
   private final BaseCommandArgs baseCommandArgs;
 
@@ -68,7 +68,7 @@ public class Entry {
                 BaseCommandArgs baseCommandArgs) {
     this.sysConfiguration = sysConfiguration;
     this.baseCommandArgs = baseCommandArgs;
-    this.classLoader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
+    this.classloader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
     loadAllEngines();
   }
 
@@ -132,7 +132,7 @@ public class Entry {
       throw new IllegalArgumentException(String.format("Engine %s not support now.", engineName));
     }
     engineRunner.initializeEngine(sysConfiguration);
-    engineRunner.loadLibrary(classLoader);
+    engineRunner.loadLibrary(classloader);
 
     ProcessBuilder procBuilder = engineRunner.getProcBuilder(
         jobConfiguration,

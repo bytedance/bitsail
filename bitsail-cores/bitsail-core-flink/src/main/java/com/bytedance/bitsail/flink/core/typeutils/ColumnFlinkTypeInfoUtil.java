@@ -78,6 +78,6 @@ public class ColumnFlinkTypeInfoUtil {
       return new ListColumnTypeInfo(toColumnFlinkTypeInformation(elementTypeInfo));
     }
 
-    return TypeInfoColumnBridge.bridge(typeInfo);
+    return TypeInfoColumnBridge.bridgeTypeInfo(typeInfo);
   }
 }

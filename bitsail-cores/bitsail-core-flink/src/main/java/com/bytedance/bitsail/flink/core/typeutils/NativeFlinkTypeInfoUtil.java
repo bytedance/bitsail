@@ -17,6 +17,8 @@
 
 package com.bytedance.bitsail.flink.core.typeutils;
 
+import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
@@ -96,8 +98,8 @@ public class NativeFlinkTypeInfoUtil {
       return typeInfos;
     }
 
-    //todo
-    return null;
+    throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,
+        "Only support row type info, code should not enter here.");
   }
 
   public static TypeInfo<?> toTypeInfo(TypeInformation<?> typeInformation) {
@@ -105,19 +107,19 @@ public class NativeFlinkTypeInfoUtil {
       org.apache.flink.api.java.typeutils.MapTypeInfo<?, ?> mapTypeInfo =
           (org.apache.flink.api.java.typeutils.MapTypeInfo<?, ?>) typeInformation;
       return new MapTypeInfo<>(
-          TypeInfoNativeBridge.recoverBridgeTypeInfo(mapTypeInfo.getKeyTypeInfo()),
-          TypeInfoNativeBridge.recoverBridgeTypeInfo(mapTypeInfo.getValueTypeInfo())
+          TypeInfoNativeBridge.bridgeTypeInfo(mapTypeInfo.getKeyTypeInfo()),
+          TypeInfoNativeBridge.bridgeTypeInfo(mapTypeInfo.getValueTypeInfo())
       );
 
     } else if (typeInformation instanceof org.apache.flink.api.java.typeutils.ListTypeInfo) {
       org.apache.flink.api.java.typeutils.ListTypeInfo<?> listTypeInfo =
           (org.apache.flink.api.java.typeutils.ListTypeInfo<?>) typeInformation;
       return new ListTypeInfo<>(
-          TypeInfoNativeBridge.recoverBridgeTypeInfo(listTypeInfo.getElementTypeInfo())
+          TypeInfoNativeBridge.bridgeTypeInfo(listTypeInfo.getElementTypeInfo())
       );
 
     } else {
-      return TypeInfoNativeBridge.recoverBridgeTypeInfo(typeInformation);
+      return TypeInfoNativeBridge.bridgeTypeInfo(typeInformation);
     }
   }
 

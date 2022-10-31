@@ -32,6 +32,9 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Bridge class for {@link TypeInfo} and {@link PrimitiveColumnTypeInfo}
+ */
 public class TypeInfoColumnBridge {
 
   public static final Map<TypeInfo<?>, TypeInformation<?>> COLUMN_BRIDGE_TYPE_INFO_MAPPING =
@@ -84,7 +87,7 @@ public class TypeInfoColumnBridge {
     }
   }
 
-  public static TypeInformation<?> bridge(TypeInfo<?> bridge) {
+  public static TypeInformation<?> bridgeTypeInfo(TypeInfo<?> bridge) {
     TypeInformation<?> typeInformation = COLUMN_BRIDGE_CLASS_MAPPING.get(bridge.getTypeClass());
     if (Objects.isNull(typeInformation)) {
       throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT, String
