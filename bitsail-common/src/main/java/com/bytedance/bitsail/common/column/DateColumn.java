@@ -28,10 +28,10 @@ import com.bytedance.bitsail.common.exception.CommonErrorCode;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 @SuppressWarnings("checkstyle:MagicNumber")
@@ -99,10 +99,14 @@ public class DateColumn extends Column {
       return null;
     }
     if (getRawData() instanceof LocalDate) {
-      return new Date(Instant.from(((LocalDate) getRawData()).atStartOfDay()).toEpochMilli());
+      LocalDate localDate = ((LocalDate) getRawData());
+      return new Date(localDate.atStartOfDay().atZone(ZoneOffset.systemDefault())
+          .toInstant().toEpochMilli());
     }
     if (getRawData() instanceof LocalDateTime) {
-      return new Date(Instant.from(((LocalDateTime) getRawData())).toEpochMilli());
+      LocalDateTime localDateTime = ((LocalDateTime) getRawData());
+      return new Date(localDateTime.atZone(ZoneOffset.systemDefault())
+          .toInstant().toEpochMilli());
     }
     return new Date((Long) this.getRawData());
   }
