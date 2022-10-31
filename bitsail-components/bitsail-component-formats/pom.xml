@@ -30,9 +30,6 @@
 
     <artifactId>bitsail-component-formats</artifactId>
     <packaging>pom</packaging>
-    <modules>
-        <module>bitsail-component-format-hbase</module>
-    </modules>
 
     <dependencies>
         <dependency>
