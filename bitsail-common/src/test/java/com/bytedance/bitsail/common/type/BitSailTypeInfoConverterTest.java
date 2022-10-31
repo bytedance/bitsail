@@ -60,7 +60,7 @@ public class BitSailTypeInfoConverterTest {
   @Test
   public void testBooleanType() {
     TypeInfo<?> typeInfo = converter.fromTypeString("boolean");
-    Assert.assertEquals(typeInfo.getTypeClass(), boolean.class);
+    Assert.assertEquals(typeInfo.getTypeClass(), Boolean.class);
   }
 
   @Test
@@ -108,19 +108,19 @@ public class BitSailTypeInfoConverterTest {
   @Test
   public void testNumberType() {
     TypeInfo<?> longTypeInfo = converter.fromTypeString("long");
-    Assert.assertEquals(longTypeInfo.getTypeClass(), long.class);
+    Assert.assertEquals(longTypeInfo.getTypeClass(), Long.class);
 
     TypeInfo<?> intTypeInfo = converter.fromTypeString("int");
-    Assert.assertEquals(intTypeInfo.getTypeClass(), int.class);
+    Assert.assertEquals(intTypeInfo.getTypeClass(), Integer.class);
 
     TypeInfo<?> shortTypeInfo = converter.fromTypeString("short");
-    Assert.assertEquals(shortTypeInfo.getTypeClass(), short.class);
+    Assert.assertEquals(shortTypeInfo.getTypeClass(), Short.class);
 
     TypeInfo<?> floatTypeInfo = converter.fromTypeString("float");
-    Assert.assertEquals(floatTypeInfo.getTypeClass(), float.class);
+    Assert.assertEquals(floatTypeInfo.getTypeClass(), Float.class);
 
     TypeInfo<?> doubleTypeInfo = converter.fromTypeString("double");
-    Assert.assertEquals(doubleTypeInfo.getTypeClass(), double.class);
+    Assert.assertEquals(doubleTypeInfo.getTypeClass(), Double.class);
 
     TypeInfo<?> bigDecimalTypeInfo = converter.fromTypeString("bigdecimal");
     Assert.assertEquals(bigDecimalTypeInfo.getTypeClass(), BigDecimal.class);
@@ -132,7 +132,7 @@ public class BitSailTypeInfoConverterTest {
   @Test
   public void testByteType() {
     TypeInfo<?> typeInfo = converter.fromTypeString("byte");
-    Assert.assertEquals(typeInfo.getTypeClass(), byte.class);
+    Assert.assertEquals(typeInfo.getTypeClass(), Byte.class);
   }
 
   @Test
@@ -147,6 +147,6 @@ public class BitSailTypeInfoConverterTest {
   @Test
   public void testVoidType() {
     TypeInfo<?> voidTypeInfo = converter.fromTypeString("void");
-    Assert.assertEquals(voidTypeInfo.getTypeClass(), void.class);
+    Assert.assertEquals(voidTypeInfo.getTypeClass(), Void.class);
   }
 }
