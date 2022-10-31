@@ -25,7 +25,8 @@ import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.type.BaseEngineTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 import com.bytedance.bitsail.connector.doris.DorisConnectionHolder;
 import com.bytedance.bitsail.connector.doris.committer.DorisCommittable;
 import com.bytedance.bitsail.connector.doris.committer.DorisCommittableSerializer;
@@ -56,6 +57,7 @@ public class DorisWriterGenerator<InputT> implements WriterGenerator<InputT, Dor
   private DorisExecutionOptions.WRITE_MODE writeMode;
   private DorisOptions dorisOptions;
   private DorisExecutionOptions dorisExecutionOptions;
+
   @Override
   public String getWriterName() {
     return "doris";
@@ -94,8 +96,8 @@ public class DorisWriterGenerator<InputT> implements WriterGenerator<InputT, Dor
   }
 
   @Override
-  public BaseEngineTypeInfoConverter createTypeInfoConverter() {
-    return WriterGenerator.super.createTypeInfoConverter();
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new FileMappingTypeInfoConverter(getWriterName());
   }
 
   @Override

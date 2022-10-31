@@ -17,29 +17,31 @@
 
 package com.bytedance.bitsail.connector.hbase.source;
 
+import com.bytedance.bitsail.base.format.DeserializationFormat;
+import com.bytedance.bitsail.base.format.DeserializationSchema;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.constants.Constants;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.ReaderOptions;
+import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfoUtils;
 import com.bytedance.bitsail.common.util.Preconditions;
-import com.bytedance.bitsail.component.format.api.RowBuilder;
-import com.bytedance.bitsail.component.format.hbase.HBaseRowBuilder;
+import com.bytedance.bitsail.component.format.hbase.HBaseDeserializationFormat;
 import com.bytedance.bitsail.connector.hadoop.source.HadoopInputFormatCommonBasePlugin;
 import com.bytedance.bitsail.connector.hbase.HBaseHelper;
 import com.bytedance.bitsail.connector.hbase.error.HBasePluginErrorCode;
 import com.bytedance.bitsail.connector.hbase.option.HBaseReaderOptions;
 import com.bytedance.bitsail.connector.hbase.source.split.RegionSplit;
 import com.bytedance.bitsail.flink.core.parallelism.SelfParallelismAdvice;
-import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
-import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.io.DefaultInputSplitAssigner;
 import org.apache.flink.api.common.io.statistics.BaseStatistics;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -76,6 +78,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, InputSplit>
     implements ResultTypeQueryable<Row>, SelfParallelismAdvice {
@@ -125,21 +128,12 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
 
   private transient Result value;
 
+  private TypeInfo<?>[] typeInfos;
   private RowTypeInfo rowTypeInfo;
-
-  /**
-   * Hbase uses different reception methods for different types, while the original type needs to be retained.
-   */
-  private RowTypeInfo inputRowTypeInfo;
-
   private List<String> columnNames;
   private Set<String> columnFamilies;
-  private RowBuilder rowBuilder;
-
-  /**
-   * HBase charsets, default UTF-8.
-   */
-  private String encoding = StandardCharsets.UTF_8.name();
+  private DeserializationFormat<byte[][], Row> deserializationFormat;
+  private transient DeserializationSchema<byte[][], Row> deserializationSchema;
 
   /**
    * Parameters for Hbase/TableInputFormat.
@@ -159,16 +153,16 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
   public void initPlugin() throws Exception {
     this.tableName = inputSliceConfig.get(HBaseReaderOptions.TABLE);
     this.hbaseConfig = inputSliceConfig.get(HBaseReaderOptions.HBASE_CONF);
-    this.encoding = inputSliceConfig.get(HBaseReaderOptions.ENCODING);
+    this.deserializationFormat = new HBaseDeserializationFormat(inputSliceConfig);
 
     this.columnFamilies = new LinkedHashSet<>();
     List<ColumnInfo> columnInfos = inputSliceConfig.getNecessaryOption(
         HBaseReaderOptions.COLUMNS, HBasePluginErrorCode.REQUIRED_VALUE);
-    this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation("hbase", columnInfos);
-    this.rowBuilder = new HBaseRowBuilder();
+    typeInfos =
+        TypeInfoUtils.getTypeInfos(new FileMappingTypeInfoConverter(StringUtils.lowerCase(getType())), columnInfos);
 
-    columnNames = Lists.newArrayList(rowTypeInfo.getFieldNames());
-    inputRowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation("hbase", columnInfos);
+    columnNames = columnInfos.stream().map(ColumnInfo::getName)
+        .collect(Collectors.toList());
 
     // Get region numbers in hbase.
     regionCount = (int) RETRYER.call(() -> {
@@ -179,8 +173,8 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
 
     // Check if input column names are in format: [ columnFamily:column ].
     columnNames.stream().peek(column -> Preconditions.checkArgument(
-        (column.contains(":") && column.split(":").length == 2) || ROW_KEY.equalsIgnoreCase(column),
-        "Invalid column names, it should be [ColumnFamily:Column] format"))
+            (column.contains(":") && column.split(":").length == 2) || ROW_KEY.equalsIgnoreCase(column),
+            "Invalid column names, it should be [ColumnFamily:Column] format"))
         .forEach(column -> columnFamilies.add(column.split(":")[0]));
   }
 
@@ -193,6 +187,7 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
     tableInputFormat = new TableInputFormat();
     tableInputFormat.setConf(getConf());
     namesMap = Maps.newConcurrentMap();
+    deserializationSchema = deserializationFormat.createRuntimeDeserializationSchema(typeInfos);
     LOG.info("Starting config HBase input format, maybe so slow........");
   }
 
@@ -223,7 +218,7 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
         LOG.error("Cannot read data from {}, reason: \n", tableName, e);
       }
     }
-    rowBuilder.build(rawRow, reuse, encoding, inputRowTypeInfo);
+    reuse = deserializationSchema.deserialize(rawRow);
     return reuse;
   }
 
@@ -249,6 +244,7 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
 
   /**
    * Firstly initialize {@link TableInputFormat} to create splits.
+   *
    * @param parameters Parameters for connection.
    */
   @Override
@@ -330,7 +326,7 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
    * Transform {@link RegionSplit} into splits that can be accepted by {@link TableInputFormat}.
    *
    * @param inputSplit {@link RegionSplit}.
-   * @param cfs Column families.
+   * @param cfs        Column families.
    * @return Splits read by {@link TableInputFormat}.
    */
   private TableSplit toTableSplit(InputSplit inputSplit, Set<String> cfs) {

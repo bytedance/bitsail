@@ -20,7 +20,6 @@ package com.bytedance.bitsail.flink.core.util;
 import com.bytedance.bitsail.common.column.LongColumn;
 import com.bytedance.bitsail.common.column.StringColumn;
 
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.types.Row;
 import org.junit.Assert;
 import org.junit.Test;
@@ -73,17 +72,5 @@ public class RowUtilTest {
     row.setField(0, mapType);
     row.setField(1, listItem);
     Assert.assertEquals(20, RowUtil.getRowBytesSize(row));
-  }
-
-  @Test
-  public void getRowBytesSizeFromFlinkTupleTypeTest() {
-    final Row row = new Row(2);
-    //4+5
-    Tuple2<Integer, String> t1 = new Tuple2<>(1, "test1");
-    //8+9
-    Tuple2<Long, Tuple2<Integer, String>> t2 = new Tuple2<>(1L, t1);
-    row.setField(0, t1);
-    row.setField(1, t2);
-    Assert.assertEquals(26, RowUtil.getRowBytesSize(row));
   }
 }

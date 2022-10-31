@@ -20,14 +20,12 @@ package com.bytedance.bitsail.connector.hadoop.source;
 import com.bytedance.bitsail.batch.parser.row.TextRowBuilder;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.component.format.api.RowBuilder;
 import com.bytedance.bitsail.connector.hadoop.common.TextInputFormatErrorCode;
 import com.bytedance.bitsail.connector.hadoop.option.HadoopReaderOptions;
 import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
 
-import com.google.common.primitives.Ints;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
@@ -40,8 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -73,13 +69,7 @@ public class HadoopInputFormat<K, V> extends
   }
 
   private static int[] createFieldIndexes(List<ColumnInfo> columnInfos) {
-    if (CollectionUtils.isNotEmpty(columnInfos)
-        && Objects.isNull(columnInfos.get(0).getIndex())) {
-      return IntStream.range(0, columnInfos.size()).toArray();
-    }
-    return Ints.toArray(columnInfos.stream()
-        .map(ColumnInfo::getIndex)
-        .collect(Collectors.toList()));
+    return IntStream.range(0, columnInfos.size()).toArray();
   }
 
   @Override
@@ -100,7 +90,7 @@ public class HadoopInputFormat<K, V> extends
     }
 
     List<ColumnInfo> columnInfos = inputSliceConfig.getNecessaryOption(HadoopReaderOptions.COLUMNS, TextInputFormatErrorCode.REQUIRED_VALUE);
-    this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(StringUtils.lowerCase(getType()), columnInfos);
+    this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(new BitSailTypeInfoConverter(), columnInfos);
     this.fieldIndex = createFieldIndexes(columnInfos);
 
     LOG.info("Row Type Info: " + rowTypeInfo);

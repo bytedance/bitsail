@@ -33,7 +33,7 @@
         {
           "upperCaseName":"ID",
           "name":"id",
-          "type":"bigint"
+          "type":"long"
         },
         {
           "upperCaseName":"TEXT",
@@ -78,7 +78,7 @@
         {
           "upperCaseName":"ID",
           "name":"id",
-          "type":"bigint"
+          "type":"long"
         },
         {
           "upperCaseName":"TEXT",

@@ -28,6 +28,10 @@ import com.bytedance.bitsail.common.exception.CommonErrorCode;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 @SuppressWarnings("checkstyle:MagicNumber")
@@ -58,14 +62,23 @@ public class DateColumn extends Column {
     this.setSubType(DateType.TIME);
   }
 
-  public DateColumn(final java.sql.Timestamp ts) {
-    this(ts == null ? null : ts.getTime());
-    this.setSubType(DateType.DATETIME);
+  public DateColumn(final LocalDate localDate) {
+    super(localDate, 8);
+    this.setSubType(DateType.LOCAL_DATE);
+  }
+
+  public DateColumn(final LocalTime localTime) {
+    super(localTime, 7);
+    this.setSubType(DateType.LOCAL_TIME);
+  }
+
+  public DateColumn(final LocalDateTime localDateTime) {
+    super(localDateTime, 15);
+    this.setSubType(DateType.LOCAL_DATE_TIME);
   }
 
   @Override
   public Long asLong() {
-
     return (Long) this.getRawData();
   }
 
@@ -85,7 +98,16 @@ public class DateColumn extends Column {
     if (null == this.getRawData()) {
       return null;
     }
-
+    if (getRawData() instanceof LocalDate) {
+      LocalDate localDate = ((LocalDate) getRawData());
+      return new Date(localDate.atStartOfDay().atZone(ZoneOffset.systemDefault())
+          .toInstant().toEpochMilli());
+    }
+    if (getRawData() instanceof LocalDateTime) {
+      LocalDateTime localDateTime = ((LocalDateTime) getRawData());
+      return new Date(localDateTime.atZone(ZoneOffset.systemDefault())
+          .toInstant().toEpochMilli());
+    }
     return new Date((Long) this.getRawData());
   }
 
@@ -132,7 +154,12 @@ public class DateColumn extends Column {
     return asDate().compareTo(o.asDate());
   }
 
-  public static enum DateType {
-    DATE, TIME, DATETIME
+  public enum DateType {
+    DATE,
+    TIME,
+    DATETIME,
+    LOCAL_TIME,
+    LOCAL_DATE,
+    LOCAL_DATE_TIME
   }
 }

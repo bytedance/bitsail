@@ -24,6 +24,8 @@ import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 import com.bytedance.bitsail.connector.elasticsearch.base.EsConstants;
 
 import java.util.List;
@@ -53,6 +55,11 @@ public class ElasticsearchWriterGenerator<CommitT> implements WriterGenerator<Ro
                                                         List<EmptyState> writerStates,
                                                         Writer.Context context) {
     return createWriter(writerConf, context);
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new FileMappingTypeInfoConverter(getWriterName());
   }
 
   @Override

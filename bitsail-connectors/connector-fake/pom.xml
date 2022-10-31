@@ -44,6 +44,12 @@
         </dependency>
 
         <dependency>
+            <groupId>cn.ipokerface</groupId>
+            <artifactId>snowflake-id-generator</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-connector-print</artifactId>
             <version>${revision}</version>

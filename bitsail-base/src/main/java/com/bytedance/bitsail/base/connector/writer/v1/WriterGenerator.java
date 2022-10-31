@@ -19,9 +19,9 @@ package com.bytedance.bitsail.base.connector.writer.v1;
 
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
-import com.bytedance.bitsail.common.type.BaseEngineTypeInfoConverter;
-import com.bytedance.bitsail.common.type.SimpleTypeInfoConverter;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -71,8 +71,8 @@ public interface WriterGenerator<InputT, CommitT, WriterStateT> extends Serializ
    * @return A converter which supports conversion from BitSail {@link TypeInfo}
    * and external engine type.
    */
-  default BaseEngineTypeInfoConverter createTypeInfoConverter() {
-    return new SimpleTypeInfoConverter(getWriterName());
+  default TypeInfoConverter createTypeInfoConverter() {
+    return new BitSailTypeInfoConverter();
   }
 
   /**

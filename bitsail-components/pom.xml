@@ -33,6 +33,7 @@
         <module>bitsail-component-progress</module>
         <module>bitsail-component-formats-flink</module>
         <module>bitsail-component-security</module>
+        <module>bitsail-component-formats</module>
     </modules>
 
     <dependencies>

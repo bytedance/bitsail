@@ -33,7 +33,7 @@
         {
           "index": 2,
           "name": "bigint_type",
-          "type": "bigint"
+          "type": "long"
         },
         {
           "index": 3,
@@ -53,7 +53,7 @@
         {
           "index": 6,
           "name": "date_type",
-          "type": "date"
+          "type": "date.date"
         }
       ]
     },

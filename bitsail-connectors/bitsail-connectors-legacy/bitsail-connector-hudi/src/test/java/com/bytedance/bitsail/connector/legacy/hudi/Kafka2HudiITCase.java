@@ -55,7 +55,7 @@ public class Kafka2HudiITCase {
   private static final Logger LOG = LoggerFactory.getLogger(Kafka2HudiITCase.class);
   private static final String[] COLUMNS = {"id", "text", "timestamp"};
   private static final String TEST_SCHEMA =
-      "[{\"name\":\"id\",\"type\":\"bigint\"},{\"name\":\"text\",\"type\":\"string\"},{\"name\":\"timestamp\",\"type\":\"string\"}]";
+      "[{\"name\":\"id\",\"type\":\"long\"},{\"name\":\"text\",\"type\":\"string\"},{\"name\":\"timestamp\",\"type\":\"string\"}]";
   private static final long START_TIME = 1658743200L;
   private static final long SEND_BATCH = 2000L;
   private static final long SEND_INTERVAL = 10L;

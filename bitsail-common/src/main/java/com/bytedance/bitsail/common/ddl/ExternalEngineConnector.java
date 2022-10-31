@@ -18,7 +18,7 @@
 package com.bytedance.bitsail.common.ddl;
 
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.type.BaseEngineTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 
 import java.io.Serializable;
 import java.util.List;
@@ -38,5 +38,5 @@ public interface ExternalEngineConnector extends Serializable {
   /**
    * Create converter for the external engine.
    */
-  BaseEngineTypeInfoConverter createTypeInfoConverter();
+  TypeInfoConverter createTypeInfoConverter();
 }

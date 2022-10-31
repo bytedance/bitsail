@@ -28,6 +28,7 @@ import com.bytedance.bitsail.batch.file.parser.BytesParseFactory;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.connector.hadoop.common.TextInputFormatErrorCode;
 import com.bytedance.bitsail.connector.hadoop.option.HadoopReaderOptions;
 import com.bytedance.bitsail.flink.core.parser.BytesParser;
@@ -116,7 +117,7 @@ public class TextInputFormat extends DelimitedFileInputFormatPlugin implements
     List<ColumnInfo> columnInfos = inputSliceConfig
         .getNecessaryOption(HadoopReaderOptions.COLUMNS, TextInputFormatErrorCode.REQUIRED_VALUE);
 
-    this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation("hadoop", columnInfos);
+    this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(new BitSailTypeInfoConverter(), columnInfos);
 
     LOG.info("Row type info: " + rowTypeInfo);
   }

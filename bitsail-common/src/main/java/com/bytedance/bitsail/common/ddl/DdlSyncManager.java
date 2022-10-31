@@ -21,13 +21,13 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.ddl.sink.SinkEngineConnector;
 import com.bytedance.bitsail.common.ddl.source.SourceEngineConnector;
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
-import com.bytedance.bitsail.common.type.BaseEngineTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
@@ -181,8 +181,8 @@ public class DdlSyncManager {
     List<ColumnInfo> columnsToAdd = Lists.newLinkedList();
     List<ColumnInfo> columnsToUpdate = Lists.newLinkedList();
 
-    BaseEngineTypeInfoConverter readerTypeInfoConverter = readerExternalEngineConnector.createTypeInfoConverter();
-    BaseEngineTypeInfoConverter writerTypeInfoConverter = writerExternalEngineConnector.createTypeInfoConverter();
+    TypeInfoConverter readerTypeInfoConverter = readerExternalEngineConnector.createTypeInfoConverter();
+    TypeInfoConverter writerTypeInfoConverter = writerExternalEngineConnector.createTypeInfoConverter();
 
     for (ColumnInfo readerColumnInfo : readerColumnInfos) {
       String readerColumnName = StringUtils.lowerCase(readerColumnInfo.getName());
@@ -241,13 +241,13 @@ public class DdlSyncManager {
     //pendingDeleteColumns = null;
   }
 
-  private void columnToAdding(BaseEngineTypeInfoConverter readerTypeInfoConverter,
-                              BaseEngineTypeInfoConverter writerTypeInfoConverter,
+  private void columnToAdding(TypeInfoConverter readerTypeInfoConverter,
+                              TypeInfoConverter writerTypeInfoConverter,
                               String sourceColumnName,
                               String sourceColumnType,
                               List<ColumnInfo> columnsToAdd) {
-    TypeInfo<?> readerTypeInfo = readerTypeInfoConverter.toTypeInfo(sourceColumnType);
-    String writerExternalEngineTypeName = writerTypeInfoConverter.fromTypeInfo(readerTypeInfo, true);
+    TypeInfo<?> readerTypeInfo = readerTypeInfoConverter.fromTypeString(sourceColumnType);
+    String writerExternalEngineTypeName = writerTypeInfoConverter.fromTypeInfo(readerTypeInfo);
 
     log.info("Adding column for reader column name: {}, " +
         "reader column type: {}, reader column type info: {}.", sourceColumnName, sourceColumnType, readerTypeInfo);
@@ -266,16 +266,16 @@ public class DdlSyncManager {
         " Cannot get sink type from source type: " + sourceColumnType + ", Please validate your columns type!");
   }
 
-  private void columnsToUpdate(BaseEngineTypeInfoConverter readerTypeInfoConverter,
-                               BaseEngineTypeInfoConverter writerTypeInfoConverter,
+  private void columnsToUpdate(TypeInfoConverter readerTypeInfoConverter,
+                               TypeInfoConverter writerTypeInfoConverter,
                                String sourceColumnName,
                                String sourceColumnType,
                                List<ColumnInfo> columnsToUpdate,
                                Map<String, String> writerColumnMapping) {
     String originalWriterColumnType = writerColumnMapping.get(sourceColumnName);
 
-    TypeInfo<?> readerTypeInfo = readerTypeInfoConverter.toTypeInfo(sourceColumnType);
-    String newWriterColumnType = writerTypeInfoConverter.fromTypeInfo(readerTypeInfo, false);
+    TypeInfo<?> readerTypeInfo = readerTypeInfoConverter.fromTypeString(sourceColumnType);
+    String newWriterColumnType = writerTypeInfoConverter.fromTypeInfo(readerTypeInfo);
     log.info("Updating column for column name: {}, reader column type: {}, " +
             "reader column type info: {}, writer column name: {}.",
         sourceColumnName, sourceColumnType, readerTypeInfo, newWriterColumnType);

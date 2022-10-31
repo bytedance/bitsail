@@ -22,12 +22,12 @@
         {
           "index": 0,
           "name": "id",
-          "type": "bigint"
+          "type": "long"
         },
         {
           "index": 1,
           "name": "bigint_type",
-          "type": "bigint"
+          "type": "long"
         },
         {
           "index": 2,
@@ -47,7 +47,7 @@
         {
           "index": 5,
           "name": "date_type",
-          "type": "date"
+          "type": "date.date"
         },
         {
           "index": 6,

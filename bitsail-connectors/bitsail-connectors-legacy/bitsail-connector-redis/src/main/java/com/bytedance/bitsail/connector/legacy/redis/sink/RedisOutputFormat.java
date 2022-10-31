@@ -99,7 +99,7 @@ public class RedisOutputFormat extends JedisOutputFormat {
   public void open(int taskNumber, int numTasks) throws IOException {
     super.open(taskNumber, numTasks);
 
-    JedisPoolConfig jedisPoolConfig =  new JedisPoolConfig();
+    JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
     jedisPoolConfig.setMaxTotal(RedisConstants.DEFAULT_MAX_TOTAL_CONNECTIONS);
     jedisPoolConfig.setMaxIdle(RedisConstants.DEFAULT_MAX_IDLE_CONNECTIONS);
     jedisPoolConfig.setMinIdle(RedisConstants.DEFAULT_MIN_IDLE_CONNECTIONS);

@@ -20,8 +20,8 @@ package com.bytedance.bitsail.connector.legacy.mongodb.source;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.type.filemapping.MongoTypeInfoConverter;
 import com.bytedance.bitsail.connector.legacy.mongodb.common.MongoConnConfig;
-import com.bytedance.bitsail.connector.legacy.mongodb.constant.MongoDBConstants;
 import com.bytedance.bitsail.connector.legacy.mongodb.error.MongoDBPluginsErrorCode;
 import com.bytedance.bitsail.connector.legacy.mongodb.option.MongoDBReaderOptions;
 import com.bytedance.bitsail.connector.legacy.mongodb.source.split.MongoSplitter;
@@ -335,14 +335,14 @@ public class MongoDBInputFormat extends InputFormatPlugin<Row, InputSplit> imple
     String hostsStr = "";
     String host = "";
     int port = 0;
- 
+
     if (inputSliceConfig.fieldExists(MongoDBReaderOptions.HOSTS_STR)) {
       hostsStr = inputSliceConfig.getNecessaryOption(MongoDBReaderOptions.HOSTS_STR, MongoDBPluginsErrorCode.REQUIRED_VALUE);
     } else {
       host = inputSliceConfig.getNecessaryOption(MongoDBReaderOptions.HOST, MongoDBPluginsErrorCode.REQUIRED_VALUE);
       port = inputSliceConfig.getNecessaryOption(MongoDBReaderOptions.PORT, MongoDBPluginsErrorCode.REQUIRED_VALUE);
     }
-    
+
     String dbName = inputSliceConfig.getNecessaryOption(MongoDBReaderOptions.DB_NAME, MongoDBPluginsErrorCode.REQUIRED_VALUE);
     String collectionName = inputSliceConfig.getNecessaryOption(MongoDBReaderOptions.COLLECTION_NAME, MongoDBPluginsErrorCode.REQUIRED_VALUE);
     String userName = inputSliceConfig.get(MongoDBReaderOptions.USER_NAME);
@@ -399,7 +399,7 @@ public class MongoDBInputFormat extends InputFormatPlugin<Row, InputSplit> imple
     this.taskGroupInfo = splitter.getTaskGroupInfo();
     this.totalSplitNum = splitter.getTotalSplitNum();
 
-    this.rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(MongoDBConstants.CONNECTOR_TYPE_NAME, columnInfos);
+    this.rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columnInfos, new MongoTypeInfoConverter());
 
     LOG.info("Row Type Info: " + rowTypeInfo);
   }

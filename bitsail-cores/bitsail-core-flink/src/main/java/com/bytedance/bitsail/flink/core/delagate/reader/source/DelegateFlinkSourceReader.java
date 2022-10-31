@@ -31,10 +31,10 @@ import com.bytedance.bitsail.base.metrics.manager.CallTracer;
 import com.bytedance.bitsail.base.ratelimit.Channel;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ReaderOptions;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.util.Pair;
 import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConvertSerializer;
 

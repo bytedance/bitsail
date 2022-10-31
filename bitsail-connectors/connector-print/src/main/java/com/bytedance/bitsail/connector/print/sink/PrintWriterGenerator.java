@@ -23,8 +23,8 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.common.type.BaseEngineTypeInfoConverter;
-import com.bytedance.bitsail.common.type.SimpleTypeInfoConverter;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.connector.print.sink.option.PrintWriterOptions;
 
 import org.slf4j.Logger;
@@ -67,7 +67,7 @@ public class PrintWriterGenerator implements WriterGenerator<Row, String, Intege
   }
 
   @Override
-  public BaseEngineTypeInfoConverter createTypeInfoConverter() {
-    return new SimpleTypeInfoConverter("bitsail");
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new BitSailTypeInfoConverter();
   }
 }

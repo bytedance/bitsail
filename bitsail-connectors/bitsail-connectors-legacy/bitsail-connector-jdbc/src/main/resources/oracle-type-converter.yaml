@@ -45,7 +45,7 @@ engine.type.to.bitsail.type.converter:
     target.type: string
 
   - source.type: number
-    target.type: bigint
+    target.type: long
 
   - source.type: integer
     target.type: int
