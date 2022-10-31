@@ -63,18 +63,18 @@ public class DateColumn extends Column {
   }
 
   public DateColumn(final LocalDate localDate) {
-    super(localDate == null ? null : localDate, 8);
-    this.setSubType(DateType.DATE);
+    super(localDate, 8);
+    this.setSubType(DateType.LOCAL_DATE);
   }
 
   public DateColumn(final LocalTime localTime) {
-    super(localTime == null ? null : localTime, 7);
-    this.setSubType(DateType.TIME);
+    super(localTime, 7);
+    this.setSubType(DateType.LOCAL_TIME);
   }
 
   public DateColumn(final LocalDateTime localDateTime) {
-    super(localDateTime == null ? null : localDateTime, 15);
-    this.setSubType(DateType.DATETIME);
+    super(localDateTime, 15);
+    this.setSubType(DateType.LOCAL_DATE_TIME);
   }
 
   @Override
@@ -154,7 +154,12 @@ public class DateColumn extends Column {
     return asDate().compareTo(o.asDate());
   }
 
-  public static enum DateType {
-    DATE, TIME, DATETIME
+  public enum DateType {
+    DATE,
+    TIME,
+    DATETIME,
+    LOCAL_DATE,
+    LOCAL_TIME,
+    LOCAL_DATE_TIME
   }
 }

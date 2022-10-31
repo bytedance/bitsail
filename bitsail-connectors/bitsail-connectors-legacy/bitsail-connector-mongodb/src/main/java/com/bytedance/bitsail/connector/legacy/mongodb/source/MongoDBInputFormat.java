@@ -20,9 +20,8 @@ package com.bytedance.bitsail.connector.legacy.mongodb.source;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
+import com.bytedance.bitsail.common.type.filemapping.MongoTypeInfoConverter;
 import com.bytedance.bitsail.connector.legacy.mongodb.common.MongoConnConfig;
-import com.bytedance.bitsail.connector.legacy.mongodb.constant.MongoDBConstants;
 import com.bytedance.bitsail.connector.legacy.mongodb.error.MongoDBPluginsErrorCode;
 import com.bytedance.bitsail.connector.legacy.mongodb.option.MongoDBReaderOptions;
 import com.bytedance.bitsail.connector.legacy.mongodb.source.split.MongoSplitter;
@@ -400,7 +399,7 @@ public class MongoDBInputFormat extends InputFormatPlugin<Row, InputSplit> imple
     this.taskGroupInfo = splitter.getTaskGroupInfo();
     this.totalSplitNum = splitter.getTotalSplitNum();
 
-    this.rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columnInfos, new FileMappingTypeInfoConverter(MongoDBConstants.CONNECTOR_TYPE_NAME));
+    this.rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columnInfos, new MongoTypeInfoConverter());
 
     LOG.info("Row Type Info: " + rowTypeInfo);
   }

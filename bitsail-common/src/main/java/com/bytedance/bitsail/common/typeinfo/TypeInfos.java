@@ -40,21 +40,21 @@ import java.util.Map;
 public final class TypeInfos {
 
   public static final TypeInfo<Void> VOID_TYPE_INFO =
-      new BasicTypeInfo<>(void.class);
+      new BasicTypeInfo<>(Void.class);
   public static final TypeInfo<Short> SHORT_TYPE_INFO =
-      new BasicTypeInfo<>(short.class);
+      new BasicTypeInfo<>(Short.class);
   public static final TypeInfo<Integer> INT_TYPE_INFO =
-      new BasicTypeInfo<>(int.class);
+      new BasicTypeInfo<>(Integer.class);
   public static final TypeInfo<Long> LONG_TYPE_INFO =
-      new BasicTypeInfo<>(long.class);
+      new BasicTypeInfo<>(Long.class);
   public static final TypeInfo<Float> FLOAT_TYPE_INFO =
-      new BasicTypeInfo<>(float.class);
+      new BasicTypeInfo<>(Float.class);
   public static final TypeInfo<Double> DOUBLE_TYPE_INFO =
-      new BasicTypeInfo<>(double.class);
+      new BasicTypeInfo<>(Double.class);
   public static final TypeInfo<Boolean> BOOLEAN_TYPE_INFO =
-      new BasicTypeInfo<>(boolean.class);
+      new BasicTypeInfo<>(Boolean.class);
   public static final TypeInfo<Byte> BYTE_TYPE_INFO =
-      new BasicTypeInfo<>(byte.class);
+      new BasicTypeInfo<>(Byte.class);
   public static final TypeInfo<BigInteger> BIG_INTEGER_TYPE_INFO =
       new BasicTypeInfo<>(BigInteger.class);
   public static final TypeInfo<BigDecimal> BIG_DECIMAL_TYPE_INFO =

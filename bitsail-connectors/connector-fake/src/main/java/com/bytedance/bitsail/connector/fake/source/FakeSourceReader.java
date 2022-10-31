@@ -58,6 +58,8 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
   private final transient RateLimiter fakeGenerateRate;
   private final transient AtomicLong counter;
   private final transient SnowflakeIdGenerator snowflakeIdGenerator;
+  private final transient Timestamp fromTimestamp;
+  private final transient Timestamp toTimestamp;
 
   public FakeSourceReader(BitSailConfiguration readerConfiguration, Context context) {
     this.readerConfiguration = readerConfiguration;
@@ -70,6 +72,8 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
         context.getIndexOfSubtask());
     this.upper = readerConfiguration.get(FakeReaderOptions.UPPER_LIMIT);
     this.lower = readerConfiguration.get(FakeReaderOptions.LOWER_LIMIT);
+    this.fromTimestamp = Timestamp.valueOf(readerConfiguration.get(FakeReaderOptions.FROM_TIMESTAMP));
+    this.toTimestamp = Timestamp.valueOf(readerConfiguration.get(FakeReaderOptions.TO_TIMESTAMP));
   }
 
   @Override
@@ -128,22 +132,22 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
       return faker.name().fullName().getBytes();
 
     } else if (TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return new java.sql.Date(faker.date().birthday(10, 99).getTime());
+      return new java.sql.Date(faker.date().between(fromTimestamp, toTimestamp).getTime());
 
     } else if (TypeInfos.SQL_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return new Time(faker.date().birthday(10, 99).getTime());
+      return new Time(faker.date().between(fromTimestamp, toTimestamp).getTime());
 
     } else if (TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return new Timestamp(faker.date().birthday(10, 99).getTime());
+      return new Timestamp(faker.date().between(fromTimestamp, toTimestamp).getTime());
 
     } else if (TypeInfos.LOCAL_DATE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return faker.date().birthday(10, 99).toLocalDateTime().toLocalDate();
+      return faker.date().between(fromTimestamp, toTimestamp).toLocalDateTime().toLocalDate();
 
     } else if (TypeInfos.LOCAL_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return faker.date().birthday(10, 99).toLocalDateTime().toLocalTime();
+      return faker.date().between(fromTimestamp, toTimestamp).toLocalDateTime().toLocalTime();
 
     } else if (TypeInfos.LOCAL_DATE_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return faker.date().birthday(10, 99).toLocalDateTime();
+      return faker.date().between(fromTimestamp, toTimestamp).toLocalDateTime();
 
     } else if (TypeInfos.VOID_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
       return null;

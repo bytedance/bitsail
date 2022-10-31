@@ -42,4 +42,12 @@ public interface FakeReaderOptions extends ReaderOptions.BaseReaderOptions {
   ConfigOption<Long> UPPER_LIMIT =
       key(READER_PREFIX + "upper_limit")
           .defaultValue(100_000_00L);
+
+  ConfigOption<String> FROM_TIMESTAMP =
+      key(READER_PREFIX + "from_timestamp")
+          .defaultValue("1970-01-01 00:00:00");
+
+  ConfigOption<String> TO_TIMESTAMP =
+      key(READER_PREFIX + "to_timestamp")
+          .defaultValue("2077-07-07 07:07:07");
 }

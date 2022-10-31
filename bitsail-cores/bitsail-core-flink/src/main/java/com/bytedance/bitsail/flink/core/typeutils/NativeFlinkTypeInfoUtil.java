@@ -17,22 +17,14 @@
 
 package com.bytedance.bitsail.flink.core.typeutils;
 
-import com.bytedance.bitsail.common.BitSailException;
-import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
-import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
-import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
-import org.apache.flink.api.common.typeinfo.LocalTimeTypeInfo;
-import org.apache.flink.api.common.typeinfo.PrimitiveArrayTypeInfo;
-import org.apache.flink.api.common.typeinfo.SqlTimeTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
@@ -76,79 +68,6 @@ public class NativeFlinkTypeInfoUtil {
   }
 
   private static TypeInformation<?> toNativeFlinkTypeInformation(TypeInfo<?> typeInfo) {
-    Class<?> internalTypeClass = typeInfo.getTypeClass();
-    if (internalTypeClass == TypeInfos.SHORT_TYPE_INFO.getTypeClass()) {
-      return BasicTypeInfo.SHORT_TYPE_INFO;
-    }
-
-    if (internalTypeClass == TypeInfos.VOID_TYPE_INFO.getTypeClass()) {
-      return BasicTypeInfo.VOID_TYPE_INFO;
-    }
-
-    if (internalTypeClass == TypeInfos.INT_TYPE_INFO.getTypeClass()) {
-      return BasicTypeInfo.INT_TYPE_INFO;
-    }
-
-    if (internalTypeClass == TypeInfos.LONG_TYPE_INFO.getTypeClass()) {
-      return BasicTypeInfo.LONG_TYPE_INFO;
-    }
-
-    if (internalTypeClass == TypeInfos.BIG_INTEGER_TYPE_INFO.getTypeClass()) {
-      return BasicTypeInfo.BIG_INT_TYPE_INFO;
-    }
-
-    if (internalTypeClass == TypeInfos.FLOAT_TYPE_INFO.getTypeClass()) {
-      return BasicTypeInfo.FLOAT_TYPE_INFO;
-    }
-
-    if (internalTypeClass == TypeInfos.DOUBLE_TYPE_INFO.getTypeClass()) {
-      return BasicTypeInfo.DOUBLE_TYPE_INFO;
-    }
-
-    if (internalTypeClass == TypeInfos.BIG_DECIMAL_TYPE_INFO.getTypeClass()) {
-      return BasicTypeInfo.BIG_DEC_TYPE_INFO;
-    }
-
-    if (internalTypeClass == TypeInfos.STRING_TYPE_INFO.getTypeClass()) {
-      return BasicTypeInfo.STRING_TYPE_INFO;
-    }
-
-    if (internalTypeClass == TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass()) {
-      return BasicTypeInfo.BOOLEAN_TYPE_INFO;
-    }
-
-    if (internalTypeClass == TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass()) {
-      return SqlTimeTypeInfo.DATE;
-    }
-
-    if (internalTypeClass == TypeInfos.SQL_TIME_TYPE_INFO.getTypeClass()) {
-      return SqlTimeTypeInfo.TIME;
-    }
-
-    if (internalTypeClass == TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass()) {
-      return SqlTimeTypeInfo.TIMESTAMP;
-    }
-
-    if (internalTypeClass == TypeInfos.LOCAL_DATE_TYPE_INFO.getTypeClass()) {
-      return LocalTimeTypeInfo.LOCAL_DATE;
-    }
-
-    if (internalTypeClass == TypeInfos.LOCAL_TIME_TYPE_INFO.getTypeClass()) {
-      return LocalTimeTypeInfo.LOCAL_TIME;
-    }
-
-    if (internalTypeClass == TypeInfos.LOCAL_DATE_TIME_TYPE_INFO.getTypeClass()) {
-      return LocalTimeTypeInfo.LOCAL_DATE_TIME;
-    }
-
-    if (internalTypeClass == TypeInfos.BYTE_TYPE_INFO.getTypeClass()) {
-      return BasicTypeInfo.BYTE_TYPE_INFO;
-    }
-
-    if (internalTypeClass == BasicArrayTypeInfo.BINARY_TYPE_INFO.getTypeClass()) {
-      return PrimitiveArrayTypeInfo.BYTE_PRIMITIVE_ARRAY_TYPE_INFO;
-    }
-
     if (typeInfo instanceof MapTypeInfo) {
       MapTypeInfo<?, ?> mapTypeInfo = (MapTypeInfo<?, ?>) typeInfo;
       TypeInfo<?> keyTypeInfo = mapTypeInfo.getKeyTypeInfo();
@@ -163,7 +82,43 @@ public class NativeFlinkTypeInfoUtil {
       return new org.apache.flink.api.java.typeutils.ListTypeInfo<>(toNativeFlinkTypeInformation(elementTypeInfo));
     }
 
-    throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT, String
-        .format("BitSail type info %s not support in flink runtime.", typeInfo));
+    return TypeInfoNativeBridge.bridgeTypeInformation(typeInfo);
   }
+
+  public static TypeInfo<?>[] toTypeInfos(TypeInformation<?> typeInformation) {
+    if (typeInformation instanceof RowTypeInfo) {
+      RowTypeInfo rowTypeInfo = (RowTypeInfo) typeInformation;
+      TypeInformation<?>[] fieldTypes = rowTypeInfo.getFieldTypes();
+      TypeInfo<?>[] typeInfos = new TypeInfo<?>[fieldTypes.length];
+      for (int index = 0; index < fieldTypes.length; index++) {
+        typeInfos[index] = toTypeInfo(fieldTypes[index]);
+      }
+      return typeInfos;
+    }
+
+    //todo
+    return null;
+  }
+
+  public static TypeInfo<?> toTypeInfo(TypeInformation<?> typeInformation) {
+    if (typeInformation instanceof org.apache.flink.api.java.typeutils.MapTypeInfo) {
+      org.apache.flink.api.java.typeutils.MapTypeInfo<?, ?> mapTypeInfo =
+          (org.apache.flink.api.java.typeutils.MapTypeInfo<?, ?>) typeInformation;
+      return new MapTypeInfo<>(
+          TypeInfoNativeBridge.recoverBridgeTypeInfo(mapTypeInfo.getKeyTypeInfo()),
+          TypeInfoNativeBridge.recoverBridgeTypeInfo(mapTypeInfo.getValueTypeInfo())
+      );
+
+    } else if (typeInformation instanceof org.apache.flink.api.java.typeutils.ListTypeInfo) {
+      org.apache.flink.api.java.typeutils.ListTypeInfo<?> listTypeInfo =
+          (org.apache.flink.api.java.typeutils.ListTypeInfo<?>) typeInformation;
+      return new ListTypeInfo<>(
+          TypeInfoNativeBridge.recoverBridgeTypeInfo(listTypeInfo.getElementTypeInfo())
+      );
+
+    } else {
+      return TypeInfoNativeBridge.recoverBridgeTypeInfo(typeInformation);
+    }
+  }
+
 }

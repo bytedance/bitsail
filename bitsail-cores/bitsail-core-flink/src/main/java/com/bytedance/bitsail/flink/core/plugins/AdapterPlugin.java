@@ -29,15 +29,16 @@ import com.bytedance.bitsail.common.column.ColumnCast;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.CommonOptions;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.flink.core.legacy.connector.Pluggable;
 import com.bytedance.bitsail.flink.core.parser.RowBytesParser;
 import com.bytedance.bitsail.flink.core.runtime.RuntimeContextInjectable;
 import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
+import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.configuration.Configuration;
@@ -47,9 +48,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -141,18 +139,8 @@ public abstract class AdapterPlugin extends RichFlatMapFunction<Row, Row> implem
   }
 
   private RowTypeInfo getCustomTypeInfoFromFlink() {
-    List<String> nameList = Arrays.asList(this.flinkRowTypeInfo.getFieldNames());
-    List<TypeInformation<?>> columnTypeInfoList = new ArrayList<>();
-
-    for (int index = 0; index < nameList.size(); index++) {
-      TypeInformation<?> flinkTypeInfo = this.flinkRowTypeInfo.getTypeAt(index);
-      TypeInformation<?> customTypeInfo = ColumnFlinkTypeInfoUtil.fromNativeTypeInformation(flinkTypeInfo);
-      columnTypeInfoList.add(customTypeInfo);
-      LOG.info("Field: " + nameList.get(index) + "   Flink Type: " + flinkTypeInfo + "   BitSail Type: " + customTypeInfo);
-    }
-
-    return new RowTypeInfo(columnTypeInfoList.toArray(new TypeInformation[columnTypeInfoList.size()]),
-        nameList.toArray(new String[nameList.size()]));
+    TypeInfo<?>[] typeInfos = NativeFlinkTypeInfoUtil.toTypeInfos(flinkRowTypeInfo);
+    return ColumnFlinkTypeInfoUtil.getRowTypeInformation(typeInfos);
   }
 
   public abstract Row transform(Row outputRow, Row inputRow) throws BitSailException;

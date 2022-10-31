@@ -24,7 +24,7 @@ import com.bytedance.bitsail.common.ddl.source.SourceEngineConnector;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.exception.FrameworkErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
+import com.bytedance.bitsail.common.type.filemapping.HiveTypeInfoConverter;
 import com.bytedance.bitsail.common.util.JsonSerializer;
 import com.bytedance.bitsail.common.util.Pair;
 import com.bytedance.bitsail.component.format.api.RowBuilder;
@@ -108,7 +108,7 @@ public class HiveInputFormat extends HadoopInputFormatBasePlugin<Void, ArrayWrit
       columnInfos = HiveMetaClientUtil.getColumnInfo(hiveConf, db, table);
     }
 
-    rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(new FileMappingTypeInfoConverter(getType()), columnInfos);
+    rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(new HiveTypeInfoConverter(), columnInfos);
     LOG.info("Row Type Info: " + rowTypeInfo);
 
     // initialize mapred input format

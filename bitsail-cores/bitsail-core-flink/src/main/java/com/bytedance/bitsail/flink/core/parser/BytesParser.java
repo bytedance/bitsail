@@ -42,6 +42,7 @@ import org.apache.flink.types.Row;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -301,6 +302,10 @@ public abstract class BytesParser implements Serializable {
       return new DateColumn((java.sql.Timestamp) fieldVal);
     } else if (fieldVal instanceof Date) {
       return new DateColumn(((Date) fieldVal).getTime());
+    } else if (fieldVal instanceof LocalDate) {
+      return new DateColumn((LocalDate) fieldVal);
+    } else if (fieldVal instanceof LocalDateTime) {
+      return new DateColumn(((LocalDateTime) fieldVal));
     }
 
     try {
