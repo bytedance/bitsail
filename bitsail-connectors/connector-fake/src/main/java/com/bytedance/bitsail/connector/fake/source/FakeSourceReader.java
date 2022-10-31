@@ -21,42 +21,59 @@ package com.bytedance.bitsail.connector.fake.source;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.ddl.typeinfo.PrimitiveTypes;
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
-import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfos;
+import com.bytedance.bitsail.common.typeinfo.TypeProperty;
 import com.bytedance.bitsail.connector.base.source.SimpleSourceReaderBase;
 import com.bytedance.bitsail.connector.fake.option.FakeReaderOptions;
 
+import cn.ipokerface.snowflake.SnowflakeIdGenerator;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.RateLimiter;
 import net.datafaker.Faker;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
 
   private BitSailConfiguration readerConfiguration;
   private TypeInfo<?>[] typeInfos;
-  private List<ColumnInfo> columnInfos;
+  private long upper;
+  private long lower;
 
   private final transient Faker faker;
   private final transient int totalCount;
   private final transient RateLimiter fakeGenerateRate;
   private final transient AtomicLong counter;
+  private final transient SnowflakeIdGenerator snowflakeIdGenerator;
+  private final transient Timestamp fromTimestamp;
+  private final transient Timestamp toTimestamp;
 
   public FakeSourceReader(BitSailConfiguration readerConfiguration, Context context) {
     this.readerConfiguration = readerConfiguration;
     this.typeInfos = context.getTypeInfos();
-    this.columnInfos = readerConfiguration.get(ReaderOptions.BaseReaderOptions.COLUMNS);
     this.totalCount = readerConfiguration.get(FakeReaderOptions.TOTAL_COUNT);
     this.fakeGenerateRate = RateLimiter.create(readerConfiguration.get(FakeReaderOptions.RATE));
     this.faker = new Faker();
     this.counter = new AtomicLong();
+    this.snowflakeIdGenerator = new SnowflakeIdGenerator(context.getIndexOfSubtask(),
+        context.getIndexOfSubtask());
+    this.upper = readerConfiguration.get(FakeReaderOptions.UPPER_LIMIT);
+    this.lower = readerConfiguration.get(FakeReaderOptions.LOWER_LIMIT);
+    this.fromTimestamp = Timestamp.valueOf(readerConfiguration.get(FakeReaderOptions.FROM_TIMESTAMP));
+    this.toTimestamp = Timestamp.valueOf(readerConfiguration.get(FakeReaderOptions.TO_TIMESTAMP));
   }
 
   @Override
@@ -72,7 +89,7 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
 
   private Row fakeNextRecord() {
     Row row = new Row(ArrayUtils.getLength(typeInfos));
-    for (int index = 0; index < columnInfos.size(); index++) {
+    for (int index = 0; index < typeInfos.length; index++) {
       row.setField(index, fakeRawValue(typeInfos[index]));
     }
     return row;
@@ -80,29 +97,72 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
 
   @SuppressWarnings("checkstyle:MagicNumber")
   private Object fakeRawValue(TypeInfo<?> typeInfo) {
-    if (PrimitiveTypes.LONG.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
-      return faker.number().randomNumber();
 
-    } else if (PrimitiveTypes.STRING.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
+    if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (CollectionUtils.isNotEmpty(typeInfo.getTypeProperties()) && typeInfo.getTypeProperties().contains(TypeProperty.UNIQUE)) {
+        return snowflakeIdGenerator.nextId();
+      } else {
+        return faker.number().randomNumber();
+      }
+    } else if (TypeInfos.INT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return Long.valueOf(faker.number().randomNumber()).intValue();
+
+    } else if (TypeInfos.SHORT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return Long.valueOf(faker.number().randomNumber()).shortValue();
+
+    } else if (TypeInfos.STRING_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
       return faker.name().fullName();
 
-    } else if (PrimitiveTypes.BOOLEAN.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
+    } else if (TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
       return faker.bool().bool();
 
-    } else if (PrimitiveTypes.DOUBLE.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
-      return faker.number().randomDouble(5, -1_000_000_000, 1_000_000_000);
+    } else if (TypeInfos.DOUBLE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return faker.number().randomDouble(5, lower, upper);
 
-    } else if (PrimitiveTypes.BYTE.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
+    } else if (TypeInfos.FLOAT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return Double.valueOf(faker.number().randomDouble(5, lower, upper)).floatValue();
+
+    } else if (TypeInfos.BIG_DECIMAL_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return new BigDecimal(faker.number().randomDouble(5, lower, upper));
+
+    } else if (TypeInfos.BIG_INTEGER_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return new BigInteger(String.valueOf(faker.number().randomNumber()));
+
+    } else if (BasicArrayTypeInfo.BINARY_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
       return faker.name().fullName().getBytes();
 
-    } else if (PrimitiveTypes.DATE_DATE.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
-      return new java.sql.Date(faker.date().birthday(10, 99).getTime());
+    } else if (TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return new java.sql.Date(faker.date().between(fromTimestamp, toTimestamp).getTime());
 
-    } else if (PrimitiveTypes.DATE_TIME.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
-      return new Time(faker.date().birthday(10, 99).getTime());
+    } else if (TypeInfos.SQL_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return new Time(faker.date().between(fromTimestamp, toTimestamp).getTime());
 
-    } else if (PrimitiveTypes.DATE_DATE_TIME.getTypeInfo().getTypeClass() == typeInfo.getTypeClass()) {
-      return new Timestamp(faker.date().birthday(10, 99).getTime());
+    } else if (TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return new Timestamp(faker.date().between(fromTimestamp, toTimestamp).getTime());
+
+    } else if (TypeInfos.LOCAL_DATE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return faker.date().between(fromTimestamp, toTimestamp).toLocalDateTime().toLocalDate();
+
+    } else if (TypeInfos.LOCAL_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return faker.date().between(fromTimestamp, toTimestamp).toLocalDateTime().toLocalTime();
+
+    } else if (TypeInfos.LOCAL_DATE_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return faker.date().between(fromTimestamp, toTimestamp).toLocalDateTime();
+
+    } else if (TypeInfos.VOID_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return null;
+    }
+
+    if (typeInfo instanceof ListTypeInfo) {
+      ListTypeInfo<?> listTypeInfo = (ListTypeInfo<?>) typeInfo;
+      return Lists.newArrayList(fakeRawValue(listTypeInfo.getElementTypeInfo()));
+    }
+
+    if (typeInfo instanceof MapTypeInfo) {
+      MapTypeInfo<?, ?> mapTypeInfo = (MapTypeInfo<?, ?>) typeInfo;
+      Map<Object, Object> mapRawValue = Maps.newHashMap();
+      mapRawValue.put(fakeRawValue(mapTypeInfo.getKeyTypeInfo()), fakeRawValue(mapTypeInfo.getValueTypeInfo()));
+      return mapRawValue;
     }
     throw new RuntimeException("Unsupported type " + typeInfo);
   }

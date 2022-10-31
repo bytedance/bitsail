@@ -34,7 +34,7 @@
       "columns": [
         {
           "name": "id",
-          "type": "bigint"
+          "type": "long"
         },
         {
           "name": "state",
@@ -65,7 +65,7 @@
       "columns": [
         {
           "name": "id",
-          "type": "bigint"
+          "type": "long"
         },
         {
           "name": "state",

@@ -22,8 +22,8 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.ddl.source.SourceEngineConnector;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.type.BaseEngineTypeInfoConverter;
-import com.bytedance.bitsail.common.type.JdbcTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.type.filemapping.JdbcTypeInfoConverter;
 import com.bytedance.bitsail.common.util.JsonSerializer;
 import com.bytedance.bitsail.connector.legacy.jdbc.model.ClusterInfo;
 import com.bytedance.bitsail.connector.legacy.jdbc.model.ConnectionInfo;
@@ -76,7 +76,7 @@ public class OracleSourceEngineConnector extends SourceEngineConnector {
   }
 
   @Override
-  public BaseEngineTypeInfoConverter createTypeInfoConverter() {
+  public TypeInfoConverter createTypeInfoConverter() {
     return new JdbcTypeInfoConverter(getExternalEngineName());
   }
 

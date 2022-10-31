@@ -23,8 +23,8 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.AdapterOptions;
-import com.bytedance.bitsail.common.type.BaseEngineTypeInfoConverter;
-import com.bytedance.bitsail.common.type.JdbcTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.type.filemapping.JdbcTypeInfoConverter;
 import com.bytedance.bitsail.common.util.Pair;
 import com.bytedance.bitsail.common.util.TypeConvertUtil.StorageEngine;
 import com.bytedance.bitsail.connector.legacy.jdbc.constants.Key;
@@ -193,7 +193,7 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
     log.info("Validate plugin configuration parameters finished.");
   }
 
-  public BaseEngineTypeInfoConverter getTypeConverter() {
+  public TypeInfoConverter getTypeConverter() {
     return new JdbcTypeInfoConverter(getStorageEngine().name());
   }
 

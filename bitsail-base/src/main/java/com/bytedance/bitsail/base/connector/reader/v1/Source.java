@@ -23,8 +23,8 @@ import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.type.BaseEngineTypeInfoConverter;
-import com.bytedance.bitsail.common.type.SimpleTypeInfoConverter;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 
 import java.io.Serializable;
 
@@ -35,6 +35,9 @@ public interface Source<T, SplitT extends SourceSplit, StateT extends Serializab
    */
   void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration);
 
+  /**
+   * Indicate the Source type.
+   */
   Boundedness getSourceBoundedness();
 
   SourceReader<T, SplitT> createReader(SourceReader.Context readerContext);
@@ -49,8 +52,8 @@ public interface Source<T, SplitT extends SourceSplit, StateT extends Serializab
     return new SimpleBinarySerializer<>();
   }
 
-  default BaseEngineTypeInfoConverter createTypeInfoConverter() {
-    return new SimpleTypeInfoConverter("bitsail");
+  default TypeInfoConverter createTypeInfoConverter() {
+    return new BitSailTypeInfoConverter();
   }
 
   String getReaderName();

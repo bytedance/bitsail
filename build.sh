@@ -4,4 +4,4 @@ set -e
 mvnProfile=flink-embedded
 
 echo "mvn profile = ${mvnProfile}"
-mvn clean package -am -Dmaven.test.skip=true -U -P${mvnProfile}
+mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true -U -P${mvnProfile}

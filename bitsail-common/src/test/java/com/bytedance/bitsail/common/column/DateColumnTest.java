@@ -20,10 +20,15 @@ package com.bytedance.bitsail.common.column;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -99,5 +104,28 @@ public class DateColumnTest {
 
     assertEquals(dateColumn.asString(), retStr);
 
+  }
+
+  @Test
+  public void testLocalDate() {
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    LocalDate localDate = LocalDate.of(2022, 1, 1);
+    DateColumn dateColumn = new DateColumn(localDate);
+
+    Date date = dateColumn.asDate();
+    String format = simpleDateFormat.format(date);
+    Assert.assertEquals(format, "2022-01-01");
+  }
+
+  @Test
+  public void testLocalDateTime() {
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    LocalDateTime localDateTime = LocalDateTime
+        .of(2022, 1, 1, 8, 0, 0);
+    DateColumn dateColumn = new DateColumn(localDateTime);
+
+    Date date = dateColumn.asDate();
+    String format = simpleDateFormat.format(date);
+    Assert.assertEquals(format, "2022-01-01");
   }
 }

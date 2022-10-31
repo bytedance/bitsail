@@ -25,10 +25,10 @@ import com.bytedance.bitsail.common.column.LongColumn;
 import com.bytedance.bitsail.common.column.MapColumn;
 import com.bytedance.bitsail.common.column.StringColumn;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.type.BaseEngineTypeInfoConverter;
-import com.bytedance.bitsail.common.type.HiveTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.type.filemapping.HiveTypeInfoConverter;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -57,11 +57,11 @@ public class FlinkRowConvertSerializerTest {
         new ColumnInfo("col4", "array<string>"),
         new ColumnInfo("col5", "map<string,int>")
     );
-    BaseEngineTypeInfoConverter converter = new HiveTypeInfoConverter();
+    TypeInfoConverter converter = new HiveTypeInfoConverter();
     BitSailConfiguration conf = BitSailConfiguration.newDefault();
     TypeInfo<?>[] typeInfos = new TypeInfo<?>[columns.size()];
     for (int index = 0; index < columns.size(); index++) {
-      typeInfos[index] = converter.toTypeInfo(columns.get(index).getType());
+      typeInfos[index] = converter.fromTypeString(columns.get(index).getType());
     }
     flinkRowConvertSerializer = new FlinkRowConvertSerializer(typeInfos, columns, conf);
   }

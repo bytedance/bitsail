@@ -33,6 +33,9 @@ import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /**
  * @desc:
@@ -82,32 +85,74 @@ public class DateColumnSerializer extends TypeSerializerSingleton<DateColumn> {
   @Override
   public void serialize(DateColumn record, DataOutputView target) throws IOException {
     if (null == record || null == record.getRawData()) {
-      target.writeLong(Long.MIN_VALUE);
+      target.writeByte(Byte.MIN_VALUE);
     } else {
-      target.writeLong(record.asLong());
+      target.writeByte(Byte.MAX_VALUE);
+      DateColumn.DateType subType = record.getSubType();
+      target.writeShort(subType.ordinal());
+      if (subType == DateColumn.DateType.LOCAL_DATE) {
+        LocalDate rawData = (LocalDate) record.getRawData();
+        serializeLocalDate(rawData, target);
+      } else if (subType == DateColumn.DateType.LOCAL_TIME) {
+        LocalTime rawData = (LocalTime) record.getRawData();
+        serializeLocalTime(rawData, target);
+      } else if (subType == DateColumn.DateType.LOCAL_DATE_TIME) {
+        LocalDateTime rawData = (LocalDateTime) record.getRawData();
+        serializeLocalDate(rawData.toLocalDate(), target);
+        serializeLocalTime(rawData.toLocalTime(), target);
+      } else {
+        target.writeLong(record.asLong());
+      }
     }
-    target.writeInt(record.getSubType().ordinal());
   }
 
-  @Override
-  public DateColumn deserialize(DataInputView source) throws IOException {
-    final long longValue = source.readLong();
+  private static void serializeLocalTime(LocalTime localTime, DataOutputView target) throws IOException {
+    target.writeByte(localTime.getHour());
+    target.writeByte(localTime.getMinute());
+    target.writeByte(localTime.getSecond());
+    target.writeInt(localTime.getNano());
+  }
 
-    DateColumn dc;
-
-    if (longValue == Long.MIN_VALUE) {
-      dc = new DateColumn((Long) null);
-    } else {
-      dc = new DateColumn(longValue);
-    }
-
-    dc.setSubType(DateColumn.DateType.values()[source.readInt()]);
-    return dc;
+  private static void serializeLocalDate(LocalDate localDate, DataOutputView target) throws IOException {
+    target.writeInt(localDate.getYear());
+    target.writeByte(localDate.getMonthValue());
+    target.writeByte(localDate.getDayOfMonth());
   }
 
   @Override
   public DateColumn deserialize(DateColumn reuse, DataInputView source) throws IOException {
     return deserialize(source);
+  }
+
+  @Override
+  public DateColumn deserialize(DataInputView source) throws IOException {
+    byte symbol = source.readByte();
+    if (symbol == Byte.MIN_VALUE) {
+      return new DateColumn((Long) null);
+    } else {
+      DateColumn.DateType dateType = DateColumn.DateType.values()[source.readShort()];
+      if (dateType == DateColumn.DateType.LOCAL_DATE) {
+        return new DateColumn(deserializeLocalDate(source));
+      } else if (dateType == DateColumn.DateType.LOCAL_TIME) {
+        return new DateColumn(deserializeLocalTime(source));
+      } else if (dateType == DateColumn.DateType.LOCAL_DATE_TIME) {
+        return new DateColumn(LocalDateTime.of(deserializeLocalDate(source),
+            deserializeLocalTime(source)));
+      } else {
+        DateColumn dateColumn = new DateColumn(source.readLong());
+        dateColumn.setSubType(dateType);
+        return dateColumn;
+      }
+    }
+  }
+
+  private static LocalDate deserializeLocalDate(DataInputView source) throws IOException {
+    return LocalDate.of(source.readInt(), source.readByte(), source.readByte());
+  }
+
+  private static LocalTime deserializeLocalTime(DataInputView source) throws IOException {
+    return LocalTime
+        .of(source.readByte(), source.readByte(), source.readByte(), source.readInt());
   }
 
   @Override

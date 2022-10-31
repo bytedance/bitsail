@@ -45,10 +45,63 @@ public class DateColumnComparator extends ColumnTypeComparator<DateColumn> {
 
   public static int compareSerializedDate(DataInputView firstSource, DataInputView secondSource,
                                           boolean ascendingComparison) throws IOException {
-    final long l1 = firstSource.readLong();
-    final long l2 = secondSource.readLong();
-    final int comp = (l1 < l2 ? -1 : (l1 == l2 ? 0 : 1));
-    return ascendingComparison ? comp : -comp;
+    final byte left = firstSource.readByte();
+    final byte right = secondSource.readByte();
+    int order = 0;
+    if (left != right) {
+      order = left < right ? -1 : 1;
+    } else {
+      if (left == Byte.MAX_VALUE) {
+        short leftOrdinal = firstSource.readShort();
+        short rightOrdinal = secondSource.readShort();
+        DateColumn.DateType leftDataType = DateColumn.DateType.values()[leftOrdinal];
+        DateColumn.DateType rightDataType = DateColumn.DateType.values()[rightOrdinal];
+        if (leftDataType == rightDataType) {
+          if (leftDataType == DateColumn.DateType.LOCAL_DATE) {
+            order = compareSerializedLocalDate(firstSource, secondSource);
+          } else if (leftDataType == DateColumn.DateType.LOCAL_TIME) {
+            order = compareSerializedLocalTime(firstSource, secondSource);
+          } else if (leftDataType == DateColumn.DateType.LOCAL_DATE_TIME) {
+            order = compareSerializedLocalDate(firstSource, secondSource);
+            if (order == 0) {
+              order = compareSerializedLocalTime(firstSource, secondSource);
+            }
+          } else {
+            return Long.compare(firstSource.readLong(), secondSource.readLong());
+          }
+        } else {
+          order = Short.compare(leftOrdinal, rightOrdinal);
+        }
+      }
+    }
+    return ascendingComparison ? order : -order;
+  }
+
+  private static int compareSerializedLocalDate(DataInputView firstSource,
+                                                DataInputView secondSource) throws IOException {
+    int cmp = firstSource.readInt() - secondSource.readInt();
+    if (cmp == 0) {
+      cmp = firstSource.readByte() - secondSource.readByte();
+      if (cmp == 0) {
+        cmp = firstSource.readByte() - secondSource.readByte();
+      }
+    }
+    return cmp;
+  }
+
+  private static int compareSerializedLocalTime(DataInputView firstSource,
+                                                DataInputView secondSource) throws IOException {
+    int cmp = firstSource.readByte() - secondSource.readByte();
+    if (cmp == 0) {
+      cmp = firstSource.readByte() - secondSource.readByte();
+      if (cmp == 0) {
+        cmp = firstSource.readByte() - secondSource.readByte();
+        if (cmp == 0) {
+          cmp = firstSource.readInt() - secondSource.readInt();
+        }
+      }
+    }
+    return cmp;
   }
 
   @Override

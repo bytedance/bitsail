@@ -35,11 +35,19 @@ public interface FakeReaderOptions extends ReaderOptions.BaseReaderOptions {
       key(READER_PREFIX + "rate")
           .defaultValue(10);
 
-  ConfigOption<Double> RANDOM_NULL_RATE =
-      key(READER_PREFIX + "random_null_rate")
-          .defaultValue(0.1);
+  ConfigOption<Long> LOWER_LIMIT =
+      key(READER_PREFIX + "lower_limit")
+          .defaultValue(0L);
 
-  ConfigOption<String> UNIQUE_FIELDS =
-      key(READER_PREFIX + "unique_fields")
-          .noDefaultValue(String.class);
+  ConfigOption<Long> UPPER_LIMIT =
+      key(READER_PREFIX + "upper_limit")
+          .defaultValue(100_000_00L);
+
+  ConfigOption<String> FROM_TIMESTAMP =
+      key(READER_PREFIX + "from_timestamp")
+          .defaultValue("1970-01-01 00:00:00");
+
+  ConfigOption<String> TO_TIMESTAMP =
+      key(READER_PREFIX + "to_timestamp")
+          .defaultValue("2077-07-07 07:07:07");
 }

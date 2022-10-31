@@ -58,7 +58,7 @@ public class DeserializationSchemaFactory {
     }
     if (StringUtils.equalsIgnoreCase(JSON_DESERIALIZATION_SCHEMA_KEY, formatType)) {
       List<ColumnInfo> columnInfos = configuration.get(ReaderOptions.BaseReaderOptions.COLUMNS);
-      RowTypeInfo rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation("bitsail", columnInfos);
+      RowTypeInfo rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columnInfos);
       return new CountKafkaDeserializationSchemaWrapper<>(configuration,
           new JsonRowDeserializationSchema.Builder(rowTypeInfo)
               .build());

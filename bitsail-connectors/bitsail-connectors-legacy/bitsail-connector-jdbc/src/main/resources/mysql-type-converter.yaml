@@ -30,10 +30,10 @@ engine.type.to.bitsail.type.converter:
     target.type: long
 
   - source.type: bigint
-    target.type: bigint
+    target.type: long
 
   - source.type: bigint unsigned
-    target.type: bigint
+    target.type: long
 
   - source.type: timestamp
     target.type: date.datetime

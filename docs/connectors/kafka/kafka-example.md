@@ -33,7 +33,7 @@ Suppose the kafka configuration used by the test is as follows:
       "columns": [
         {
           "name": "id",
-          "type": "bigint"
+          "type": "long"
         },
         {
           "name": "state",
@@ -64,7 +64,7 @@ Suppose the kafka configuration used by the test is as follows:
       "columns": [
         {
           "name": "id",
-          "type": "bigint"
+          "type": "long"
         },
         {
           "name": "state",

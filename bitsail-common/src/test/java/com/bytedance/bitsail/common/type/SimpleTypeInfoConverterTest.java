@@ -17,7 +17,9 @@
 
 package com.bytedance.bitsail.common.type;
 
-import com.bytedance.bitsail.common.ddl.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
+import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoReader;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,8 +33,8 @@ public class SimpleTypeInfoConverterTest {
 
   @Test
   public void testSimpleTypeInfoConverter() {
-    SimpleTypeInfoConverter simpleTypeInfoConverter = new SimpleTypeInfoConverter("fake");
-    TypeConverterReader reader = simpleTypeInfoConverter.getReader();
+    FileMappingTypeInfoConverter fileMappingTypeInfoConverter = new FileMappingTypeInfoConverter("fake");
+    FileMappingTypeInfoReader reader = fileMappingTypeInfoConverter.getReader();
     Map<String, TypeInfo<?>> toTypeInformation = reader.getToTypeInformation();
     Map<TypeInfo<?>, String> fromTypeInformation = reader.getFromTypeInformation();
 

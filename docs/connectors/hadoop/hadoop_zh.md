@@ -23,28 +23,27 @@ Hadoop连接器可用于批式场景下的hdfs文件读取。其功能点主要�
 ## 支持的数据类型
  - 支持的基础数据类型如下:
     - 整数类型:
-        - tinyint
-        - smallint
+        - short
         - int
-        - bigint
+        - long
+        - bitinteger
     - 浮点类型:
         - float
         - double
-        - decimal
+        - bigdecimal
     - 时间类型:
         - timestamp
         - date
+        - time
     - 字符类型:
         - string
-        - varchar
-        - char
     - 布尔类型:
         - boolean
     - 二进制类型:
         - binary
  - 支持的复杂数据类型包括:
     - map
-    - array
+    - list
     
 ## 主要参数
 

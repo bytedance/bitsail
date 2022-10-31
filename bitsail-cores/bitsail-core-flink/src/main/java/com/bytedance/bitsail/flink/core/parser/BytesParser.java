@@ -42,6 +42,7 @@ import org.apache.flink.types.Row;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,23 +63,23 @@ public abstract class BytesParser implements Serializable {
 
   protected SerializerFeature[] serializerFeatures = new SerializerFeature[0];
 
-  public Column createColumn(TypeInformation typeInformation, Object fieldVal) {
-    Class columnTypeClass = typeInformation.getTypeClass();
+  public Column createColumn(TypeInformation<?> typeInformation, Object fieldVal) {
+    Class<?> columnTypeClass = typeInformation.getTypeClass();
     // attention to that there is List and Map
     if (columnTypeClass == List.class) {
       if (fieldVal != null && fieldVal.getClass().isArray()) {
         fieldVal = convertArrayToList(fieldVal);
       }
-      return createListColumn(typeInformation, (List) fieldVal);
+      return createListColumn(typeInformation, (List<?>) fieldVal);
     } else if (columnTypeClass == Map.class) {
-      return createMapColumn((MapColumnTypeInfo) typeInformation, (Map) fieldVal);
+      return createMapColumn((MapColumnTypeInfo<?, ?>) typeInformation, (Map<?, ?>) fieldVal);
     } else {
       return createBasicColumn(typeInformation, fieldVal);
     }
   }
 
   protected List<Object> convertArrayToList(Object fieldVal) {
-    Class componentType = fieldVal.getClass().getComponentType();
+    Class<?> componentType = fieldVal.getClass().getComponentType();
     if (componentType.isPrimitive()) {
       if (componentType == boolean.class) {
         boolean[] arr = (boolean[]) fieldVal;
@@ -152,10 +153,8 @@ public abstract class BytesParser implements Serializable {
   }
 
   @SuppressWarnings("checkstyle:MagicNumber")
-  public Column createBasicColumn(TypeInformation typeInformation, Object fieldVal) {
-    Class columnTypeClass = typeInformation.getTypeClass();
-    //Todo: Try to use a better way to instead of {if else}?
-
+  public Column createBasicColumn(TypeInformation<?> typeInformation, Object fieldVal) {
+    Class<?> columnTypeClass = typeInformation.getTypeClass();
     boolean columnTypeSupport = true;
     try {
       if (columnTypeClass == StringColumn.class) {
@@ -303,6 +302,10 @@ public abstract class BytesParser implements Serializable {
       return new DateColumn((java.sql.Timestamp) fieldVal);
     } else if (fieldVal instanceof Date) {
       return new DateColumn(((Date) fieldVal).getTime());
+    } else if (fieldVal instanceof LocalDate) {
+      return new DateColumn((LocalDate) fieldVal);
+    } else if (fieldVal instanceof LocalDateTime) {
+      return new DateColumn(((LocalDateTime) fieldVal));
     }
 
     try {

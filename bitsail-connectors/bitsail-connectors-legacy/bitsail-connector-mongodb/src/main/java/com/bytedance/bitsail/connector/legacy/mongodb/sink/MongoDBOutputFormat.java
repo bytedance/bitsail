@@ -20,6 +20,7 @@ package com.bytedance.bitsail.connector.legacy.mongodb.sink;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.type.filemapping.MongoTypeInfoConverter;
 import com.bytedance.bitsail.connector.legacy.mongodb.common.MongoConnConfig;
 import com.bytedance.bitsail.connector.legacy.mongodb.common.MongoConnOptions;
 import com.bytedance.bitsail.connector.legacy.mongodb.constant.MongoDBConstants;
@@ -110,7 +111,7 @@ public class MongoDBOutputFormat extends OutputFormatPlugin<Row> implements Resu
       String uniqueKeysStr = outputSliceConfig.getNecessaryOption(MongoDBWriterOptions.UNIQUE_KEY, MongoDBPluginsErrorCode.REQUIRED_VALUE);
       this.uniqueKeyList = Arrays.asList(StringUtils.split(uniqueKeysStr, ","));
     }
-    this.rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(MongoDBConstants.CONNECTOR_TYPE_NAME, columnInfos);
+    this.rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columnInfos, new MongoTypeInfoConverter());
     LOG.info("Output Row Type Info: " + rowTypeInfo);
   }
 
@@ -207,11 +208,11 @@ public class MongoDBOutputFormat extends OutputFormatPlugin<Row> implements Resu
   }
 
   /**
-   *  Supported pre-sql operations:<br/>
+   * Supported pre-sql operations:<br/>
    * 1. drop: Drop all data from target collection.<br/>
-   *    example: {"type":"drop"}<br/>
+   * example: {"type":"drop"}<br/>
    * 2. remove: Drop data that matches from target collection.<br/>
-   *    example: {"type":"remove", "item":[{"name":"key1", "value":"test"}]}<br/>
+   * example: {"type":"remove", "item":[{"name":"key1", "value":"test"}]}<br/>
    * Support 'drop' and 'remove' operations.
    */
   public void handlePreSql() {

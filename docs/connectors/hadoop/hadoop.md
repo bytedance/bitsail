@@ -23,28 +23,27 @@ Hadoop connector can be used to read hdfs files in batch scenarios. Its function
 ## Supported data types
  - Basic data types supported by Hadoop connectors:
       - Integer type:
-        - tinyint
-        - smallint
+        - short
         - int
-        - bigint
-    - Float type:
-        - float
-        - double
-        - decimal
-    - Time type:
-        - timestamp
-        - date
-    - String type:
-        - string
-        - varchar
-        - char
-    - Bool type:
-        - boolean
-    - Binary type:
-        - binary
+        - long
+        - biginterger
+      - Float type:
+          - float
+          - double
+          - bigdecimal
+      - Time type:
+          - timestamp
+          - date
+          - time
+      - String type:
+          - string
+      - Bool type:
+          - boolean
+      - Binary type:
+          - binary
 - Composited data types supported by Hadoop connectors:
     - map
-    - array
+    - list
 
 ## Parameters
 

@@ -16,11 +16,32 @@
       "columns": [
         {
           "name": "id",
-          "type": "long"
+          "type": "long",
+          "properties": "unique"
         },
         {
           "name": "id",
           "type": "date"
+        },
+        {
+          "name": "list_value",
+          "type": "list<string>"
+        },
+        {
+          "name": "map_value",
+          "type": "map<string,string>"
+        },
+        {
+          "name": "localdatetime_value",
+          "type": "timestamp"
+        },
+        {
+          "name": "date_value",
+          "type": "date.date"
+        },
+        {
+          "name": "datetime_value",
+          "type": "date.datetime"
         }
       ]
     },
