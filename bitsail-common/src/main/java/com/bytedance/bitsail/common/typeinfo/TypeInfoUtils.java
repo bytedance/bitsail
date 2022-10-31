@@ -19,6 +19,8 @@
 
 package com.bytedance.bitsail.common.typeinfo;
 
+import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.BitSailTypeParser;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
@@ -26,6 +28,7 @@ import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 public class TypeInfoUtils {
 
@@ -36,6 +39,10 @@ public class TypeInfoUtils {
     for (int index = 0; index < columnInfos.size(); index++) {
       String type = StringUtils.lowerCase(columnInfos.get(index).getType());
       TypeInfo<?> typeInfo = converter.fromTypeString(type);
+      if (Objects.isNull(typeInfo)) {
+        throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
+            String.format("Type converter = %s not support type %s.", converter, type));
+      }
       List<TypeProperty> typeProperties = BitSailTypeParser
           .fromTypePropertyString(columnInfos.get(index).getProperties());
       typeInfo.setTypeProperties(typeProperties);

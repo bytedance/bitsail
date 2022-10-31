@@ -8,6 +8,9 @@ engine.type.to.bitsail.type.converter:
   - source.type: int
     target.type: int
 
+  - source.type: bigint
+    target.type: bigint
+
   - source.type: float
     target.type: double
 
@@ -18,7 +21,7 @@ engine.type.to.bitsail.type.converter:
     target.type: double
 
   - source.type: timestamp
-    target.type: long
+    target.type: bigint
 
   - source.type: date
     target.type: date.date
@@ -73,6 +76,9 @@ bitsail.type.to.engine.type.converter:
     target.type: int
 
   - source.type: long
+    target.type: bigint
+
+  - source.type: bigint
     target.type: bigint
 
   - source.type: double

@@ -147,6 +147,9 @@ bitsail.type.to.engine.type.converter:
   - source.type: long
     target.type: bigint
 
+  - source.type: bigint
+    target.type: bigint
+
   - source.type: double
     target.type: double
 
