@@ -139,7 +139,7 @@ public class KuduFactory implements Closeable {
   public void closeCurrentClient() throws IOException {
     if (kuduClient != null) {
       try {
-        kuduClient.close();
+        kuduClient.shutdown();
       } catch (KuduException e) {
         throw new IOException("Failed to close kudu client.", e);
       } finally {

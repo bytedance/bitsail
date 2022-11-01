@@ -8,8 +8,8 @@
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
-      "total_count": 500,
-      "rate": 100,
+      "total_count": 5000,
+      "rate": 1000,
       "columns": [
         {
           "name": "key",

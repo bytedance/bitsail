@@ -39,11 +39,14 @@ import java.util.stream.Collectors;
 
 public class KuduWriterITCase {
   private static final String TABLE_NAME = "test_kudu_table";
-  private static final int TOTAL_COUNT = 500;
+  private static final int TOTAL_COUNT = 10000;
 
+  /**
+   * Note that the tablet server number should be larger than hash buckets number.
+   */
   @Rule
   public KuduTestHarness harness = new KuduTestHarness(
-      new MiniKuduCluster.MiniKuduClusterBuilder()
+      new MiniKuduCluster.MiniKuduClusterBuilder().numTabletServers(KuduTestUtils.BUCKET_NUM)
   );
 
   @Test
@@ -55,17 +58,21 @@ public class KuduWriterITCase {
     updateJobConf(jobConf);
 
     EmbeddedFlinkCluster.submitJob(jobConf);
-    Assert.assertEquals(TOTAL_COUNT, KuduTestUtils.getTableRowCount(client, TABLE_NAME));
 
+    List<List<Object>> scanResults;
     try {
-      KuduTestUtils.scanTable(client, TABLE_NAME);
+      scanResults = KuduTestUtils.scanTable(client, TABLE_NAME);
     } catch (Exception e) {
-      throw new RuntimeException("Failed to get rows from table " + TABLE_NAME);
+      throw new RuntimeException("Failed to scan rows from table " + TABLE_NAME);
     }
+
+    // KuduTableStatistics::getLiveRowCount() is not accurate, so we count the scan results here.
+    Assert.assertEquals(TOTAL_COUNT, scanResults.size());
   }
 
   private void updateJobConf(BitSailConfiguration jobConf) {
     jobConf.set(FakeReaderOptions.TOTAL_COUNT, TOTAL_COUNT);
+    jobConf.set(FakeReaderOptions.RATE, TOTAL_COUNT / 5);
     jobConf.set(KuduWriterOptions.KUDU_TABLE_NAME, TABLE_NAME);
 
     String masterAddressString = harness.getMasterAddressesAsString();

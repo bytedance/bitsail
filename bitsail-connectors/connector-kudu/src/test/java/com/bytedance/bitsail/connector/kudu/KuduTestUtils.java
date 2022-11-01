@@ -41,6 +41,9 @@ import java.util.stream.Collectors;
 public class KuduTestUtils {
   private static final Logger LOG = LoggerFactory.getLogger(KuduTestUtils.class);
 
+  public static final int REPLICA_NUM = 1;
+  public static final int BUCKET_NUM = 3;
+
   private static final List<ColumnSchema> COLUMNS;
   private static final Schema SCHEMA;
 
@@ -57,10 +60,9 @@ public class KuduTestUtils {
 
 
   public static void createTable(KuduClient client, String tableName) {
-    CreateTableOptions cto = new CreateTableOptions();
+    CreateTableOptions cto = new CreateTableOptions().setNumReplicas(REPLICA_NUM);
     List<String> hashKeys = Lists.newArrayList("key");
-    int numBuckets = 4;
-    cto.addHashPartitions(hashKeys, numBuckets);
+    cto.addHashPartitions(hashKeys, BUCKET_NUM);
 
     try {
       client.createTable(tableName, SCHEMA, cto);
@@ -106,6 +108,7 @@ public class KuduTestUtils {
       results.forEachRemaining(kuduRow -> rows.add(convert(kuduRow)));
     }
 
+    LOG.info("Found {} rows in table {}", rows.size(), tableName);
     return rows;
   }
 
