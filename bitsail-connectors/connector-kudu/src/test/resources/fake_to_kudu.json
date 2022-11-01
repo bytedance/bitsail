@@ -1,0 +1,73 @@
+{
+  "job": {
+    "common": {
+      "job_id": -2413,
+      "job_name": "bitsail_fake_to_kudu_test",
+      "instance_id": -20413,
+      "user_name": "user"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
+      "total_count": 500,
+      "rate": 100,
+      "columns": [
+        {
+          "name": "key",
+          "type": "long",
+          "properties": "unique"
+        },
+        {
+          "name": "fake_boolean",
+          "type": "boolean"
+        },
+        {
+          "name": "fake_int",
+          "type": "int"
+        },
+        {
+          "name": "fake_double",
+          "type": "double"
+        },
+        {
+          "name": "fake_date",
+          "type": "date.date"
+        },
+        {
+          "name": "fake_binary",
+          "type": "binary"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.kudu.sink.KuduWriterGenerator",
+      "kudu_worker_count": 2,
+      "columns": [
+        {
+          "name": "key",
+          "type": "long",
+          "properties": "unique"
+        },
+        {
+          "name": "field_boolean",
+          "type": "boolean"
+        },
+        {
+          "name": "field_int",
+          "type": "int"
+        },
+        {
+          "name": "field_double",
+          "type": "double"
+        },
+        {
+          "name": "field_date",
+          "type": "date"
+        },
+        {
+          "name": "field_binary",
+          "type": "binary"
+        }
+      ]
+    }
+  }
+}

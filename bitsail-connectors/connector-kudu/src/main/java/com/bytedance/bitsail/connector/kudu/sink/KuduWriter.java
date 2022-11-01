@@ -159,7 +159,7 @@ public class KuduWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
    * Check if an operation is failed.
    */
   private static void handleOperationResponse(OperationResponse operationResponse) throws IOException {
-    if (operationResponse.hasRowError()) {
+    if (operationResponse != null && operationResponse.hasRowError()) {
       LOG.error("Failed to add an operation to session: {}", operationResponse.getRowError());
       throw new IOException("Failed to add an operation to session: " + operationResponse.getRowError());
     }
@@ -169,7 +169,7 @@ public class KuduWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
    * Check if an session has errors.
    */
   private static void handleSessionPendingErrors(KuduSession session) throws IOException {
-    if (session.countPendingErrors() != 0) {
+    if (session != null && session.countPendingErrors() != 0) {
       RowErrorsAndOverflowStatus roStatus = session.getPendingErrors();
       RowError[] errs = roStatus.getRowErrors();
 

@@ -55,7 +55,7 @@ public class KuduRowBuilder implements Serializable {
 
   private BiConsumer<PartialRow, Object> initRowInserter(ColumnInfo columnInfo) {
     String columnName = columnInfo.getName();
-    String typeName = columnInfo.getType();
+    String typeName = columnInfo.getType().trim().toUpperCase();
 
     switch (typeName) {
       case "BOOLEAN": // BOOLEAN_TYPE_INFO
@@ -66,6 +66,7 @@ public class KuduRowBuilder implements Serializable {
         return (PartialRow kuduRow, Object value) -> kuduRow.addShort(columnName, (short) value);
       case "INT":     // INT_TYPE_INFO
         return (PartialRow kuduRow, Object value) -> kuduRow.addInt(columnName, (int) value);
+      case "INT64":
       case "LONG":    // LONG_TYPE_INFO
         return (PartialRow kuduRow, Object value) -> kuduRow.addLong(columnName, (long) value);
       case "DATE":    // SQL_DATE_TYPE_INFO
