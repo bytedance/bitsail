@@ -18,8 +18,8 @@
 package com.bytedance.bitsail.connector.legacy.ftp.source;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.connector.legacy.ftp.option.FtpReaderOptions;
 import com.bytedance.bitsail.connector.legacy.ftp.common.FtpConfig;
+import com.bytedance.bitsail.connector.legacy.ftp.option.FtpReaderOptions;
 import com.bytedance.bitsail.connector.legacy.ftp.util.SetupUtil;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;

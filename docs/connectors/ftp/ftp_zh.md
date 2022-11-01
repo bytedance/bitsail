@@ -56,7 +56,7 @@
 
 | 参数名称     | 参数是否必需 | 参数枚举值      | 参数含义                                                                                       |
 | :----------- | :----------- | :-------------- | :--------------------------------------------------------------------------------------------- |
-| class        | 是           |                 | H读连接器类名，只能为 `com.bytedance.bitsail.connector.legacy.ftp.source` |
+| class        | 是           |                 | 读连接器类名，只能为 `com.bytedance.bitsail.connector.legacy.ftp.source.FtpInputFormat` |
 | path_list    | 是           |                 | 指定读入文件的路径。可指定多个路径，使用 `','`分隔                                           |
 | content_type | 是           | JSON/CSV | 指定读入文件的格式，详情参考[支持的文件格式](#jump_format)                                        |
 | columns      | 是           |                 | 数据字段名称及类型                                                                             |
@@ -65,7 +65,7 @@
 | user | 是 |  | 用户名 |
 | password | 是 |  | 密码 |
 | protocol | 是 | FTP/SFTP | 文件传输协议 |
-| success_file_path | 是 |  | SUCCESS标签检查默认开启，文件路径 |
+| success_file_path | 是 |  | SUCCESS标签文件路径(检查默认开启，文件存在才会执行任务) |
 
 ### 可选参数
 
@@ -79,7 +79,7 @@
 
 ## <span id="jump_format">支持的文件格式</span>
 
-支持对以下格式的文件进行解读:
+支持对以下格式的文件进行解读(配置参数`content_type`):
 
 - [JSON](#jump_json)
 - [CSV](#jump_csv)

@@ -24,9 +24,9 @@ import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.component.format.api.RowBuilder;
 import com.bytedance.bitsail.connector.legacy.ftp.client.FtpHandlerFactory;
 import com.bytedance.bitsail.connector.legacy.ftp.client.IFtpHandler;
+import com.bytedance.bitsail.connector.legacy.ftp.common.FtpConfig;
 import com.bytedance.bitsail.connector.legacy.ftp.error.FtpInputFormatErrorCode;
 import com.bytedance.bitsail.connector.legacy.ftp.option.FtpReaderOptions;
-import com.bytedance.bitsail.connector.legacy.ftp.common.FtpConfig;
 import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatPlugin;
 import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
 

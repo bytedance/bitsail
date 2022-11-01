@@ -18,8 +18,8 @@
 package com.bytedance.bitsail.connector.legacy.ftp.client;
 
 import com.bytedance.bitsail.common.BitSailException;
-import com.bytedance.bitsail.connector.legacy.ftp.error.FtpInputFormatErrorCode;
 import com.bytedance.bitsail.connector.legacy.ftp.common.FtpConfig;
+import com.bytedance.bitsail.connector.legacy.ftp.error.FtpInputFormatErrorCode;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;

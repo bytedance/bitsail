@@ -26,7 +26,7 @@ import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
 /**
  * Ftp Options
  */
-public interface FtpReaderOptions extends ReaderOptions.BaseFileReaderOptions {
+public interface FtpReaderOptions extends ReaderOptions.BaseReaderOptions {
   ConfigOption<String> READER_CLASS =
       key(READER_PREFIX + "class")
           .defaultValue("com.bytedance.bitsail.connector.legacy.ftp.source.FtpInputFormat");

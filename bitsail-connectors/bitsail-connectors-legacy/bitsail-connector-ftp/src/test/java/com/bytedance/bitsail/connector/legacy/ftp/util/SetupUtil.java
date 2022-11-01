@@ -56,8 +56,8 @@ public class SetupUtil {
 
     UnixFakeFileSystem fakeFileSystem = new UnixFakeFileSystem();
     fakeFileSystem.add(new DirectoryEntry(UPLOAD));
-    fakeFileSystem.add(new FileEntry(UPLOAD + "test1.csv", "c0,c1\naaa,bbb"));
-    fakeFileSystem.add(new FileEntry(UPLOAD + "test2.csv", "c0,c1\nbbb,aaa"));
+    fakeFileSystem.add(new FileEntry(UPLOAD + "test1.csv", "c0,c1,c2,c3,c4\n111,aaa,1.1,1.12345,true,2022-11-01"));
+    fakeFileSystem.add(new FileEntry(UPLOAD + "test2.csv", "c0,c1,c2,c3,c4\n-111,aaa,-1.1,-1.12345,false,2022-11-01"));
     fakeFileSystem.add(new FileEntry(UPLOAD + SUCCESS_TAG));
     fakeFtpServer.setFileSystem(fakeFileSystem);
     fakeFtpServer.setServerControlPort(FTP_PORT);

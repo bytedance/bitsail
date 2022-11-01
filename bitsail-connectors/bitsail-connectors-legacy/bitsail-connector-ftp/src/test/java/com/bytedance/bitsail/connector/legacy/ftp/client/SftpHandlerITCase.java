@@ -50,8 +50,8 @@ public class SftpHandlerITCase {
 
   @After
   public void teardown() throws IOException {
-    sftpServer.stop();
     sftpHandler.logoutFtpServer();
+    sftpServer.stop();
   }
 
   @Test
@@ -63,7 +63,7 @@ public class SftpHandlerITCase {
 
   @Test
   public void testGetFilesSize() {
-    Assert.assertEquals(26L, sftpHandler.getFilesSize(UPLOAD));
+    Assert.assertEquals(104L, sftpHandler.getFilesSize(UPLOAD));
     Assert.assertEquals(0L, sftpHandler.getFilesSize(UPLOAD + SUCCESS_TAG));
   }
 }

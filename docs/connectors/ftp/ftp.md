@@ -54,9 +54,9 @@ The following mentioned parameters should be added to `job.reader` block when us
 
 | Param name   | Required | Optional value   | Description                                                                                   |
 | :----------- | :------- | :--------------- | :-------------------------------------------------------------------------------------------- |
-| class        | Yes      |                  | Class name of connector,`com.bytedance.bitsail.connector.legacy.ftp.source`             |
+| class        | Yes      |                  | Class name of connector,`com.bytedance.bitsail.connector.legacy.ftp.source.FtpInputFormat`             |
 | path_list    | Yes      |                  | Specifies the path of the read in file. Multiple paths can be specified, separated by `','` |
-| content_type | Yes      | JSON<br>CSV | Specify the format of the read in file. For details, refer to  [Supported formats](#jump_format)      |
+| content_type | Yes      | JSON/CSV | Specify the format of the read in file. For details, refer to  [Supported formats](#jump_format)      |
 | columns      | Yes      |                  | Describing fields' names and types                                                            |
 | port | Yes |  | Server port，normally FTP is 21, SFTP is 22 |
 | host | Yes |  | Server host |
@@ -69,7 +69,7 @@ The following mentioned parameters should be added to `job.reader` block when us
 
 | Param name             | Required | Default value | Optional value | Description                                                  |
 | :--------------------- | :------- | :------ | ---- | :----------------------------------------------------------- |
-| connect_pattern           | No          | PASV if FTP, NULL if SFTP | PASV/PORT/     | In ftp mode, connect pattern can be PASV or PORT. In sftp mode, connect pattern is NULL |
+| connect_pattern           | No          | PASV if FTP, NULL if SFTP | PASV/PORT/NULL     | In ftp mode, connect pattern can be PASV or PORT. In sftp mode, connect pattern is NULL |
 | time_out                  | No         | 5000ms               |                | Connection timeout                       |
 | enable_success_file_check | No         | True                 |                | Enabled by default, the job will not start if SUCCESS tag doesn't exist |
 | max_retry_time            | No         | 60                   |                | Max time to check for SUCCESS tag file |
@@ -77,7 +77,7 @@ The following mentioned parameters should be added to `job.reader` block when us
 
 ## <span id="jump_format">Supported formats</span>
 
-Support the following formats:
+Support the following formats(configured by `content_type`):
 
 - [JSON](#jump_json)
 - [CSV](#jump_csv)
