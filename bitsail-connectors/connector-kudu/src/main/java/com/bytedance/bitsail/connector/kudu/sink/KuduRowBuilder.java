@@ -19,31 +19,83 @@
 
 package com.bytedance.bitsail.connector.kudu.sink;
 
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
 import com.bytedance.bitsail.connector.kudu.option.KuduWriterOptions;
 
 import org.apache.kudu.client.PartialRow;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 public class KuduRowBuilder implements Serializable {
 
-  private final List<ColumnInfo> columnInfos;
+  private final List<BiConsumer<PartialRow, Object>> rowInserters;
+  private final int fieldSize;
 
   public KuduRowBuilder(BitSailConfiguration jobConf) {
-    this.columnInfos = jobConf.get(KuduWriterOptions.COLUMNS);
+    List<ColumnInfo> columnInfos = jobConf.get(KuduWriterOptions.COLUMNS);
+    this.rowInserters = columnInfos.stream().map(this::initRowInserter).collect(Collectors.toList());
+    this.fieldSize = rowInserters.size();
   }
 
-  public void transform(PartialRow kuduRow, Row row) {
-    Object[] fields = row.getFields();
+  public void build(PartialRow kuduRow, Row row) {
+    for (int i = 0; i < fieldSize; ++i) {
+      rowInserters.get(i).accept(kuduRow, row.getField(i));
+    }
+  }
 
-    String columnName;
-    for (int i = 0; i < fields.length; ++i) {
-       columnName = columnInfos.get(i).getName();
+  private BiConsumer<PartialRow, Object> initRowInserter(ColumnInfo columnInfo) {
+    String columnName = columnInfo.getName();
+    String typeName = columnInfo.getType();
 
+    switch (typeName) {
+      case "BOOLEAN": // BOOLEAN_TYPE_INFO
+        return (PartialRow kuduRow, Object value) -> kuduRow.addBoolean(columnName, (boolean) value);
+      case "INT8":    // BYTE_TYPE_INFO
+        return (PartialRow kuduRow, Object value) -> kuduRow.addByte(columnName, (byte) value);
+      case "INT16":   // SHORT_TYPE_INFO
+        return (PartialRow kuduRow, Object value) -> kuduRow.addShort(columnName, (short) value);
+      case "INT":     // INT_TYPE_INFO
+        return (PartialRow kuduRow, Object value) -> kuduRow.addInt(columnName, (int) value);
+      case "LONG":    // LONG_TYPE_INFO
+        return (PartialRow kuduRow, Object value) -> kuduRow.addLong(columnName, (long) value);
+      case "DATE":    // SQL_DATE_TYPE_INFO
+        return (PartialRow kuduRow, Object value) -> kuduRow.addDate(columnName, (Date) value);
+      case "TIMESTAMP":   // SQL_TIMESTAMP_TYPE_INFO
+        return (PartialRow kuduRow, Object value) -> {
+          if (value instanceof Timestamp) {
+            kuduRow.addTimestamp(columnName, (Timestamp) value);
+          } else if (value instanceof Long) {
+            kuduRow.addLong(columnName, (Long) value);
+          } else {
+            throw new BitSailException(KuduErrorCode.ILLEGAL_VALUE, "Value "+ value + " is not Long or Timestamp.");
+          }
+        };
+      case "FLOAT":   // FLOAT_TYPE_INFO
+        return (PartialRow kuduRow, Object value) -> kuduRow.addFloat(columnName, (float) value);
+      case "DOUBLE":  // DOUBLE_TYPE_INFO
+        return (PartialRow kuduRow, Object value) -> kuduRow.addDouble(columnName, (double) value);
+      case "DECIMAL": // BIG_DECIMAL_TYPE_INFO
+        return (PartialRow kuduRow, Object value) -> kuduRow.addDecimal(columnName, (BigDecimal) value);
+      case "VARCHAR": // STRING_TYPE_INFO
+        return (PartialRow kuduRow, Object value) -> kuduRow.addVarchar(columnName, value.toString());
+      case "STRING":  // STRING_TYPE_INFO
+        return (PartialRow kuduRow, Object value) -> kuduRow.addString(columnName, value.toString());
+      case "STRING_UTF8": // BINARY_TYPE_INFO
+        return (PartialRow kuduRow, Object value) -> kuduRow.addStringUtf8(columnName, (byte[]) value);
+      case "BINARY":  // BINARY_TYPE_INFO
+        return (PartialRow kuduRow, Object value) -> kuduRow.addBinary(columnName, (byte[]) value);
+      default:
+        throw new BitSailException(KuduErrorCode.UNSUPPORTED_TYPE, "Type " + typeName + " is not supported");
     }
   }
 }

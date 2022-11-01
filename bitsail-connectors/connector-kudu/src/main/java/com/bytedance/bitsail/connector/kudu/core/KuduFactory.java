@@ -19,19 +19,25 @@
 
 package com.bytedance.bitsail.connector.kudu.core;
 
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.util.Preconditions;
-import com.bytedance.bitsail.connector.kudu.config.KuduClientConfig;
-import com.bytedance.bitsail.connector.kudu.config.KuduSessionConfig;
+import com.bytedance.bitsail.connector.kudu.core.config.KuduClientConfig;
+import com.bytedance.bitsail.connector.kudu.core.config.KuduSessionConfig;
+import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
 
-import lombok.Data;
 import org.apache.kudu.client.KuduClient;
+import org.apache.kudu.client.KuduException;
 import org.apache.kudu.client.KuduSession;
+import org.apache.kudu.client.KuduTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
+import java.io.Closeable;
+import java.io.IOException;
 
-@Data
-public class KuduFactory implements Serializable {
+public class KuduFactory implements Closeable {
+  private static final Logger LOG = LoggerFactory.getLogger(KuduFactory.class);
 
   private final KuduClientConfig clientConfig;
   private final KuduSessionConfig sessionConfig;
@@ -42,7 +48,7 @@ public class KuduFactory implements Serializable {
   public KuduFactory(BitSailConfiguration jobConf, String role) {
     // initialize client config
     role = role.trim();
-    Preconditions.checkState("reader".equalsIgnoreCase(role) || "writer".equalsIgnoreCase(role));
+    Preconditions.checkState("READER".equalsIgnoreCase(role) || "WRITER".equalsIgnoreCase(role));
     this.clientConfig = new KuduClientConfig(jobConf, role);
     clientConfig.validate();
 
@@ -86,18 +92,17 @@ public class KuduFactory implements Serializable {
     }
 
     this.kuduClient = builder.build();
+    LOG.info("Kudu client is initialized.");
+
     return kuduClient;
   }
 
   /**
-   * Make sure one KuduFactory only creates one session.
+   * Make sure there is only one active session in any moment.
    */
   public KuduSession getSession() {
-    // Make sure KuduClient is initialized.
-     getClient();
-
-    if (kuduSession == null) {
-      kuduSession = kuduClient.newSession();
+    if (kuduSession == null || kuduSession.isClosed()) {
+      kuduSession = getClient().newSession();
       kuduSession.setFlushMode(sessionConfig.getFlushMode());
       kuduSession.setExternalConsistencyMode(sessionConfig.getConsistencyMode());
 
@@ -116,8 +121,50 @@ public class KuduFactory implements Serializable {
       if (sessionConfig.getIgnoreDuplicateRows() != null) {
         kuduSession.setIgnoreAllDuplicateRows(sessionConfig.getIgnoreDuplicateRows());
       }
+      LOG.info("Kudu session is created.");
     }
 
     return kuduSession;
+  }
+
+  public KuduTable getTable(String tableName) throws BitSailException {
+    try {
+      return getClient().openTable(tableName);
+    } catch (KuduException e) {
+      LOG.error("Failed to open table {}.", tableName, e);
+      throw new BitSailException(KuduErrorCode.OPEN_TABLE_ERROR, e.getMessage());
+    }
+  }
+
+  public void closeCurrentClient() throws IOException {
+    if (kuduClient != null) {
+      try {
+        kuduClient.close();
+      } catch (KuduException e) {
+        throw new IOException("Failed to close kudu client.", e);
+      } finally {
+        kuduClient = null;
+      }
+      LOG.info("Current kudu client is closed.");
+    }
+  }
+
+  public void closeCurrentSession() throws IOException {
+    if (kuduSession != null && !kuduSession.isClosed()) {
+      try {
+        kuduSession.close();
+      } catch (KuduException e) {
+        throw new IOException("Failed to close kudu session.", e);
+      } finally {
+        kuduSession = null;
+      }
+      LOG.info("Current kudu session is closed.");
+    }
+  }
+
+  @Override
+  public void close() throws IOException {
+    closeCurrentSession();
+    closeCurrentClient();
   }
 }

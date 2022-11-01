@@ -24,7 +24,9 @@ public enum KuduErrorCode implements ErrorCode {
   REQUIRED_VALUE("Kudu-00", "The configuration file lack necessary options"),
   CONFIG_ERROR("Kudu-01", "The configuration has wrong option"),
   OPEN_TABLE_ERROR("Kudu-02", "Failed to open table"),
-  UNSUPPORTED_OPERATION("Kudu-03", "Operation is not supported");
+  UNSUPPORTED_OPERATION("Kudu-03", "Operation is not supported"),
+  UNSUPPORTED_TYPE("Kudu-04", "Type is not supported"),
+  ILLEGAL_VALUE("Kudu-05", "Value type is illegal");
 
   private final String code;
 

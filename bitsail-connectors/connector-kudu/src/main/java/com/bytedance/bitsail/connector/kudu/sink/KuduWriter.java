@@ -26,52 +26,115 @@ import com.bytedance.bitsail.connector.kudu.core.KuduFactory;
 import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
 import com.bytedance.bitsail.connector.kudu.option.KuduWriterOptions;
 
-import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.client.KuduException;
 import org.apache.kudu.client.KuduSession;
 import org.apache.kudu.client.KuduTable;
 import org.apache.kudu.client.Operation;
+import org.apache.kudu.client.OperationResponse;
+import org.apache.kudu.client.PartialRow;
+import org.apache.kudu.client.RowError;
+import org.apache.kudu.client.RowErrorsAndOverflowStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class KuduWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   private static final Logger LOG = LoggerFactory.getLogger(KuduWriter.class);
+  private static final int SESSION_ERROR_LOG_COUNT = 5;
 
-  private final String kuduTableName;
-
-  private final KuduClient kuduClient;
-  private final KuduSession kuduSession;
+  private final KuduFactory kuduFactory;
   private final KuduTable kuduTable;
+  private KuduSession kuduSession;
 
   private final Supplier<Operation> operationSupplier;
 
+  private final KuduRowBuilder rowBuilder;
+
   public KuduWriter(BitSailConfiguration jobConf) {
-    this.kuduTableName = jobConf.getNecessaryOption(KuduWriterOptions.KUDU_TABLE_NAME, KuduErrorCode.REQUIRED_VALUE);
+    String kuduTableName = jobConf.getNecessaryOption(KuduWriterOptions.KUDU_TABLE_NAME, KuduErrorCode.REQUIRED_VALUE);
 
-    KuduFactory factory = new KuduFactory(jobConf, "writer");
-    this.kuduClient = factory.getClient();
-    this.kuduSession = factory.getSession();
+    this.kuduFactory = new KuduFactory(jobConf, "writer");
+    this.kuduSession = kuduFactory.getSession();
+    this.kuduTable = kuduFactory.getTable(kuduTableName);
 
-    try {
-      this.kuduTable = kuduClient.openTable(kuduTableName);
-    } catch (KuduException e) {
-      LOG.error("Failed to open table {}.", kuduTableName, e);
-      throw new BitSailException(KuduErrorCode.OPEN_TABLE_ERROR, e.getMessage());
-    }
-
-    String writeMode = jobConf.get(KuduWriterOptions.WRITE_MODE).trim().toUpperCase();
+    String writeMode = jobConf.get(KuduWriterOptions.WRITE_MODE);
     this.operationSupplier = initOperationSupplier(writeMode);
+    this.rowBuilder = new KuduRowBuilder(jobConf);
+
+    LOG.info("KuduWriter is initialized.");
   }
 
   @Override
   public void write(Row element) throws IOException {
+    Operation operation = operationSupplier.get();
+    PartialRow kuduRow = operation.getRow();
+    rowBuilder.build(kuduRow, element);
 
+    OperationResponse response;
+    try {
+      response = kuduSession.apply(operation);
+    } catch (KuduException e) {
+      e.printStackTrace();
+      throw new IOException("Failed to write element to session.");
+    }
+
+    handleOperationResponse(response);
   }
 
+  @Override
+  public void flush(boolean endOfInput) throws IOException {
+    List<OperationResponse> responses;
+    try {
+      responses = kuduSession.flush();
+    } catch (KuduException e) {
+      LOG.error("Failed to flush rows in session.", e);
+      throw new IOException("Failed to flush rows in session.", e);
+    }
+
+    // Check if any error occurs.
+    for (OperationResponse response : responses) {
+      handleOperationResponse(response);
+    }
+    handleSessionPendingErrors(kuduSession);
+  }
+
+  @Override
+  public List<CommitT> prepareCommit() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<EmptyState> snapshotState(long checkpointId) throws IOException {
+    flush(false);
+
+    // Close old kudu session.
+    kuduFactory.closeCurrentSession();
+    handleSessionPendingErrors(kuduSession);
+
+    // Create a new session for the next period.
+    this.kuduSession = kuduFactory.getSession();
+    return Collections.emptyList();
+  }
+
+  @Override
+  public void close() throws IOException {
+    flush(true);
+
+    kuduFactory.closeCurrentSession();
+    handleSessionPendingErrors(kuduSession);
+    kuduFactory.close();
+  }
+
+  /**
+   * Create a supplier which get operations from table according to write mode.
+   */
   private Supplier<Operation> initOperationSupplier(String writeMode) {
+    writeMode = writeMode.trim().toUpperCase();
     switch (writeMode) {
       case "INSERT":
         return kuduTable::newInsert;
@@ -89,6 +152,41 @@ public class KuduWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
         return kuduTable::newDeleteIgnore;
       default:
         throw new BitSailException(KuduErrorCode.UNSUPPORTED_OPERATION, "Write mode " + writeMode + " is not supported.");
+    }
+  }
+
+  /**
+   * Check if an operation is failed.
+   */
+  private static void handleOperationResponse(OperationResponse operationResponse) throws IOException {
+    if (operationResponse.hasRowError()) {
+      LOG.error("Failed to add an operation to session: {}", operationResponse.getRowError());
+      throw new IOException("Failed to add an operation to session: " + operationResponse.getRowError());
+    }
+  }
+
+  /**
+   * Check if an session has errors.
+   */
+  private static void handleSessionPendingErrors(KuduSession session) throws IOException {
+    if (session.countPendingErrors() != 0) {
+      RowErrorsAndOverflowStatus roStatus = session.getPendingErrors();
+      RowError[] errs = roStatus.getRowErrors();
+
+      LOG.error("Found {} pending errors.", session.countPendingErrors());
+      if (roStatus.isOverflowed()) {
+        LOG.error("error buffer overflowed: some errors were discarded");
+      }
+
+      List<String> sessionErrorMessage = new ArrayList<>();
+      for (int i = 0; i < errs.length; ++i) {
+        LOG.error("The {}-th error: {}", i, errs[i]);
+        if (i < SESSION_ERROR_LOG_COUNT) {
+          sessionErrorMessage.add(String.format("[error-%d: %s]", i, errs[i]));
+        }
+      }
+
+      throw new IOException("Found " + session.countPendingErrors() + " errors in session. The first few errors are: " + String.join(", ", sessionErrorMessage));
     }
   }
 }

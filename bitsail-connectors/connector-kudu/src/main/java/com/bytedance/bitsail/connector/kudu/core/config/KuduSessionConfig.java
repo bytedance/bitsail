@@ -17,19 +17,19 @@
  *
  */
 
-package com.bytedance.bitsail.connector.kudu.config;
+package com.bytedance.bitsail.connector.kudu.core.config;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.kudu.option.KuduWriterOptions;
 
-import lombok.Data;
+import lombok.Getter;
 import org.apache.kudu.client.ExternalConsistencyMode;
 import org.apache.kudu.client.SessionConfiguration.FlushMode;
 
 import java.io.Serializable;
 
-@Data
+@Getter
 public class KuduSessionConfig implements Serializable {
 
   private final FlushMode flushMode;

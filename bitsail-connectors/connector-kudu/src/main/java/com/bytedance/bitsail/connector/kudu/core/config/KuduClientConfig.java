@@ -17,7 +17,7 @@
  *
  */
 
-package com.bytedance.bitsail.connector.kudu.config;
+package com.bytedance.bitsail.connector.kudu.core.config;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
@@ -28,14 +28,14 @@ import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
 import com.bytedance.bitsail.connector.kudu.option.KuduWriterOptions;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kudu.client.AsyncKuduClient;
 
 import java.io.Serializable;
 import java.util.List;
 
-@Data
+@Getter
 public class KuduClientConfig implements Serializable {
 
   /**
