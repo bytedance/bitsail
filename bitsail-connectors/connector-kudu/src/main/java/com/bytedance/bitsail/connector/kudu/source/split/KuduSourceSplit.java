@@ -21,24 +21,28 @@ import com.bytedance.bitsail.base.connector.reader.v1.SourceSplit;
 
 import lombok.Getter;
 import org.apache.kudu.client.KuduPredicate;
+import org.apache.kudu.client.KuduScanner;
 
 import java.util.ArrayList;
 import java.util.List;
 
+// 把它搞成serializable的，并用predicates
 @Getter
 public class KuduSourceSplit implements SourceSplit {
+
+  public static final String KUDU_SOURCE_SPLIT_PREFIX = "kudu_source_split_";
 
   private final String splitId;
 
   private List<KuduPredicate> predicates;
 
-  public KuduSourceSplit(String splitId) {
-    this.splitId = splitId;
+  public KuduSourceSplit(int splitId) {
+    this.splitId = KUDU_SOURCE_SPLIT_PREFIX + splitId;
   }
 
   @Override
   public String uniqSplitId() {
-    return null;
+    return splitId;
   }
 
   public void addPredicate(KuduPredicate predicate) {
@@ -46,5 +50,9 @@ public class KuduSourceSplit implements SourceSplit {
       predicates = new ArrayList<>();
     }
     predicates.add(predicate);
+  }
+
+  public void bindScanner(KuduScanner.KuduScannerBuilder builder) {
+    predicates.forEach(builder::addPredicate);
   }
 }

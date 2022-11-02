@@ -17,9 +17,95 @@
 
 package com.bytedance.bitsail.connector.kudu.source;
 
+import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.connector.kudu.core.KuduFactory;
+import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
+import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
+import com.bytedance.bitsail.connector.kudu.source.split.KuduSourceSplit;
 
-public class KuduSourceReader implements SourceReader {
+import org.apache.kudu.client.KuduScanner;
+import org.apache.kudu.client.RowResult;
+import org.apache.kudu.client.RowResultIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
 
+public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
+  private static final Logger LOG = LoggerFactory.getLogger(KuduSourceReader.class);
+
+  private final List<ColumnInfo> columns;
+  private final String tableName;
+
+  private final KuduFactory kuduFactory;
+  private final KuduScannerConstructor scannerConstructor;
+
+  private Deque<KuduSourceSplit> splits;
+
+  public KuduSourceReader(BitSailConfiguration jobConf) {
+    this.columns = jobConf.getNecessaryOption(KuduReaderOptions.COLUMNS, KuduErrorCode.REQUIRED_VALUE);
+    this.tableName = jobConf.getNecessaryOption(KuduReaderOptions.KUDU_TABLE_NAME, KuduErrorCode.REQUIRED_VALUE);
+
+    this.kuduFactory = new KuduFactory(jobConf, "reader");
+    this.scannerConstructor = new KuduScannerConstructor(jobConf);
+    LOG.info("KuduReader is initialized.");
+  }
+
+  @Override
+  public void start() {}
+
+  @Override
+  public void pollNext(SourcePipeline<Row> pipeline) throws Exception {
+    KuduSourceSplit split = splits.poll();
+    LOG.info("Begin to read split: {}", split.getSplitId());
+
+    KuduScanner scanner = scannerConstructor.createScanner(kuduFactory.getClient(), tableName, split);
+    while(scanner.hasMoreRows()) {
+      RowResultIterator rowResults = scanner.nextRows();
+      while (rowResults.hasNext()) {
+        RowResult rowResult = rowResults.next();
+        // todo: 补充这里
+        Row row = new Row(5);
+        pipeline.output(row);
+      }
+    }
+    scanner.close();
+
+    LOG.info("Finish reading split: {}", split.getSplitId());
+  }
+
+  @Override
+  public void addSplits(List<KuduSourceSplit> splitList) {
+    if (splits == null) {
+      this.splits = new LinkedList<>();
+    }
+    splits.addAll(splitList);
+  }
+
+  @Override
+  public boolean hasMoreElements() {
+    return !splits.isEmpty();
+  }
+
+  @Override
+  public List<KuduSourceSplit> snapshotState(long checkpointId) {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public void notifyCheckpointComplete(long checkpointId) throws Exception {
+    //Ignore
+  }
+
+  @Override
+  public void close() throws Exception {
+    kuduFactory.close();
+  }
 }

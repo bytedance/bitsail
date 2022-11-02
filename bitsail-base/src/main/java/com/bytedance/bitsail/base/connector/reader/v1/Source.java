@@ -26,6 +26,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 public interface Source<T, SplitT extends SourceSplit, StateT extends Serializable> extends Serializable {
@@ -33,7 +34,7 @@ public interface Source<T, SplitT extends SourceSplit, StateT extends Serializab
   /**
    * Run in client side for source initialize;
    */
-  void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration);
+  void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration) throws IOException;
 
   /**
    * Indicate the Source type.

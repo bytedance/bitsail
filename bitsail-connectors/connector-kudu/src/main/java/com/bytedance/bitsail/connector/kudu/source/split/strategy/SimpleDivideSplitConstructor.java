@@ -151,7 +151,7 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
       KuduPredicate lowerPred = KuduPredicate.newComparisonPredicate(column, KuduPredicate.ComparisonOp.GREATER_EQUAL, beg);
       KuduPredicate upperPred = KuduPredicate.newComparisonPredicate(column, KuduPredicate.ComparisonOp.LESS, beg + step);
 
-      KuduSourceSplit split = new KuduSourceSplit(SIMPLE_DIVIDE_SPLIT_PREFIX + index++);
+      KuduSourceSplit split = new KuduSourceSplit(index++);
       split.addPredicate(lowerPred);
       split.addPredicate(upperPred);
       splits.add(split);

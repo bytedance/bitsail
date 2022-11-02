@@ -90,17 +90,40 @@ public interface KuduReaderOptions extends ReaderOptions.BaseReaderOptions {
           .noDefaultValue(String.class);
 
   // Belows are scan token options.
-  ConfigOption<Boolean> CACHE_BLOCKS =
-      key(READER_PREFIX + "enable_cache_blocks")
-      .defaultValue(false);
+  /**
+   * Ref: {@link org.apache.kudu.client.AsyncKuduScanner.ReadMode}
+   */
+  ConfigOption<String> READ_MODE =
+      key(READER_PREFIX + "read_mode")
+          .defaultValue("READ_LATEST");
+
+  ConfigOption<Long> SNAPSHOT_TIMESTAMP_US =
+      key(READER_PREFIX + "snapshot_timestamp_us")
+          .noDefaultValue(Long.class);
 
   ConfigOption<Boolean> FAULT_TOLERANT =
       key(READER_PREFIX + "enable_fault_tolerant")
       .defaultValue(false);
 
+  ConfigOption<Integer> SCAN_BATCH_SIZE_BYTES =
+      key(READER_PREFIX + "scan_batch_size_bytes")
+          .noDefaultValue(Integer.class);
+
+  ConfigOption<Long> SCAN_MAX_COUNT =
+      key(READER_PREFIX + "scan_max_count")
+          .noDefaultValue(Long.class);
+
+  ConfigOption<Boolean> CACHE_BLOCKS =
+      key(READER_PREFIX + "enable_cache_blocks")
+          .defaultValue(true);
+
   ConfigOption<Long> SCAN_TIMEOUT =
       key(READER_PREFIX + "scan_timeout_ms")
           .defaultValue(30000L);
+
+  ConfigOption<Long> SCAN_ALIVE_PERIOD_MS =
+      key(READER_PREFIX + "scan_keep_alive_period_ms")
+          .noDefaultValue(Long.class);
 
   // Split configurations.
   ConfigOption<String> SPLIT_STRATEGY =
