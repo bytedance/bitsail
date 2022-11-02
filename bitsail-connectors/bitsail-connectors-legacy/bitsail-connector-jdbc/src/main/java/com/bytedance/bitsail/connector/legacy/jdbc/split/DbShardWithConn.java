@@ -197,9 +197,6 @@ public class DbShardWithConn {
 
       if (statementReadOnly) {
         statement = getConnection().prepareStatement(sqlTemplate, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-        if (driverClassName.equalsIgnoreCase(MysqlUtil.DRIVER_NAME)) {
-          statement.setFetchSize(Integer.MIN_VALUE);
-        }
       } else {
         statement = getConnection().prepareStatement(sqlTemplate);
       }
