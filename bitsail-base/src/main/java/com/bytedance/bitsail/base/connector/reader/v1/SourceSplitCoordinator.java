@@ -24,6 +24,8 @@ import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.function.BiConsumer;
 
 public interface SourceSplitCoordinator<SplitT extends SourceSplit, StateT> extends Serializable, AutoCloseable {
 
@@ -63,5 +65,10 @@ public interface SourceSplitCoordinator<SplitT extends SourceSplit, StateT> exte
     void signalNoMoreSplits(int subtask);
 
     void sendEventToSourceReader(int subtaskId, SourceEvent event);
+
+    <T> void runAsync(Callable<T> callable,
+                      BiConsumer<T, Throwable> handler,
+                      int initialDelay,
+                      long interval);
   }
 }

@@ -37,6 +37,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -101,6 +103,11 @@ public class DelegateFlinkSourceSplitEnumerator<SplitT extends SourceSplit,
       @Override
       public void sendEventToSourceReader(int subtaskId, com.bytedance.bitsail.base.connector.reader.v1.SourceEvent event) {
         splitEnumeratorContext.sendEventToSourceReader(subtaskId, new DelegateSourceEvent(event));
+      }
+
+      @Override
+      public <T> void runAsync(Callable<T> callable, BiConsumer<T, Throwable> handler, int initialDelay, long interval) {
+        splitEnumeratorContext.callAsync(callable, handler, initialDelay, interval);
       }
     };
     coordinator = splitCoordinatorFunction.apply(context);
