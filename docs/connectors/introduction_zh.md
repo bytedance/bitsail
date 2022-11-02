@@ -7,6 +7,8 @@
 
 - [Elasticsearch连接器](./elasticsearch/elasticsearch_zh.md)
 
+- [FTP/SFTP 连接器](./ftp/ftp_zh.md)
+
 - [Hadoop连接器](./hadoop/hadoop_zh.md)
 
 - [Hive连接器](./hive/hive_zh.md)
