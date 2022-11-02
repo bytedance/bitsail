@@ -22,12 +22,10 @@ import com.bytedance.bitsail.connector.legacy.jdbc.container.MySQLContainerMaria
 import com.bytedance.bitsail.connector.legacy.jdbc.model.ClusterInfo;
 import com.bytedance.bitsail.connector.legacy.jdbc.model.ConnectionInfo;
 import com.bytedance.bitsail.connector.legacy.jdbc.options.JdbcReaderOptions;
-import com.bytedance.bitsail.connector.legacy.jdbc.options.JdbcWriterOptions;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +36,6 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
-import java.util.Map;
 import java.util.stream.Stream;
 
 public class JdbcSourceITCase {
