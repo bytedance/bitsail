@@ -24,6 +24,8 @@ import com.alibaba.fastjson.TypeReference;
 import java.util.List;
 import java.util.Map;
 
+import static com.bytedance.bitsail.common.option.ConfigOptions.key;
+
 /**
  * The set of configuration options relating to reader config.
  */
@@ -32,21 +34,21 @@ public interface ReaderOptions {
   String READER_PREFIX = JOB_READER + ".";
 
   ConfigOption<String> READER_CLASS =
-      ConfigOptions.key(READER_PREFIX + "class")
+      key(READER_PREFIX + "class")
           .noDefaultValue(String.class);
 
   /**
    * Metric tag for indicating reader type.
    */
   ConfigOption<String> READER_METRIC_TAG_NAME =
-      ConfigOptions.key(READER_PREFIX + "metric_tag_name")
+      key(READER_PREFIX + "metric_tag_name")
           .noDefaultValue(String.class);
 
   /**
    * for describing different source operator
    */
   ConfigOption<String> SOURCE_OPERATOR_DESC =
-      ConfigOptions.key(READER_PREFIX + "source_operator.desc")
+      key(READER_PREFIX + "source_operator.desc")
           .noDefaultValue(String.class);
 
   /**
@@ -64,47 +66,48 @@ public interface ReaderOptions {
    * ]
    */
   ConfigOption<List<Map<String, Object>>> READER_CONFIG_LIST =
-      ConfigOptions.key(READER_PREFIX + "reader_conf_list")
+      key(READER_PREFIX + "reader_conf_list")
           .onlyReference(new TypeReference<List<Map<String, Object>>>() {
           });
 
   interface BaseReaderOptions {
 
     ConfigOption<List<ColumnInfo>> COLUMNS =
-        ConfigOptions.key(READER_PREFIX + "columns")
+        key(READER_PREFIX + "columns")
             .onlyReference(new TypeReference<List<ColumnInfo>>() {
             });
 
     ConfigOption<Integer> READER_PARALLELISM_NUM =
-        ConfigOptions.key(READER_PREFIX + "reader_parallelism_num")
+        key(READER_PREFIX + "reader_parallelism_num")
             .noDefaultValue(Integer.class);
 
     ConfigOption<String> CHARSET_NAME =
-        ConfigOptions.key(READER_PREFIX + "charset_name")
+        key(READER_PREFIX + "charset_name")
             .defaultValue("");
 
     ConfigOption<String> DB_NAME =
-        ConfigOptions.key(READER_PREFIX + "db_name")
+        key(READER_PREFIX + "db_name")
             .noDefaultValue(String.class);
 
     ConfigOption<String> TABLE_NAME =
-        ConfigOptions.key(READER_PREFIX + "table_name")
+        key(READER_PREFIX + "table_name")
             .noDefaultValue(String.class);
 
     ConfigOption<String> PARTITION =
-        ConfigOptions.key(READER_PREFIX + "partition")
+        key(READER_PREFIX + "partition")
             .noDefaultValue(String.class);
 
     ConfigOption<String> USER_NAME =
-        ConfigOptions.key(READER_PREFIX + "user_name")
+        key(READER_PREFIX + "user_name")
             .noDefaultValue(String.class);
 
     ConfigOption<String> PASSWORD =
-        ConfigOptions.key(READER_PREFIX + "password")
+        key(READER_PREFIX + "password")
             .noDefaultValue(String.class);
 
     ConfigOption<String> CONTENT_TYPE =
-        ConfigOptions.key(READER_PREFIX + "content_type")
+        key(READER_PREFIX + "content_type")
             .noDefaultValue(String.class);
   }
+
 }

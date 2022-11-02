@@ -128,6 +128,12 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
   <tr>
     <td>SqlServer</td>
   </tr>
+    <tr>
+    <td>FTP/SFTP</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
   <tr>
     <td>Fake</td>
     <td>-</td>

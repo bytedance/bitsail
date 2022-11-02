@@ -151,6 +151,12 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <td> </td>
   </tr>
   <tr>
+    <td>FTP/SFTP</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
     <td>Print</td>
     <td>-</td>
     <td> </td>
