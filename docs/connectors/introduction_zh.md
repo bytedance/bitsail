@@ -27,7 +27,7 @@
 
 - [Doris连接器](./doris/doris_zh.md)
 
-- [StreamingFile连接器](./StreamingFile/StreamingFile_zh.md)
+- [StreamingFile连接器 (hdfs流式连接器)](./StreamingFile/StreamingFile_zh.md)
 
 - [Jdbc连接器](./Jdbc/jdbc_zh.md)
   

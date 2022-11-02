@@ -28,7 +28,7 @@
 
 - [Doris connector](./doris/doris.md)
 
-- [StreamingFile connector](./StreamingFile/StreamingFile.md)
+- [StreamingFile connector (Hdfs streaming connector)](./StreamingFile/StreamingFile.md)
 
 - [Jdbc connector](./Jdbc/jdbc.md)
 
