@@ -26,7 +26,8 @@ public enum KuduErrorCode implements ErrorCode {
   OPEN_TABLE_ERROR("Kudu-02", "Failed to open table"),
   UNSUPPORTED_OPERATION("Kudu-03", "Operation is not supported"),
   UNSUPPORTED_TYPE("Kudu-04", "Type is not supported"),
-  ILLEGAL_VALUE("Kudu-05", "Value type is illegal");
+  ILLEGAL_VALUE("Kudu-05", "Value type is illegal"),
+  SPLIT_ERROR("Kudu-06", "Something wrong with creating splits.");
 
   private final String code;
 

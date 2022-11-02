@@ -101,4 +101,13 @@ public interface KuduReaderOptions extends ReaderOptions.BaseReaderOptions {
   ConfigOption<Long> SCAN_TIMEOUT =
       key(READER_PREFIX + "scan_timeout_ms")
           .defaultValue(30000L);
+
+  // Split configurations.
+  ConfigOption<String> SPLIT_STRATEGY =
+      key(READER_PREFIX + "split_strategy")
+          .defaultValue("SIMPLE_DIVIDE");
+
+  ConfigOption<String> SPLIT_CONFIGURATION =
+      key(READER_PREFIX + "split_config")
+          .noDefaultValue(String.class);
 }

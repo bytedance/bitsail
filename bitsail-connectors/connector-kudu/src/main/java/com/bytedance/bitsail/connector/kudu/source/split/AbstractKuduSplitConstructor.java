@@ -17,5 +17,35 @@
 
 package com.bytedance.bitsail.connector.kudu.source.split;
 
+import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
+import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
+
+import org.apache.kudu.Schema;
+import org.apache.kudu.client.KuduClient;
+import org.apache.kudu.client.KuduException;
+
+import java.io.IOException;
+import java.util.List;
+
 public abstract class AbstractKuduSplitConstructor {
+
+  protected final String tableName;
+  protected final Schema schema;
+
+  public AbstractKuduSplitConstructor(BitSailConfiguration jobConf, KuduClient kuduClient) throws BitSailException {
+    this.tableName = jobConf.get(KuduReaderOptions.KUDU_TABLE_NAME);
+    try {
+      this.schema = kuduClient.openTable(tableName).getSchema();
+    } catch (KuduException e) {
+      throw new BitSailException(KuduErrorCode.OPEN_TABLE_ERROR, "Failed to get schema from table " + tableName);
+    }
+  }
+
+  public abstract boolean isAvailable();
+
+  protected abstract void fillSplitConf(BitSailConfiguration jobConf, KuduClient client) throws IOException;
+
+  public abstract List<KuduSourceSplit> construct(KuduClient kuduClient) throws IOException;
 }

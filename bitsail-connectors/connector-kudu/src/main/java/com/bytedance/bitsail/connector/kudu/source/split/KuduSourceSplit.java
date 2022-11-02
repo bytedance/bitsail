@@ -19,15 +19,18 @@ package com.bytedance.bitsail.connector.kudu.source.split;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplit;
 
-import lombok.Data;
+import lombok.Getter;
 import org.apache.kudu.client.KuduPredicate;
 
-@Data
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
 public class KuduSourceSplit implements SourceSplit {
 
   private final String splitId;
 
-  private KuduPredicate predicate;
+  private List<KuduPredicate> predicates;
 
   public KuduSourceSplit(String splitId) {
     this.splitId = splitId;
@@ -36,5 +39,12 @@ public class KuduSourceSplit implements SourceSplit {
   @Override
   public String uniqSplitId() {
     return null;
+  }
+
+  public void addPredicate(KuduPredicate predicate) {
+    if (predicates == null) {
+      predicates = new ArrayList<>();
+    }
+    predicates.add(predicate);
   }
 }

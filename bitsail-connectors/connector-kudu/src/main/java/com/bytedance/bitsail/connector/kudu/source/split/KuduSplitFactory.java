@@ -17,5 +17,37 @@
 
 package com.bytedance.bitsail.connector.kudu.source.split;
 
+import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
+import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
+import com.bytedance.bitsail.connector.kudu.source.split.strategy.SimpleDivideSplitConstructor;
+
+import org.apache.kudu.client.KuduClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+
 public class KuduSplitFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(KuduSplitFactory.class);
+
+  enum KuduSplitStrategy {
+    SIMPLE_DIVIDE;
+  }
+
+  public AbstractKuduSplitConstructor getSplitConstructor(BitSailConfiguration jobConf,
+                                                          KuduClient client) {
+    KuduSplitStrategy strategy = KuduSplitStrategy.valueOf(jobConf.get(KuduReaderOptions.SPLIT_STRATEGY));
+    switch (strategy) {
+      case SIMPLE_DIVIDE:
+        try {
+          return new SimpleDivideSplitConstructor(jobConf, client);
+        } catch (IOException e) {
+          LOG.warn("Failed to create SimpleDivideSplitConstructor, will try the next constructor type.");
+        }
+      default:
+        throw new BitSailException(KuduErrorCode.SPLIT_ERROR, "Cannot create a split constructor.");
+    }
+  }
 }
