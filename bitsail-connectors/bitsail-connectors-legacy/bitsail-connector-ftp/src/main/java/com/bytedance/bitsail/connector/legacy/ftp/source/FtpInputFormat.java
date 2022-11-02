@@ -21,6 +21,7 @@ import com.bytedance.bitsail.batch.parser.row.TextRowBuilder;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 import com.bytedance.bitsail.component.format.api.RowBuilder;
 import com.bytedance.bitsail.connector.legacy.ftp.client.FtpHandlerFactory;
 import com.bytedance.bitsail.connector.legacy.ftp.client.IFtpHandler;
@@ -72,7 +73,7 @@ public class FtpInputFormat extends InputFormatPlugin<Row, InputSplit> implement
     this.rowBuilder = new TextRowBuilder(inputSliceConfig);
 
     List<ColumnInfo> columnInfos = inputSliceConfig.getNecessaryOption(FtpReaderOptions.COLUMNS, FtpInputFormatErrorCode.REQUIRED_VALUE);
-    this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(StringUtils.lowerCase(getType()), columnInfos);
+    this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(new FileMappingTypeInfoConverter(StringUtils.lowerCase(getType())), columnInfos);
     log.info("Row Type Info: " + rowTypeInfo);
   }
 
