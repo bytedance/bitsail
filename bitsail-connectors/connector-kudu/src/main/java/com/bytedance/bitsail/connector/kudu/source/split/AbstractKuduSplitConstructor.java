@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.kudu.source;
+package com.bytedance.bitsail.connector.kudu.source.split;
 
-//public class KuduSource implements Source<T, Splitg{
-//}
+public abstract class AbstractKuduSplitConstructor {
+}
