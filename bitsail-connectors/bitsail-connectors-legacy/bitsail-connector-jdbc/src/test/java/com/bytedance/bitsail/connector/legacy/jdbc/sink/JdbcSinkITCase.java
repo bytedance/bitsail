@@ -18,8 +18,8 @@
 package com.bytedance.bitsail.connector.legacy.jdbc.sink;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.connector.legacy.jdbc.container.MySQLContainerMariadbAdapter;
 import com.bytedance.bitsail.connector.legacy.jdbc.options.JdbcWriterOptions;
-import com.bytedance.bitsail.connector.legacy.jdbc.sink.container.MySQLContainerMariadbAdapter;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
