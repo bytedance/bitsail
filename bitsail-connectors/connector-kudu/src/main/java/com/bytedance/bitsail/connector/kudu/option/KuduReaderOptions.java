@@ -19,6 +19,7 @@
 
 package com.bytedance.bitsail.connector.kudu.option;
 
+import com.bytedance.bitsail.common.annotation.Essential;
 import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 
@@ -28,9 +29,15 @@ import java.util.List;
 
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
+import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
 
 public interface KuduReaderOptions extends ReaderOptions.BaseReaderOptions {
+  @Essential
+  ConfigOption<String> KUDU_TABLE_NAME =
+      key(WRITER_PREFIX + "kudu_table_name")
+          .noDefaultValue(String.class);
 
+  @Essential
   ConfigOption<List<String>> MASTER_ADDRESS_LIST =
       key(READER_PREFIX + "kudu_master_address_list")
           .onlyReference(new TypeReference<List<String>>() {});
@@ -83,4 +90,17 @@ public interface KuduReaderOptions extends ReaderOptions.BaseReaderOptions {
   ConfigOption<String> ENCRYPTION_POLICY =
       key(READER_PREFIX + "encryption_policy")
           .noDefaultValue(String.class);
+
+  // Belows are scan token options.
+  ConfigOption<Boolean> CACHE_BLOCKS =
+      key(READER_PREFIX + "enable_cache_blocks")
+      .defaultValue(false);
+
+  ConfigOption<Boolean> FAULT_TOLERANT =
+      key(READER_PREFIX + "enable_fault_tolerant")
+      .defaultValue(false);
+
+  ConfigOption<Long> SCAN_TIMEOUT =
+      key(READER_PREFIX + "scan_timeout_ms")
+          .defaultValue(30000L);
 }
