@@ -50,11 +50,10 @@ public class SqlServerValueConverter extends JdbcValueConverter {
                            int columnIndex,
                            int columnType,
                            String columnTypeName,
-                           String columnName,
                            String encoding) throws Exception {
     SQLServerResultSet sqlserverResultSet = unwrap(rs);
     if (Objects.isNull(sqlserverResultSet)) {
-      return super.extract(rs, metaData, columnIndex, columnType, columnTypeName, columnName, encoding);
+      return super.extract(rs, metaData, columnIndex, columnType, columnTypeName, encoding);
     }
     SQLServerResultSetMetaData sqlServerResultSetMetaData = (SQLServerResultSetMetaData) metaData;
     int sqlserverColumnType = sqlServerResultSetMetaData.getColumnType(columnIndex);
@@ -68,12 +67,12 @@ public class SqlServerValueConverter extends JdbcValueConverter {
       case Types.MONEY:
         return extractMoneyValue(sqlserverResultSet, columnIndex);
       default:
-        return super.extract(rs, metaData, columnIndex, columnType, columnTypeName, columnName, encoding);
+        return super.extract(rs, metaData, columnIndex, columnType, columnTypeName, encoding);
     }
   }
 
   @Override
-  protected Object convert(Object value, int columnType, String columnName, String columnTypeName) throws Exception {
+  protected Object convert(Object value, int columnType, String columnTypeName) throws Exception {
     switch (columnType) {
       case Types.DATETIME:
       case Types.DATETIMEOFFSET:
@@ -82,7 +81,7 @@ public class SqlServerValueConverter extends JdbcValueConverter {
       case Types.MONEY:
         return value;
       default:
-        return super.convert(value, columnType, columnName, columnTypeName);
+        return super.convert(value, columnType, columnTypeName);
     }
   }
 

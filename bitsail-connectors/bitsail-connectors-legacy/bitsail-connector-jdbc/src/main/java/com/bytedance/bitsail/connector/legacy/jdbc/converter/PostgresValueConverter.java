@@ -53,11 +53,10 @@ public class PostgresValueConverter extends JdbcValueConverter {
                            int columnIndex,
                            int columnType,
                            String columnTypeName,
-                           String columnName,
                            String encoding) throws Exception {
     PgResultSet pgResultSet = unwrap(rs);
     if (Objects.isNull(pgResultSet)) {
-      return super.extract(rs, metaData, columnIndex, columnType, columnTypeName, columnName, encoding);
+      return super.extract(rs, metaData, columnIndex, columnType, columnTypeName, encoding);
     }
     String pgColumnTypeName = metaData.getColumnTypeName(columnIndex);
     int pgColumnType;
@@ -65,7 +64,7 @@ public class PostgresValueConverter extends JdbcValueConverter {
       pgColumnType = Oid.valueOf(pgColumnTypeName);
     } catch (Exception e) {
       LOG.debug("Column type name = {} is invalid.", columnTypeName);
-      return super.extract(rs, metaData, columnIndex, columnType, columnTypeName, columnName, encoding);
+      return super.extract(rs, metaData, columnIndex, columnType, columnTypeName, encoding);
     }
 
     switch (pgColumnType) {
@@ -76,24 +75,24 @@ public class PostgresValueConverter extends JdbcValueConverter {
       case Oid.BOOL:
         return extractBooleanValue(pgResultSet, columnIndex);
       default:
-        return super.extract(rs, metaData, columnIndex, columnType, columnTypeName, columnName, encoding);
+        return super.extract(rs, metaData, columnIndex, columnType, columnTypeName, encoding);
     }
   }
 
   @Override
-  protected Object convert(Object value, int columnType, String columnName, String columnTypeName) throws Exception {
+  protected Object convert(Object value, int columnType, String columnTypeName) throws Exception {
     int pgColumnType;
     try {
       pgColumnType = Oid.valueOf(columnTypeName);
     } catch (Exception e) {
       LOG.debug("Column type name = {} is invalid.", columnTypeName);
-      return super.convert(value, columnType, columnName, columnTypeName);
+      return super.convert(value, columnType, columnTypeName);
     }
     switch (pgColumnType) {
       case Oid.BOOL:
-        return convertBooleanValue(value, columnName, columnTypeName);
+        return convertBooleanValue(value);
       default:
-        return super.convert(value, columnType, columnName, columnTypeName);
+        return super.convert(value, columnType, columnTypeName);
     }
   }
 

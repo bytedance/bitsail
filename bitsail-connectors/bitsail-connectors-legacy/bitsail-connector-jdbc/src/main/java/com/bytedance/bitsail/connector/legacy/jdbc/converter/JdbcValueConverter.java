@@ -53,7 +53,6 @@ public class JdbcValueConverter implements Serializable {
                            int columnIndex,
                            int columnType,
                            String columnTypeName,
-                           String columnName,
                            String encoding) throws Exception {
     switch (columnType) {
       case Types.CHAR:
@@ -113,9 +112,8 @@ public class JdbcValueConverter implements Serializable {
             .asBitSailException(
                 DBUtilErrorCode.UNSUPPORTED_TYPE,
                 String.format(
-                    "JDBC extract: The column data type in your configuration is not support. Column name:[%s], Column type:[%s]." +
+                    "JDBC extract: The column data type in your configuration is not support. Column type name:[%s]." +
                         " Please try to change the column data type or don't transmit this column.",
-                    columnName,
                     columnTypeName));
 
     }
@@ -126,16 +124,14 @@ public class JdbcValueConverter implements Serializable {
                               int columnIndex,
                               String encoding) throws Exception {
     int columnType = metaData.getColumnType(columnIndex);
-    String columnName = metaData.getColumnName(columnIndex);
     String columnTypeName = metaData.getColumnTypeName(columnIndex);
-    Object value = extract(rs, metaData, columnIndex, columnType, columnTypeName, columnName, encoding);
+    Object value = extract(rs, metaData, columnIndex, columnType, columnTypeName, encoding);
     LOG.debug("value: {}", value);
-    return convert(value, columnType, columnName, columnTypeName);
+    return convert(value, columnType, columnTypeName);
   }
 
   protected Object convert(Object value,
                            int columnType,
-                           String columnName,
                            String columnTypeName) throws Exception {
     switch (columnType) {
       case Types.CHAR:
@@ -147,53 +143,52 @@ public class JdbcValueConverter implements Serializable {
       case Types.CLOB:
       case Types.NCLOB:
       case Types.ROWID:
-        return convertStringValue(value, columnName, columnTypeName);
+        return convertStringValue(value);
       case Types.BIT:
       case Types.TINYINT:
       case Types.SMALLINT:
-        return convertShortValue(value, columnName, columnTypeName);
+        return convertShortValue(value);
       case Types.INTEGER:
-        return convertLongValue(value, columnName, columnTypeName);
+        return convertLongValue(value);
 
       case Types.BIGINT:
-        return convertBigIntegerValue(value, columnName, columnTypeName);
+        return convertBigIntegerValue(value);
 
       case Types.NUMERIC:
       case Types.DECIMAL:
-        return convertBigDecimalValue(value, columnName, columnTypeName);
+        return convertBigDecimalValue(value);
 
       case Types.FLOAT:
       case Types.REAL:
       case Types.DOUBLE:
-        return convertDoubleValue(value, columnName, columnTypeName);
+        return convertDoubleValue(value);
 
       case Types.TIME:
       case Types.DATE:
       case Types.TIMESTAMP:
-        return convertTimeValue(value, columnName, columnTypeName);
+        return convertTimeValue(value);
       case Types.BINARY:
       case Types.VARBINARY:
       case Types.BLOB:
       case Types.LONGVARBINARY:
-        return convertBinaryValue(value, columnName, columnTypeName);
+        return convertBinaryValue(value);
 
       case Types.BOOLEAN:
-        return convertBooleanValue(value, columnName, columnTypeName);
+        return convertBooleanValue(value);
 
       case Types.ARRAY:
-        return convertArrayValue(value, columnName, columnTypeName);
+        return convertArrayValue(value);
       case Types.NULL:
       case Types.OTHER:
       case Types.STRUCT:
-        return convertObjectValue(value, columnName, columnTypeName);
+        return convertObjectValue(value);
       default:
         throw BitSailException
             .asBitSailException(
                 DBUtilErrorCode.UNSUPPORTED_TYPE,
                 String.format(
-                    "JDBC convert: The column data type in your configuration is not support. Column name:[%s], Column type:[%s]." +
+                    "JDBC convert: The column data type in your configuration is not support. Column type:[%s]." +
                         " Please try to change the column data type or don't transmit this column.",
-                    columnName,
                     columnTypeName));
 
     }
@@ -279,7 +274,7 @@ public class JdbcValueConverter implements Serializable {
     return objectValue;
   }
 
-  protected String convertStringValue(Object value, String columnName, String columnTypeName) {
+  protected String convertStringValue(Object value) {
     if (Objects.isNull(value)) {
       return null;
     }
@@ -287,10 +282,10 @@ public class JdbcValueConverter implements Serializable {
       return (String) value;
     }
     throw new IllegalArgumentException(String
-        .format("Unexpected value for JDBC type: %s and column %s", columnTypeName, columnName));
+        .format("Unexpected value %s while converting to String", value));
   }
 
-  private Short convertShortValue(Object value, String columnName, String columnTypeName) {
+  private Short convertShortValue(Object value) {
     if (Objects.isNull(value)) {
       return null;
     }
@@ -301,10 +296,10 @@ public class JdbcValueConverter implements Serializable {
       return ((Number) value).shortValue();
     }
     throw new IllegalArgumentException(String
-        .format("Unexpected value for JDBC type: %s and column %s", columnTypeName, columnName));
+        .format("Unexpected value %s while converting to Short", value));
   }
 
-  private Long convertLongValue(Object value, String columnName, String columnTypeName) {
+  private Long convertLongValue(Object value) {
     if (Objects.isNull(value)) {
       return null;
     }
@@ -321,10 +316,10 @@ public class JdbcValueConverter implements Serializable {
       return ((Number) value).longValue();
     }
     throw new IllegalArgumentException(String
-        .format("Unexpected value for JDBC type: %s and column %s", columnTypeName, columnName));
+        .format("Unexpected value %s while converting to Long", value));
   }
 
-  private BigInteger convertBigIntegerValue(Object value, String columnName, String columnTypeName) {
+  private BigInteger convertBigIntegerValue(Object value) {
     if (Objects.isNull(value)) {
       return null;
     }
@@ -335,10 +330,10 @@ public class JdbcValueConverter implements Serializable {
       return (BigInteger) value;
     }
     throw new IllegalArgumentException(String
-        .format("Unexpected value for JDBC type: %s and column %s", columnTypeName, columnName));
+        .format("Unexpected value %s while converting to BigInteger", value));
   }
 
-  private BigDecimal convertBigDecimalValue(Object value, String columnName, String columnTypeName) {
+  private BigDecimal convertBigDecimalValue(Object value) {
     if (Objects.isNull(value)) {
       return null;
     }
@@ -352,10 +347,10 @@ public class JdbcValueConverter implements Serializable {
       return (BigDecimal) value;
     }
     throw new IllegalArgumentException(String
-        .format("Unexpected value for JDBC type: %s and column %s", columnTypeName, columnName));
+        .format("Unexpected value %s while converting to BigDecimal", value));
   }
 
-  protected Double convertDoubleValue(Object value, String columnName, String columnTypeName) {
+  protected Double convertDoubleValue(Object value) {
     if (Objects.isNull(value)) {
       return null;
     }
@@ -369,10 +364,10 @@ public class JdbcValueConverter implements Serializable {
       return ((BigDecimal) value).doubleValue();
     }
     throw new IllegalArgumentException(String
-        .format("Unexpected value for JDBC type: %s and column %s", columnTypeName, columnName));
+        .format("Unexpected value %s while converting to Double", value));
   }
 
-  protected Object convertTimeValue(Object value, String columnName, String columnTypeName) {
+  protected Object convertTimeValue(Object value) {
     if (Objects.isNull(value)) {
       return null;
     }
@@ -389,10 +384,10 @@ public class JdbcValueConverter implements Serializable {
       return (Date) value;
     }
     throw new IllegalArgumentException(String
-        .format("Unexpected value for JDBC type: %s and column %s", columnTypeName, columnName));
+        .format("Unexpected value %s while converting to Time", value));
   }
 
-  private byte[] convertBinaryValue(Object value, String columnName, String columnTypeName) {
+  private byte[] convertBinaryValue(Object value) {
     if (Objects.isNull(value)) {
       return null;
     }
@@ -400,10 +395,10 @@ public class JdbcValueConverter implements Serializable {
       return (byte[]) value;
     }
     throw new IllegalArgumentException(String
-        .format("Unexpected value for JDBC type: %s and column %s", columnTypeName, columnName));
+        .format("Unexpected value %s while converting to byte[]", value));
   }
 
-  protected Boolean convertBooleanValue(Object value, String columnName, String columnTypeName) {
+  protected Boolean convertBooleanValue(Object value) {
     if (Objects.isNull(value)) {
       return null;
     }
@@ -411,10 +406,10 @@ public class JdbcValueConverter implements Serializable {
       return (Boolean) value;
     }
     throw new IllegalArgumentException(String
-        .format("Unexpected value for JDBC type: %s and column %s", columnTypeName, columnName));
+        .format("Unexpected value %s while converting to Boolean", value));
   }
 
-  private List<Object> convertArrayValue(Object value, String columnName, String columnTypeName) throws Exception {
+  private List<Object> convertArrayValue(Object value) throws Exception {
     if (Objects.isNull(value)) {
       return null;
     }
@@ -423,15 +418,15 @@ public class JdbcValueConverter implements Serializable {
       Object[] arrays = (Object[]) arrayElements.getArray();
       List<Object> tmpArrays = Lists.newArrayList();
       for (Object element : arrays) {
-        tmpArrays.add(convert(element, arrayElements.getBaseType(), columnName, arrayElements.getBaseTypeName()));
+        tmpArrays.add(convert(element, arrayElements.getBaseType(), arrayElements.getBaseTypeName()));
       }
       return tmpArrays;
     }
     throw new IllegalArgumentException(String
-        .format("Unexpected value for JDBC type: %s and column %s", columnTypeName, columnName));
+        .format("Unexpected value %s while converting to Array", value));
   }
 
-  private Object convertObjectValue(Object value, String columnName, String columnTypeName) throws SQLException {
+  private Object convertObjectValue(Object value) {
     if (Objects.isNull(value)) {
       return null;
     }
