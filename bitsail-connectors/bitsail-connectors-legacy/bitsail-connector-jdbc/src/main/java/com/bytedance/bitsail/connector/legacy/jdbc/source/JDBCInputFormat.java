@@ -624,8 +624,9 @@ public class JDBCInputFormat extends InputFormatPlugin<Row, InputSplit> implemen
    * For more details: <a href="https://mariadb.com/kb/en/about-mariadb-connector-j/#streaming-result-sets">MariaDB connector: streaming result sets</a>
    */
   public int getReaderFetchSize(int fetchSize) {
-    if (MysqlUtil.DRIVER_NAME.equalsIgnoreCase(getDriverName())) {
-      return 1;
+    if (fetchSize < 0) {
+      fetchSize = 1;
+      LOG.warn("fetch size should not be negative in jdbc reader.");
     }
     return fetchSize;
   }

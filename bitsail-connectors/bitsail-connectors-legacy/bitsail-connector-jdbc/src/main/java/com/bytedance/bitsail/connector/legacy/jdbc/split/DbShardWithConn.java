@@ -195,11 +195,11 @@ public class DbShardWithConn {
         statement.close();
       }
 
+      statement = getConnection().prepareStatement(sqlTemplate);
+
       // enable streaming result set by set fetch size to a positive value.
       if (statementReadOnly) {
         statement.setFetchSize(1);
-      } else {
-        statement = getConnection().prepareStatement(sqlTemplate);
       }
 
       if (statementFetchSize > 0) {
