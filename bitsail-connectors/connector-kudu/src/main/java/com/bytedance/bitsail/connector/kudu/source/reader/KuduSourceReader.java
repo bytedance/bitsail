@@ -1,26 +1,26 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
  */
 
-package com.bytedance.bitsail.connector.kudu.source;
+package com.bytedance.bitsail.connector.kudu.source.reader;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.kudu.core.KuduFactory;
 import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
@@ -41,17 +41,15 @@ import java.util.List;
 public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
   private static final Logger LOG = LoggerFactory.getLogger(KuduSourceReader.class);
 
-  private final List<ColumnInfo> columns;
   private final String tableName;
 
   private final KuduFactory kuduFactory;
   private final KuduScannerConstructor scannerConstructor;
 
   private Deque<KuduSourceSplit> splits;
-  private transient KuduRowDeserializer rowDeserializer;
+  private final transient KuduRowDeserializer rowDeserializer;
 
   public KuduSourceReader(BitSailConfiguration jobConf) {
-    this.columns = jobConf.getNecessaryOption(KuduReaderOptions.COLUMNS, KuduErrorCode.REQUIRED_VALUE);
     this.tableName = jobConf.getNecessaryOption(KuduReaderOptions.KUDU_TABLE_NAME, KuduErrorCode.REQUIRED_VALUE);
 
     this.kuduFactory = new KuduFactory(jobConf, "reader");
@@ -102,7 +100,7 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
   }
 
   @Override
-  public void notifyCheckpointComplete(long checkpointId) throws Exception {
+  public void notifyCheckpointComplete(long checkpointId) {
     //Ignore
   }
 

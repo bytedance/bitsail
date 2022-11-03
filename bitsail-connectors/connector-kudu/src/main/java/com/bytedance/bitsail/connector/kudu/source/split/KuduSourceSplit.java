@@ -21,6 +21,7 @@ import com.bytedance.bitsail.base.connector.reader.v1.SourceSplit;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import org.apache.kudu.Schema;
 import org.apache.kudu.client.KuduPredicate;
@@ -28,8 +29,11 @@ import org.apache.kudu.client.KuduScanner;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 public class KuduSourceSplit implements SourceSplit {
@@ -42,6 +46,16 @@ public class KuduSourceSplit implements SourceSplit {
 
   public KuduSourceSplit(int splitId) {
     this.splitId = KUDU_SOURCE_SPLIT_PREFIX + splitId;
+  }
+
+  public String toFormatString(Schema schema) {
+    Map<String, Object> properties = new HashMap<>();
+    properties.put("split_id", this.uniqSplitId());
+
+    List<KuduPredicate> kuduPredicates = deserializePredicates(schema);
+    properties.put("predicates", kuduPredicates);
+
+    return new JSONObject(properties).toJSONString();
   }
 
   @Override
@@ -57,14 +71,30 @@ public class KuduSourceSplit implements SourceSplit {
   }
 
   public void bindScanner(KuduScanner.KuduScannerBuilder builder, Schema schema) {
-    serializedPredicates.forEach(serializedPredicate -> {
-      List<KuduPredicate> kuduPredicates;
+    List<KuduPredicate> kuduPredicates = deserializePredicates(schema);
+    kuduPredicates.forEach(builder::addPredicate);
+  }
+
+  private List<KuduPredicate> deserializePredicates(Schema schema) {
+    List<KuduPredicate> kuduPredicates = new ArrayList<>();
+    for (byte[] predicateBytes : serializedPredicates) {
       try {
-        kuduPredicates = KuduPredicate.deserialize(schema, serializedPredicate);
+        kuduPredicates.addAll(KuduPredicate.deserialize(schema, predicateBytes));
       } catch (IOException e) {
-        throw new BitSailException(KuduErrorCode.SPLIT_ERROR, "Failed to deserialize predicate.");
+        throw new BitSailException(KuduErrorCode.PREDICATE_ERROR, "Failed to deserialize predicates: " + e.getCause().getMessage());
       }
-      kuduPredicates.forEach(builder::addPredicate);
-    });
+    }
+    return kuduPredicates;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return (obj instanceof KuduSourceSplit) && (splitId.equals(((KuduSourceSplit) obj).splitId));
+  }
+
+  @Override
+  public int hashCode() {
+    return splitId.hashCode() +
+        ((Long) serializedPredicates.stream().map(Arrays::hashCode).mapToLong(Integer::intValue).sum()).intValue();
   }
 }

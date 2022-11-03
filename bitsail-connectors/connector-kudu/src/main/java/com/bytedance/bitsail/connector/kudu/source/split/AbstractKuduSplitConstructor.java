@@ -31,10 +31,12 @@ import java.util.List;
 
 public abstract class AbstractKuduSplitConstructor {
 
+  protected final BitSailConfiguration jobConf;
   protected final String tableName;
   protected final Schema schema;
 
   public AbstractKuduSplitConstructor(BitSailConfiguration jobConf, KuduClient kuduClient) throws BitSailException {
+    this.jobConf = jobConf;
     this.tableName = jobConf.get(KuduReaderOptions.KUDU_TABLE_NAME);
     try {
       this.schema = kuduClient.openTable(tableName).getSchema();

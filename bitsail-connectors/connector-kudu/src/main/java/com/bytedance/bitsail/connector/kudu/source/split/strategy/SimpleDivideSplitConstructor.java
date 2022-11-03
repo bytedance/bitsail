@@ -21,12 +21,12 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
+import com.bytedance.bitsail.connector.kudu.source.reader.KuduScannerConstructor;
 import com.bytedance.bitsail.connector.kudu.source.split.AbstractKuduSplitConstructor;
 import com.bytedance.bitsail.connector.kudu.source.split.KuduSourceSplit;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -104,10 +104,8 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
 
     // If left or right border is not defined, scan the whole table's column to get min and max value.
     try {
-      KuduScanner scanner = client
-          .newScannerBuilder(client.openTable(tableName))
-          .setProjectedColumnNames(ImmutableList.of(splitConf.getName()))
-          .build();
+      KuduScannerConstructor scannerConstructor = new KuduScannerConstructor(jobConf);
+      KuduScanner scanner = scannerConstructor.createScannerForWholeTable(client, tableName);
 
       while (scanner.hasMoreRows()) {
         RowResultIterator results = scanner.nextRows();

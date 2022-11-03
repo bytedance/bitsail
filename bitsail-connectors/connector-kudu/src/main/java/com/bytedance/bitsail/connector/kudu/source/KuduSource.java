@@ -26,30 +26,17 @@ import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.kudu.core.KuduConstants;
-import com.bytedance.bitsail.connector.kudu.core.KuduFactory;
-import com.bytedance.bitsail.connector.kudu.source.split.AbstractKuduSplitConstructor;
+import com.bytedance.bitsail.connector.kudu.source.reader.KuduSourceReader;
 import com.bytedance.bitsail.connector.kudu.source.split.KuduSourceSplit;
-import com.bytedance.bitsail.connector.kudu.source.split.KuduSplitFactory;
-
-import org.apache.kudu.client.KuduClient;
-
-import java.io.IOException;
-import java.util.List;
+import com.bytedance.bitsail.connector.kudu.source.split.coordinator.KuduSourceSplitCoordinator;
 
 public class KuduSource implements Source<Row, KuduSourceSplit, EmptyState> {
 
   private BitSailConfiguration jobConf;
-  private List<KuduSourceSplit> splits;
 
   @Override
-  public void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration) throws IOException {
+  public void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration) {
     this.jobConf = readerConfiguration;
-
-    try (KuduFactory kuduFactory = new KuduFactory(jobConf, "reader")) {
-      KuduClient client = kuduFactory.getClient();
-      AbstractKuduSplitConstructor splitConstructor = KuduSplitFactory.getSplitConstructor(jobConf, client);
-      this.splits = splitConstructor.construct(client);
-    }
   }
 
   @Override
@@ -62,10 +49,9 @@ public class KuduSource implements Source<Row, KuduSourceSplit, EmptyState> {
     return new KuduSourceReader(jobConf);
   }
 
-  // todo: 补充完全
   @Override
   public SourceSplitCoordinator<KuduSourceSplit, EmptyState> createSplitCoordinator(SourceSplitCoordinator.Context<KuduSourceSplit, EmptyState> coordinatorContext) {
-    return null;
+    return new KuduSourceSplitCoordinator(coordinatorContext, jobConf);
   }
 
   @Override

@@ -16,7 +16,7 @@
  *
  */
 
-package com.bytedance.bitsail.connector.kudu.source;
+package com.bytedance.bitsail.connector.kudu.source.reader;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;

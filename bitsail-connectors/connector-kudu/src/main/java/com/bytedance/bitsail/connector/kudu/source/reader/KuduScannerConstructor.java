@@ -16,7 +16,7 @@
  *
  */
 
-package com.bytedance.bitsail.connector.kudu.source;
+package com.bytedance.bitsail.connector.kudu.source.reader;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
@@ -73,10 +73,7 @@ public class KuduScannerConstructor implements Serializable {
     this.scanAlivePeriodMs = jobConf.get(KuduReaderOptions.SCAN_ALIVE_PERIOD_MS);
   }
 
-  public KuduScanner createScanner(KuduClient client, String tableName, KuduSourceSplit split) throws KuduException {
-    KuduTable table = client.openTable(tableName);
-    Schema schema = table.getSchema();
-
+  private KuduScanner.KuduScannerBuilder prepareBuilder(KuduClient client, KuduTable table) throws KuduException {
     KuduScanner.KuduScannerBuilder builder = client
         .newScannerBuilder(table)
         .setProjectedColumnNames(projectedColumns)
@@ -104,10 +101,25 @@ public class KuduScannerConstructor implements Serializable {
       builder.keepAlivePeriodMs(scanAlivePeriodMs);
     }
 
+    return builder;
+  }
+
+  public KuduScanner createScanner(KuduClient client, String tableName, KuduSourceSplit split) throws KuduException {
+    KuduTable table = client.openTable(tableName);
+    Schema schema = table.getSchema();
+
+    KuduScanner.KuduScannerBuilder builder = prepareBuilder(client, table);
+
     split.bindScanner(builder, schema);
 
     KuduScanner scanner = builder.build();
     LOG.info("Scanner for split {} created.", split.uniqSplitId());
     return scanner;
+  }
+
+  public KuduScanner createScannerForWholeTable(KuduClient client, String tableName) throws KuduException {
+    KuduTable table = client.openTable(tableName);
+    KuduScanner.KuduScannerBuilder builder = prepareBuilder(client, table);
+    return builder.build();
   }
 }
