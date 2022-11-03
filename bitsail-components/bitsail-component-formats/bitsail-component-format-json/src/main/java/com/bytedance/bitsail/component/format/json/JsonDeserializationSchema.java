@@ -126,8 +126,17 @@ public class JsonDeserializationSchema implements DeserializationSchema<byte[], 
       for (int i = 0; i < arity; i++) {
         String fieldName = fieldNames[i];
         JsonNode field = node.get(fieldName);
-        Object convertedField = fieldConverters[i].convert(field);
-        row.setField(i, convertedField);
+        Object converted;
+        try {
+          converted = fieldConverters[i].convert(field);
+        } catch (Exception e) {
+          throw BitSailException.asBitSailException(JsonFormatErrorCode.JSON_FORMAT_COVERT_FAILED,
+              String.format("Field %s can't convert into type %s, value = %s.",
+                  fieldName,
+                  typeInfos[i],
+                  field));
+        }
+        row.setField(i, converted);
       }
       return row;
     };
