@@ -11,6 +11,9 @@ engine.type.to.bitsail.type.converter:
   - source.type: int
     target.type: int
 
+  - source.type: int32
+    target.type: int32
+
   - source.type: int64
     target.type: long
 

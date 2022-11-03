@@ -48,6 +48,7 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
   private final KuduScannerConstructor scannerConstructor;
 
   private Deque<KuduSourceSplit> splits;
+  private transient KuduRowDeserializer rowDeserializer;
 
   public KuduSourceReader(BitSailConfiguration jobConf) {
     this.columns = jobConf.getNecessaryOption(KuduReaderOptions.COLUMNS, KuduErrorCode.REQUIRED_VALUE);
@@ -55,6 +56,8 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
 
     this.kuduFactory = new KuduFactory(jobConf, "reader");
     this.scannerConstructor = new KuduScannerConstructor(jobConf);
+    this.rowDeserializer = new KuduRowDeserializer(jobConf);
+
     LOG.info("KuduReader is initialized.");
   }
 
@@ -64,21 +67,20 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
   @Override
   public void pollNext(SourcePipeline<Row> pipeline) throws Exception {
     KuduSourceSplit split = splits.poll();
-    LOG.info("Begin to read split: {}", split.getSplitId());
+    LOG.info("Begin to read split: {}", split.uniqSplitId());
 
     KuduScanner scanner = scannerConstructor.createScanner(kuduFactory.getClient(), tableName, split);
     while(scanner.hasMoreRows()) {
       RowResultIterator rowResults = scanner.nextRows();
       while (rowResults.hasNext()) {
         RowResult rowResult = rowResults.next();
-        // todo: 补充这里
-        Row row = new Row(5);
+        Row row = rowDeserializer.convert(rowResult);
         pipeline.output(row);
       }
     }
     scanner.close();
 
-    LOG.info("Finish reading split: {}", split.getSplitId());
+    LOG.info("Finish reading split: {}", split.uniqSplitId());
   }
 
   @Override

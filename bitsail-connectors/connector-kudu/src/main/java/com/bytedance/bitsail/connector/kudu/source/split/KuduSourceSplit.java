@@ -18,15 +18,19 @@
 package com.bytedance.bitsail.connector.kudu.source.split;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplit;
+import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
 
 import lombok.Getter;
+import org.apache.kudu.Schema;
 import org.apache.kudu.client.KuduPredicate;
 import org.apache.kudu.client.KuduScanner;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-// 把它搞成serializable的，并用predicates
 @Getter
 public class KuduSourceSplit implements SourceSplit {
 
@@ -34,7 +38,7 @@ public class KuduSourceSplit implements SourceSplit {
 
   private final String splitId;
 
-  private List<KuduPredicate> predicates;
+  private List<byte[]> serializedPredicates;
 
   public KuduSourceSplit(int splitId) {
     this.splitId = KUDU_SOURCE_SPLIT_PREFIX + splitId;
@@ -45,14 +49,22 @@ public class KuduSourceSplit implements SourceSplit {
     return splitId;
   }
 
-  public void addPredicate(KuduPredicate predicate) {
-    if (predicates == null) {
-      predicates = new ArrayList<>();
+  public void addPredicate(KuduPredicate predicate) throws IOException {
+    if (serializedPredicates == null) {
+      serializedPredicates = new ArrayList<>();
     }
-    predicates.add(predicate);
+    serializedPredicates.add(KuduPredicate.serialize(Collections.singletonList(predicate)));
   }
 
-  public void bindScanner(KuduScanner.KuduScannerBuilder builder) {
-    predicates.forEach(builder::addPredicate);
+  public void bindScanner(KuduScanner.KuduScannerBuilder builder, Schema schema) {
+    serializedPredicates.forEach(serializedPredicate -> {
+      List<KuduPredicate> kuduPredicates;
+      try {
+        kuduPredicates = KuduPredicate.deserialize(schema, serializedPredicate);
+      } catch (IOException e) {
+        throw new BitSailException(KuduErrorCode.SPLIT_ERROR, "Failed to deserialize predicate.");
+      }
+      kuduPredicates.forEach(builder::addPredicate);
+    });
   }
 }

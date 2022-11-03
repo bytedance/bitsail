@@ -25,10 +25,12 @@ import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
 import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
 import com.bytedance.bitsail.connector.kudu.source.split.KuduSourceSplit;
 
+import org.apache.kudu.Schema;
 import org.apache.kudu.client.AsyncKuduScanner;
 import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.client.KuduException;
 import org.apache.kudu.client.KuduScanner;
+import org.apache.kudu.client.KuduTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,8 +75,11 @@ public class KuduScannerConstructor implements Serializable {
   }
 
   public KuduScanner createScanner(KuduClient client, String tableName, KuduSourceSplit split) throws KuduException {
+    KuduTable table = client.openTable(tableName);
+    Schema schema = table.getSchema();
+
     KuduScanner.KuduScannerBuilder builder = client
-        .newScannerBuilder(client.openTable(tableName))
+        .newScannerBuilder(table)
         .setProjectedColumnNames(projectedColumns)
         .readMode(readMode)
         .setFaultTolerant(enableFaultTolerant)
@@ -100,7 +105,7 @@ public class KuduScannerConstructor implements Serializable {
       builder.keepAlivePeriodMs(scanAlivePeriodMs);
     }
 
-    split.bindScanner(builder);
+    split.bindScanner(builder, schema);
 
     KuduScanner scanner = builder.build();
     LOG.info("Scanner for split {} created.", split.uniqSplitId());

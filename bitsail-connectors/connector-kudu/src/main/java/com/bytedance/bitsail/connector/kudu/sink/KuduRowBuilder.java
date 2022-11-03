@@ -63,6 +63,7 @@ public class KuduRowBuilder {
         return (PartialRow kuduRow, Object value) -> kuduRow.addByte(columnName, (byte) value);
       case "INT16":   // SHORT_TYPE_INFO
         return (PartialRow kuduRow, Object value) -> kuduRow.addShort(columnName, (short) value);
+      case "INT32":
       case "INT":     // INT_TYPE_INFO
         return (PartialRow kuduRow, Object value) -> kuduRow.addInt(columnName, (int) value);
       case "INT64":
