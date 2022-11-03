@@ -15,16 +15,17 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.jdbc.sink;
+package com.bytedance.bitsail.connector.legacy.jdbc.source;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.legacy.jdbc.container.MySQLContainerMariadbAdapter;
-import com.bytedance.bitsail.connector.legacy.jdbc.options.JdbcWriterOptions;
+import com.bytedance.bitsail.connector.legacy.jdbc.model.ClusterInfo;
+import com.bytedance.bitsail.connector.legacy.jdbc.model.ConnectionInfo;
+import com.bytedance.bitsail.connector.legacy.jdbc.options.JdbcReaderOptions;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,14 +36,10 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
-import java.util.Map;
 import java.util.stream.Stream;
 
-/**
- * Created 2022/7/26
- */
-public class JdbcSinkITCase {
-  private static final Logger LOG = LoggerFactory.getLogger(JdbcSinkITCase.class);
+public class JdbcSourceITCase {
+  private static final Logger LOG = LoggerFactory.getLogger(JdbcSourceITCase.class);
 
   private static final String MYSQL_DOCKER_IMAGER = "mysql:8.0.29";
 
@@ -52,7 +49,7 @@ public class JdbcSinkITCase {
   public void before() {
     container = new MySQLContainerMariadbAdapter<>(DockerImageName.parse(MYSQL_DOCKER_IMAGER))
         .withUrlParam("permitMysqlScheme", null)
-        .withInitScript("scripts/fake_to_jdbc_sink.sql")
+        .withInitScript("scripts/jdbc_to_print.sql")
         .withLogConsumer(new Slf4jLogConsumer(LOG));
 
     Startables.deepStart(Stream.of(container)).join();
@@ -64,14 +61,19 @@ public class JdbcSinkITCase {
   }
 
   @Test
-  public void testInsertModeMySQL() throws Exception {
-    BitSailConfiguration globalConfiguration = JobConfUtils.fromClasspath("scripts/fake_to_jdbc_sink.json");
+  public void testMysqlReader() throws Exception {
+    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("scripts/jdbc_to_print.json");
 
-    Map<String, Object> connection = Maps.newHashMap();
-    connection.put("db_url", container.getJdbcUrl());
-    connection.put("host", container.getHost());
-    connection.put("port", container.getFirstMappedPort());
-    globalConfiguration.set(JdbcWriterOptions.CONNECTIONS, Lists.newArrayList(connection));
-    EmbeddedFlinkCluster.submitJob(globalConfiguration);
+    ConnectionInfo connectionInfo = ConnectionInfo.builder()
+        .host(container.getHost())
+        .port(container.getFirstMappedPort())
+        .url(container.getJdbcUrl())
+        .build();
+    ClusterInfo clusterInfo = ClusterInfo.builder()
+        .slave(connectionInfo)
+        .build();
+    jobConf.set(JdbcReaderOptions.CONNECTIONS, Lists.newArrayList(clusterInfo));
+
+    EmbeddedFlinkCluster.submitJob(jobConf);
   }
 }

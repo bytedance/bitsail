@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.jdbc.sink.container;
+package com.bytedance.bitsail.connector.legacy.jdbc.container;
 
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
@@ -38,3 +38,4 @@ public class MySQLContainerMariadbAdapter<SELF extends MySQLContainerMariadbAdap
     return super.getJdbcUrl();
   }
 }
+
