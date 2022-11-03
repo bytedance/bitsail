@@ -7,6 +7,8 @@
 
 - [Elasticsearch连接器](./elasticsearch/elasticsearch_zh.md)
 
+- [FTP/SFTP 连接器](./ftp/ftp_zh.md)
+
 - [Hadoop连接器](./hadoop/hadoop_zh.md)
 
 - [Hive连接器](./hive/hive_zh.md)
@@ -25,7 +27,7 @@
 
 - [Doris连接器](./doris/doris_zh.md)
 
-- [StreamingFile连接器](./StreamingFile/StreamingFile_zh.md)
+- [StreamingFile连接器 (hdfs流式连接器)](./StreamingFile/StreamingFile_zh.md)
 
 - [Jdbc连接器](./Jdbc/jdbc_zh.md)
   

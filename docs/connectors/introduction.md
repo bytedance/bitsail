@@ -8,6 +8,8 @@
 
 - [Elasticsearch connector](./elasticsearch/elasticsearch.md)
 
+- [FTP/SFTP connector](./ftp/ftp.md)
+
 - [Hadoop connector](./hadoop/hadoop.md)
 
 - [Hive connector](./hive/hive.md)
@@ -26,7 +28,7 @@
 
 - [Doris connector](./doris/doris.md)
 
-- [StreamingFile connector](./StreamingFile/StreamingFile.md)
+- [StreamingFile connector (Hdfs streaming connector)](./StreamingFile/StreamingFile.md)
 
 - [Jdbc connector](./Jdbc/jdbc.md)
 
