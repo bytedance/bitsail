@@ -167,7 +167,7 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
         byte[] value = ((String) record.getField(1)).getBytes();
         byte[] scoreOrHashKey = value;
         if (columnSize == SORTED_SET_OR_HASH_COLUMN_SIZE) {
-          value = (byte[]) record.getField(2);
+          value = ((String) record.getField(2)).getBytes();
           // Replace empty key with additionalKey in sorted set and hash.
           if (key.length == 0) {
             key = commandDescription.getAdditionalKey().getBytes();
