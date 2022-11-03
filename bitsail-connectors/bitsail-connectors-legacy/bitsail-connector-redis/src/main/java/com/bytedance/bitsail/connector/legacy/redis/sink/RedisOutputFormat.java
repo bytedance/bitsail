@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.bytedance.bitsail.connector.legacy.redis.constant.RedisConstants.MAX_PARALLELISM_OUTPUT_REDIS;
 
-public class RedisOutputFormat extends JedisOutputFormat {
+public class  RedisOutputFormat extends JedisOutputFormat {
   private static final Logger LOG = LoggerFactory.getLogger(RedisOutputFormat.class);
 
   private static final long serialVersionUID = 1865789744864217944L;
@@ -129,6 +129,7 @@ public class RedisOutputFormat extends JedisOutputFormat {
   protected PipelineProcessor genPipelineProcessor(int commandSize, boolean complexTypeWithTtl) throws ExecutionException, RetryException {
     return new RedisPipelineProcessor(jedisPool, jedisFetcher, commandSize, processorId, logSampleInterval, complexTypeWithTtl);
   }
+
 
   @Override
   protected byte[] generateKey(byte[] key) {

@@ -1,0 +1,9 @@
+{
+  "name": "bitsail-connector-redis",
+  "classes": [
+    "com.bytedance.bitsail.connector.redis.sink.RedisWriterGenerator"
+  ],
+  "libs": [
+    "bitsail-connector-redis-${version}.jar"
+  ]
+}
