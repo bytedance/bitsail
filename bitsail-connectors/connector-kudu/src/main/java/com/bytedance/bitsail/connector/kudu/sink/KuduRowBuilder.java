@@ -78,7 +78,7 @@ public class KuduRowBuilder {
           } else if (value instanceof Long) {
             kuduRow.addLong(columnName, (Long) value);
           } else {
-            throw new BitSailException(KuduErrorCode.ILLEGAL_VALUE, "Value "+ value + " is not Long or Timestamp.");
+            throw new BitSailException(KuduErrorCode.ILLEGAL_VALUE, "Value " + value + " is not Long or Timestamp.");
           }
         };
       case "FLOAT":   // FLOAT_TYPE_INFO

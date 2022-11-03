@@ -97,7 +97,7 @@ public interface KuduWriterOptions extends WriterOptions.BaseWriterOptions {
    * Ref: {@link org.apache.kudu.client.SessionConfiguration.FlushMode}
    */
   ConfigOption<String> SESSION_FLUSH_MODE =
-      key(WRITER_PREFIX +"kudu_session_flush_mode")
+      key(WRITER_PREFIX + "kudu_session_flush_mode")
           .defaultValue("AUTO_FLUSH_BACKGROUND");
 
   /**
@@ -124,7 +124,7 @@ public interface KuduWriterOptions extends WriterOptions.BaseWriterOptions {
    * Ref: {@link org.apache.kudu.client.ExternalConsistencyMode}
    */
   ConfigOption<String> SESSION_EXTERNAL_CONSISTENCY_MODE =
-      key(WRITER_PREFIX +"kudu_session_external_consistency_mode")
+      key(WRITER_PREFIX + "kudu_session_external_consistency_mode")
           .defaultValue("CLIENT_PROPAGATED");
 
   /**

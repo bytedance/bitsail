@@ -23,15 +23,12 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
 
-import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Schema;
 import org.apache.kudu.client.KuduTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class KuduSchemaUtils {
   private static final Logger LOG = LoggerFactory.getLogger(KuduSchemaUtils.class);

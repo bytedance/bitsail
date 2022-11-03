@@ -70,7 +70,7 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
     LOG.info("Begin to read split: {}", split.uniqSplitId());
 
     KuduScanner scanner = scannerConstructor.createScanner(kuduFactory.getClient(), tableName, split);
-    while(scanner.hasMoreRows()) {
+    while (scanner.hasMoreRows()) {
       RowResultIterator rowResults = scanner.nextRows();
       while (rowResults.hasNext()) {
         RowResult rowResult = rowResults.next();

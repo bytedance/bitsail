@@ -109,7 +109,7 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
           .setProjectedColumnNames(ImmutableList.of(splitConf.getName()))
           .build();
 
-      while(scanner.hasMoreRows()) {
+      while (scanner.hasMoreRows()) {
         RowResultIterator results = scanner.nextRows();
         while (results.hasNext()) {
           RowResult result = results.next();

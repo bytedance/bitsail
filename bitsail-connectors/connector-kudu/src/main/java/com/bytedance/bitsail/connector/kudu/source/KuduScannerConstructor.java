@@ -65,7 +65,6 @@ public class KuduScannerConstructor implements Serializable {
       throw new BitSailException(KuduErrorCode.CONFIG_ERROR, "Snapshort timestamp must be set when using READ_AT_SNAPSHOT read mode");
     }
 
-
     this.enableFaultTolerant = jobConf.get(KuduReaderOptions.FAULT_TOLERANT);
     this.scanBatchSize = jobConf.get(KuduReaderOptions.SCAN_BATCH_SIZE_BYTES);
     this.scanMaxCount = jobConf.get(KuduReaderOptions.SCAN_MAX_COUNT);
