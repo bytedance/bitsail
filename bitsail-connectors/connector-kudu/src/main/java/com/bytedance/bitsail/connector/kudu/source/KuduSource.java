@@ -23,7 +23,6 @@ import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
-import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.kudu.core.KuduConstants;
@@ -48,8 +47,7 @@ public class KuduSource implements Source<Row, KuduSourceSplit, EmptyState> {
 
     try (KuduFactory kuduFactory = new KuduFactory(jobConf, "reader")) {
       KuduClient client = kuduFactory.getClient();
-      KuduSplitFactory splitFactory = new KuduSplitFactory();
-      AbstractKuduSplitConstructor splitConstructor = splitFactory.getSplitConstructor(jobConf, client);
+      AbstractKuduSplitConstructor splitConstructor = KuduSplitFactory.getSplitConstructor(jobConf, client);
       this.splits = splitConstructor.construct(client);
     }
   }

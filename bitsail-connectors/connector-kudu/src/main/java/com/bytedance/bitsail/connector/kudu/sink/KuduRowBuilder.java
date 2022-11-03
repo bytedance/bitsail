@@ -28,7 +28,6 @@ import com.bytedance.bitsail.connector.kudu.option.KuduWriterOptions;
 
 import org.apache.kudu.client.PartialRow;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -36,7 +35,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-public class KuduRowBuilder implements Serializable {
+public class KuduRowBuilder {
 
   private final List<BiConsumer<PartialRow, Object>> rowInserters;
   private final int fieldSize;

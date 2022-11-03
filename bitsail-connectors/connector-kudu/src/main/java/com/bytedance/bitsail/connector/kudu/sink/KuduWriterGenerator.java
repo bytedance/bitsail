@@ -25,7 +25,6 @@ import com.bytedance.bitsail.base.connector.writer.v1.WriterGenerator;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
-import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.row.Row;
@@ -33,7 +32,6 @@ import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 import com.bytedance.bitsail.connector.kudu.core.KuduConstants;
 import com.bytedance.bitsail.connector.kudu.core.KuduFactory;
-import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
 import com.bytedance.bitsail.connector.kudu.option.KuduWriterOptions;
 import com.bytedance.bitsail.connector.kudu.util.KuduSchemaUtils;
 

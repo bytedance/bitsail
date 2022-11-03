@@ -54,7 +54,6 @@ import java.util.function.Function;
 public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
   private static final Logger LOG = LoggerFactory.getLogger(SimpleDivideSplitConstructor.class);
 
-  private static final String SIMPLE_DIVIDE_SPLIT_PREFIX = "simple_divide_split_";
   private static final Set<Type> SUPPORTED_TYPE = ImmutableSet.of(
       Type.INT8, Type.INT16, Type.INT32, Type.INT64
   );

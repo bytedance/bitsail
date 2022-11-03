@@ -36,8 +36,8 @@ public class KuduSplitFactory {
     SIMPLE_DIVIDE;
   }
 
-  public AbstractKuduSplitConstructor getSplitConstructor(BitSailConfiguration jobConf,
-                                                          KuduClient client) {
+  public static AbstractKuduSplitConstructor getSplitConstructor(BitSailConfiguration jobConf,
+                                                                 KuduClient client) {
     KuduSplitStrategy strategy = KuduSplitStrategy.valueOf(jobConf.get(KuduReaderOptions.SPLIT_STRATEGY));
     switch (strategy) {
       case SIMPLE_DIVIDE:

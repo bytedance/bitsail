@@ -48,12 +48,12 @@ public class KuduWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   private static final int SESSION_ERROR_LOG_COUNT = 5;
 
   private final KuduFactory kuduFactory;
-  private final KuduTable kuduTable;
-  private KuduSession kuduSession;
+  private final transient KuduTable kuduTable;
+  private transient KuduSession kuduSession;
 
-  private final Supplier<Operation> operationSupplier;
+  private final transient Supplier<Operation> operationSupplier;
 
-  private final KuduRowBuilder rowBuilder;
+  private final transient KuduRowBuilder rowBuilder;
 
   public KuduWriter(BitSailConfiguration jobConf) {
     String kuduTableName = jobConf.getNecessaryOption(KuduWriterOptions.KUDU_TABLE_NAME, KuduErrorCode.REQUIRED_VALUE);

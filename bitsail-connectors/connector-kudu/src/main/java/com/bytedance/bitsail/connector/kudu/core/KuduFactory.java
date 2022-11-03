@@ -33,15 +33,16 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.Serializable;
 
-public class KuduFactory implements Closeable {
+public class KuduFactory implements Closeable, Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(KuduFactory.class);
 
   private final KuduClientConfig clientConfig;
   private final KuduSessionConfig sessionConfig;
 
-  private KuduClient kuduClient;
-  private KuduSession kuduSession;
+  private transient KuduClient kuduClient;
+  private transient KuduSession kuduSession;
 
   public KuduFactory(BitSailConfiguration jobConf, String role) {
     // initialize client config

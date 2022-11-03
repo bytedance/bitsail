@@ -32,10 +32,11 @@ import org.apache.kudu.client.KuduScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class KuduScannerConstructor {
+public class KuduScannerConstructor implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(KuduScannerConstructor.class);
 
   private final List<String> projectedColumns;
@@ -101,6 +102,8 @@ public class KuduScannerConstructor {
 
     split.bindScanner(builder);
 
-    return builder.build();
+    KuduScanner scanner = builder.build();
+    LOG.info("Scanner for split {} created.", split.uniqSplitId());
+    return scanner;
   }
 }
