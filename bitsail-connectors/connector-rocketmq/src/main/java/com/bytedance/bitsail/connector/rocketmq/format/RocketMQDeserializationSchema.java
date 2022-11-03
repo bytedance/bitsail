@@ -39,6 +39,7 @@ public class RocketMQDeserializationSchema implements DeserializationSchema<byte
   @Override
   public Row deserialize(byte[] message) {
     Row row = new Row(typeInfos.length);
+    //todo deserialization
     return row;
   }
 

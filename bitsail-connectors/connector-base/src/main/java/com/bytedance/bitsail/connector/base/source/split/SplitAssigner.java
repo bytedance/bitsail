@@ -17,39 +17,19 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.connector.rocketmq.source.split;
+package com.bytedance.bitsail.connector.base.source.split;
 
-import com.bytedance.bitsail.base.connector.reader.v1.SourceSplit;
+import java.io.Serializable;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.rocketmq.common.message.MessageQueue;
+public interface SplitAssigner<T> extends Serializable {
 
-@Builder
-@Getter
-public class RocketMQSplit implements SourceSplit {
+  /**
+   * Assign split id to message queue.
+   */
+  String assignSplitId(T messageQueue);
 
-  private MessageQueue messageQueue;
-
-  @Setter
-  private long startOffset;
-
-  private long endOffset;
-
-  private String splitId;
-
-  @Override
-  public String uniqSplitId() {
-    return splitId;
-  }
-
-  @Override
-  public String toString() {
-    return "RocketMQSplit{" +
-        "messageQueue=" + messageQueue +
-        ", startOffset=" + startOffset +
-        ", endOffset=" + endOffset +
-        '}';
-  }
+  /**
+   * Assign split to source reader according to the split id and parallelism.
+   */
+  int assignToReader(String splitId, int totalParallelism);
 }

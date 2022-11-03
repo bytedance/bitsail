@@ -22,17 +22,17 @@ package com.bytedance.bitsail.connector.rocketmq.source.split;
 import org.apache.rocketmq.common.message.MessageQueue;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.Map;
 
 public class RocketMQState implements Serializable {
 
-  private final Set<MessageQueue> assignedPartitions;
+  private final Map<MessageQueue, String> assignedWithSplitIds;
 
-  public RocketMQState(Set<MessageQueue> assignedPartitions) {
-    this.assignedPartitions = assignedPartitions;
+  public RocketMQState(Map<MessageQueue, String> assignedWithSplitIds) {
+    this.assignedWithSplitIds = assignedWithSplitIds;
   }
 
-  public Set<MessageQueue> getAssignedPartitions() {
-    return assignedPartitions;
+  public Map<MessageQueue, String> getAssignedWithSplits() {
+    return assignedWithSplitIds;
   }
 }

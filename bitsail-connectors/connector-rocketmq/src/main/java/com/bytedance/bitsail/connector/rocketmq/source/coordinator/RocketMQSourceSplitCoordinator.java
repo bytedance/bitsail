@@ -24,6 +24,7 @@ import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.connector.base.source.split.SplitAssigner;
 import com.bytedance.bitsail.connector.rocketmq.error.RocketMQErrorCode;
 import com.bytedance.bitsail.connector.rocketmq.option.RocketMQSourceOptions;
 import com.bytedance.bitsail.connector.rocketmq.source.split.RocketMQSplit;
@@ -51,7 +52,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.apache.rocketmq.client.consumer.store.ReadOffsetType.READ_FROM_MEMORY;
 
@@ -67,7 +67,7 @@ public class RocketMQSourceSplitCoordinator implements
   private final Boundedness boundedness;
 
   private final Set<MessageQueue> discoveredPartitions;
-  private final Set<MessageQueue> assignedPartitions;
+  private final Map<MessageQueue, String> assignedPartitions;
   private final Map<Integer, Set<RocketMQSplit>> pendingRocketMQSplitAssignment;
   private final long discoveryInternal;
 
@@ -82,6 +82,7 @@ public class RocketMQSourceSplitCoordinator implements
   private Map<MessageQueue, Long> consumerStopOffset;
 
   private transient DefaultLitePullConsumer consumer;
+  private transient SplitAssigner<MessageQueue> splitAssigner;
 
   public RocketMQSourceSplitCoordinator(
       SourceSplitCoordinator.Context<RocketMQSplit, RocketMQState> context,
@@ -96,10 +97,10 @@ public class RocketMQSourceSplitCoordinator implements
     this.discoveredPartitions = new HashSet<>();
     if (context.isRestored()) {
       RocketMQState restoreState = context.getRestoreState();
-      assignedPartitions = restoreState.getAssignedPartitions();
-      discoveredPartitions.addAll(assignedPartitions);
+      assignedPartitions = restoreState.getAssignedWithSplits();
+      discoveredPartitions.addAll(assignedPartitions.keySet());
     } else {
-      assignedPartitions = Sets.newHashSet();
+      assignedPartitions = Maps.newHashMap();
     }
 
     prepareConsumerProperties();
@@ -146,6 +147,7 @@ public class RocketMQSourceSplitCoordinator implements
   @Override
   public void start() {
     prepareRocketMQConsumer();
+    splitAssigner = new FairRocketMQSplitAssigner(jobConfiguration, assignedPartitions);
     if (discoveryInternal > 0) {
       context.runAsync(
           this::fetchMessageQueues,
@@ -164,14 +166,16 @@ public class RocketMQSourceSplitCoordinator implements
 
     Set<RocketMQSplit> pendingAssignedPartitions = Sets.newHashSet();
     for (MessageQueue messageQueue : fetchedMessageQueues) {
-      if (assignedPartitions.contains(messageQueue)) {
+      if (assignedPartitions.containsKey(messageQueue)) {
         continue;
       }
+
       pendingAssignedPartitions.add(
           RocketMQSplit.builder()
               .messageQueue(messageQueue)
               .startOffset(getStartOffset(messageQueue))
               .endOffset(getEndOffset(messageQueue))
+              .splitId(splitAssigner.assignSplitId(messageQueue))
               .build()
       );
     }
@@ -236,11 +240,10 @@ public class RocketMQSourceSplitCoordinator implements
 
       context.assignSplit(pendingAssignmentReader,
           tmpRocketMQSplitAssignments.get(pendingAssignmentReader));
-      Set<RocketMQSplit> remove = pendingRocketMQSplitAssignment.remove(pendingAssignmentReader);
-      assignedPartitions.addAll(remove
-          .stream().map(RocketMQSplit::getMessageQueue)
-          .collect(Collectors.toList())
-      );
+      Set<RocketMQSplit> removes = pendingRocketMQSplitAssignment.remove(pendingAssignmentReader);
+      removes.forEach(removeSplit -> {
+        assignedPartitions.put(removeSplit.getMessageQueue(), removeSplit.getSplitId());
+      });
 
       LOG.info("Assigned splits to reader {}", pendingAssignmentReader);
 
@@ -254,11 +257,9 @@ public class RocketMQSourceSplitCoordinator implements
   private synchronized void addSplitChangeToPendingAssignment(Set<RocketMQSplit> newRocketMQSplits) {
     int numReader = context.totalParallelism();
     for (RocketMQSplit split : newRocketMQSplits) {
-
-      int readerIndex = split.uniqSplitId().hashCode() % numReader;
+      int readerIndex = splitAssigner.assignToReader(split.getSplitId(), numReader);
       pendingRocketMQSplitAssignment.computeIfAbsent(readerIndex, r -> new HashSet<>())
           .add(split);
-
     }
     LOG.debug("RocketMQ splits {} finished assignment.", newRocketMQSplits);
   }

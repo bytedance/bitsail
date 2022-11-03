@@ -109,5 +109,4 @@ public interface ReaderOptions {
         key(READER_PREFIX + "content_type")
             .noDefaultValue(String.class);
   }
-
 }

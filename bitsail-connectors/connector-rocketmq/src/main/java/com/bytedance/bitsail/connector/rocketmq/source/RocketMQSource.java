@@ -38,16 +38,19 @@ import com.bytedance.bitsail.connector.rocketmq.source.split.RocketMQState;
 public class RocketMQSource
     implements Source<Row, RocketMQSplit, RocketMQState>, ParallelismComputable {
 
-  public BitSailConfiguration readerConfiguration;
+  private BitSailConfiguration readerConfiguration;
+
+  private BitSailConfiguration commonConfiguration;
 
   @Override
   public void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration) {
     this.readerConfiguration = readerConfiguration;
+    this.commonConfiguration = execution.getCommonConfiguration();
   }
 
   @Override
   public Boundedness getSourceBoundedness() {
-    return Mode.BATCH.equals(Mode.getJobRunMode(readerConfiguration.get(CommonOptions.JOB_TYPE))) ?
+    return Mode.BATCH.equals(Mode.getJobRunMode(commonConfiguration.get(CommonOptions.JOB_TYPE))) ?
         Boundedness.BOUNDEDNESS :
         Boundedness.UNBOUNDEDNESS;
   }

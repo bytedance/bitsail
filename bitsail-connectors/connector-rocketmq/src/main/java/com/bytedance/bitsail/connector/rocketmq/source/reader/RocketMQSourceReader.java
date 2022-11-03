@@ -27,7 +27,6 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.rocketmq.error.RocketMQErrorCode;
-import com.bytedance.bitsail.connector.rocketmq.format.CountableDeserializationSchema;
 import com.bytedance.bitsail.connector.rocketmq.format.RocketMQDeserializationSchema;
 import com.bytedance.bitsail.connector.rocketmq.option.RocketMQSourceOptions;
 import com.bytedance.bitsail.connector.rocketmq.source.split.RocketMQSplit;
@@ -47,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -67,12 +67,13 @@ public class RocketMQSourceReader implements SourceReader<Row, RocketMQSplit> {
   private final String accessKey;
   private final String secretKey;
 
-  private BitSailConfiguration readerConfiguration;
-  private transient Context context;
-  private transient DefaultMQPullConsumer consumer;
-  private transient Set<RocketMQSplit> assignedRocketMQSplits;
-  private transient DeserializationSchema<byte[], Row> deserializationSchema;
+  private final BitSailConfiguration readerConfiguration;
+  private final transient Context context;
+  private final transient Set<RocketMQSplit> assignedRocketMQSplits;
+  private final transient Set<RocketMQSplit> finishedRocketMQSplits;
+  private final transient DeserializationSchema<byte[], Row> deserializationSchema;
   private transient boolean noMoreSplits;
+  private transient DefaultMQPullConsumer consumer;
 
   public RocketMQSourceReader(BitSailConfiguration readerConfiguration,
                               Context context,
@@ -81,11 +82,10 @@ public class RocketMQSourceReader implements SourceReader<Row, RocketMQSplit> {
     this.boundedness = boundedness;
     this.context = context;
     this.assignedRocketMQSplits = Sets.newHashSet();
-    this.deserializationSchema = new CountableDeserializationSchema<byte[], Row>(readerConfiguration,
-        new RocketMQDeserializationSchema(
-            readerConfiguration,
-            context.getTypeInfos())
-    );
+    this.finishedRocketMQSplits = Sets.newHashSet();
+    this.deserializationSchema = new RocketMQDeserializationSchema(
+        readerConfiguration,
+        context.getTypeInfos());
     this.noMoreSplits = false;
 
     cluster = readerConfiguration.get(RocketMQSourceOptions.CLUSTER);
@@ -123,7 +123,6 @@ public class RocketMQSourceReader implements SourceReader<Row, RocketMQSplit> {
 
   @Override
   public void pollNext(SourcePipeline<Row> pipeline) throws Exception {
-    Set<RocketMQSplit> endedRocketMQSplits = Sets.newHashSet();
     for (RocketMQSplit rocketmqSplit : assignedRocketMQSplits) {
       MessageQueue messageQueue = rocketmqSplit.getMessageQueue();
       PullResult pullResult = consumer.pull(rocketmqSplit.getMessageQueue(),
@@ -132,24 +131,27 @@ public class RocketMQSourceReader implements SourceReader<Row, RocketMQSplit> {
           pollBatchSize,
           pollTimeout);
 
+      if (Objects.isNull(pullResult) || CollectionUtils.isEmpty(pullResult.getMsgFoundList())) {
+        continue;
+      }
+
       for (MessageExt message : pullResult.getMsgFoundList()) {
         Row deserialize = deserializationSchema.deserialize(message.getBody());
         pipeline.output(deserialize);
-        rocketmqSplit.setStartOffset(message.getQueueOffset());
-        if (deserializationSchema.isEndOfStream(deserialize)
-            || rocketmqSplit.getStartOffset() >= rocketmqSplit.getEndOffset()) {
+        if (rocketmqSplit.getStartOffset() >= rocketmqSplit.getEndOffset()) {
           LOG.info("Subtask {} rocketmq split {} in end of stream.",
               context.getIndexOfSubtask(),
               rocketmqSplit);
-          endedRocketMQSplits.add(rocketmqSplit);
-          continue;
+          finishedRocketMQSplits.add(rocketmqSplit);
+          break;
         }
       }
+      rocketmqSplit.setStartOffset(pullResult.getNextBeginOffset());
       if (!commitInCheckpoint) {
         consumer.updateConsumeOffset(messageQueue, pullResult.getMaxOffset());
       }
     }
-    assignedRocketMQSplits.removeAll(endedRocketMQSplits);
+    assignedRocketMQSplits.removeAll(finishedRocketMQSplits);
   }
 
   @Override
@@ -159,28 +161,7 @@ public class RocketMQSourceReader implements SourceReader<Row, RocketMQSplit> {
         CollectionUtils.size(splits),
         splits);
 
-    List<RocketMQSplit> dupeRocketMQSplits = Lists.newArrayList();
-    for (RocketMQSplit split : splits) {
-      if (assignedRocketMQSplits.contains(split)) {
-        continue;
-      }
-      try {
-        //consumer.assign(Collections.singleton(split.getMessageQueue()));
-        //consumer.seek(split.getMessageQueue(), split.getStartOffset());
-      } catch (Exception e) {
-        LOG.error("Source reader {} seek offset {} for message queue {} failed.",
-            context.getIndexOfSubtask(),
-            split.getStartOffset(),
-            split.getMessageQueue(),
-            e);
-        throw BitSailException.asBitSailException(RocketMQErrorCode.CONSUMER_SEEK_OFFSET_FAILED, e);
-      }
-      dupeRocketMQSplits.add(split);
-      assignedRocketMQSplits.add(split);
-    }
-    //consumer.assign(dupeRocketMQSplits.stream()
-    //    .map(RocketMQSplit::getMessageQueue)
-    //    .collect(Collectors.toList()));
+    assignedRocketMQSplits.addAll(splits);
   }
 
   @Override
