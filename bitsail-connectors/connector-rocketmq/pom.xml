@@ -43,6 +43,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-component-format-json</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-client</artifactId>
             <version>${rocketmq.version}</version>

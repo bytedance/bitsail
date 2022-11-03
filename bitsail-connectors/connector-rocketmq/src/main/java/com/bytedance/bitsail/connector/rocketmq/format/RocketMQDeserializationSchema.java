@@ -23,6 +23,7 @@ import com.bytedance.bitsail.base.format.DeserializationSchema;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.component.format.json.JsonDeserializationSchema;
 
 public class RocketMQDeserializationSchema implements DeserializationSchema<byte[], Row> {
 
@@ -30,17 +31,25 @@ public class RocketMQDeserializationSchema implements DeserializationSchema<byte
 
   private TypeInfo<?>[] typeInfos;
 
+  private String[] fieldNames;
+
+  private transient JsonDeserializationSchema deserializationSchema;
+
   public RocketMQDeserializationSchema(BitSailConfiguration deserializationConfiguration,
-                                       TypeInfo<?>[] typeInfos) {
+                                       TypeInfo<?>[] typeInfos,
+                                       String[] fieldNames) {
     this.deserializationConfiguration = deserializationConfiguration;
     this.typeInfos = typeInfos;
+    this.fieldNames = fieldNames;
+    //todo spi.
+    this.deserializationSchema = new JsonDeserializationSchema(deserializationConfiguration,
+        typeInfos,
+        fieldNames);
   }
 
   @Override
   public Row deserialize(byte[] message) {
-    Row row = new Row(typeInfos.length);
-    //todo deserialization
-    return row;
+    return deserializationSchema.deserialize(message);
   }
 
   @Override

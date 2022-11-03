@@ -67,6 +67,8 @@ public interface SourceReader<T, SplitT extends SourceSplit> extends Serializabl
 
     TypeInfo<?>[] getTypeInfos();
 
+    String[] getFieldNames();
+
     int getIndexOfSubtask();
 
     void sendSplitRequest();

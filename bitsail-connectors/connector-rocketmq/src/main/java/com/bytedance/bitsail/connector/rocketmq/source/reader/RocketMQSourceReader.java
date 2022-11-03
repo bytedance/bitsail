@@ -85,7 +85,8 @@ public class RocketMQSourceReader implements SourceReader<Row, RocketMQSplit> {
     this.finishedRocketMQSplits = Sets.newHashSet();
     this.deserializationSchema = new RocketMQDeserializationSchema(
         readerConfiguration,
-        context.getTypeInfos());
+        context.getTypeInfos(),
+        context.getFieldNames());
     this.noMoreSplits = false;
 
     cluster = readerConfiguration.get(RocketMQSourceOptions.CLUSTER);
