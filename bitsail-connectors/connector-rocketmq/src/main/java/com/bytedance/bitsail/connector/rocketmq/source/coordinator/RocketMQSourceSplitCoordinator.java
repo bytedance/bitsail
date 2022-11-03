@@ -29,6 +29,7 @@ import com.bytedance.bitsail.connector.rocketmq.option.RocketMQSourceOptions;
 import com.bytedance.bitsail.connector.rocketmq.source.split.RocketMQSplit;
 import com.bytedance.bitsail.connector.rocketmq.source.split.RocketMQState;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
@@ -43,13 +44,14 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.apache.rocketmq.client.consumer.store.ReadOffsetType.READ_FROM_MEMORY;
 
@@ -65,7 +67,8 @@ public class RocketMQSourceSplitCoordinator implements
   private final Boundedness boundedness;
 
   private final Set<MessageQueue> discoveredPartitions;
-  private final Map<Integer, List<RocketMQSplit>> pendingRocketMQSplitAssignment;
+  private final Set<MessageQueue> assignedPartitions;
+  private final Map<Integer, Set<RocketMQSplit>> pendingRocketMQSplitAssignment;
   private final long discoveryInternal;
 
   private String cluster;
@@ -93,7 +96,10 @@ public class RocketMQSourceSplitCoordinator implements
     this.discoveredPartitions = new HashSet<>();
     if (context.isRestored()) {
       RocketMQState restoreState = context.getRestoreState();
-      discoveredPartitions.addAll(restoreState.getAssignedPartitions());
+      assignedPartitions = restoreState.getAssignedPartitions();
+      discoveredPartitions.addAll(assignedPartitions);
+    } else {
+      assignedPartitions = Sets.newHashSet();
     }
 
     prepareConsumerProperties();
@@ -153,13 +159,15 @@ public class RocketMQSourceSplitCoordinator implements
   private Set<RocketMQSplit> fetchMessageQueues() throws MQClientException {
     Collection<MessageQueue> fetchedMessageQueues = Sets.newHashSet(consumer
         .fetchMessageQueues(topic));
-    consumer.assign(fetchedMessageQueues);
-    Set<RocketMQSplit> newDiscoveredPartitions = Sets.newHashSet();
+    discoveredPartitions.addAll(fetchedMessageQueues);
+    consumer.assign(discoveredPartitions);
+
+    Set<RocketMQSplit> pendingAssignedPartitions = Sets.newHashSet();
     for (MessageQueue messageQueue : fetchedMessageQueues) {
-      if (discoveredPartitions.contains(messageQueue)) {
+      if (assignedPartitions.contains(messageQueue)) {
         continue;
       }
-      newDiscoveredPartitions.add(
+      pendingAssignedPartitions.add(
           RocketMQSplit.builder()
               .messageQueue(messageQueue)
               .startOffset(getStartOffset(messageQueue))
@@ -167,8 +175,7 @@ public class RocketMQSourceSplitCoordinator implements
               .build()
       );
     }
-
-    return newDiscoveredPartitions;
+    return pendingAssignedPartitions;
   }
 
   private long getEndOffset(MessageQueue messageQueue) {
@@ -195,7 +202,7 @@ public class RocketMQSourceSplitCoordinator implements
     }
   }
 
-  private void handleMessageQueueChanged(Set<RocketMQSplit> newDiscoveredPartitions,
+  private void handleMessageQueueChanged(Set<RocketMQSplit> pendingAssignedSplits,
                                          Throwable throwable) {
     if (throwable != null) {
       throw BitSailException.asBitSailException(
@@ -203,28 +210,43 @@ public class RocketMQSourceSplitCoordinator implements
           String.format("Failed to fetch rocketmq offset for the topic: %s", topic), throwable);
     }
 
-    if (CollectionUtils.isEmpty(newDiscoveredPartitions)) {
+    if (CollectionUtils.isEmpty(pendingAssignedSplits)) {
       return;
     }
-    addSplitChangeToPendingAssignment(newDiscoveredPartitions);
+    addSplitChangeToPendingAssignment(pendingAssignedSplits);
     notifyReaderAssignmentResult();
   }
 
   private void notifyReaderAssignmentResult() {
+    Map<Integer, List<RocketMQSplit>> tmpRocketMQSplitAssignments = new HashMap<>();
+
     for (Integer pendingAssignmentReader : pendingRocketMQSplitAssignment.keySet()) {
+
       if (CollectionUtils.isNotEmpty(pendingRocketMQSplitAssignment.get(pendingAssignmentReader))
           && context.registeredReaders().contains(pendingAssignmentReader)) {
 
-        LOG.info("Assigning splits {} to reader {}", pendingAssignmentReader,
-            pendingRocketMQSplitAssignment.get(pendingAssignmentReader));
-        context.assignSplit(pendingAssignmentReader,
-            pendingRocketMQSplitAssignment.get(pendingAssignmentReader));
-        LOG.info("Assigned splits to reader {}", pendingAssignmentReader);
+        tmpRocketMQSplitAssignments.put(pendingAssignmentReader, Lists.newArrayList(pendingRocketMQSplitAssignment.get(pendingAssignmentReader)));
+      }
+    }
 
-        if (Boundedness.BOUNDEDNESS == boundedness) {
-          LOG.info("Signal reader {} no more splits assigned in future.", pendingAssignmentReader);
-          context.signalNoMoreSplits(pendingAssignmentReader);
-        }
+    for (Integer pendingAssignmentReader : tmpRocketMQSplitAssignments.keySet()) {
+
+      LOG.info("Assigning splits reader {}, splits = {}.", pendingAssignmentReader,
+          tmpRocketMQSplitAssignments.get(pendingAssignmentReader));
+
+      context.assignSplit(pendingAssignmentReader,
+          tmpRocketMQSplitAssignments.get(pendingAssignmentReader));
+      Set<RocketMQSplit> remove = pendingRocketMQSplitAssignment.remove(pendingAssignmentReader);
+      assignedPartitions.addAll(remove
+          .stream().map(RocketMQSplit::getMessageQueue)
+          .collect(Collectors.toList())
+      );
+
+      LOG.info("Assigned splits to reader {}", pendingAssignmentReader);
+
+      if (Boundedness.BOUNDEDNESS == boundedness) {
+        LOG.info("Signal reader {} no more splits assigned in future.", pendingAssignmentReader);
+        context.signalNoMoreSplits(pendingAssignmentReader);
       }
     }
   }
@@ -234,7 +256,7 @@ public class RocketMQSourceSplitCoordinator implements
     for (RocketMQSplit split : newRocketMQSplits) {
 
       int readerIndex = split.uniqSplitId().hashCode() % numReader;
-      pendingRocketMQSplitAssignment.computeIfAbsent(readerIndex, r -> new ArrayList<>())
+      pendingRocketMQSplitAssignment.computeIfAbsent(readerIndex, r -> new HashSet<>())
           .add(split);
 
     }
@@ -252,6 +274,7 @@ public class RocketMQSourceSplitCoordinator implements
 
   @Override
   public void addSplitsBack(List<RocketMQSplit> splits, int subtaskId) {
+    LOG.info("Source reader {} return splits {}.", subtaskId, splits);
     addSplitChangeToPendingAssignment(new HashSet<>(splits));
     notifyReaderAssignmentResult();
   }
@@ -263,7 +286,7 @@ public class RocketMQSourceSplitCoordinator implements
 
   @Override
   public RocketMQState snapshotState() throws Exception {
-    return new RocketMQState(discoveredPartitions);
+    return new RocketMQState(assignedPartitions);
   }
 
   @Override

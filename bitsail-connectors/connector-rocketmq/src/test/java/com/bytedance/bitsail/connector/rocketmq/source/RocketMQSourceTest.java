@@ -20,20 +20,20 @@
 package com.bytedance.bitsail.connector.rocketmq.source;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.ReaderOptions;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfoUtils;
 import com.bytedance.bitsail.common.util.JsonSerializer;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import lombok.SneakyThrows;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.common.message.Message;
-import org.apache.rocketmq.common.message.MessageQueue;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
@@ -51,6 +51,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 public class RocketMQSourceTest extends EmbeddedFlinkCluster {
@@ -79,7 +82,7 @@ public class RocketMQSourceTest extends EmbeddedFlinkCluster {
         .withExposedPorts()
         .withLogConsumer(new Slf4jLogConsumer(LOG))
         .waitingFor(new LogMessageWaitStrategy()
-            .withRegEx(".*boot success.*")
+            .withRegEx(".*The Name Server boot success.*")
             .withStartupTimeout(Duration.ofMinutes(2)));
 
     ArrayList<String> portBindings = new ArrayList<>();
@@ -93,10 +96,10 @@ public class RocketMQSourceTest extends EmbeddedFlinkCluster {
         .withNetworkAliases("broker")
         .withLogConsumer(new Slf4jLogConsumer(LOG))
         .withExposedPorts()
-        .dependsOn(nameServ);
-        //.waitingFor(new LogMessageWaitStrategy()
-        //    .withRegEx(".*boot success.*")
-        //    .withStartupTimeout(Duration.ofMinutes(2)));
+        .dependsOn(nameServ)
+        .waitingFor(new LogMessageWaitStrategy()
+            .withRegEx(".*The broker.*boot success.*")
+            .withStartupTimeout(Duration.ofMinutes(2)));
     ArrayList<String> portBindingsBroker = new ArrayList<>();
     portBindingsBroker.add("10911:10911");
     brokerServ.setPortBindings(portBindingsBroker);
@@ -112,30 +115,33 @@ public class RocketMQSourceTest extends EmbeddedFlinkCluster {
   }
 
   private void prepareRocketMQ() throws MQClientException {
-    try {
-      producer = new DefaultMQProducer(DEFAULT_PRODUCE_GROUP);
-      producer.setNamesrvAddr("localhost:9876");
-      producer.start();
-      producer.setSendMsgTimeout(5 * 1000);
-      producer.setMqClientApiTimeout(5 * 1000);
-      List<MessageQueue> messageQueues = producer.fetchPublishMessageQueues(DEFAULT_TOPIC);
-      new Thread(new Runnable() {
-        @SneakyThrows
-        @Override
-        public void run() {
-          List<Message> messages = Lists.newArrayList();
-          for (int i = 0; i < 100; i++) {
-            messages.add(new Message(DEFAULT_TOPIC, fakeJsonObject(i)));
-          }
-          producer.send(messages);
-        }
-      });
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    producer = new DefaultMQProducer(DEFAULT_PRODUCE_GROUP);
+    producer.setNamesrvAddr("localhost:9876");
+    producer.start();
+    producer.setSendMsgTimeout(5 * 1000);
+    producer.setMqClientApiTimeout(5 * 1000);
   }
 
-  private static byte[] fakeJsonObject(int index) {
+  private void startProduceMessages(TypeInfo<?>[] typeInfos) throws MQClientException {
+    ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+    scheduledExecutor.scheduleAtFixedRate(
+        new Thread(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              List<Message> messages = Lists.newArrayList();
+              for (int i = 0; i < 100; i++) {
+                messages.add(new Message(DEFAULT_TOPIC, fakeJsonObject(i, typeInfos)));
+              }
+              producer.send(messages);
+            } catch (Exception e) {
+              LOG.error("Produce failed.", e);
+            }
+          }
+        }), 0, 15, TimeUnit.SECONDS);
+  }
+
+  private static byte[] fakeJsonObject(int index, TypeInfo<?>[] typeInfos) {
     Map<Object, Object> demo = Maps.newHashMap();
     demo.put("id", index);
     return JsonSerializer.serialize(demo).getBytes();
@@ -151,9 +157,14 @@ public class RocketMQSourceTest extends EmbeddedFlinkCluster {
     }
   }
 
-  @Test
+  //  @Test
   public void testBoundednessRocketMQSource() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("bitsail_rocketmq_print.json");
+    RocketMQSource rocketMQSource = new RocketMQSource();
+    TypeInfo<?>[] typeInfos = TypeInfoUtils.getTypeInfos(rocketMQSource.createTypeInfoConverter(),
+        jobConf.get(ReaderOptions.BaseReaderOptions.COLUMNS));
+
+    startProduceMessages(typeInfos);
     EmbeddedFlinkCluster.submitJob(jobConf);
   }
 

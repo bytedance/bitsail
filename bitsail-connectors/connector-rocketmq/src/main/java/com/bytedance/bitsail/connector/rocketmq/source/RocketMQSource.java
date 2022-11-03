@@ -24,9 +24,11 @@ import com.bytedance.bitsail.base.connector.reader.v1.Source;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
+import com.bytedance.bitsail.base.execution.Mode;
 import com.bytedance.bitsail.base.extension.ParallelismComputable;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.rocketmq.source.coordinator.RocketMQSourceSplitCoordinator;
 import com.bytedance.bitsail.connector.rocketmq.source.reader.RocketMQSourceReader;
@@ -45,8 +47,9 @@ public class RocketMQSource
 
   @Override
   public Boundedness getSourceBoundedness() {
-    //todo support more
-    return Boundedness.UNBOUNDEDNESS;
+    return Mode.BATCH.equals(Mode.getJobRunMode(readerConfiguration.get(CommonOptions.JOB_TYPE))) ?
+        Boundedness.BOUNDEDNESS :
+        Boundedness.UNBOUNDEDNESS;
   }
 
   @Override
