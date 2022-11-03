@@ -178,13 +178,14 @@ public class RocketMQSourceReader implements SourceReader<Row, RocketMQSplit> {
 
   @Override
   public List<RocketMQSplit> snapshotState(long checkpointId) {
-    LOG.info("Subtask {} start snapshotting.", context.getIndexOfSubtask());
+    LOG.info("Subtask {} start snapshotting for checkpoint id = {}.", context.getIndexOfSubtask(), checkpointId);
     if (commitInCheckpoint) {
       for (RocketMQSplit rocketMQSplit : assignedRocketMQSplits) {
         try {
           consumer.updateConsumeOffset(rocketMQSplit.getMessageQueue(), rocketMQSplit.getStartOffset());
-          LOG.debug("Subtask {} committed message queue = {}.", context.getIndexOfSubtask(),
-              rocketMQSplit.getMessageQueue());
+          LOG.debug("Subtask {} committed message queue = {} in checkpoint id = {}.", context.getIndexOfSubtask(),
+              rocketMQSplit.getMessageQueue(),
+              checkpointId);
         } catch (MQClientException e) {
           throw new RuntimeException(e);
         }
@@ -197,11 +198,14 @@ public class RocketMQSourceReader implements SourceReader<Row, RocketMQSplit> {
   public void close() throws Exception {
     if (consumer != null) {
       consumer.shutdown();
+      LOG.info("Subtask {} shutdown consumer.", context.getIndexOfSubtask());
     }
+    LOG.info("Subtask {} closed.", context.getIndexOfSubtask());
   }
 
   @Override
   public void notifyNoMoreSplits() {
+    LOG.info("Subtask {} received no more split signal.", context.getIndexOfSubtask());
     noMoreSplits = true;
   }
 }

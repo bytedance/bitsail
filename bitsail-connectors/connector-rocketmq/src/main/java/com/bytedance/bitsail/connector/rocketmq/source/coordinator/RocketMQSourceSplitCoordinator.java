@@ -235,7 +235,7 @@ public class RocketMQSourceSplitCoordinator implements
 
     for (Integer pendingAssignmentReader : tmpRocketMQSplitAssignments.keySet()) {
 
-      LOG.info("Assigning splits reader {}, splits = {}.", pendingAssignmentReader,
+      LOG.info("Assigning splits to reader {}, splits = {}.", pendingAssignmentReader,
           tmpRocketMQSplitAssignments.get(pendingAssignmentReader));
 
       context.assignSplit(pendingAssignmentReader,
