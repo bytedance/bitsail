@@ -24,19 +24,13 @@
     <parent>
         <artifactId>bitsail-component-formats</artifactId>
         <groupId>com.bytedance.bitsail</groupId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>bitsail-component-format-json</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-base</artifactId>
-            <version>${revision}</version>
-            <scope>provided</scope>
-        </dependency>
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
