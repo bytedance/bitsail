@@ -134,10 +134,10 @@ public class JsonDeserializationSchema implements DeserializationSchema<byte[], 
   }
 
   private DeserializationConverter createConverter(TypeInfo<?> typeInfo) {
-    return wrapIntoNullableConverter(typeInfo);
+    return wrapperCreateConverter(typeInfo);
   }
 
-  private DeserializationConverter wrapIntoNullableConverter(TypeInfo<?> typeInfo) {
+  private DeserializationConverter wrapperCreateConverter(TypeInfo<?> typeInfo) {
     DeserializationConverter typeInfoConverter =
         createTypeInfoConverter(typeInfo);
     return (jsonNode) -> {
@@ -270,7 +270,6 @@ public class JsonDeserializationSchema implements DeserializationSchema<byte[], 
 
   private double convertToDouble(JsonNode jsonNode) {
     if (jsonNode.isDouble()) {
-      // avoid redundant toString and parseDouble, for better performance
       return jsonNode.asDouble();
     } else {
       return Double.parseDouble(jsonNode.asText().trim());
@@ -279,7 +278,6 @@ public class JsonDeserializationSchema implements DeserializationSchema<byte[], 
 
   private float convertToFloat(JsonNode jsonNode) {
     if (jsonNode.isDouble()) {
-      // avoid redundant toString and parseDouble, for better performance
       return (float) jsonNode.asDouble();
     } else {
       return Float.parseFloat(jsonNode.asText().trim());
