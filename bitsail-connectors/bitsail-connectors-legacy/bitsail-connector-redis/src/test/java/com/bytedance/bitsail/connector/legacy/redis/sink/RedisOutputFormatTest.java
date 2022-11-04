@@ -36,7 +36,7 @@ public class RedisOutputFormatTest {
     // ttl < 0
     String redisType = "string";
     int ttl = -1;
-    String additionalKey = "dts_test";
+    String additionalKey = "bitsail_test";
     JedisCommandDescription redisCommandDescriptionWithoutTtl = outputFormat.initJedisCommandDescription(redisType, ttl, additionalKey);
     assertEquals(JedisCommand.SET, redisCommandDescriptionWithoutTtl.getJedisCommand());
     assertNull(redisCommandDescriptionWithoutTtl.getAdditionalTTL());
