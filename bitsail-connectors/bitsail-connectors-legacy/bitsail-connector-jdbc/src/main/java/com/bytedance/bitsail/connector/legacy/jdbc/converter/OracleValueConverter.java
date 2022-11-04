@@ -17,19 +17,18 @@
 
 package com.bytedance.bitsail.connector.legacy.jdbc.converter;
 
-import com.bytedance.bitsail.connector.legacy.jdbc.utils.MicroIntervalUtil;
+import com.bytedance.bitsail.connector.legacy.jdbc.model.Duration;
 
+import com.google.common.annotations.VisibleForTesting;
+import lombok.NonNull;
 import oracle.jdbc.OracleResultSet;
 import oracle.jdbc.OracleTypes;
 import oracle.sql.INTERVALDS;
 import oracle.sql.INTERVALYM;
-import oracle.sql.TIMESTAMP;
 import org.apache.commons.dbcp.DelegatingResultSet;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,11 +39,7 @@ import java.util.regex.Pattern;
 public class OracleValueConverter extends JdbcValueConverter {
 
   private static final Pattern INTERVAL_DAY_SECOND_PATTERN = Pattern.compile("([+\\-])?(\\d+) (\\d+):(\\d+):(\\d+).(\\d+)");
-  private static final int PATTERN_GROUP_DAYS_IDX = 2;
-  private static final int PATTERN_GROUP_HOURS_IDX = 3;
-  private static final int PATTERN_GROUP_MINUTES_IDX = 4;
-  private static final int PATTERN_GROUP_SECONDS_IDX = 5;
-  private static final int PATTERN_GROUP_MICROSECONDS_IDX = 6;
+  private static final Pattern INTERVAL_YEAR_MONTH_PATTERN = Pattern.compile("([+\\-])?(\\d+)-(\\d+)");
   private static final int MICROS_LENGTH = 6;
   private IntervalHandlingMode intervalMode;
 
@@ -59,7 +54,6 @@ public class OracleValueConverter extends JdbcValueConverter {
     } else if (rs instanceof DelegatingResultSet) {
       oracleResultSet = unwrap(((DelegatingResultSet) rs).getInnermostDelegate());
     }
-
     return oracleResultSet;
   }
 
@@ -79,11 +73,11 @@ public class OracleValueConverter extends JdbcValueConverter {
     switch (oracleColumnType) {
       case OracleTypes.TIMESTAMPTZ:
       case OracleTypes.TIMESTAMPLTZ:
-        return getTimestampWithoutConnection(oracleResultSet, columnIndex);
+        return oracleResultSet.getTIMESTAMP(columnIndex).timestampValue();
       case OracleTypes.INTERVALDS:
-        return getIntervalDSValue(oracleResultSet, columnIndex);
+        return oracleResultSet.getINTERVALDS(columnIndex);
       case OracleTypes.INTERVALYM:
-        return getIntervalYMValue(oracleResultSet, columnIndex);
+        return oracleResultSet.getINTERVALYM(columnIndex);
       case OracleTypes.BINARY_FLOAT:
       case OracleTypes.BINARY_DOUBLE:
         return extractDoubleValue(oracleResultSet, columnIndex);
@@ -99,9 +93,8 @@ public class OracleValueConverter extends JdbcValueConverter {
       case OracleTypes.TIMESTAMPLTZ:
         return convertTimeValue(value, columnName, columnTypeName);
       case OracleTypes.INTERVALDS:
-        return convertIntervalDSValue((INTERVALDS) value, this.intervalMode);
       case OracleTypes.INTERVALYM:
-        return convertIntervalYMValue((INTERVALYM) value, this.intervalMode);
+        return convertInterval(value);
       case OracleTypes.BINARY_FLOAT:
       case OracleTypes.BINARY_DOUBLE:
         return value;
@@ -110,73 +103,42 @@ public class OracleValueConverter extends JdbcValueConverter {
     }
   }
 
-  private Timestamp getTimestampWithoutConnection(OracleResultSet rs,
-                                                  int columnIndex) throws SQLException {
-    TIMESTAMP timestamp = rs.getTIMESTAMP(columnIndex);
-    return timestamp.timestampValue();
-  }
-
-  private Object getIntervalDSValue(OracleResultSet rs,
-                                    int columnIndex) throws Exception {
-    return rs.getINTERVALDS(columnIndex);
-  }
-
-  private Object getIntervalYMValue(OracleResultSet rs,
-                                    int columnIndex) throws Exception {
-    return rs.getINTERVALYM(columnIndex);
-  }
-
-  private Object convertIntervalDSValue(INTERVALDS interval, IntervalHandlingMode mode) throws Exception {
+  @VisibleForTesting
+  @SuppressWarnings("checkstyle:MagicNumber")
+  Object convertInterval(final Object interval) {
+    if (this.intervalMode == null) {
+      throw new IllegalArgumentException("Fail to convert interval for oracle with null mode. value: " + interval);
+    }
     final String intervalStr = interval.toString();
-    if (mode.equals(IntervalHandlingMode.STRING)) {
+    if (this.intervalMode.equals(IntervalHandlingMode.STRING)) {
       return intervalStr;
-    } else if (mode.equals(IntervalHandlingMode.NUMERIC)) {
+    }
+    // Handle IntervalHandlingMode.NUMERIC
+    if (interval instanceof INTERVALDS) {
       final Matcher m = INTERVAL_DAY_SECOND_PATTERN.matcher(intervalStr);
       if (m.matches()) {
         final int sign = "-".equals(m.group(1)) ? -1 : 1;
-        return MicroIntervalUtil.durationMicros(
-                0,
-                0,
-                sign * Integer.parseInt(m.group(PATTERN_GROUP_DAYS_IDX)),
-                sign * Integer.parseInt(m.group(PATTERN_GROUP_HOURS_IDX)),
-                sign * Integer.parseInt(m.group(PATTERN_GROUP_MINUTES_IDX)),
-                sign * Integer.parseInt(m.group(PATTERN_GROUP_SECONDS_IDX)),
-                sign * Integer.parseInt(MicroIntervalUtil.pad(m.group(PATTERN_GROUP_MICROSECONDS_IDX), MICROS_LENGTH, '0')),
-                MicroIntervalUtil.DAYS_PER_MONTH_AVG);
+        final Duration duration = Duration.builder()
+                .days(sign * Integer.parseInt(m.group(2)))
+                .hours(sign * Integer.parseInt(m.group(3)))
+                .minutes(sign * Integer.parseInt(m.group(4)))
+                .seconds(sign * Integer.parseInt(m.group(5)))
+                .microseconds(sign * Integer.parseInt(convertNumRightToFloatingPointToMicro(m.group(6))))
+                .build();
+        return duration.toMicros();
+      }
+    } else if (interval instanceof INTERVALYM) {
+      final Matcher m = INTERVAL_YEAR_MONTH_PATTERN.matcher(intervalStr);
+      if (m.matches()) {
+        final int sign = "-".equals(m.group(1)) ? -1 : 1;
+        final Duration duration = Duration.builder()
+                .years(sign * Integer.parseInt(m.group(2)))
+                .months(sign * Integer.parseInt(m.group(3)))
+                .build();
+        return duration.toMicros();
       }
     }
-    throw new IllegalArgumentException("Fail to convert interval_day_to_seconds for oracle, mode: " + mode + " value: " + interval.toString());
-  }
-
-  private Object convertIntervalYMValue(INTERVALYM interval, IntervalHandlingMode mode) throws Exception {
-    final String intervalStr = interval.toString();
-    if (mode.equals(IntervalHandlingMode.STRING)) {
-      return intervalStr;
-    } else if (mode.equals(IntervalHandlingMode.NUMERIC)) {
-      int sign = 1;
-      int start = 0;
-      if (intervalStr.charAt(0) == '-') {
-        sign = -1;
-        start = 1;
-      }
-      for (int i = 1; i < intervalStr.length(); i++) {
-        if (intervalStr.charAt(i) == '-') {
-          final int year = sign * Integer.parseInt(intervalStr.substring(start, i));
-          final int month = sign * Integer.parseInt(intervalStr.substring(i + 1, intervalStr.length()));
-          return MicroIntervalUtil.durationMicros(
-                  year,
-                  month,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  MicroIntervalUtil.DAYS_PER_MONTH_AVG);
-        }
-      }
-    }
-
-    throw new Exception("Fail to convert interval_year_to_month for oracle, mode: " + mode + " value: " + interval.toString());
+    throw new IllegalArgumentException("Fail to convert interval for oracle, mode: " + this.intervalMode + " value: " + interval);
   }
 
   /**
@@ -214,5 +176,23 @@ public class OracleValueConverter extends JdbcValueConverter {
     public String getValue() {
       return value;
     }
+  }
+
+  /**
+   * Convert number right to floating point to micro number
+   *
+   * @param numRightToFloatingPoint the string to be converted into micro number
+   * @return micro number string
+   */
+  @VisibleForTesting
+  String convertNumRightToFloatingPointToMicro(@NonNull final String numRightToFloatingPoint) {
+    if (numRightToFloatingPoint.length() > MICROS_LENGTH) {
+      return numRightToFloatingPoint.substring(0, MICROS_LENGTH);
+    }
+    final StringBuilder sb = new StringBuilder(numRightToFloatingPoint);
+    while (sb.length() < MICROS_LENGTH) {
+      sb.append('0');
+    }
+    return sb.toString();
   }
 }

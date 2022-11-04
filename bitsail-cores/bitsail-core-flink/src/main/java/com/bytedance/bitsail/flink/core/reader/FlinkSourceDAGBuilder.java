@@ -25,20 +25,25 @@ import com.bytedance.bitsail.base.connector.reader.v1.SourceSplit;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.extension.ParallelismComputable;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.flink.core.delagate.reader.source.DelegateFlinkSource;
 import com.bytedance.bitsail.flink.core.execution.FlinkExecutionEnviron;
 import com.bytedance.bitsail.flink.core.plugins.InputAdapter;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 
 public class FlinkSourceDAGBuilder<T, SplitT extends SourceSplit, StateT extends Serializable>
     implements DataReaderDAGBuilder, ParallelismComputable {
@@ -62,10 +67,12 @@ public class FlinkSourceDAGBuilder<T, SplitT extends SourceSplit, StateT extends
 
   public DataStream<T> fromSource(FlinkExecutionEnviron executionEnviron,
                                   int readerParallelism) throws Exception {
-    DataStream<T> dataStream = executionEnviron.getExecutionEnvironment()
+    DataStreamSource<T> dataStreamSource = executionEnviron.getExecutionEnvironment()
         //todo watermark
-        .fromSource(delegateFlinkSource, WatermarkStrategy.noWatermarks(), source.getReaderName())
-        .setParallelism(readerParallelism)
+        .fromSource(delegateFlinkSource, WatermarkStrategy.noWatermarks(), source.getReaderName());
+
+    setDataSourceParallel(dataStreamSource);
+    DataStream<T> dataStream = dataStreamSource.setParallelism(readerParallelism)
         .uid(source.getReaderName());
 
     //todo remove in future
@@ -78,6 +85,15 @@ public class FlinkSourceDAGBuilder<T, SplitT extends SourceSplit, StateT extends
         .setParallelism(dataStream.getParallelism());
 
     return dataStream;
+  }
+
+  public static <T> void setDataSourceParallel(DataStreamSource<T> dataStreamSource) {
+    Field field = FieldUtils.getDeclaredField(dataStreamSource.getClass(), "isParallel", true);
+    try {
+      field.set(dataStreamSource, true);
+    } catch (Exception e) {
+      throw BitSailException.asBitSailException(CommonErrorCode.RUNTIME_ERROR, e);
+    }
   }
 
   @Override
