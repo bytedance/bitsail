@@ -63,10 +63,11 @@ public class OracleValueConverter extends JdbcValueConverter {
                            int columnIndex,
                            int columnType,
                            String columnTypeName,
+                           String columnName,
                            String encoding) throws Exception {
     OracleResultSet oracleResultSet = unwrap(rs);
     if (Objects.isNull(oracleResultSet)) {
-      return super.extract(rs, metaData, columnIndex, columnType, columnTypeName, encoding);
+      return super.extract(rs, metaData, columnIndex, columnType, columnTypeName, columnName, encoding);
     }
     int oracleColumnType = metaData.getColumnType(columnIndex);
     switch (oracleColumnType) {
@@ -81,16 +82,16 @@ public class OracleValueConverter extends JdbcValueConverter {
       case OracleTypes.BINARY_DOUBLE:
         return extractDoubleValue(oracleResultSet, columnIndex);
       default:
-        return super.extract(rs, metaData, columnIndex, columnType, columnTypeName, encoding);
+        return super.extract(rs, metaData, columnIndex, columnType, columnTypeName, columnName, encoding);
     }
   }
 
   @Override
-  protected Object convert(Object value, int columnType, String columnTypeName) throws Exception {
+  protected Object convert(Object value, int columnType, String columnName, String columnTypeName) throws Exception {
     switch (columnType) {
       case OracleTypes.TIMESTAMPTZ:
       case OracleTypes.TIMESTAMPLTZ:
-        return convertTimeValue(value);
+        return convertTimeValue(value, columnName, columnTypeName);
       case OracleTypes.INTERVALDS:
       case OracleTypes.INTERVALYM:
         return convertInterval(value);
@@ -98,7 +99,7 @@ public class OracleValueConverter extends JdbcValueConverter {
       case OracleTypes.BINARY_DOUBLE:
         return value;
       default:
-        return super.convert(value, columnType, columnTypeName);
+        return super.convert(value, columnType, columnName, columnTypeName);
     }
   }
 

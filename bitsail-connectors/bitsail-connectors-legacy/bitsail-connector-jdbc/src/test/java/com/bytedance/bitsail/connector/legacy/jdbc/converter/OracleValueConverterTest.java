@@ -46,31 +46,32 @@ public class OracleValueConverterTest {
     final INTERVALDS intervalds = new INTERVALDS();
     when(mockMetaData.getColumnType(columnIndex)).thenReturn(OracleTypes.INTERVALDS);
     when(mockOracleResultSet.getINTERVALDS(columnIndex)).thenReturn(intervalds);
-    assertEquals(intervalds, numericOracleValueConverter.extract(mockOracleResultSet, mockMetaData, columnIndex, 0, null, null));
+    assertEquals(intervalds, numericOracleValueConverter.extract(
+            mockOracleResultSet, mockMetaData, columnIndex, 0, null, null, null));
   }
 
   @Test
   public void testConvertCharColumnType() throws Exception {
     String varchar = "varchar";
-    assertEquals(varchar, stringOracleValueConverter.convert(varchar, Types.VARCHAR, null));
+    assertEquals(varchar, stringOracleValueConverter.convert(varchar, Types.VARCHAR, null, null));
   }
 
   @Test
   public void testConvertTimestamptzColumnType() throws Exception {
     int value = 1;
-    assertEquals(value, stringOracleValueConverter.convert(value, OracleTypes.TIMESTAMPTZ, null));
+    assertEquals(value, stringOracleValueConverter.convert(value, OracleTypes.TIMESTAMPTZ, null, null));
   }
 
   @Test
   public void testConvertIntervalColumnType() throws Exception {
     final INTERVALYM intervalym = new INTERVALYM("2022-10");
-    assertEquals("2022-10", stringOracleValueConverter.convert(intervalym, OracleTypes.INTERVALYM, null));
+    assertEquals("2022-10", stringOracleValueConverter.convert(intervalym, OracleTypes.INTERVALYM, null, null));
   }
 
   @Test
   public void testConvertBinaryFloatColumnType() throws Exception {
     final Object value = 1;
-    assertEquals(value, stringOracleValueConverter.convert(value, OracleTypes.BINARY_FLOAT, null));
+    assertEquals(value, stringOracleValueConverter.convert(value, OracleTypes.BINARY_FLOAT, null, null));
   }
 
   @Test(expected = IllegalArgumentException.class)
