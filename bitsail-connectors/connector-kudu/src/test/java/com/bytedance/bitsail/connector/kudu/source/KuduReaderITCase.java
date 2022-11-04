@@ -23,13 +23,15 @@ import com.bytedance.bitsail.connector.kudu.KuduTestUtils;
 import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.test.KuduTestHarness;
 import org.apache.kudu.test.cluster.MiniKuduCluster;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.List;
 
 public class KuduReaderITCase {
   private static final String TABLE_NAME = "test_kudu_table";
   private static final int TOTAL_COUNT = 10000;
-
 
   /**
    * Note that the tablet server number should be larger than hash buckets number.
@@ -43,5 +45,15 @@ public class KuduReaderITCase {
   public void testKuduToPrint() throws Exception {
     KuduClient client = harness.getClient();
     KuduTestUtils.createTable(client, TABLE_NAME);
+    KuduTestUtils.insertRandomData(client, TABLE_NAME, 10);
+
+    List<List<Object>> scanResults;
+    try {
+      scanResults = KuduTestUtils.scanTable(client, TABLE_NAME);
+      scanResults.forEach(System.out::println);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to scan rows from table " + TABLE_NAME, e);
+    }
+//    Assert.assertEquals(TOTAL_COUNT, scanResults.size());
   }
 }

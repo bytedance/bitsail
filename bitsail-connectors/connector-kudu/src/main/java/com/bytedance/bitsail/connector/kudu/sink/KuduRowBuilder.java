@@ -26,30 +26,51 @@ import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
 import com.bytedance.bitsail.connector.kudu.option.KuduWriterOptions;
 
+import org.apache.kudu.ColumnSchema;
+import org.apache.kudu.Schema;
 import org.apache.kudu.client.PartialRow;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 public class KuduRowBuilder {
 
   private final List<BiConsumer<PartialRow, Object>> rowInserters;
   private final int fieldSize;
 
-  public KuduRowBuilder(BitSailConfiguration jobConf) {
+  public KuduRowBuilder(BitSailConfiguration jobConf, Schema schema) {
     List<ColumnInfo> columnInfos = jobConf.get(KuduWriterOptions.COLUMNS);
-    this.rowInserters = columnInfos.stream().map(this::initRowInserter).collect(Collectors.toList());
-    this.fieldSize = rowInserters.size();
+    this.fieldSize = columnInfos.size();
+
+    this.rowInserters = new ArrayList<>(fieldSize);
+    columnInfos.forEach(columnInfo -> {
+      ColumnSchema columnSchema = schema.getColumn(columnInfo.getName());
+      rowInserters.add(columnSchema.isNullable() ?
+          initNullableRowInserter(columnInfo) : initRowInserter(columnInfo));
+    });
   }
 
   public void build(PartialRow kuduRow, Row row) {
     for (int i = 0; i < fieldSize; ++i) {
       rowInserters.get(i).accept(kuduRow, row.getField(i));
     }
+  }
+
+  private BiConsumer<PartialRow, Object> initNullableRowInserter(ColumnInfo columnInfo) {
+    String columnName = columnInfo.getName();
+    BiConsumer<PartialRow, Object> rowInserter = initRowInserter(columnInfo);
+
+    return (PartialRow kuduRow, Object value) -> {
+      if (value == null) {
+        kuduRow.setNull(columnName);
+      } else {
+        rowInserter.accept(kuduRow, value);
+      }
+    };
   }
 
   private BiConsumer<PartialRow, Object> initRowInserter(ColumnInfo columnInfo) {

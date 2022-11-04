@@ -64,7 +64,7 @@ public class KuduWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
 
     String writeMode = jobConf.get(KuduWriterOptions.WRITE_MODE);
     this.operationSupplier = initOperationSupplier(writeMode);
-    this.rowBuilder = new KuduRowBuilder(jobConf);
+    this.rowBuilder = new KuduRowBuilder(jobConf, kuduTable.getSchema());
 
     LOG.info("KuduWriter is initialized.");
   }

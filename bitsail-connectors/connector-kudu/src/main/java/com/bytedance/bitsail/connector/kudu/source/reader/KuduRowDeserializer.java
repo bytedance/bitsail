@@ -38,7 +38,7 @@ public class KuduRowDeserializer {
 
   public KuduRowDeserializer(BitSailConfiguration jobConf) {
     List<ColumnInfo> columnInfos = jobConf.get(KuduReaderOptions.COLUMNS);
-    this.converters = columnInfos.stream().map(this::initConverter).collect(Collectors.toList());
+    this.converters = columnInfos.stream().map(this::initWrappedConverter).collect(Collectors.toList());
     this.fieldSize = converters.size();
   }
 
@@ -48,6 +48,12 @@ public class KuduRowDeserializer {
       row.setField(i, converters.get(i).apply(rowResult));
     }
     return row;
+  }
+
+  private Function<RowResult, Object> initWrappedConverter(ColumnInfo columnInfo) {
+    String columnName = columnInfo.getName();
+    Function<RowResult, Object> converter = initConverter(columnInfo);
+    return rowResult -> rowResult.isNull(columnName) ? null : converter.apply(rowResult);
   }
 
   private Function<RowResult, Object> initConverter(ColumnInfo columnInfo) {

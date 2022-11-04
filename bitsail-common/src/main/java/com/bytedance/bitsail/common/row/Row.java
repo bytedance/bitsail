@@ -106,6 +106,10 @@ public class Row implements Serializable {
     return (Date) this.fields[pos];
   }
 
+  public java.sql.Date getSqlDate(int pos) {
+    return (java.sql.Date) this.fields[pos];
+  }
+
   public long getLong(int pos) {
     return (Long) this.fields[pos];
   }
