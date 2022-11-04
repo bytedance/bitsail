@@ -63,7 +63,7 @@ public class KuduWriterITCase {
     try {
       scanResults = KuduTestUtils.scanTable(client, TABLE_NAME);
     } catch (Exception e) {
-      throw new RuntimeException("Failed to scan rows from table " + TABLE_NAME);
+      throw new RuntimeException("Failed to scan rows from table " + TABLE_NAME, e);
     }
 
     // KuduTableStatistics::getLiveRowCount() is not accurate, so we count the scan results here.

@@ -21,6 +21,7 @@ package com.bytedance.bitsail.connector.fake.source;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.BasicTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
@@ -41,11 +42,14 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Map;
 
+import static com.bytedance.bitsail.common.typeinfo.TypeProperty.NULLABLE;
+
 public class FakeRowGenerator {
 
   private final transient Faker faker;
   private final transient SnowflakeIdGenerator snowflakeIdGenerator;
 
+  private final Integer nullPercentage;
   private final long upper;
   private final long lower;
   private final transient Timestamp fromTimestamp;
@@ -55,6 +59,7 @@ public class FakeRowGenerator {
     this.faker = new Faker();
     this.snowflakeIdGenerator = new SnowflakeIdGenerator(taskId, taskId);
 
+    this.nullPercentage = jobConf.get(FakeReaderOptions.NULL_PERCENTAGE);
     this.upper = jobConf.get(FakeReaderOptions.UPPER_LIMIT);
     this.lower = jobConf.get(FakeReaderOptions.LOWER_LIMIT);
     this.fromTimestamp = Timestamp.valueOf(jobConf.get(FakeReaderOptions.FROM_TIMESTAMP));
@@ -64,9 +69,25 @@ public class FakeRowGenerator {
   public Row fakeOneRecord(TypeInfo<?>[] typeInfos) {
     Row row = new Row(ArrayUtils.getLength(typeInfos));
     for (int index = 0; index < typeInfos.length; index++) {
-      row.setField(index, fakeRawValue(typeInfos[index]));
+      TypeInfo<?> typeInfo = typeInfos[index];
+      if (isNullable(typeInfo) && isNull()) {
+        row.setField(index, null);
+      } else {
+        row.setField(index, fakeRawValue(typeInfo));
+      }
     }
     return row;
+  }
+
+  private boolean isNullable(TypeInfo<?> typeInfo) {
+    return typeInfo instanceof BasicTypeInfo
+        && CollectionUtils.isNotEmpty(typeInfo.getTypeProperties())
+        && typeInfo.getTypeProperties().contains(NULLABLE);
+  }
+
+  @SuppressWarnings("checkstyle:MagicNumber")
+  private boolean isNull() {
+    return (faker.number().randomNumber() % 100) < nullPercentage;
   }
 
   @SuppressWarnings("checkstyle:MagicNumber")

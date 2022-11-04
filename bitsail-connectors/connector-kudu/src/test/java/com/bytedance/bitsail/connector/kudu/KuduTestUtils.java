@@ -66,6 +66,7 @@ public class KuduTestUtils {
     COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_int", Type.INT32).build());
     COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_double", Type.DOUBLE).build());
     COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_date", Type.DATE).build());
+    COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_string", Type.STRING).nullable(true).build());
     COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_binary", Type.BINARY).nullable(true).build());
     SCHEMA = new Schema(COLUMNS);
   }
@@ -94,6 +95,7 @@ public class KuduTestUtils {
         TypeInfos.INT_TYPE_INFO,
         TypeInfos.DOUBLE_TYPE_INFO,
         TypeInfos.SQL_DATE_TYPE_INFO,
+        TypeInfos.STRING_TYPE_INFO,
         TypeInfos.STRING_TYPE_INFO      // getBytes()
     };
 
@@ -109,10 +111,11 @@ public class KuduTestUtils {
       partialRow.addInt("field_int", randomRow.getInt(1));
       partialRow.addDouble("field_double", randomRow.getDouble(2));
       partialRow.addDate("field_date", randomRow.getSqlDate(3));
+      partialRow.addString("field_string", randomRow.getString(4));
       if (i % 10 == 1) {
         partialRow.setNull("field_binary");
       } else {
-        partialRow.addBinary("field_binary", randomRow.getString(4).getBytes());
+        partialRow.addBinary("field_binary", randomRow.getString(5).getBytes());
       }
 
       session.apply(insert);
@@ -187,6 +190,13 @@ public class KuduTestUtils {
     result.add(kuduRow.getInt("field_int"));
     result.add(kuduRow.getDouble("field_double"));
     result.add(kuduRow.getDate("field_date"));
+
+    if (kuduRow.isNull("field_string")) {
+      result.add(null);
+    } else {
+      result.add(kuduRow.getString("field_string"));
+    }
+
     if (kuduRow.isNull("field_binary")) {
       result.add(null);
     } else {

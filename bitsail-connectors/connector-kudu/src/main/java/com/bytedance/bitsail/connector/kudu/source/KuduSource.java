@@ -25,6 +25,8 @@ import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 import com.bytedance.bitsail.connector.kudu.core.KuduConstants;
 import com.bytedance.bitsail.connector.kudu.source.reader.KuduSourceReader;
 import com.bytedance.bitsail.connector.kudu.source.split.KuduSourceSplit;
@@ -57,5 +59,10 @@ public class KuduSource implements Source<Row, KuduSourceSplit, EmptyState> {
   @Override
   public String getReaderName() {
     return KuduConstants.KUDU_CONNECTOR_NAME;
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new FileMappingTypeInfoConverter(getReaderName());
   }
 }

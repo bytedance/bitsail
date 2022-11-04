@@ -32,7 +32,7 @@ import java.io.IOException;
 public class KuduSplitFactory {
   private static final Logger LOG = LoggerFactory.getLogger(KuduSplitFactory.class);
 
-  enum KuduSplitStrategy {
+  public enum KuduSplitStrategy {
     SIMPLE_DIVIDE;
   }
 

@@ -20,6 +20,7 @@ package com.bytedance.bitsail.connector.kudu.option;
 import com.bytedance.bitsail.common.annotation.Essential;
 import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.ReaderOptions;
+import com.bytedance.bitsail.connector.kudu.source.split.KuduSplitFactory;
 
 import com.alibaba.fastjson.TypeReference;
 
@@ -128,7 +129,7 @@ public interface KuduReaderOptions extends ReaderOptions.BaseReaderOptions {
   // Split configurations.
   ConfigOption<String> SPLIT_STRATEGY =
       key(READER_PREFIX + "split_strategy")
-          .defaultValue("SIMPLE_DIVIDE");
+          .defaultValue(KuduSplitFactory.KuduSplitStrategy.SIMPLE_DIVIDE.name());
 
   ConfigOption<String> SPLIT_CONFIGURATION =
       key(READER_PREFIX + "split_config")

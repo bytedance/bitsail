@@ -18,16 +18,22 @@
 
 package com.bytedance.bitsail.connector.kudu.source;
 
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.kudu.KuduTestUtils;
+import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
+import com.bytedance.bitsail.connector.kudu.option.KuduWriterOptions;
+import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
+import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
 import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.test.KuduTestHarness;
 import org.apache.kudu.test.cluster.MiniKuduCluster;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class KuduReaderITCase {
   private static final String TABLE_NAME = "test_kudu_table";
@@ -45,15 +51,17 @@ public class KuduReaderITCase {
   public void testKuduToPrint() throws Exception {
     KuduClient client = harness.getClient();
     KuduTestUtils.createTable(client, TABLE_NAME);
-    KuduTestUtils.insertRandomData(client, TABLE_NAME, 10);
+    KuduTestUtils.insertRandomData(client, TABLE_NAME, TOTAL_COUNT);
 
-    List<List<Object>> scanResults;
-    try {
-      scanResults = KuduTestUtils.scanTable(client, TABLE_NAME);
-      scanResults.forEach(System.out::println);
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to scan rows from table " + TABLE_NAME, e);
-    }
-//    Assert.assertEquals(TOTAL_COUNT, scanResults.size());
+    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("fake_to_kudu.json");
+    updateJobConf(jobConf);
+    EmbeddedFlinkCluster.submitJob(jobConf);
+  }
+
+  private void updateJobConf(BitSailConfiguration jobConf) {
+    String masterAddressString = harness.getMasterAddressesAsString();
+    List<String> masterAddressList = Arrays.stream(masterAddressString.split(",")).collect(Collectors.toList());
+    jobConf.set(KuduWriterOptions.MASTER_ADDRESS_LIST, masterAddressList);
+    jobConf.set(KuduReaderOptions.KUDU_TABLE_NAME, TABLE_NAME);
   }
 }
