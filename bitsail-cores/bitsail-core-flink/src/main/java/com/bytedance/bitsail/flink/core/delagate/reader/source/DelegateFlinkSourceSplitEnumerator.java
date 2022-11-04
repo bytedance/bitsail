@@ -109,6 +109,11 @@ public class DelegateFlinkSourceSplitEnumerator<SplitT extends SourceSplit,
       public <T> void runAsync(Callable<T> callable, BiConsumer<T, Throwable> handler, int initialDelay, long interval) {
         splitEnumeratorContext.callAsync(callable, handler, initialDelay, interval);
       }
+
+      @Override
+      public <T> void runAsyncOnce(Callable<T> callable, BiConsumer<T, Throwable> handler) {
+        splitEnumeratorContext.callAsync(callable, handler);
+      }
     };
     coordinator = splitCoordinatorFunction.apply(context);
   }

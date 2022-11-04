@@ -70,5 +70,8 @@ public interface SourceSplitCoordinator<SplitT extends SourceSplit, StateT> exte
                       BiConsumer<T, Throwable> handler,
                       int initialDelay,
                       long interval);
+
+    <T> void runAsyncOnce(Callable<T> callable,
+                          BiConsumer<T, Throwable> handler);
   }
 }

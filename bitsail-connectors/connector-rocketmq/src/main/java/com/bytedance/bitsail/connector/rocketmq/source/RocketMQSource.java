@@ -30,13 +30,26 @@ import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.connector.rocketmq.option.RocketMQSourceOptions;
 import com.bytedance.bitsail.connector.rocketmq.source.coordinator.RocketMQSourceSplitCoordinator;
 import com.bytedance.bitsail.connector.rocketmq.source.reader.RocketMQSourceReader;
 import com.bytedance.bitsail.connector.rocketmq.source.split.RocketMQSplit;
 import com.bytedance.bitsail.connector.rocketmq.source.split.RocketMQState;
+import com.bytedance.bitsail.connector.rocketmq.utils.RocketMQUtils;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.rocketmq.client.consumer.DefaultLitePullConsumer;
+import org.apache.rocketmq.common.message.MessageQueue;
+
+import java.util.Collection;
+import java.util.UUID;
 
 public class RocketMQSource
     implements Source<Row, RocketMQSplit, RocketMQState>, ParallelismComputable {
+
+  private static final String SOURCE_INSTANCE_NAME_TEMPLATE = "rmq_source:%s_%s_%s:%s";
+
+  private static final int DEFAULT_ROCKETMQ_PARALLELISM_THRESHOLD = 4;
 
   private BitSailConfiguration readerConfiguration;
 
@@ -78,7 +91,25 @@ public class RocketMQSource
   }
 
   @Override
-  public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConf, BitSailConfiguration selfConf, ParallelismAdvice upstreamAdvice) throws Exception {
-    return ParallelismAdvice.builder().adviceParallelism(1).build();
+  public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConfiguration,
+                                                BitSailConfiguration rocketmqConfiguration,
+                                                ParallelismAdvice upstreamAdvice) throws Exception {
+    String cluster = rocketmqConfiguration.get(RocketMQSourceOptions.CLUSTER);
+    String topic = rocketmqConfiguration.get(RocketMQSourceOptions.TOPIC);
+    String consumerGroup = rocketmqConfiguration.get(RocketMQSourceOptions.CONSUMER_GROUP);
+    DefaultLitePullConsumer consumer = RocketMQUtils.prepareRocketMQConsumer(rocketmqConfiguration, String.format(SOURCE_INSTANCE_NAME_TEMPLATE,
+        cluster,
+        topic,
+        consumerGroup,
+        UUID.randomUUID()
+    ));
+    consumer.start();
+    Collection<MessageQueue> messageQueues = consumer.fetchMessageQueues(topic);
+    int adviceParallelism = Math.max(CollectionUtils.size(messageQueues) /
+        DEFAULT_ROCKETMQ_PARALLELISM_THRESHOLD, 1);
+    return ParallelismAdvice.builder()
+        .adviceParallelism(adviceParallelism)
+        .enforceDownStreamChain(true)
+        .build();
   }
 }

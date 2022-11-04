@@ -29,14 +29,13 @@ import com.bytedance.bitsail.connector.rocketmq.error.RocketMQErrorCode;
 import com.bytedance.bitsail.connector.rocketmq.option.RocketMQSourceOptions;
 import com.bytedance.bitsail.connector.rocketmq.source.split.RocketMQSplit;
 import com.bytedance.bitsail.connector.rocketmq.source.split.RocketMQState;
+import com.bytedance.bitsail.connector.rocketmq.utils.RocketMQUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.rocketmq.acl.common.AclClientRPCHook;
-import org.apache.rocketmq.acl.common.SessionCredentials;
 import org.apache.rocketmq.client.consumer.DefaultLitePullConsumer;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageQueue;
@@ -74,9 +73,6 @@ public class RocketMQSourceSplitCoordinator implements
   private String cluster;
   private String topic;
   private String consumerGroup;
-  private String consumerTag;
-  private String accessKey;
-  private String secretKey;
   private String consumerOffsetMode;
   private long consumerOffsetTimestamp;
   private Map<MessageQueue, Long> consumerStopOffset;
@@ -110,9 +106,6 @@ public class RocketMQSourceSplitCoordinator implements
     cluster = jobConfiguration.get(RocketMQSourceOptions.CLUSTER);
     topic = jobConfiguration.get(RocketMQSourceOptions.TOPIC);
     consumerGroup = jobConfiguration.get(RocketMQSourceOptions.CONSUMER_GROUP);
-    consumerTag = jobConfiguration.get(RocketMQSourceOptions.CONSUMER_TAG);
-    accessKey = jobConfiguration.get(RocketMQSourceOptions.ACCESS_KEY);
-    secretKey = jobConfiguration.get(RocketMQSourceOptions.SECRET_KEY);
     consumerOffsetMode = jobConfiguration.get(RocketMQSourceOptions.CONSUMER_OFFSET_MODE);
     if (StringUtils.equalsIgnoreCase(consumerOffsetMode,
         RocketMQSourceOptions.CONSUMER_OFFSET_TIMESTAMP_KEY)) {
@@ -127,17 +120,9 @@ public class RocketMQSourceSplitCoordinator implements
 
   private void prepareRocketMQConsumer() {
     try {
-      if (StringUtils.isNotEmpty(accessKey) && StringUtils.isNotEmpty(secretKey)) {
-        AclClientRPCHook aclClientRPCHook = new AclClientRPCHook(
-            new SessionCredentials(accessKey, secretKey));
-        consumer = new DefaultLitePullConsumer(aclClientRPCHook);
-      } else {
-        consumer = new DefaultLitePullConsumer();
-      }
-      consumer.setConsumerGroup(consumerGroup);
-      consumer.setNamesrvAddr(cluster);
-      consumer.setInstanceName(String.format(COORDINATOR_INSTANCE_NAME_TEMPLATE,
-          cluster, topic, consumerGroup, UUID.randomUUID()));
+      consumer = RocketMQUtils.prepareRocketMQConsumer(jobConfiguration,
+          String.format(COORDINATOR_INSTANCE_NAME_TEMPLATE,
+              cluster, topic, consumerGroup, UUID.randomUUID()));
       consumer.start();
     } catch (Exception e) {
       throw BitSailException.asBitSailException(RocketMQErrorCode.CONSUMER_CREATE_FAILED, e);
@@ -154,6 +139,11 @@ public class RocketMQSourceSplitCoordinator implements
           this::handleMessageQueueChanged,
           0,
           discoveryInternal
+      );
+    } else {
+      context.runAsyncOnce(
+          this::fetchMessageQueues,
+          this::handleMessageQueueChanged
       );
     }
   }
