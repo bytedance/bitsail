@@ -50,7 +50,7 @@ public class KuduWriterITCase {
   );
 
   @Test
-  public void test() throws Exception {
+  public void testFakeToKudu() throws Exception {
     KuduClient client = harness.getClient();
     KuduTestUtils.createTable(client, TABLE_NAME);
 

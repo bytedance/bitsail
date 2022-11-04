@@ -58,7 +58,6 @@ public class KuduTestUtils {
     SCHEMA = new Schema(COLUMNS);
   }
 
-
   public static void createTable(KuduClient client, String tableName) {
     CreateTableOptions cto = new CreateTableOptions().setNumReplicas(REPLICA_NUM);
     List<String> hashKeys = Lists.newArrayList("key");
