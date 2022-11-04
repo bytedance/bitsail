@@ -618,9 +618,15 @@ public class JDBCInputFormat extends InputFormatPlugin<Row, InputSplit> implemen
     return new JDBCSourceEngineConnectorBase(commonConf, readerConf);
   }
 
+  /**
+   * In mariadb mysql java client, it enables streaming result set by `setFetchSize({any positive integer})`.<br/>
+   * In official mysql jdbc client, it enables streaming result set by `setFetchSize(INT.MIN_VALUE)`, and fetch one row once.<br/>
+   * For more details: <a href="https://mariadb.com/kb/en/about-mariadb-connector-j/#streaming-result-sets">MariaDB connector: streaming result sets</a>
+   */
   public int getReaderFetchSize(int fetchSize) {
-    if (MysqlUtil.DRIVER_NAME.equalsIgnoreCase(getDriverName())) {
-      return Integer.MIN_VALUE;
+    if (fetchSize < 0) {
+      fetchSize = 1;
+      LOG.warn("fetch size should not be negative in jdbc reader.");
     }
     return fetchSize;
   }

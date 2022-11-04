@@ -195,13 +195,11 @@ public class DbShardWithConn {
         statement.close();
       }
 
+      statement = getConnection().prepareStatement(sqlTemplate);
+
+      // enable streaming result set by set fetch size to a positive value.
       if (statementReadOnly) {
-        statement = getConnection().prepareStatement(sqlTemplate, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-        if (driverClassName.equalsIgnoreCase(MysqlUtil.DRIVER_NAME)) {
-          statement.setFetchSize(Integer.MIN_VALUE);
-        }
-      } else {
-        statement = getConnection().prepareStatement(sqlTemplate);
+        statement.setFetchSize(1);
       }
 
       if (statementFetchSize > 0) {
