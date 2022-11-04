@@ -1,0 +1,10 @@
+{
+  "name": "bitsail-connector-kudu",
+  "classes": [
+    "com.bytedance.bitsail.connector.kudu.sink.KuduWriterGenerator",
+    "com.bytedance.bitsail.connector.kudu.source.KuduSource"
+  ],
+  "libs": [
+    "bitsail-connector-kudu-${version}.jar"
+  ]
+}
