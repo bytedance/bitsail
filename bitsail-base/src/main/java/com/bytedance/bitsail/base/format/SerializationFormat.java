@@ -21,7 +21,9 @@ package com.bytedance.bitsail.base.format;
 
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
-public interface SerializationFormat<T> {
+import java.io.Serializable;
+
+public interface SerializationFormat<T> extends Serializable {
 
   T createRuntimeSerializationSchema(TypeInfo<?>[] typeInfos);
 
