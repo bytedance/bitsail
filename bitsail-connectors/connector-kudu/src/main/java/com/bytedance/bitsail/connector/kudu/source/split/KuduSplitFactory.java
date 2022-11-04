@@ -40,15 +40,22 @@ public class KuduSplitFactory {
   public static AbstractKuduSplitConstructor getSplitConstructor(BitSailConfiguration jobConf,
                                                                  KuduClient client) {
     KuduSplitStrategy strategy = KuduSplitStrategy.valueOf(jobConf.get(KuduReaderOptions.SPLIT_STRATEGY));
+    AbstractKuduSplitConstructor constructor;
+
     switch (strategy) {
       case SIMPLE_DIVIDE:
         try {
-          return new SimpleDivideSplitConstructor(jobConf, client);
+          constructor = new SimpleDivideSplitConstructor(jobConf, client);
+          if (constructor.isAvailable()) {
+            break;
+          }
         } catch (IOException e) {
           LOG.warn("Failed to create SimpleDivideSplitConstructor, will try the next constructor type.");
         }
       default:
         throw new BitSailException(KuduErrorCode.SPLIT_ERROR, "Cannot create a split constructor.");
     }
+
+    return constructor;
   }
 }

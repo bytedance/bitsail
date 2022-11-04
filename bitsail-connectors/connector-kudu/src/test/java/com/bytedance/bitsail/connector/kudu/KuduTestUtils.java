@@ -111,7 +111,11 @@ public class KuduTestUtils {
       partialRow.addInt("field_int", randomRow.getInt(1));
       partialRow.addDouble("field_double", randomRow.getDouble(2));
       partialRow.addDate("field_date", randomRow.getSqlDate(3));
-      partialRow.addString("field_string", randomRow.getString(4));
+      if (i % 10 == 1) {
+        partialRow.setNull("field_string");
+      } else {
+        partialRow.addString("field_string", randomRow.getString(4));
+      }
       if (i % 10 == 1) {
         partialRow.setNull("field_binary");
       } else {

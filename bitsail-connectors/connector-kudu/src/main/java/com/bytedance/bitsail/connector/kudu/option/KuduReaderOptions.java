@@ -28,12 +28,11 @@ import java.util.List;
 
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
-import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
 
 public interface KuduReaderOptions extends ReaderOptions.BaseReaderOptions {
   @Essential
   ConfigOption<String> KUDU_TABLE_NAME =
-      key(WRITER_PREFIX + "kudu_table_name")
+      key(READER_PREFIX + "kudu_table_name")
           .noDefaultValue(String.class);
 
   @Essential

@@ -29,8 +29,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.google.common.collect.ImmutableSet;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kudu.ColumnSchema;
@@ -59,7 +58,7 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
   );
 
   private SplitConfiguration splitConf = null;
-  private boolean available = true;
+  private boolean available = false;
   private Function<RowResult, Long> valueGetter;
 
   public SimpleDivideSplitConstructor(BitSailConfiguration jobConf, KuduClient client) throws IOException {
@@ -160,10 +159,20 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
     return splits;
   }
 
+  @Override
+  public int estimateSplitNum() {
+    int estimatedSplitNum = 1;
+    if (splitConf.getSplitNum() != null && splitConf.getSplitNum() > 0) {
+      estimatedSplitNum = splitConf.getSplitNum();
+    }
+    LOG.info("Estimated split num is: {}", estimatedSplitNum);
+    return estimatedSplitNum;
+  }
+
   @AllArgsConstructor
-  @Getter
+  @Data
   @ToString(of = {"name", "splitNum", "lower", "upper"})
-  static class SplitConfiguration {
+  public static class SplitConfiguration {
 
     @JSONField(name = "name")
     private String name;
@@ -174,7 +183,6 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
     @JSONField(name = "upper_bound")
     private Long upper;
 
-    @Setter
     @JSONField(name = "split_num")
     private Integer splitNum;
 

@@ -21,7 +21,6 @@ package com.bytedance.bitsail.connector.kudu.source;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.kudu.KuduTestUtils;
 import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
-import com.bytedance.bitsail.connector.kudu.option.KuduWriterOptions;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
@@ -37,7 +36,7 @@ import java.util.stream.Collectors;
 
 public class KuduReaderITCase {
   private static final String TABLE_NAME = "test_kudu_table";
-  private static final int TOTAL_COUNT = 10000;
+  private static final int TOTAL_COUNT = 10;
 
   /**
    * Note that the tablet server number should be larger than hash buckets number.
@@ -53,7 +52,7 @@ public class KuduReaderITCase {
     KuduTestUtils.createTable(client, TABLE_NAME);
     KuduTestUtils.insertRandomData(client, TABLE_NAME, TOTAL_COUNT);
 
-    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("fake_to_kudu.json");
+    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("kudu_to_print.json");
     updateJobConf(jobConf);
     EmbeddedFlinkCluster.submitJob(jobConf);
   }
@@ -61,7 +60,7 @@ public class KuduReaderITCase {
   private void updateJobConf(BitSailConfiguration jobConf) {
     String masterAddressString = harness.getMasterAddressesAsString();
     List<String> masterAddressList = Arrays.stream(masterAddressString.split(",")).collect(Collectors.toList());
-    jobConf.set(KuduWriterOptions.MASTER_ADDRESS_LIST, masterAddressList);
+    jobConf.set(KuduReaderOptions.MASTER_ADDRESS_LIST, masterAddressList);
     jobConf.set(KuduReaderOptions.KUDU_TABLE_NAME, TABLE_NAME);
   }
 }
