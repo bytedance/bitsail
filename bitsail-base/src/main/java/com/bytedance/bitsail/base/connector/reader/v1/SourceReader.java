@@ -59,11 +59,15 @@ public interface SourceReader<T, SplitT extends SourceSplit> extends Serializabl
   /**
    * When all tasks finished snapshot, notify checkpoint complete will be invoked.
    */
-  void notifyCheckpointComplete(long checkpointId) throws Exception;
+  default void notifyCheckpointComplete(long checkpointId) throws Exception {
+
+  }
 
   interface Context {
 
     TypeInfo<?>[] getTypeInfos();
+
+    String[] getFieldNames();
 
     int getIndexOfSubtask();
 

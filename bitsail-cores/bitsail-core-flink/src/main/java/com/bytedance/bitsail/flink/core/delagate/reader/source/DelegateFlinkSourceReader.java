@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.bytedance.bitsail.base.constants.BaseMetricsNames.RECORD_INVOKE_LATENCY;
 
@@ -61,6 +62,7 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
   private final BitSailConfiguration commonConfiguration;
   private final BitSailConfiguration readerConfiguration;
   private final TypeInfo<?>[] sourceTypeInfos;
+  private final String[] fieldNames;
   private final List<ColumnInfo> columnInfos;
   private final String readerName;
 
@@ -92,6 +94,10 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
     this.readerName = readerName;
     this.sourceTypeInfos = typeInfos;
     this.columnInfos = readerConfiguration.get(ReaderOptions.BaseReaderOptions.COLUMNS);
+    this.fieldNames = columnInfos.stream()
+        .map(ColumnInfo::getName)
+        .collect(Collectors.toList())
+        .toArray(new String[] {});
 
     this.metricManager = new BitSailMetricManager(commonConfiguration,
         "input",
@@ -117,6 +123,11 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
           @Override
           public TypeInfo<?>[] getTypeInfos() {
             return sourceTypeInfos;
+          }
+
+          @Override
+          public String[] getFieldNames() {
+            return fieldNames;
           }
 
           @Override
