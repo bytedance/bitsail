@@ -174,7 +174,7 @@ public class JsonDeserializationSchema implements DeserializationSchema<byte[], 
       return this::convertToBoolean;
     }
     if (typeClass == TypeInfos.SHORT_TYPE_INFO.getTypeClass()) {
-      return jsonNode -> Short.parseShort(jsonNode.asText().trim());
+      return this::convertToShort;
     }
     if (typeClass == TypeInfos.INT_TYPE_INFO.getTypeClass()) {
       return this::convertToInt;
@@ -227,6 +227,13 @@ public class JsonDeserializationSchema implements DeserializationSchema<byte[], 
     }
     throw BitSailException.asBitSailException(JsonFormatErrorCode.JSON_FORMAT_COVERT_FAILED,
         String.format("Json format converter not support type info: %s.", typeInfo));
+  }
+
+  private Short convertToShort(JsonNode jsonNode) {
+    if (jsonNode.isShort()) {
+      return jsonNode.shortValue();
+    }
+    return Short.parseShort(jsonNode.asText().trim());
   }
 
   private Date convertToSqlDate(JsonNode jsonNode) {

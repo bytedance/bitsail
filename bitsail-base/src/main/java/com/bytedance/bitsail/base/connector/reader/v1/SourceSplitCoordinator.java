@@ -51,12 +51,24 @@ public interface SourceSplitCoordinator<SplitT extends SourceSplit, StateT> exte
 
     boolean isRestored();
 
+    /**
+     * Return the state to the split coordinator, for the exactly-once.
+     */
     StateT getRestoreState();
 
+    /**
+     * Return total parallelism of the source reader.
+     */
     int totalParallelism();
 
+    /**
+     * When Source reader started, it will be registered itself to coordinator.
+     */
     Set<Integer> registeredReaders();
 
+    /**
+     * Assign splits to reader.
+     */
     void assignSplit(int subtaskId, List<SplitT> splits);
 
     /**
@@ -64,13 +76,23 @@ public interface SourceSplitCoordinator<SplitT extends SourceSplit, StateT> exte
      */
     void signalNoMoreSplits(int subtask);
 
+    /**
+     * If split coordinator have any event want to send source reader, use this method.
+     * Like send Pause event to Source Reader in CDC2.0.
+     */
     void sendEventToSourceReader(int subtaskId, SourceEvent event);
 
+    /**
+     * Schedule to run the callable and handler, often used in un-boundedness mode.
+     */
     <T> void runAsync(Callable<T> callable,
                       BiConsumer<T, Throwable> handler,
                       int initialDelay,
                       long interval);
 
+    /**
+     * Just run callable and handler once, often used in boundedness mode.
+     */
     <T> void runAsyncOnce(Callable<T> callable,
                           BiConsumer<T, Throwable> handler);
   }

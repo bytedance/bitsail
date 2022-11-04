@@ -257,7 +257,7 @@ public class RocketMQSourceSplitCoordinator implements
   @Override
   public void addReader(int subtaskId) {
     LOG.info(
-        "Adding reader {} to RocketMQSourceEnumerator for consumer group {}.",
+        "Adding reader {} to RocketMQ Split Coordinator for consumer group {}.",
         subtaskId,
         consumerGroup);
     notifyReaderAssignmentResult();
