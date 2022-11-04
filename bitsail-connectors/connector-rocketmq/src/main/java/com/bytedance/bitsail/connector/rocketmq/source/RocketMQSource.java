@@ -103,13 +103,17 @@ public class RocketMQSource
         consumerGroup,
         UUID.randomUUID()
     ));
-    consumer.start();
-    Collection<MessageQueue> messageQueues = consumer.fetchMessageQueues(topic);
-    int adviceParallelism = Math.max(CollectionUtils.size(messageQueues) /
-        DEFAULT_ROCKETMQ_PARALLELISM_THRESHOLD, 1);
-    return ParallelismAdvice.builder()
-        .adviceParallelism(adviceParallelism)
-        .enforceDownStreamChain(true)
-        .build();
+    try {
+      consumer.start();
+      Collection<MessageQueue> messageQueues = consumer.fetchMessageQueues(topic);
+      int adviceParallelism = Math.max(CollectionUtils.size(messageQueues) / DEFAULT_ROCKETMQ_PARALLELISM_THRESHOLD, 1);
+
+      return ParallelismAdvice.builder()
+          .adviceParallelism(adviceParallelism)
+          .enforceDownStreamChain(true)
+          .build();
+    } finally {
+      consumer.shutdown();
+    }
   }
 }
