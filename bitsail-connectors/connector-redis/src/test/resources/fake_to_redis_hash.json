@@ -38,17 +38,14 @@
       "columns": [
         {
           "index": 0,
-          "name": "fake_key",
           "type": "string"
         },
         {
           "index": 1,
-          "name": "fake_hash_key",
           "type": "string"
         },
         {
           "index": 2,
-          "name": "fake_hash_value",
           "type": "string"
         }
       ]

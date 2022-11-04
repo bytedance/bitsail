@@ -20,7 +20,6 @@ package com.bytedance.bitsail.connector.redis.constant;
 public class RedisConstants {
 
   public static final int MAX_PARALLELISM_OUTPUT_REDIS = 5;
-
   public static final int DEFAULT_MAX_WAIT_TIME_IN_MILLS = 60000;
   public static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 2;
   public static final int DEFAULT_MAX_IDLE_CONNECTIONS = 2;

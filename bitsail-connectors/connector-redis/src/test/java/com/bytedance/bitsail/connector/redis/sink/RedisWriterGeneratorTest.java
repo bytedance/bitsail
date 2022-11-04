@@ -16,6 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.bytedance.bitsail.connector.redis.sink;
 
 import com.bytedance.bitsail.common.BitSailException;
@@ -37,7 +38,7 @@ public class RedisWriterGeneratorTest {
     // ttl < 0
     String redisType = "string";
     int ttl = -1;
-    String additionalKey = "dts_test";
+    String additionalKey = "bitsail_test";
     JedisCommandDescription redisCommandDescriptionWithoutTtl = redisWriterGenerator.initJedisCommandDescription(redisType, ttl, additionalKey);
     assertEquals(JedisCommand.SET, redisCommandDescriptionWithoutTtl.getJedisCommand());
     assertNull(redisCommandDescriptionWithoutTtl.getAdditionalTTL());
