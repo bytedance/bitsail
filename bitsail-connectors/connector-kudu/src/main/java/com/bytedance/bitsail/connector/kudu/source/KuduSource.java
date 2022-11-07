@@ -25,14 +25,12 @@ import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.extension.ParallelismComputable;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
-import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 import com.bytedance.bitsail.connector.kudu.core.KuduConstants;
 import com.bytedance.bitsail.connector.kudu.core.KuduFactory;
-import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
 import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
 import com.bytedance.bitsail.connector.kudu.source.reader.KuduSourceReader;
 import com.bytedance.bitsail.connector.kudu.source.split.AbstractKuduSplitConstructor;
@@ -87,7 +85,7 @@ public class KuduSource implements Source<Row, KuduSourceSplit, EmptyState>, Par
     if (selfConf.fieldExists(KuduReaderOptions.READER_PARALLELISM_NUM)) {
       parallelism = selfConf.get(KuduReaderOptions.READER_PARALLELISM_NUM);
     } else {
-      try (KuduFactory kuduFactory = new KuduFactory(jobConf, "reader")) {
+      try (KuduFactory kuduFactory = KuduFactory.initReaderFactory(jobConf)) {
         KuduClient client = kuduFactory.getClient();
         AbstractKuduSplitConstructor splitConstructor = KuduSplitFactory.getSplitConstructor(jobConf, client);
         parallelism = splitConstructor.estimateSplitNum();

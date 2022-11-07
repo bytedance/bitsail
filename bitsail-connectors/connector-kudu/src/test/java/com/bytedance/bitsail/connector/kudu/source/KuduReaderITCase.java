@@ -21,9 +21,11 @@ package com.bytedance.bitsail.connector.kudu.source;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.kudu.KuduTestUtils;
 import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
+import com.bytedance.bitsail.connector.kudu.source.split.strategy.SimpleDivideSplitConstructor;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.test.KuduTestHarness;
 import org.apache.kudu.test.cluster.MiniKuduCluster;
@@ -36,7 +38,8 @@ import java.util.stream.Collectors;
 
 public class KuduReaderITCase {
   private static final String TABLE_NAME = "test_kudu_table";
-  private static final int TOTAL_COUNT = 10;
+  private static final int TOTAL_COUNT = 1000;
+  private static final int SPLIT_NUM = 3;
 
   /**
    * Note that the tablet server number should be larger than hash buckets number.
@@ -62,5 +65,8 @@ public class KuduReaderITCase {
     List<String> masterAddressList = Arrays.stream(masterAddressString.split(",")).collect(Collectors.toList());
     jobConf.set(KuduReaderOptions.MASTER_ADDRESS_LIST, masterAddressList);
     jobConf.set(KuduReaderOptions.KUDU_TABLE_NAME, TABLE_NAME);
+
+    SimpleDivideSplitConstructor.SplitConfiguration splitConf = new SimpleDivideSplitConstructor.SplitConfiguration("key", 0L, (long) TOTAL_COUNT, SPLIT_NUM);
+    jobConf.set(KuduReaderOptions.SPLIT_CONFIGURATION, JSON.toJSONString(splitConf));
   }
 }

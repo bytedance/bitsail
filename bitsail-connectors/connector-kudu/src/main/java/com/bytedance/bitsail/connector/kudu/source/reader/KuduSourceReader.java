@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
   private static final Logger LOG = LoggerFactory.getLogger(KuduSourceReader.class);
@@ -46,16 +47,19 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
   private final KuduFactory kuduFactory;
   private final KuduScannerConstructor scannerConstructor;
 
+  private int totalSplitNum = 0;
+  private boolean hasNoMoreSplits = false;
+
   private Deque<KuduSourceSplit> splits;
   private final transient KuduRowDeserializer rowDeserializer;
 
   public KuduSourceReader(BitSailConfiguration jobConf) {
     this.tableName = jobConf.getNecessaryOption(KuduReaderOptions.KUDU_TABLE_NAME, KuduErrorCode.REQUIRED_VALUE);
 
-    this.kuduFactory = new KuduFactory(jobConf, "reader");
+    this.kuduFactory = KuduFactory.initReaderFactory(jobConf);
     this.scannerConstructor = new KuduScannerConstructor(jobConf);
     this.rowDeserializer = new KuduRowDeserializer(jobConf);
-
+    this.splits = new LinkedList<>();
     LOG.info("KuduReader is initialized.");
   }
 
@@ -64,9 +68,20 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
 
   @Override
   public void pollNext(SourcePipeline<Row> pipeline) throws Exception {
-    KuduSourceSplit split = splits.poll();
-    LOG.info("Begin to read split: {}", split.uniqSplitId());
+    while (!hasNoMoreSplits) {
+      try {
+        LOG.info("Wait all splits get prepared.");
+        TimeUnit.SECONDS.sleep(1);
+        return;
+      } catch (Exception ignored) {
+        // ignored
+      }
+    }
 
+    KuduSourceSplit split = splits.poll();
+    LOG.info("Begin to read split: {}=[{}]", split.uniqSplitId(), split.toFormatString(kuduFactory.getSchema(tableName)));
+
+    long scanCount = 0;
     KuduScanner scanner = scannerConstructor.createScanner(kuduFactory.getClient(), tableName, split);
     while (scanner.hasMoreRows()) {
       RowResultIterator rowResults = scanner.nextRows();
@@ -74,24 +89,33 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
         RowResult rowResult = rowResults.next();
         Row row = rowDeserializer.convert(rowResult);
         pipeline.output(row);
+        scanCount++;
       }
     }
     scanner.close();
 
-    LOG.info("Finish reading split: {}", split.uniqSplitId());
+    LOG.info("Finish reading {} rows from split: {}", scanCount, split.uniqSplitId());
   }
 
   @Override
   public void addSplits(List<KuduSourceSplit> splitList) {
-    if (splits == null) {
-      this.splits = new LinkedList<>();
-    }
+    totalSplitNum += splitList.size();
     splits.addAll(splitList);
   }
 
   @Override
+  public void notifyNoMoreSplits() {
+    this.hasNoMoreSplits = true;
+    LOG.info("No more splits will be assigned.");
+  }
+
+  @Override
   public boolean hasMoreElements() {
-    return !splits.isEmpty();
+    if (hasNoMoreSplits && splits.isEmpty()) {
+      LOG.info("Finish reading all {} splits.", totalSplitNum);
+      return false;
+    }
+    return true;
   }
 
   @Override

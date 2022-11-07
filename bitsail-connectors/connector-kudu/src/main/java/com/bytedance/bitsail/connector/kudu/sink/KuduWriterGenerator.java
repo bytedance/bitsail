@@ -54,7 +54,7 @@ public class KuduWriterGenerator<CommitT> implements WriterGenerator<Row, Commit
     this.writerConf = writerConfiguration;
 
     String tableName = writerConf.get(KuduWriterOptions.KUDU_TABLE_NAME);
-    KuduFactory kuduFactory = new KuduFactory(writerConf, "writer");
+    KuduFactory kuduFactory = KuduFactory.initWriterFactory(writerConf);
     KuduTable kuduTable = kuduFactory.getTable(tableName);
 
     // todo: add schema ddl

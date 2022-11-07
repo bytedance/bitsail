@@ -156,6 +156,9 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
     }
 
     LOG.info("Finally get {} splits.", splits.size());
+    for (int i = 0; i < splits.size(); ++i) {
+      LOG.info(">>> the {}-th split is: {}", i, splits.get(i).toFormatString(schema));
+    }
     return splits;
   }
 

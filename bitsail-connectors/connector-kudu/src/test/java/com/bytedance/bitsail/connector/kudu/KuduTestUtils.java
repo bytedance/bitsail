@@ -116,7 +116,7 @@ public class KuduTestUtils {
       } else {
         partialRow.addString("field_string", randomRow.getString(4));
       }
-      if (i % 10 == 1) {
+      if (i % 10 == 2) {
         partialRow.setNull("field_binary");
       } else {
         partialRow.addBinary("field_binary", randomRow.getString(5).getBytes());

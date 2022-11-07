@@ -24,6 +24,7 @@ import com.bytedance.bitsail.connector.kudu.core.config.KuduClientConfig;
 import com.bytedance.bitsail.connector.kudu.core.config.KuduSessionConfig;
 import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
 
+import org.apache.kudu.Schema;
 import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.client.KuduException;
 import org.apache.kudu.client.KuduSession;
@@ -44,7 +45,15 @@ public class KuduFactory implements Closeable, Serializable {
   private transient KuduClient kuduClient;
   private transient KuduSession kuduSession;
 
-  public KuduFactory(BitSailConfiguration jobConf, String role) {
+  public static KuduFactory initReaderFactory(BitSailConfiguration jobConf) {
+    return new KuduFactory(jobConf, "reader");
+  }
+
+  public static KuduFactory initWriterFactory(BitSailConfiguration jobConf) {
+    return new KuduFactory(jobConf, "writer");
+  }
+
+  private KuduFactory(BitSailConfiguration jobConf, String role) {
     // initialize client config
     role = role.trim();
     Preconditions.checkState("READER".equalsIgnoreCase(role) || "WRITER".equalsIgnoreCase(role));
@@ -133,6 +142,10 @@ public class KuduFactory implements Closeable, Serializable {
       LOG.error("Failed to open table {}.", tableName, e);
       throw new BitSailException(KuduErrorCode.OPEN_TABLE_ERROR, e.getMessage());
     }
+  }
+
+  public Schema getSchema(String tableName) throws BitSailException {
+    return getTable(tableName).getSchema();
   }
 
   public void closeCurrentClient() throws IOException {

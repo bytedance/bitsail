@@ -11,7 +11,7 @@
       "kudu_table_name": "kudu_test_table",
       "kudu_master_address_list": "localhost:1234",
       "read_mode": "READ_LATEST",
-      "split_config": "{\"name\": \"key\", \"lower_bound\": 0, \"upper_bound\": \"10000\", \"split_num\": 10}",
+      "split_config": "{\"name\": \"key\", \"lower_bound\": 0, \"upper_bound\": \"10000\", \"split_num\": 3}",
       "columns": [
         {
           "name": "key",
@@ -34,7 +34,7 @@
           "type": "date"
         },
         {
-          "name": "field_binary",
+          "name": "field_string",
           "type": "string"
         },
         {

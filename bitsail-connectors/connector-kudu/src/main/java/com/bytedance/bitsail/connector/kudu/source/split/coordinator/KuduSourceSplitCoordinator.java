@@ -29,6 +29,8 @@ import com.bytedance.bitsail.connector.kudu.source.split.KuduSourceSplit;
 import com.bytedance.bitsail.connector.kudu.source.split.KuduSplitFactory;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import lombok.NoArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.kudu.client.KuduClient;
 import org.slf4j.Logger;
@@ -42,6 +44,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class KuduSourceSplitCoordinator implements SourceSplitCoordinator<KuduSourceSplit, EmptyState> {
   private static final Logger LOG = LoggerFactory.getLogger(KuduSourceSplitCoordinator.class);
@@ -49,20 +52,18 @@ public class KuduSourceSplitCoordinator implements SourceSplitCoordinator<KuduSo
   private final SourceSplitCoordinator.Context<KuduSourceSplit, EmptyState> context;
   private final BitSailConfiguration jobConf;
   private final Map<Integer, Set<KuduSourceSplit>> splitAssignmentPlan;
-  private final Set<KuduSourceSplit> assignedSplits;
 
   public KuduSourceSplitCoordinator(Context<KuduSourceSplit, EmptyState> context,
                                     BitSailConfiguration jobConf) {
     this.context = context;
     this.jobConf = jobConf;
-    this.assignedSplits = new HashSet<>();
-    this.splitAssignmentPlan = new HashMap<>();
+    this.splitAssignmentPlan = Maps.newConcurrentMap();
   }
 
   @Override
   public void start() {
     List<KuduSourceSplit> splitList;
-    try (KuduFactory kuduFactory = new KuduFactory(jobConf, "reader")) {
+    try (KuduFactory kuduFactory = KuduFactory.initReaderFactory(jobConf)) {
       KuduClient client = kuduFactory.getClient();
       AbstractKuduSplitConstructor splitConstructor = KuduSplitFactory.getSplitConstructor(jobConf, client);
       splitList = splitConstructor.construct(client);
@@ -71,13 +72,14 @@ public class KuduSourceSplitCoordinator implements SourceSplitCoordinator<KuduSo
     }
 
     int readerNum = context.totalParallelism();
+    LOG.info("Found {} readers and {} splits.", readerNum, splitList.size());
     if (readerNum > splitList.size()) {
       LOG.error("Reader number {} is larger than split number {}.", readerNum, splitList.size());
     }
 
     for (KuduSourceSplit split : splitList) {
-      int readerIndex = getReaderIndex(split, readerNum);
-      splitAssignmentPlan.computeIfAbsent(readerIndex, HashSet::new).add(split);
+      int readerIndex = ReaderSelector.getReaderIndex(readerNum);
+      splitAssignmentPlan.computeIfAbsent(readerIndex, k -> new HashSet<>()).add(split);
       LOG.info("Will assign split {} to the {}-th reader", split.uniqSplitId(), readerIndex);
     }
   }
@@ -92,12 +94,14 @@ public class KuduSourceSplitCoordinator implements SourceSplitCoordinator<KuduSo
   public void addSplitsBack(List<KuduSourceSplit> splits, int subtaskId) {
     LOG.info("Source reader {} return splits {}.", subtaskId, splits);
 
-    int numReader = context.totalParallelism();
+    int readerNum = context.totalParallelism();
     for (KuduSourceSplit split : splits) {
-      int readerIndex = getReaderIndex(split, numReader);
-      splitAssignmentPlan.computeIfAbsent(readerIndex, HashSet::new).add(split);
+      int readerIndex = ReaderSelector.getReaderIndex(readerNum);
+      splitAssignmentPlan.computeIfAbsent(readerIndex, k -> new HashSet<>()).add(split);
       LOG.info("Re-assign split {} to the {}-th reader.", split.uniqSplitId(), readerIndex);
     }
+
+    tryAssignSplitsToReader();
   }
 
   private void tryAssignSplitsToReader() {
@@ -110,19 +114,13 @@ public class KuduSourceSplitCoordinator implements SourceSplitCoordinator<KuduSo
     }
 
     for (Integer readerIndex : splitsToAssign.keySet()) {
-      LOG.info("Try assigning splits reader {}, splits are: {}", readerIndex, splitsToAssign.get(readerIndex));
-
+      LOG.info("Try assigning splits reader {}, splits are: [{}]", readerIndex,
+          splitsToAssign.get(readerIndex).stream().map(KuduSourceSplit::getSplitId).collect(Collectors.toList()));
+      splitAssignmentPlan.remove(readerIndex);
       context.assignSplit(readerIndex, splitsToAssign.get(readerIndex));
       context.signalNoMoreSplits(readerIndex);
-      Set<KuduSourceSplit> remove = splitAssignmentPlan.remove(readerIndex);
-      assignedSplits.addAll(remove);
-
       LOG.info("Finish assigning splits reader {}", readerIndex);
     }
-  }
-
-  private static int getReaderIndex(KuduSourceSplit split, int totalReaderNum) {
-    return split.hashCode() % totalReaderNum;
   }
 
   @Override
@@ -138,5 +136,13 @@ public class KuduSourceSplitCoordinator implements SourceSplitCoordinator<KuduSo
   @Override
   public void close() {
     // empty
+  }
+
+  @NoArgsConstructor
+  static class ReaderSelector {
+    private static long readerIndex = 0;
+    public static int getReaderIndex(int totalReaderNum) {
+      return (int) readerIndex++ % totalReaderNum;
+    }
   }
 }

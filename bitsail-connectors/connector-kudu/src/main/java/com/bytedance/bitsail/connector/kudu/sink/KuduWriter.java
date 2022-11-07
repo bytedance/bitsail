@@ -58,7 +58,7 @@ public class KuduWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   public KuduWriter(BitSailConfiguration jobConf) {
     String kuduTableName = jobConf.getNecessaryOption(KuduWriterOptions.KUDU_TABLE_NAME, KuduErrorCode.REQUIRED_VALUE);
 
-    this.kuduFactory = new KuduFactory(jobConf, "writer");
+    this.kuduFactory = KuduFactory.initWriterFactory(jobConf);
     this.kuduSession = kuduFactory.getSession();
     this.kuduTable = kuduFactory.getTable(kuduTableName);
 

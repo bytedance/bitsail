@@ -53,7 +53,7 @@ public class KuduSourceSplit implements SourceSplit {
     properties.put("split_id", this.uniqSplitId());
 
     List<KuduPredicate> kuduPredicates = deserializePredicates(schema);
-    properties.put("predicates", kuduPredicates);
+    properties.put("predicates", kuduPredicates.toString());
 
     return new JSONObject(properties).toJSONString();
   }
