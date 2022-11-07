@@ -17,7 +17,6 @@
 
 package com.bytedance.bitsail.connector.hbase.sink;
 
-import com.bytedance.bitsail.base.enumerate.NullMode;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.column.Column;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
@@ -25,6 +24,7 @@ import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 import com.bytedance.bitsail.connector.hbase.HBaseHelper;
 import com.bytedance.bitsail.connector.hbase.auth.KerberosAuthenticator;
+import com.bytedance.bitsail.connector.hbase.constant.NullMode;
 import com.bytedance.bitsail.connector.hbase.error.HBasePluginErrorCode;
 import com.bytedance.bitsail.connector.hbase.option.HBaseWriterOptions;
 import com.bytedance.bitsail.connector.hbase.sink.function.FunctionParser;

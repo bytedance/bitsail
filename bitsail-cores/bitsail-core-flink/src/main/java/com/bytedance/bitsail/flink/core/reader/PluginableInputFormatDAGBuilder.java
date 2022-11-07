@@ -20,6 +20,7 @@ package com.bytedance.bitsail.flink.core.reader;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.ProcessResult;
 import com.bytedance.bitsail.base.extension.GlobalCommittable;
+import com.bytedance.bitsail.base.extension.ParallelismComputable;
 import com.bytedance.bitsail.base.extension.SchemaAlignmentable;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.BitSailException;
@@ -31,7 +32,6 @@ import com.bytedance.bitsail.flink.core.constants.TypeSystem;
 import com.bytedance.bitsail.flink.core.execution.FlinkExecutionEnviron;
 import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatPlugin;
 import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatSourceFunction;
-import com.bytedance.bitsail.flink.core.parallelism.SelfParallelismAdvice;
 import com.bytedance.bitsail.flink.core.parallelism.batch.FlinkBatchReaderParallelismComputer;
 import com.bytedance.bitsail.flink.core.plugins.InputAdapter;
 
@@ -160,8 +160,8 @@ public class PluginableInputFormatDAGBuilder<T extends Row, Split extends InputS
 
     Stopwatch stopwatch = Stopwatch.createStarted();
     try {
-      if (inputFormatPlugin instanceof SelfParallelismAdvice) {
-        return ((SelfParallelismAdvice) inputFormatPlugin).advice();
+      if (inputFormatPlugin instanceof ParallelismComputable) {
+        return ((ParallelismComputable) inputFormatPlugin).getParallelismAdvice(commonConf, readerConf, upstreamAdvice);
       }
 
       FlinkBatchReaderParallelismComputer parallelismComputer = new FlinkBatchReaderParallelismComputer(commonConf);
