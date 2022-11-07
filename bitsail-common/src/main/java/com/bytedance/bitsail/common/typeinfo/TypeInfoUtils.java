@@ -25,6 +25,7 @@ import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.BitSailTypeParser;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
@@ -45,7 +46,12 @@ public class TypeInfoUtils {
       }
       List<TypeProperty> typeProperties = BitSailTypeParser
           .fromTypePropertyString(columnInfos.get(index).getProperties());
-      typeInfo.setTypeProperties(typeProperties);
+
+      //1. type property should not share in same type definition, so we need create a new one.
+      //2. type property only support in basic type info.
+      if (typeInfo instanceof BasicTypeInfo && CollectionUtils.isNotEmpty(typeProperties)) {
+        typeInfo = new BasicTypeInfo<>(typeInfo.getTypeClass(), typeProperties);
+      }
       fieldTypes[index] = typeInfo;
     }
     return fieldTypes;

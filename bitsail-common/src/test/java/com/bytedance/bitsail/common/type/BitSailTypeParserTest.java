@@ -19,8 +19,13 @@
 
 package com.bytedance.bitsail.common.type;
 
+import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfoUtils;
 import com.bytedance.bitsail.common.typeinfo.TypeProperty;
 
+import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -43,4 +48,27 @@ public class BitSailTypeParserTest {
     Assert.assertEquals(TypeProperty.NOT_NULL, uniqWithNotNullTypePropertyProperties.get(1));
   }
 
+  @Test
+  public void fromTypePropertyForSameTypeString() {
+    BitSailTypeInfoConverter bitSailTypeInfoConverter = new BitSailTypeInfoConverter();
+    List<ColumnInfo> columnInfos = Lists.newArrayList();
+    ColumnInfo columnInfo1 = ColumnInfo
+        .builder()
+        .type("bigint")
+        .name("bigint_1")
+        .build();
+    columnInfo1.setProperties("unique");
+    ColumnInfo columnInfo2 = ColumnInfo
+        .builder()
+        .type("bigint")
+        .name("bigint_2")
+        .build();
+    columnInfos.add(columnInfo1);
+    columnInfos.add(columnInfo2);
+
+    TypeInfo<?>[] typeInfos = TypeInfoUtils.getTypeInfos(bitSailTypeInfoConverter, columnInfos);
+    Assert.assertEquals(CollectionUtils.size(typeInfos[0].getTypeProperties()), 1);
+    Assert.assertEquals(typeInfos[0].getTypeProperties().get(0), TypeProperty.UNIQUE);
+    Assert.assertEquals(CollectionUtils.size(typeInfos[1].getTypeProperties()), 0);
+  }
 }
