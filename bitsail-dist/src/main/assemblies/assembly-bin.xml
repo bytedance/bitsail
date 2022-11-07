@@ -61,6 +61,7 @@ under the License.
             <excludes>
                 <exclude>com.bytedance.bitsail:bitsail-connector-messagequeue</exclude>
                 <exclude>com.bytedance.bitsail:bitsail-connector-streamingfile-common</exclude>
+                <exclude>com.bytedance.bitsail:connector-base</exclude>
             </excludes>
             <outputFileNameMapping>${artifact.file.name}</outputFileNameMapping>
         </dependencySet>
