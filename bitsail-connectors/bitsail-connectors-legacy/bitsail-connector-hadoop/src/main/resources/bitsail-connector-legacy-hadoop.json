@@ -1,5 +1,5 @@
 {
-  "name": "bitsail-connector-hadoop",
+  "name": "bitsail-connector-legacy-hadoop",
   "classes": [
     "com.bytedance.bitsail.connector.hadoop.source.HadoopInputFormat"
   ],

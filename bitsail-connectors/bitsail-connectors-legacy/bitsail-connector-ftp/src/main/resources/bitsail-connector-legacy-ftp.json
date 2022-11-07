@@ -1,5 +1,5 @@
 {
-  "name": "bitsail-connector-ftp",
+  "name": "bitsail-connector-legacy-ftp",
   "classes": [
     "com.bytedance.bitsail.connector.legacy.ftp.source.FtpInputFormat"
   ],

@@ -53,7 +53,7 @@ Elasticsearch连接器支持基本的字段类型:
 
 | 参数名称     | 参数默认值 | 参数枚举值 | 参数含义                                                                                                    |
 |:---------|:------|:------|:--------------------------------------------------------------------------------------------------------|
-| class    | -     |       | Elasticsearch连接器类名，只能为`com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchWriterGenerator` |
+| class    | -     |       | Elasticsearch连接器类名，只能为`com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchSink` |
 | es_hosts | -     |       | Elasticsearch集群接受restful请求的地址列表                                                                         |
 | es_index | -     |       | 要写入的elasticsearch索引                                                                                     |
 | columns  | -     |       | 数据字段名称及类型                                                                                               |

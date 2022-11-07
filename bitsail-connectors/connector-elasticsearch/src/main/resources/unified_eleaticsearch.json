@@ -1,9 +1,0 @@
-{
-  "name": "bitsail-connector-elasticsearch",
-  "classes": [
-    "com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchWriterGenerator"
-  ],
-  "libs": [
-    "bitsail-connector-elasticsearch-${version}.jar"
-  ]
-}

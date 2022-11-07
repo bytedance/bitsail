@@ -1,5 +1,5 @@
 {
-  "name": "bitsail-connector-streamingfile",
+  "name": "bitsail-connector-legacy-streamingfile",
   "classes": [
     "com.bytedance.bitsail.connector.legacy.streamingfile.sink.FileSystemSinkFunctionDAGBuilder"
   ],

@@ -17,10 +17,9 @@
 
 package com.bytedance.bitsail.flink.core.delagate.writer;
 
+import com.bytedance.bitsail.base.connector.writer.v1.Sink;
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
-import com.bytedance.bitsail.base.connector.writer.v1.WriterGenerator;
 import com.bytedance.bitsail.base.connector.writer.v1.comittable.CommittableMessage;
-import com.bytedance.bitsail.base.connector.writer.v1.context.SimpleWriterContext;
 import com.bytedance.bitsail.base.dirty.AbstractDirtyCollector;
 import com.bytedance.bitsail.base.messenger.Messenger;
 import com.bytedance.bitsail.base.messenger.common.MessageType;
@@ -41,10 +40,10 @@ import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConvertSerial
 import com.bytedance.bitsail.flink.core.delagate.serializer.DelegateSimpleVersionedSerializer;
 import com.bytedance.bitsail.flink.core.runtime.RuntimeContextInjectable;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.flink.api.common.state.ListState;
 import org.apache.flink.api.common.state.ListStateDescriptor;
@@ -61,7 +60,9 @@ import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 import org.apache.flink.types.Row;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -71,20 +72,21 @@ import static com.bytedance.bitsail.base.constants.BaseMetricsNames.RECORD_INVOK
 /**
  * Created 2022/6/10
  */
-public class DelegateFlinkWriter<InputT, CommitT, WriterStateT> extends AbstractStreamOperator<CommittableMessage<CommitT>> implements
+public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterStateT extends Serializable> extends AbstractStreamOperator<CommittableMessage<CommitT>>
+    implements
     CheckpointListener, BoundedOneInput, OneInputStreamOperator<InputT, CommittableMessage<CommitT>> {
 
   private static final ListStateDescriptor<byte[]> WRITE_STATES_DESCRIPTOR =
       new ListStateDescriptor<byte[]>("write-states", PrimitiveArrayTypeInfo.BYTE_PRIMITIVE_ARRAY_TYPE_INFO);
   private final boolean isCheckpointingEnabled;
-  private final WriterGenerator<InputT, CommitT, WriterStateT> writerGenerator;
+  private final Sink<InputT, CommitT, WriterStateT> sink;
   private final BitSailConfiguration writerConfiguration;
   private final BitSailConfiguration commonConfiguration;
   private final FlinkRowConvertSerializer flinkRowConvertSerializer;
   private final TypeInfo<?>[] typeInfos;
   private transient Writer<InputT, CommitT, WriterStateT> writer;
   private transient ListState<WriterStateT> writeState;
-  private DelegateSimpleVersionedSerializer<WriterStateT> writeStateSerializer;
+  private final DelegateSimpleVersionedSerializer<WriterStateT> writeStateSerializer;
   private boolean endOfInput = false;
 
   @Setter
@@ -100,17 +102,17 @@ public class DelegateFlinkWriter<InputT, CommitT, WriterStateT> extends Abstract
 
   public DelegateFlinkWriter(BitSailConfiguration commonConfiguration,
                              BitSailConfiguration writerConfiguration,
-                             WriterGenerator<InputT, CommitT, WriterStateT> writerGenerator,
+                             Sink<InputT, CommitT, WriterStateT> sink,
                              boolean isCheckpointingEnabled) {
     super();
     this.isCheckpointingEnabled = isCheckpointingEnabled;
     this.commonConfiguration = commonConfiguration;
     this.writerConfiguration = writerConfiguration;
-    this.writerGenerator = writerGenerator;
+    this.sink = sink;
 
     List<ColumnInfo> columnInfos = writerConfiguration.get(WriterOptions.BaseWriterOptions.COLUMNS);
     this.typeInfos = TypeInfoUtils
-        .getTypeInfos(writerGenerator.createTypeInfoConverter(),
+        .getTypeInfos(sink.createTypeInfoConverter(),
             columnInfos);
 
     this.flinkRowConvertSerializer = new FlinkRowConvertSerializer(
@@ -118,14 +120,8 @@ public class DelegateFlinkWriter<InputT, CommitT, WriterStateT> extends Abstract
         columnInfos,
         this.commonConfiguration);
 
-    if (isCheckpointingEnabled) {
-      Preconditions.checkArgument(writerGenerator.getWriteStateSerializer().isPresent(),
-          "Writer state serializer should not be null when enable checkpoint.");
-      this.writeStateSerializer = DelegateSimpleVersionedSerializer
-          .delegate(writerGenerator.getWriteStateSerializer().get());
-    } else {
-      this.writeStateSerializer = null;
-    }
+    this.writeStateSerializer = DelegateSimpleVersionedSerializer
+        .delegate(sink.getWriteStateSerializer());
 
   }
 
@@ -146,7 +142,7 @@ public class DelegateFlinkWriter<InputT, CommitT, WriterStateT> extends Abstract
         false,
         ImmutableList.of(
             Pair.newPair("instance", String.valueOf(commonConfiguration.get(CommonOptions.INSTANCE_ID))),
-            Pair.newPair("type", writerGenerator.getWriterName()),
+            Pair.newPair("type", sink.getWriterName()),
             Pair.newPair("task", String.valueOf(taskId))
         )
     );
@@ -156,22 +152,37 @@ public class DelegateFlinkWriter<InputT, CommitT, WriterStateT> extends Abstract
   @Override
   public void initializeState(StateInitializationContext context) throws Exception {
     super.initializeState(context);
-    SimpleWriterContext simpleWriterContext =
-        new SimpleWriterContext(typeInfos, getRuntimeContext().getIndexOfThisSubtask());
-    if (!isCheckpointingEnabled) {
-      writer = writerGenerator.createWriter(writerConfiguration, simpleWriterContext);
-      return;
-    }
     ListState<byte[]> rawWriteState = context
         .getOperatorStateStore()
         .getListState(WRITE_STATES_DESCRIPTOR);
 
     writeState = new SimpleVersionedListState<>(rawWriteState, writeStateSerializer);
-    if (context.isRestored()) {
-      writer = writerGenerator.restoreWriter(writerConfiguration, Lists.newArrayList(writeState.get()), simpleWriterContext);
-    } else {
-      writer = writerGenerator.createWriter(writerConfiguration, simpleWriterContext);
-    }
+    Writer.Context<WriterStateT> writeSinkContext = new Writer.Context<WriterStateT>() {
+
+      @Override
+      public TypeInfo<?>[] getTypeInfos() {
+        return typeInfos;
+      }
+
+      @Override
+      public int getIndexOfSubTaskId() {
+        return getRuntimeContext().getIndexOfThisSubtask();
+      }
+
+      @Override
+      public boolean isRestored() {
+        return isCheckpointingEnabled && context.isRestored();
+      }
+
+      @SneakyThrows
+      @Override
+      public List<WriterStateT> getRestoreStates() {
+        return isCheckpointingEnabled && context.isRestored() ?
+            Lists.newArrayList(writeState.get()) :
+            Collections.emptyList();
+      }
+    };
+    writer = sink.createWriter(writeSinkContext);
   }
 
   @Override

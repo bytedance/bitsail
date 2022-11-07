@@ -17,21 +17,20 @@
 
 package com.bytedance.bitsail.connector.elasticsearch.sink;
 
+import com.bytedance.bitsail.base.connector.writer.v1.Sink;
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.base.connector.writer.v1.WriterCommitter;
-import com.bytedance.bitsail.base.connector.writer.v1.WriterGenerator;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
-import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 import com.bytedance.bitsail.connector.elasticsearch.base.EsConstants;
 
-import java.util.List;
+import java.io.Serializable;
 import java.util.Optional;
 
-public class ElasticsearchWriterGenerator<CommitT> implements WriterGenerator<Row, CommitT, EmptyState> {
+public class ElasticsearchSink<CommitT extends Serializable> implements Sink<Row, CommitT, EmptyState> {
 
   private BitSailConfiguration writerConf;
 
@@ -46,15 +45,8 @@ public class ElasticsearchWriterGenerator<CommitT> implements WriterGenerator<Ro
   }
 
   @Override
-  public Writer<Row, CommitT, EmptyState> createWriter(BitSailConfiguration writerConfiguration, Writer.Context context) {
+  public Writer<Row, CommitT, EmptyState> createWriter(Writer.Context<EmptyState> context) {
     return new ElasticsearchWriter<>(writerConf);
-  }
-
-  @Override
-  public Writer<Row, CommitT, EmptyState> restoreWriter(BitSailConfiguration writerConfiguration,
-                                                        List<EmptyState> writerStates,
-                                                        Writer.Context context) {
-    return createWriter(writerConf, context);
   }
 
   @Override
@@ -67,24 +59,4 @@ public class ElasticsearchWriterGenerator<CommitT> implements WriterGenerator<Ro
     return Optional.empty();
   }
 
-  @Override
-  public Optional<BinarySerializer<CommitT>> getCommittableSerializer() {
-    return Optional.empty();
-  }
-
-  @Override
-  public Optional<BinarySerializer<EmptyState>> getWriteStateSerializer() {
-    BinarySerializer<EmptyState> serializer = new BinarySerializer<EmptyState>() {
-      @Override
-      public byte[] serialize(EmptyState obj) {
-        return new byte[0];
-      }
-
-      @Override
-      public EmptyState deserialize(byte[] serialized) {
-        return EmptyState.fromBytes();
-      }
-    };
-    return Optional.of(serializer);
-  }
 }

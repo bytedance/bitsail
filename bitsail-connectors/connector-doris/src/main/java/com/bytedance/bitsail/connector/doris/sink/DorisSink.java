@@ -17,9 +17,9 @@
 
 package com.bytedance.bitsail.connector.doris.sink;
 
+import com.bytedance.bitsail.base.connector.writer.v1.Sink;
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.base.connector.writer.v1.WriterCommitter;
-import com.bytedance.bitsail.base.connector.writer.v1.WriterGenerator;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
@@ -52,11 +52,12 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-public class DorisWriterGenerator<InputT> implements WriterGenerator<InputT, DorisCommittable, DorisWriterState> {
-  private static final Logger LOG = LoggerFactory.getLogger(DorisWriterGenerator.class);
+public class DorisSink<InputT> implements Sink<InputT, DorisCommittable, DorisWriterState> {
+  private static final Logger LOG = LoggerFactory.getLogger(DorisSink.class);
   private DorisExecutionOptions.WRITE_MODE writeMode;
   private DorisOptions dorisOptions;
   private DorisExecutionOptions dorisExecutionOptions;
+  private BitSailConfiguration writerConfiguration;
 
   @Override
   public String getWriterName() {
@@ -65,6 +66,7 @@ public class DorisWriterGenerator<InputT> implements WriterGenerator<InputT, Dor
 
   @Override
   public void configure(BitSailConfiguration commonConfiguration, BitSailConfiguration writerConfiguration) throws IOException {
+    this.writerConfiguration = writerConfiguration;
     this.writeMode =
         DorisExecutionOptions.WRITE_MODE.valueOf(writerConfiguration.get(DorisWriterOptions.SINK_WRITE_MODE).toUpperCase());
     initDorisExecutionOptions(writerConfiguration);
@@ -86,13 +88,8 @@ public class DorisWriterGenerator<InputT> implements WriterGenerator<InputT, Dor
   }
 
   @Override
-  public Writer<InputT, DorisCommittable, DorisWriterState> createWriter(BitSailConfiguration writerConfiguration, Writer.Context context) {
+  public Writer<InputT, DorisCommittable, DorisWriterState> createWriter(Writer.Context<DorisWriterState> context) {
     return new DorisWriter(writerConfiguration, dorisOptions, dorisExecutionOptions);
-  }
-
-  @Override
-  public Writer<InputT, DorisCommittable, DorisWriterState> restoreWriter(BitSailConfiguration writerConfiguration, List writerStates, Writer.Context context) {
-    return createWriter(writerConfiguration, null);
   }
 
   @Override
@@ -106,13 +103,13 @@ public class DorisWriterGenerator<InputT> implements WriterGenerator<InputT, Dor
   }
 
   @Override
-  public Optional<BinarySerializer<DorisCommittable>> getCommittableSerializer() {
-    return Optional.of(new DorisCommittableSerializer());
+  public BinarySerializer<DorisCommittable> getCommittableSerializer() {
+    return new DorisCommittableSerializer();
   }
 
   @Override
-  public Optional<BinarySerializer<DorisWriterState>> getWriteStateSerializer() {
-    return Optional.of(new SimpleBinarySerializer<DorisWriterState>());
+  public BinarySerializer<DorisWriterState> getWriteStateSerializer() {
+    return new SimpleBinarySerializer<DorisWriterState>();
   }
 
   private void initDorisOptions(BitSailConfiguration writerConfiguration) {

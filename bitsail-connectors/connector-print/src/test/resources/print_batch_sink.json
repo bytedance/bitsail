@@ -32,7 +32,7 @@
       ]
     },
     "writer": {
-      "class": "com.bytedance.bitsail.connector.print.sink.PrintWriterGenerator",
+      "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
       "content_type": "json",
       "batch_size": 10,
       "columns": [
