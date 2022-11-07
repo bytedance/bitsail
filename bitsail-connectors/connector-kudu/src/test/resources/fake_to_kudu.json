@@ -44,7 +44,7 @@
       ]
     },
     "writer": {
-      "class": "com.bytedance.bitsail.connector.kudu.sink.KuduWriterGenerator",
+      "class": "com.bytedance.bitsail.connector.kudu.sink.KuduSink",
       "kudu_worker_count": 2,
       "columns": [
         {

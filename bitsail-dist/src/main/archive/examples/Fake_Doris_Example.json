@@ -57,7 +57,7 @@
       ]
     },
     "writer": {
-      "class": "com.bytedance.bitsail.connector.doris.sink.DorisWriterGenerator",
+      "class": "com.bytedance.bitsail.connector.doris.sink.DorisSink",
       "fe_hosts": "<your doris fe hosts>",
       "mysql_hosts": "<your doris jdbc hosts>",
       "user": "<user name>",

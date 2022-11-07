@@ -18,12 +18,9 @@
 
 package com.bytedance.bitsail.connector.kudu.sink;
 
+import com.bytedance.bitsail.base.connector.writer.v1.Sink;
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
-import com.bytedance.bitsail.base.connector.writer.v1.WriterCommitter;
-import com.bytedance.bitsail.base.connector.writer.v1.WriterGenerator;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
-import com.bytedance.bitsail.base.serializer.BinarySerializer;
-import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.row.Row;
@@ -36,10 +33,10 @@ import com.bytedance.bitsail.connector.kudu.util.KuduSchemaUtils;
 
 import org.apache.kudu.client.KuduTable;
 
+import java.io.Serializable;
 import java.util.List;
-import java.util.Optional;
 
-public class KuduWriterGenerator<CommitT> implements WriterGenerator<Row, CommitT, EmptyState> {
+public class KuduSink<CommitT extends Serializable> implements Sink<Row, CommitT, EmptyState> {
 
   private BitSailConfiguration writerConf;
 
@@ -62,32 +59,12 @@ public class KuduWriterGenerator<CommitT> implements WriterGenerator<Row, Commit
   }
 
   @Override
-  public Writer<Row, CommitT, EmptyState> createWriter(BitSailConfiguration writerConfiguration, Writer.Context context) {
+  public Writer<Row, CommitT, EmptyState> createWriter(Writer.Context<EmptyState> context) {
     return new KuduWriter<>(writerConf);
-  }
-
-  @Override
-  public Writer<Row, CommitT, EmptyState> restoreWriter(BitSailConfiguration writerConfiguration, List<EmptyState> writerStates, Writer.Context context) {
-    return createWriter(writerConf, context);
   }
 
   @Override
   public TypeInfoConverter createTypeInfoConverter() {
     return new FileMappingTypeInfoConverter(getWriterName());
-  }
-
-  @Override
-  public Optional<WriterCommitter<CommitT>> createCommitter() {
-    return Optional.empty();
-  }
-
-  @Override
-  public Optional<BinarySerializer<CommitT>> getCommittableSerializer() {
-    return Optional.empty();
-  }
-
-  @Override
-  public Optional<BinarySerializer<EmptyState>> getWriteStateSerializer() {
-    return Optional.of(new SimpleBinarySerializer<>());
   }
 }
