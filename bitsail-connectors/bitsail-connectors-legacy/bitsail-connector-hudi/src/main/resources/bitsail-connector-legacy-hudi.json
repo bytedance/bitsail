@@ -1,5 +1,5 @@
 {
-  "name": "bitsail-connector-hudi",
+  "name": "bitsail-connector-legacy-hudi",
   "classes": [
     "com.bytedance.bitsail.connector.legacy.hudi.dag.HudiSinkFunctionDAGBuilder",
     "com.bytedance.bitsail.connector.legacy.hudi.dag.HudiSourceFunctionDAGBuilder",

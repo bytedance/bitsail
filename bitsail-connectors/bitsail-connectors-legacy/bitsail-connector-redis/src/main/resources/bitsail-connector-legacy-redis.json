@@ -1,5 +1,5 @@
 {
-  "name": "bitsail-connector-redis",
+  "name": "bitsail-connector-legacy-redis",
   "classes": [
     "com.bytedance.bitsail.connector.legacy.redis.source.RedisOutputFormat"
   ],

@@ -17,8 +17,8 @@
 
 package com.bytedance.bitsail.flink.core.writer;
 
+import com.bytedance.bitsail.base.connector.writer.v1.Sink;
 import com.bytedance.bitsail.base.connector.writer.v1.WriterCommitter;
-import com.bytedance.bitsail.base.connector.writer.v1.WriterGenerator;
 import com.bytedance.bitsail.base.connector.writer.v1.comittable.CommittableMessage;
 import com.bytedance.bitsail.base.dirty.AbstractDirtyCollector;
 import com.bytedance.bitsail.base.dirty.DirtyCollectorFactory;
@@ -45,17 +45,18 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 /**
  * Created 2022/6/10
  */
-public class FlinkWriterBuilder<InputT, CommitT, WriterStateT>
+public class FlinkWriterBuilder<InputT, CommitT extends Serializable, WriterStateT extends Serializable>
     extends FlinkDataWriterDAGBuilder<InputT> implements GlobalCommittable {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlinkWriterBuilder.class);
 
-  private final WriterGenerator<InputT, CommitT, WriterStateT> writerGenerator;
+  private final Sink<InputT, CommitT, WriterStateT> sink;
 
   private boolean isBatchMode;
 
@@ -71,8 +72,8 @@ public class FlinkWriterBuilder<InputT, CommitT, WriterStateT>
 
   private Channel channel;
 
-  public FlinkWriterBuilder(WriterGenerator<InputT, CommitT, WriterStateT> writerGenerator) {
-    this.writerGenerator = writerGenerator;
+  public FlinkWriterBuilder(Sink<InputT, CommitT, WriterStateT> sink) {
+    this.sink = sink;
   }
 
   @Override
@@ -82,7 +83,7 @@ public class FlinkWriterBuilder<InputT, CommitT, WriterStateT>
     this.commonConfiguration = execution.getCommonConfiguration();
     this.writerConfiguration = writerConfiguration;
 
-    writerGenerator.configure(execution.getCommonConfiguration(), writerConfiguration);
+    sink.configure(execution.getCommonConfiguration(), writerConfiguration);
 
     this.messengerContext = SimpleMessengerContext.builder()
         .messengerGroup(MessengerGroup.WRITER)
@@ -107,7 +108,7 @@ public class FlinkWriterBuilder<InputT, CommitT, WriterStateT>
     DelegateFlinkWriter<InputT, CommitT, WriterStateT> flinkWriter = new DelegateFlinkWriter<>(
         commonConfiguration,
         writerConfiguration,
-        writerGenerator,
+        sink,
         isCheckpointingEnabled);
     flinkWriter.setMessenger(messenger);
     flinkWriter.setDirtyCollector(dirtyCollector);
@@ -120,7 +121,7 @@ public class FlinkWriterBuilder<InputT, CommitT, WriterStateT>
         .name(getWriterOperatorName())
         .uid(getWriterOperatorName());
 
-    Optional<WriterCommitter<CommitT>> committer = writerGenerator.createCommitter();
+    Optional<WriterCommitter<CommitT>> committer = sink.createCommitter();
     if (committer.isPresent()) {
       LOG.info("Writer enabled committer.");
       DataStream<CommittableMessage<CommitT>> commitStream = writeStream
@@ -129,7 +130,7 @@ public class FlinkWriterBuilder<InputT, CommitT, WriterStateT>
               TypeInformation.of(new TypeHint<CommittableMessage<CommitT>>() {
               }),
               DelegateFlinkCommitter.of(committer.get(),
-                  writerGenerator.getCommittableSerializer(), isBatchMode, isCheckpointingEnabled))
+                  sink.getCommittableSerializer(), isBatchMode, isCheckpointingEnabled))
           .uid(getWriterCommitterOperatorName())
           .name(getWriterCommitterOperatorName())
           .setParallelism(writerParallelism);
@@ -142,7 +143,7 @@ public class FlinkWriterBuilder<InputT, CommitT, WriterStateT>
 
   @Override
   public String getWriterName() {
-    return writerGenerator.getWriterName();
+    return sink.getWriterName();
   }
 
   private String getWriterOperatorName() {

@@ -18,7 +18,7 @@
 package com.bytedance.bitsail.core.writer;
 
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
-import com.bytedance.bitsail.base.connector.writer.v1.WriterGenerator;
+import com.bytedance.bitsail.base.connector.writer.v1.Sink;
 import com.bytedance.bitsail.base.execution.Mode;
 import com.bytedance.bitsail.base.packages.PackageManager;
 import com.bytedance.bitsail.common.BitSailException;
@@ -62,8 +62,8 @@ public class DataWriterBuilderFactory {
                                                                  PackageManager packageManager) throws Exception {
 
     Class<T> writerClass = DataWriterBuilderFactory.<T>getWriterClass(globalConfiguration, packageManager);
-    if (WriterGenerator.class.isAssignableFrom(writerClass)) {
-      return new FlinkWriterBuilder((WriterGenerator<?, ?, ?>) writerClass.getConstructor().newInstance());
+    if (Sink.class.isAssignableFrom(writerClass)) {
+      return new FlinkWriterBuilder((Sink<?, ?, ?>) writerClass.getConstructor().newInstance());
     }
     if (DataWriterDAGBuilder.class.isAssignableFrom(writerClass)) {
       return (DataWriterDAGBuilder) writerClass.getConstructor().newInstance();
