@@ -216,7 +216,7 @@
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-rocketmq</artifactId>
+            <artifactId>connector-rocketmq</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>
