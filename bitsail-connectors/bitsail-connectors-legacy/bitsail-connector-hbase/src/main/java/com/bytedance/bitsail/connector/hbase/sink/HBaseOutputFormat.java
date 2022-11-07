@@ -17,7 +17,7 @@
 
 package com.bytedance.bitsail.connector.hbase.sink;
 
-import com.bytedance.bitsail.base.enumerate.NullMode;
+import com.bytedance.bitsail.connector.hbase.constant.NullMode;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.column.Column;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;

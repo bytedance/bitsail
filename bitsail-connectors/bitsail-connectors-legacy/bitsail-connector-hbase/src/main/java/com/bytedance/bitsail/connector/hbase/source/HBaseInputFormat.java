@@ -17,10 +17,12 @@
 
 package com.bytedance.bitsail.connector.hbase.source;
 
+import com.bytedance.bitsail.base.extension.ParallelismComputable;
 import com.bytedance.bitsail.base.format.DeserializationFormat;
 import com.bytedance.bitsail.base.format.DeserializationSchema;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.constants.Constants;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.ReaderOptions;
@@ -34,7 +36,6 @@ import com.bytedance.bitsail.connector.hbase.HBaseHelper;
 import com.bytedance.bitsail.connector.hbase.error.HBasePluginErrorCode;
 import com.bytedance.bitsail.connector.hbase.option.HBaseReaderOptions;
 import com.bytedance.bitsail.connector.hbase.source.split.RegionSplit;
-import com.bytedance.bitsail.flink.core.parallelism.SelfParallelismAdvice;
 
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
@@ -81,7 +82,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, InputSplit>
-    implements ResultTypeQueryable<Row>, SelfParallelismAdvice {
+    implements ResultTypeQueryable<Row>, ParallelismComputable {
   private static final Logger LOG = LoggerFactory.getLogger(HBaseInputFormat.class);
   private static final String ROW_KEY = "rowkey";
 
@@ -132,7 +133,7 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
   private RowTypeInfo rowTypeInfo;
   private List<String> columnNames;
   private Set<String> columnFamilies;
-  private DeserializationFormat<byte[][], Row> deserializationFormat;
+  private transient DeserializationFormat<byte[][], Row> deserializationFormat;
   private transient DeserializationSchema<byte[][], Row> deserializationSchema;
 
   /**
@@ -153,7 +154,6 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
   public void initPlugin() throws Exception {
     this.tableName = inputSliceConfig.get(HBaseReaderOptions.TABLE);
     this.hbaseConfig = inputSliceConfig.get(HBaseReaderOptions.HBASE_CONF);
-    this.deserializationFormat = new HBaseDeserializationFormat(inputSliceConfig);
 
     this.columnFamilies = new LinkedHashSet<>();
     List<ColumnInfo> columnInfos = inputSliceConfig.getNecessaryOption(
@@ -187,6 +187,7 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
     tableInputFormat = new TableInputFormat();
     tableInputFormat.setConf(getConf());
     namesMap = Maps.newConcurrentMap();
+    deserializationFormat = new HBaseDeserializationFormat(inputSliceConfig);
     deserializationSchema = deserializationFormat.createRuntimeDeserializationSchema(typeInfos);
     LOG.info("Starting config HBase input format, maybe so slow........");
   }
@@ -266,7 +267,9 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
   }
 
   @Override
-  public ParallelismAdvice advice() {
+  public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConf,
+                                                BitSailConfiguration selfConf,
+                                                ParallelismAdvice upstreamAdvice) throws Exception {
     int parallelism = inputSliceConfig.getUnNecessaryOption(ReaderOptions.BaseReaderOptions.READER_PARALLELISM_NUM, -1);
     if (parallelism > regionCount || parallelism < 0) {
       LOG.info("Reader parallelism is amended to shard count: {}, origin parallelism is: {}", regionCount, parallelism);
