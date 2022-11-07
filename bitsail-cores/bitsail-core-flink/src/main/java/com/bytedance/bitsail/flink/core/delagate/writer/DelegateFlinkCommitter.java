@@ -45,7 +45,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
-import java.util.Optional;
 import java.util.TreeMap;
 
 /**
@@ -73,24 +72,18 @@ public class DelegateFlinkCommitter<CommitT> extends AbstractStreamOperator<Comm
   private long lastCompletedCheckpointId = -1;
 
   private DelegateFlinkCommitter(WriterCommitter<CommitT> writerCommitter,
-                                 Optional<BinarySerializer<CommitT>> committerSerializer,
+                                 BinarySerializer<CommitT> committerSerializer,
                                  boolean isBatchMode,
                                  boolean isCheckpointEnabled) {
     this.isBatchMode = isBatchMode;
     this.isCheckpointingEnabled = isCheckpointEnabled;
     this.writerCommitter = Preconditions.checkNotNull(writerCommitter);
     this.committablesPerCheckpoint = new TreeMap<>();
-    if (isCheckpointingEnabled) {
-      Preconditions.checkArgument(committerSerializer.isPresent(),
-          "Committer serializer should not be null when enable checkpoint.");
-      this.commitStateSerializer = DelegateSimpleVersionedSerializer.delegate(committerSerializer.get());
-    } else {
-      this.commitStateSerializer = null;
-    }
+    this.commitStateSerializer = DelegateSimpleVersionedSerializer.delegate(committerSerializer);
   }
 
   public static <CommitT> DelegateFlinkCommitter<CommitT> of(WriterCommitter<CommitT> writerCommitter,
-                                                             Optional<BinarySerializer<CommitT>> committerSerializer,
+                                                             BinarySerializer<CommitT> committerSerializer,
                                                              boolean isBatchMode,
                                                              boolean isCheckpointingEnabled) {
     return new DelegateFlinkCommitter<>(writerCommitter,

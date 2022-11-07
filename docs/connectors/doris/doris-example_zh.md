@@ -52,7 +52,7 @@ PROPERTIES
 {
    "job": {
      "writer": {
-       "class": "com.bytedance.bitsail.connector.doris.sink.DorisWriterGenerator",
+       "class": "com.bytedance.bitsail.connector.doris.sink.DorisSink",
        "fe_hosts": "127.0.0.1:1234",
        "mysql_hosts": "127.0.0.1:4321",
        "user": "test_user",

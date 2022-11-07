@@ -1,5 +1,5 @@
 {
-  "name": "bitsail-connector-jdbc",
+  "name": "bitsail-connector-legacy-jdbc",
   "classes": [
     "com.bytedance.bitsail.connector.legacy.jdbc.sink.JDBCOutputFormat",
     "com.bytedance.bitsail.connector.legacy.jdbc.source.JDBCInputFormat",

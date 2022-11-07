@@ -1,9 +1,0 @@
-{
-  "name": "bitsail-connector-doris",
-  "classes": [
-    "com.bytedance.bitsail.connector.doris.sink.DorisWriterGenerator"
-  ],
-  "libs": [
-    "bitsail-connector-doris-${version}.jar"
-  ]
-}

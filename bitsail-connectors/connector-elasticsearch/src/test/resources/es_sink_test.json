@@ -40,7 +40,7 @@
       ]
     },
     "writer": {
-      "class": "com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchWriterGenerator",
+      "class": "com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchSink",
       "es_id_fields": "id",
       "columns": [
         {

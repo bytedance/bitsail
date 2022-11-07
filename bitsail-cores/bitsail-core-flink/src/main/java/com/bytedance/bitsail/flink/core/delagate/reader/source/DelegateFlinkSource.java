@@ -102,7 +102,7 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
 
   @Override
   public SimpleVersionedSerializer<StateT> getEnumeratorCheckpointSerializer() {
-    return DelegateSimpleVersionedSerializer.delegate(source.getEnumeratorCheckpointSerializer());
+    return DelegateSimpleVersionedSerializer.delegate(source.getSplitCoordinatorCheckpointSerializer());
   }
 
   @Override

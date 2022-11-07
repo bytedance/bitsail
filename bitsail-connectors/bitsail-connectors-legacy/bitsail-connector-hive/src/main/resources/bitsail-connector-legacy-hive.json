@@ -1,5 +1,5 @@
 {
-  "name": "bitsail-connector-hive",
+  "name": "bitsail-connector-legacy-hive",
   "classes": [
     "com.bytedance.bitsail.connector.legacy.hive.source.HiveInputFormat",
     "com.bytedance.bitsail.connector.legacy.hive.sink.HiveOutputFormat"

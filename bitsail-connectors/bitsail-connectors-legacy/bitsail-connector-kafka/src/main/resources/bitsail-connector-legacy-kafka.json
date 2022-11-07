@@ -1,5 +1,5 @@
 {
-  "name": "bitsail-connector-kafka",
+  "name": "bitsail-connector-legacy-kafka",
   "classes": [
     "com.bytedance.bitsail.connector.legacy.kafka.source.KafkaSourceFunctionDAGBuilder",
     "com.bytedance.bitsail.connector.legacy.kafka.sink.KafkaOutputFormat"

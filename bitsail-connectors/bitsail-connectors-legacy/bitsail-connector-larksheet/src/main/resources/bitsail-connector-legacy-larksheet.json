@@ -1,5 +1,5 @@
 {
-  "name": "bitsail-connector-larksheet",
+  "name": "bitsail-connector-legacy-larksheet",
   "classes": [
     "com.bytedance.bitsail.connector.legacy.larksheet.source.LarkSheetInputFormat"
   ],
