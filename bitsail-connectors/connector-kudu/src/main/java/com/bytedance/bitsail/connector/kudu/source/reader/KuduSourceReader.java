@@ -49,7 +49,7 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
   private int totalSplitNum = 0;
   private boolean hasNoMoreSplits = false;
 
-  private Deque<KuduSourceSplit> splits;
+  private final Deque<KuduSourceSplit> splits;
   private final transient KuduRowDeserializer rowDeserializer;
 
   private KuduSourceSplit currentSplit;

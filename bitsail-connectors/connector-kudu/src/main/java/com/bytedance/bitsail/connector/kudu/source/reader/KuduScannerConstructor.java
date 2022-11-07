@@ -62,7 +62,7 @@ public class KuduScannerConstructor implements Serializable {
       throw new BitSailException(KuduErrorCode.CONFIG_ERROR, "Read mode READ_YOUR_WRITES is not supported.");
     }
     if (readMode.equals(AsyncKuduScanner.ReadMode.READ_AT_SNAPSHOT) && snapshotTimestamp == null) {
-      throw new BitSailException(KuduErrorCode.CONFIG_ERROR, "Snapshort timestamp must be set when using READ_AT_SNAPSHOT read mode");
+      throw new BitSailException(KuduErrorCode.CONFIG_ERROR, "Snapshot timestamp must be set when using READ_AT_SNAPSHOT read mode");
     }
 
     this.enableFaultTolerant = jobConf.get(KuduReaderOptions.FAULT_TOLERANT);
@@ -73,7 +73,7 @@ public class KuduScannerConstructor implements Serializable {
     this.scanAlivePeriodMs = jobConf.get(KuduReaderOptions.SCAN_ALIVE_PERIOD_MS);
   }
 
-  private KuduScanner.KuduScannerBuilder prepareBuilder(KuduClient client, KuduTable table) throws KuduException {
+  private KuduScanner.KuduScannerBuilder prepareBuilder(KuduClient client, KuduTable table) {
     KuduScanner.KuduScannerBuilder builder = client
         .newScannerBuilder(table)
         .setProjectedColumnNames(projectedColumns)

@@ -33,7 +33,7 @@ public class KuduSplitFactory {
   private static final Logger LOG = LoggerFactory.getLogger(KuduSplitFactory.class);
 
   public enum KuduSplitStrategy {
-    SIMPLE_DIVIDE;
+    SIMPLE_DIVIDE
   }
 
   @SuppressWarnings("checkstyle:FallThrough")
