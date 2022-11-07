@@ -69,6 +69,7 @@ public class KuduReaderITCase {
     SplitConfiguration splitConf = new SplitConfiguration();
     splitConf.setName("key");
     splitConf.setSplitNum(SPLIT_NUM);
+    splitConf.setLower((long) (TOTAL_COUNT / 2));
     jobConf.set(KuduReaderOptions.SPLIT_CONFIGURATION, JSON.toJSONString(splitConf));
   }
 }

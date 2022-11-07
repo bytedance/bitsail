@@ -103,6 +103,8 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
     }
 
     // If left or right border is not defined, scan the whole table's column to get min and max value.
+    boolean needUpdateLower = splitConf.getLower() == null;
+    boolean needUpdateUpper = splitConf.getUpper() == null;
     try {
       KuduScannerConstructor scannerConstructor = new KuduScannerConstructor(jobConf);
       KuduScanner scanner = scannerConstructor.createScannerForWholeTable(client, tableName);
@@ -119,8 +121,12 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
             return;
           }
 
-          splitConf.setLower(value);
-          splitConf.setUpper(value);
+          if (needUpdateLower) {
+            splitConf.updateLower(value);
+          }
+          if (needUpdateUpper) {
+            splitConf.updateUpper(value);
+          }
         }
       }
       LOG.info("Get final range: [{}, {}]", splitConf.getLower(), splitConf.getUpper());
@@ -191,13 +197,13 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
     @JSONField(name = "split_num")
     private Integer splitNum;
 
-    public void setLower(long value) {
+    public void updateLower(long value) {
       if (lower == null || lower > value) {
         lower = value;
       }
     }
 
-    public void setUpper(long value) {
+    public void updateUpper(long value) {
       if (upper == null || upper < value) {
         upper = value;
       }
