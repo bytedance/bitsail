@@ -21,7 +21,7 @@ package com.bytedance.bitsail.connector.kudu.source;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.kudu.KuduTestUtils;
 import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
-import com.bytedance.bitsail.connector.kudu.source.split.strategy.SimpleDivideSplitConstructor;
+import com.bytedance.bitsail.connector.kudu.source.split.strategy.SimpleDivideSplitConstructor.SplitConfiguration;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
@@ -66,7 +66,9 @@ public class KuduReaderITCase {
     jobConf.set(KuduReaderOptions.MASTER_ADDRESS_LIST, masterAddressList);
     jobConf.set(KuduReaderOptions.KUDU_TABLE_NAME, TABLE_NAME);
 
-    SimpleDivideSplitConstructor.SplitConfiguration splitConf = new SimpleDivideSplitConstructor.SplitConfiguration("key", 0L, (long) TOTAL_COUNT, SPLIT_NUM);
+    SplitConfiguration splitConf = new SplitConfiguration();
+    splitConf.setName("key");
+    splitConf.setSplitNum(SPLIT_NUM);
     jobConf.set(KuduReaderOptions.SPLIT_CONFIGURATION, JSON.toJSONString(splitConf));
   }
 }

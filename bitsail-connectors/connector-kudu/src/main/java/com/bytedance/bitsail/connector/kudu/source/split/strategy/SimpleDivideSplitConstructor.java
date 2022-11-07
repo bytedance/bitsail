@@ -30,6 +30,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.google.common.collect.ImmutableSet;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kudu.ColumnSchema;
@@ -139,7 +140,7 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
     List<KuduSourceSplit> splits = new ArrayList<>(splitConf.getSplitNum());
 
     int index = 0;
-    long step = splitConf.getStep();
+    long step = splitConf.computeStep();
     long beg = splitConf.getLower();
     ColumnSchema column = schema.getColumn(splitConf.getName());
 
@@ -172,6 +173,7 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
     return estimatedSplitNum;
   }
 
+  @NoArgsConstructor
   @AllArgsConstructor
   @Data
   @ToString(of = {"name", "splitNum", "lower", "upper"})
@@ -201,7 +203,7 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
       }
     }
 
-    public long getStep() {
+    public long computeStep() {
       return Double.valueOf(Math.ceil((upper - lower + 1) * 1.0 / splitNum)).longValue();
     }
 
