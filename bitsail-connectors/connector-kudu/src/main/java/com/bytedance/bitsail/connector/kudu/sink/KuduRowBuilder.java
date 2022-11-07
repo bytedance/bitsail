@@ -53,6 +53,9 @@ public class KuduRowBuilder {
     });
   }
 
+  /**
+   * Transform a bitsail row to KuduRow.
+   */
   public void build(PartialRow kuduRow, Row row) {
     for (int i = 0; i < fieldSize; ++i) {
       rowInserters.get(i).accept(kuduRow, row.getField(i));

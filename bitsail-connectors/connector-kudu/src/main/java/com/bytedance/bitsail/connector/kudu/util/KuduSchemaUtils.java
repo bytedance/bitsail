@@ -43,8 +43,13 @@ public class KuduSchemaUtils {
     boolean hasUnknownColumns = false;
     for (ColumnInfo column : columns) {
       String columnName = column.getName();
-      if (schema.getColumn(columnName) == null) {
-        LOG.error("Column {} does not exist in table {}.", columnName, kuduTable.getName());
+      try {
+        if (schema.getColumn(columnName) == null) {
+          LOG.error("Column {} does not exist in table {}.", columnName, kuduTable.getName());
+          hasUnknownColumns = true;
+        }
+      } catch (Exception e) {
+        LOG.error("Failed to find column {} from table.", columnName, e);
         hasUnknownColumns = true;
       }
     }

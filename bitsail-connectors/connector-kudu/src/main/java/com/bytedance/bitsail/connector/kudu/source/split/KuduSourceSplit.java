@@ -22,6 +22,7 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.Getter;
 import org.apache.kudu.Schema;
 import org.apache.kudu.client.KuduPredicate;
@@ -75,7 +76,8 @@ public class KuduSourceSplit implements SourceSplit {
     kuduPredicates.forEach(builder::addPredicate);
   }
 
-  private List<KuduPredicate> deserializePredicates(Schema schema) {
+  @VisibleForTesting
+  public List<KuduPredicate> deserializePredicates(Schema schema) {
     List<KuduPredicate> kuduPredicates = new ArrayList<>();
     for (byte[] predicateBytes : serializedPredicates) {
       try {

@@ -38,6 +38,10 @@ public class KuduSessionConfig implements Serializable {
   private final Long timeout;
   private final Boolean ignoreDuplicateRows;
 
+  /**
+   * Init kudu client configurations.
+   * @param jobConf Job configuration.
+   */
   public KuduSessionConfig(BitSailConfiguration jobConf) {
     this.flushMode = FlushMode.valueOf(jobConf.get(KuduWriterOptions.SESSION_FLUSH_MODE));
     this.consistencyMode = ExternalConsistencyMode.valueOf(jobConf.get(KuduWriterOptions.SESSION_EXTERNAL_CONSISTENCY_MODE));
@@ -50,6 +54,9 @@ public class KuduSessionConfig implements Serializable {
     validate();
   }
 
+  /**
+   * Check if configurations are valid.
+   */
   public void validate() {
     Preconditions.checkState(mutationBufferSize == null || mutationBufferSize > 0);
     Preconditions.checkState(flushInterval == null || flushInterval > 0);

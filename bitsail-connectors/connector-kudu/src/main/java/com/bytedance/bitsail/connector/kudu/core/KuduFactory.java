@@ -36,6 +36,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.Serializable;
 
+/**
+ * A factory to manage kudu client and kudu session.
+ */
 public class KuduFactory implements Closeable, Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(KuduFactory.class);
 
@@ -45,14 +48,23 @@ public class KuduFactory implements Closeable, Serializable {
   private transient KuduClient kuduClient;
   private transient KuduSession kuduSession;
 
+  /**
+   * Init factory for KuduSource.
+   */
   public static KuduFactory initReaderFactory(BitSailConfiguration jobConf) {
     return new KuduFactory(jobConf, "reader");
   }
 
+  /**
+   * Init factory for KuduSink.
+   */
   public static KuduFactory initWriterFactory(BitSailConfiguration jobConf) {
     return new KuduFactory(jobConf, "writer");
   }
 
+  /**
+   * Init a kudu factory.
+   */
   private KuduFactory(BitSailConfiguration jobConf, String role) {
     // initialize client config
     role = role.trim();
@@ -135,6 +147,9 @@ public class KuduFactory implements Closeable, Serializable {
     return kuduSession;
   }
 
+  /**
+   * Get specific table form current client.
+   */
   public KuduTable getTable(String tableName) throws BitSailException {
     try {
       return getClient().openTable(tableName);
@@ -144,10 +159,16 @@ public class KuduFactory implements Closeable, Serializable {
     }
   }
 
+  /**
+   * Get schema of specific table.
+   */
   public Schema getSchema(String tableName) throws BitSailException {
     return getTable(tableName).getSchema();
   }
 
+  /**
+   * Close current kudu client.
+   */
   public void closeCurrentClient() throws IOException {
     if (kuduClient != null) {
       try {
@@ -161,6 +182,9 @@ public class KuduFactory implements Closeable, Serializable {
     }
   }
 
+  /**
+   * Close current kudu session.
+   */
   public void closeCurrentSession() throws IOException {
     if (kuduSession != null && !kuduSession.isClosed()) {
       try {
@@ -174,6 +198,10 @@ public class KuduFactory implements Closeable, Serializable {
     }
   }
 
+  /**
+   * Close factory, including kudu client and kudu session.
+   * @throws IOException
+   */
   @Override
   public void close() throws IOException {
     closeCurrentSession();

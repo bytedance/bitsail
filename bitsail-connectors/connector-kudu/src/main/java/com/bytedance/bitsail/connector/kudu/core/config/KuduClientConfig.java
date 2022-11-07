@@ -53,6 +53,11 @@ public class KuduClientConfig implements Serializable {
   private final Boolean requireAuthentication;
   private final AsyncKuduClient.EncryptionPolicy encryptionPolicy;
 
+  /**
+   * Init kudu client configurations.
+   * @param jobConf Job configuration.
+   * @param role Init kudu client from reader or writer.
+   */
   public KuduClientConfig(BitSailConfiguration jobConf, String role) {
     this.role = role.trim().toUpperCase();
 
@@ -73,6 +78,9 @@ public class KuduClientConfig implements Serializable {
     validate();
   }
 
+  /**
+   * Check if configurations are valid.
+   */
   public void validate() {
     if (masterAddressList == null || masterAddressList.isEmpty()) {
       throw new BitSailException(KuduErrorCode.CONFIG_ERROR, KuduWriterOptions.MASTER_ADDRESS_LIST.key() + " cannot be empty");
