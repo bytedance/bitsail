@@ -38,6 +38,7 @@
         <module>connector-base</module>
         <module>connector-doris</module>
         <module>connector-rocketmq</module>
+        <module>connector-redis</module>
     </modules>
 
     <dependencies>
