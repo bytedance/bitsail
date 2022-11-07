@@ -5,6 +5,6 @@
     "com.bytedance.bitsail.connector.kudu.source.KuduSource"
   ],
   "libs": [
-    "bitsail-connector-kudu-${version}.jar"
+    "connector-kudu-${version}.jar"
   ]
 }

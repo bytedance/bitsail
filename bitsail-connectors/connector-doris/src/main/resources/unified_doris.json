@@ -4,6 +4,6 @@
     "com.bytedance.bitsail.connector.doris.sink.DorisWriterGenerator"
   ],
   "libs": [
-    "bitsail-connector-doris-${version}.jar"
+    "connector-doris-${version}.jar"
   ]
 }

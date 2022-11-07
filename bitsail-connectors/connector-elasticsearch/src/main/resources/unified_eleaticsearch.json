@@ -4,6 +4,6 @@
     "com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchWriterGenerator"
   ],
   "libs": [
-    "bitsail-connector-elasticsearch-${version}.jar"
+    "connector-elasticsearch-${version}.jar"
   ]
 }
