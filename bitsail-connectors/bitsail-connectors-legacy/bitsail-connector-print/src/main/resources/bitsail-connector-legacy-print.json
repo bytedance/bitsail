@@ -1,5 +1,5 @@
 {
-  "name": "bitsail-connector-print",
+  "name": "bitsail-connector-legacy-print",
   "classes": [
     "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink"
   ],

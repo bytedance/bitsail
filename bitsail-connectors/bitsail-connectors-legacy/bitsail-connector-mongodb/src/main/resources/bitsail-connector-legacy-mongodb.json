@@ -1,5 +1,5 @@
 {
-  "name": "bitsail-connector-mongodb",
+  "name": "bitsail-connector-legacy-mongodb",
   "classes": [
     "com.bytedance.bitsail.connector.legacy.mongodb.source.MongoDBInputFormat",
     "com.bytedance.bitsail.connector.legacy.mongodb.sink.MongoDBOutputFormat"

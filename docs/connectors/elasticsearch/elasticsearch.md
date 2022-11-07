@@ -54,7 +54,7 @@ Users can add parameters to `job.writer` block in task configuration files.
 
 | Param name | Default value | Optional value | Description                                                                                                             |
 |:-----------|:--------------|:---------------|:------------------------------------------------------------------------------------------------------------------------|
-| class      | -             |                | Class name of Elasticsearch connector，`com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchWriterGenerator` |
+| class      | -             |                | Class name of Elasticsearch connector，`com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchSink` |
 | es_hosts   | -             |                | Address list for Elasticsearch handling REST requests                                                                   |
 | es_index   | -             |                | Elasticsearch index                                                                                                     |
 | columns    | -             |                | Describing fields' names and types                                                                                      |

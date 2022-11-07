@@ -54,7 +54,7 @@
 {
   "job": {
     "writer": {
-      "class": "com.bytedance.bitsail.connector.doris.sink.DorisWriterGenerator",
+      "class": "com.bytedance.bitsail.connector.doris.sink.DorisSink",
       "db_name": "test_db",
       "table_name": "test_doris_table"
     }
@@ -66,7 +66,7 @@
 
 | 参数名称              | 是否必填 | 参数枚举值 | 参数含义                                                                                      |
 |:------------------|:-----|:------|:------------------------------------------------------------------------------------------|
-| class             | 是  |       | Doris写连接器类型, `com.bytedance.bitsail.connector.doris.sink.DorisWriterGenerator` |
+| class             | 是  |       | Doris写连接器类型, `com.bytedance.bitsail.connector.doris.sink.DorisSink` |
 | fe_hosts   | 是  |       | Doris FE地址, 多个地址用逗号分隔 |
 | mysql_hosts        | 是  |       | JDBC连接Doris的地址, 多个地址用逗号分隔 |
 | user| 是 | | Doris账户 |

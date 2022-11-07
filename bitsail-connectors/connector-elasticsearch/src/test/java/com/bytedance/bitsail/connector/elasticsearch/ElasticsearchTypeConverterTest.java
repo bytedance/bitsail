@@ -22,7 +22,7 @@ import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 import com.bytedance.bitsail.common.util.Pair;
-import com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchWriterGenerator;
+import com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchSink;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public class ElasticsearchTypeConverterTest {
 
   @Test
   public void testTypeConverter() {
-    TypeInfoConverter typeInfoConverter = new ElasticsearchWriterGenerator<>().createTypeInfoConverter();
+    TypeInfoConverter typeInfoConverter = new ElasticsearchSink<>().createTypeInfoConverter();
 
     toBitSailTypePairs.forEach(pair -> {
       TypeInfo<?> typeInfo = typeInfoConverter.fromTypeString(pair.getSecond());

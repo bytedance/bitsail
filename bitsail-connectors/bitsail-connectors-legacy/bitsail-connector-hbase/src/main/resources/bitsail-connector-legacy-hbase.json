@@ -1,5 +1,5 @@
 {
-  "name": "bitsail-connector-hbase",
+  "name": "bitsail-connector-legacy-hbase",
   "classes": [
     "com.bytedance.bitsail.connector.hbase.source.HBaseInputFormat",
     "com.bytedance.bitsail.connector.hbase.sink.HBaseOutputFormat"

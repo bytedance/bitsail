@@ -55,7 +55,7 @@ The following mentioned parameters should be added to `job.writer` block when us
 {
   "job": {
     "writer": {
-      "class": "com.bytedance.bitsail.connector.doris.sink.DorisWriterGenerator",
+      "class": "com.bytedance.bitsail.connector.doris.sink.DorisSink",
       "db_name": "test_db",
       "table_name": "test_doris_table"
     }
@@ -67,7 +67,7 @@ The following mentioned parameters should be added to `job.writer` block when us
 
 | Param name                   | Required | Optional value | Description                                                                                                    |
 |:-----------------------------|:---------|:---------------|:---------------------------------------------------------------------------------------------------------------|
-| class             | yes  |       | Doris writer class name, `com.bytedance.bitsail.connector.doris.sink.DorisWriterGenerator` |
+| class             | yes  |       | Doris writer class name, `com.bytedance.bitsail.connector.doris.sink.DorisSink` |
 | fe_hosts   | yes  |       | Doris FE address, multi addresses separated by comma |
 | mysql_hosts        | yes  |       | Doris jdbc query address , multi addresses separated by comma |
 | user| yes | | Doris account user |

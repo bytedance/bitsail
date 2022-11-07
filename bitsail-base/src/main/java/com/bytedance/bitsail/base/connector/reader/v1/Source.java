@@ -41,21 +41,39 @@ public interface Source<T, SplitT extends SourceSplit, StateT extends Serializab
    */
   Boundedness getSourceBoundedness();
 
+  /**
+   * Create Source Reader.
+   */
   SourceReader<T, SplitT> createReader(SourceReader.Context readerContext);
 
+  /**
+   * Create split coordinator.
+   */
   SourceSplitCoordinator<SplitT, StateT> createSplitCoordinator(SourceSplitCoordinator.Context<SplitT, StateT> coordinatorContext);
 
+  /**
+   * Get Split serializer for the framework,{@link SplitT}should implement from {@link  Serializable}
+   */
   default BinarySerializer<SplitT> getSplitSerializer() {
     return new SimpleBinarySerializer<>();
   }
 
-  default BinarySerializer<StateT> getEnumeratorCheckpointSerializer() {
+  /**
+   * Get State serializer for the framework, {@link StateT}should implement from {@link  Serializable}
+   */
+  default BinarySerializer<StateT> getSplitCoordinatorCheckpointSerializer() {
     return new SimpleBinarySerializer<>();
   }
 
+  /**
+   * Create type info converter for the source, default value {@link BitSailTypeInfoConverter}
+   */
   default TypeInfoConverter createTypeInfoConverter() {
     return new BitSailTypeInfoConverter();
   }
 
+  /**
+   * Get Source' name.
+   */
   String getReaderName();
 }

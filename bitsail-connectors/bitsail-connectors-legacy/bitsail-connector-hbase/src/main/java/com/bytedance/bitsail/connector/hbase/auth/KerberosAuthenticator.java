@@ -79,6 +79,7 @@ public class KerberosAuthenticator {
     securityConf.set(KerberosOptions.KERBEROS_KEYTAB_PATH, keytabFileName);
     securityConf.set(KerberosOptions.KERBEROS_KRB5_CONF_PATH, krb5ConfPath);
     securityConf.set(KerberosOptions.KERBEROS_HADOOP_CONF, kerberosHadoopConf);
+    securityConf.set(KerberosOptions.KERBEROS_ENABLE, true);
 
     // *** step2: login hadoop security module ***
     HadoopSecurityModule securityModule = new HadoopSecurityModule();

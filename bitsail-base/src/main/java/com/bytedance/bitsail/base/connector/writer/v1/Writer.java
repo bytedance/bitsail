@@ -72,10 +72,14 @@ public interface Writer<InputT, CommT, WriterStateT> extends Serializable, Close
 
   }
 
-  interface Context extends Serializable {
+  interface Context<WriterStateT> extends Serializable {
 
     TypeInfo<?>[] getTypeInfos();
 
     int getIndexOfSubTaskId();
+
+    boolean isRestored();
+
+    List<WriterStateT> getRestoreStates();
   }
 }
