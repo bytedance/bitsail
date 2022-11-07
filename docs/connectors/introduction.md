@@ -34,3 +34,5 @@
 
 - [LarkSheet_connector](./larksheet/larksheet.md)
 
+- [Kudu connector](./kudu/kudu.md)
+

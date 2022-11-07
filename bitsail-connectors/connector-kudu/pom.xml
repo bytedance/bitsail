@@ -37,58 +37,10 @@
             <version>${kudu.version}</version>
         </dependency>
 
-        <!-- dependencies for test -->
-        <dependency>
-            <groupId>org.apache.kudu</groupId>
-            <artifactId>kudu-test-utils</artifactId>
-            <version>${kudu.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.kudu</groupId>
-            <artifactId>kudu-binary</artifactId>
-            <version>${kudu.version}</version>
-            <scope>test</scope>
-            <classifier>${os.detected.classifier}</classifier>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-test</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>connector-fake</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>connector-print</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <extensions>
-            <!-- Used to find the right kudu-binary artifact with the property os.detected.classifier -->
-            <extension>
-                <groupId>kr.motd.maven</groupId>
-                <artifactId>os-maven-plugin</artifactId>
-                <version>1.6.2</version>
-            </extension>
-    </extensions>
-</build>
 </project>
