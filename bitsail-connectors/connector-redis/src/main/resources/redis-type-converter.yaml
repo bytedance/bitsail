@@ -1,0 +1,8 @@
+engine.type.to.bitsail.type.converter:
+  - source.type: string
+    target.type: string
+
+bitsail.type.to.engine.type.converter:
+  - source.type: string
+    target.type: string
+

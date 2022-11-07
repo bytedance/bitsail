@@ -39,6 +39,7 @@
         <module>connector-doris</module>
         <module>connector-kudu</module>
         <module>connector-rocketmq</module>
+        <module>connector-redis</module>
     </modules>
 
     <dependencies>
