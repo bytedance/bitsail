@@ -21,11 +21,10 @@ package com.bytedance.bitsail.common.type;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
-import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
-import com.bytedance.bitsail.common.typeinfo.TypeInfos;
+import com.bytedance.bitsail.common.typeinfo.TypeInfoBridge;
 import com.bytedance.bitsail.common.typeinfo.TypeProperty;
 import com.bytedance.bitsail.common.typeinfo.Types;
 import com.bytedance.bitsail.common.util.Preconditions;
@@ -89,52 +88,12 @@ public class BitSailTypeParser {
         return new ListTypeInfo<>(fromTypeString(elementTypeString));
       }
     }
-    if (equalsTypeString(typeString, Types.VOID)) {
-      return TypeInfos.VOID_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.SHORT)) {
-      return TypeInfos.SHORT_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.INT)) {
-      return TypeInfos.INT_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.LONG) || equalsTypeString(typeString, Types.BIGINT)) {
-      return TypeInfos.LONG_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.FLOAT)) {
-      return TypeInfos.FLOAT_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.DOUBLE)) {
-      return TypeInfos.DOUBLE_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.BIGINTEGER)) {
-      return TypeInfos.BIG_INTEGER_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.BIGDECIMAL)) {
-      return TypeInfos.BIG_DECIMAL_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.BOOLEAN)) {
-      return TypeInfos.BOOLEAN_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.STRING)) {
-      return TypeInfos.STRING_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.BYTE)) {
-      return TypeInfos.BYTE_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.BYTES)) {
-      return BasicArrayTypeInfo.BINARY_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.BINARY)) {
-      return BasicArrayTypeInfo.BINARY_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.DATE)) {
-      return TypeInfos.LOCAL_DATE_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.TIME)) {
-      return TypeInfos.LOCAL_TIME_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.TIMESTAMP)) {
-      return TypeInfos.LOCAL_DATE_TIME_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.DATE_DATE)) {
-      return TypeInfos.SQL_DATE_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.DATE_TIME)) {
-      return TypeInfos.SQL_TIME_TYPE_INFO;
-    } else if (equalsTypeString(typeString, Types.DATE_DATE_TIME)) {
-      return TypeInfos.SQL_TIMESTAMP_TYPE_INFO;
+    TypeInfo<?> typeInfo = TypeInfoBridge.bridgeTypeInfo(typeString);
+    if (Objects.isNull(typeInfo)) {
+      throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,
+          String.format("Not support type string %s.", typeString));
     }
-    throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,
-        String.format("Not support type string %s.", typeString));
-  }
-
-  private static boolean equalsTypeString(String typeString, Types types) {
-    return StringUtils.equalsIgnoreCase(typeString, types.name())
-        || StringUtils.equalsIgnoreCase(typeString, types.getTypeStringNickName());
+    return typeInfo;
   }
 
   private static String[] parseMapTypeString(String typeString) {
