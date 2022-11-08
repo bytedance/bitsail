@@ -44,8 +44,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.bytedance.bitsail.connector.redis.constant.RedisConstants.MAX_ATTEMPT_NUM;
-
 /**
  * Wrapping up the native Jedis pipeline, making it retryable.
  **/
@@ -150,15 +148,22 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
    */
   protected int logSampleInterval;
 
+  /**
+   * Retryer retry count
+   */
+  protected int maxAttemptCount;
+
   protected AbstractPipelineProcessor(JedisPool jedisPool,
                                       Retryer.RetryerCallable<Jedis> jedisFetcher,
                                       int commandSize,
                                       long processorId,
                                       int logSampleInterval,
-                                      boolean complexTypeWithTtl) {
+                                      boolean complexTypeWithTtl,
+                                      int maxAttemptCount) {
     this.jedisPool = jedisPool;
     this.jedisFetcher = jedisFetcher;
     this.commandSize = commandSize;
+    this.maxAttemptCount = maxAttemptCount;
 
     this.requests = new ArrayList<>(commandSize);
     this.successfulRecords = new ArrayList<>(commandSize);
@@ -276,7 +281,7 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
     if (CollectionUtils.isNotEmpty(unexpectedFailedRecords)) {
       throw new RedisUnexpectedException(printErrorMessage(), unexpectedFailedRecords.get(0).getSecond());
     }
-    boolean needRetry = attemptNumber.get() < MAX_ATTEMPT_NUM
+    boolean needRetry = attemptNumber.get() < maxAttemptCount
         && CollectionUtils.isNotEmpty(needRetriedRecords);
 
     if (!needRetry) {

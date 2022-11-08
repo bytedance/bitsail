@@ -57,5 +57,4 @@ public interface FailureHandler {
    * @param processor pipeline processor, to store resolve result
    */
   void caughtUnexpectedError(Command command, Throwable failure, PipelineProcessor processor);
-
 }

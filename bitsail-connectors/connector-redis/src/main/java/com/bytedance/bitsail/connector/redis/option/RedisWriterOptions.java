@@ -117,6 +117,13 @@ public interface RedisWriterOptions extends WriterOptions.BaseWriterOptions {
    * Jedis pool max wait time in millis
    */
   ConfigOption<Integer> JEDIS_POOL_MAX_WAIT_TIME_IN_MILLIS =
-      key(WRITER_PREFIX + "connection_pool_max_wait_time")
+      key(WRITER_PREFIX + "connection_pool_max_wait_time_ms")
           .defaultValue(60000);
+
+  /**
+   * Retryer retry count
+   */
+  ConfigOption<Integer> MAX_ATTEMPT_COUNT =
+      key(WRITER_PREFIX + "max_attempt_count")
+          .defaultValue(5);
 }

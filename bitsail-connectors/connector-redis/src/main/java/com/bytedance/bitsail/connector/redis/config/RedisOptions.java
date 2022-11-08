@@ -33,16 +33,20 @@ public class RedisOptions implements Serializable {
   private static final long serialVersionUID = 1865789744864217944L;
 
   private String redisHost;
+
   private int redisPort;
+
   private String redisPassword;
+
   private int timeout;
+
   /**
    * Expiring times in seconds.
    */
   private int ttlInSeconds;
 
   /**
-   * Also BatchSize, Batch send by pipeline after 'batchInterval' records.
+   * The number of record per batch.
    */
   private int batchInterval;
 
@@ -55,10 +59,11 @@ public class RedisOptions implements Serializable {
    * Number of columns to send in each record.
    */
   private int columnSize;
+
   private RowTypeInfo rowTypeInfo;
 
   /**
-   * Log interval of pipelines, Send log every 'logSampleInterval' times flush (Each flush corresponds to one pipeline)
+   * Log sample every "logSampleInterval" batch.
    */
   private int logSampleInterval;
 
@@ -66,4 +71,9 @@ public class RedisOptions implements Serializable {
    * Complex type command with ttl.
    */
   private boolean complexTypeWithTtl;
+
+  /**
+   * Retryer retry count
+   */
+  private int maxAttemptCount;
 }

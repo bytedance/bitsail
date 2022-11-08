@@ -106,5 +106,4 @@ public interface PipelineProcessor extends Closeable {
    * @return
    */
   boolean hitLogSampling();
-
 }

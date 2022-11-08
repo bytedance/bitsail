@@ -51,17 +51,23 @@ import static com.bytedance.bitsail.connector.redis.constant.RedisConstants.REDI
 
 public class RedisSink<CommitT extends Serializable> implements Sink<Row, CommitT, EmptyState> {
   private static final Logger LOG = LoggerFactory.getLogger(RedisSink.class);
+
   private static final long serialVersionUID = -2257717951626656731L;
+
   private RedisOptions redisOptions;
+
   private JedisPoolOptions jedisPoolOptions;
+
   /**
    * Complex type command with ttl.
    */
   private boolean complexTypeWithTtl;
+
   /**
    * Command used in the job.
    */
   private JedisCommandDescription commandDescription;
+
   @Override
   public String getWriterName() {
     return REDIS_CONNECTOR_NAME;
@@ -75,7 +81,8 @@ public class RedisSink<CommitT extends Serializable> implements Sink<Row, Commit
         .redisPassword(writerConfiguration.get(RedisWriterOptions.PASSWORD))
         .timeout(writerConfiguration.get(RedisWriterOptions.CLIENT_TIMEOUT_MS))
         .batchInterval(writerConfiguration.get(RedisWriterOptions.WRITE_BATCH_INTERVAL))
-        .logSampleInterval(writerConfiguration.get(RedisWriterOptions.LOG_SAMPLE_INTERVAL));
+        .logSampleInterval(writerConfiguration.get(RedisWriterOptions.LOG_SAMPLE_INTERVAL))
+        .maxAttemptCount(writerConfiguration.get(RedisWriterOptions.MAX_ATTEMPT_COUNT));
 
     // initialize ttl
     int ttl = writerConfiguration.getUnNecessaryOption(RedisWriterOptions.TTL, -1);

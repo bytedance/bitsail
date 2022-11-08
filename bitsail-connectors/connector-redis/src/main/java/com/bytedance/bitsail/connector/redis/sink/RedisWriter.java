@@ -53,7 +53,6 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static com.bytedance.bitsail.connector.redis.constant.RedisConstants.MAX_ATTEMPT_NUM;
 import static com.bytedance.bitsail.connector.redis.constant.RedisConstants.SORTED_SET_OR_HASH_COLUMN_SIZE;
 
 public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
@@ -71,7 +70,9 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   private transient Retryer.RetryerCallable<Jedis> jedisFetcher;
 
   private transient Retryer<Boolean> retryer;
+
   private transient CircularFifoQueue<Row> recordQueue;
+
   /**
    * pipeline id for logging.
    */
@@ -81,26 +82,35 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
    * Command used in the job.
    */
   private JedisCommandDescription commandDescription;
+
   /**
    * Number of columns to send in each record.
    */
   private int columnSize;
+
   /**
    * Complex type command with ttl.
    */
   private boolean complexTypeWithTtl;
+
   /**
    * Log interval of pipelines.
    */
   private int logSampleInterval;
 
+  /**
+   * Retryer retry count
+   */
+  private int maxAttemptCount;
+
   @SuppressWarnings("checkstyle:MagicNumber")
   public RedisWriter(RedisOptions redisOptions, JedisPoolOptions jedisPoolOptions) {
     this.recordQueue = new CircularFifoQueue<>(redisOptions.getBatchInterval());
-    columnSize = redisOptions.getColumnSize();
-    complexTypeWithTtl = redisOptions.isComplexTypeWithTtl();
-    commandDescription = redisOptions.getCommandDescription();
-    logSampleInterval = redisOptions.getLogSampleInterval();
+    this.columnSize = redisOptions.getColumnSize();
+    this.complexTypeWithTtl = redisOptions.isComplexTypeWithTtl();
+    this.commandDescription = redisOptions.getCommandDescription();
+    this.logSampleInterval = redisOptions.getLogSampleInterval();
+    this.maxAttemptCount = redisOptions.getMaxAttemptCount();
 
     JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
     jedisPoolConfig.setMaxTotal(jedisPoolOptions.getMaxTotalConnection());
@@ -129,7 +139,7 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
         .retryIfResult(needRetry -> Objects.equals(needRetry, true))
         .retryIfException(e -> !(e instanceof BitSailException))
         .withWaitStrategy(WaitStrategies.fixedWait(3, TimeUnit.SECONDS))
-        .withStopStrategy(StopStrategies.stopAfterAttempt(MAX_ATTEMPT_NUM))
+        .withStopStrategy(StopStrategies.stopAfterAttempt(maxAttemptCount))
         .build();
   }
 
@@ -224,7 +234,7 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
    * @return Jedis pipeline.
    */
   private PipelineProcessor genPipelineProcessor(int commandSize, boolean complexTypeWithTtl) throws ExecutionException, RetryException {
-    return new RedisPipelineProcessor(jedisPool, jedisFetcher, commandSize, processorId, logSampleInterval, complexTypeWithTtl);
+    return new RedisPipelineProcessor(jedisPool, jedisFetcher, commandSize, processorId, logSampleInterval, complexTypeWithTtl, maxAttemptCount);
   }
 
   @Override

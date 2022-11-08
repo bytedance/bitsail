@@ -31,14 +31,17 @@ public class JedisPoolOptions implements Serializable {
    * Jedis pool max total connection
    */
   private int maxTotalConnection;
+
   /**
    * Jedis pool max idle connection
    */
   private int maxIdleConnection;
+
   /**
    * Jedis pool min idle connection
    */
   private int minIdleConnection;
+
   /**
    * Jedis pool max wait time in millis
    */

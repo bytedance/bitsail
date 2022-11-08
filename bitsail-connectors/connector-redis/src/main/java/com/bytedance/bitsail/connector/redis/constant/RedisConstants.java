@@ -24,12 +24,7 @@ public class RedisConstants {
   public static final String REDIS_CONNECTOR_NAME = "redis";
 
   /**
-   * column in sorted_set or hash
+   * column size in sorted_set or hash
    */
   public static final int SORTED_SET_OR_HASH_COLUMN_SIZE = 3;
-
-  /**
-   * retryer retry times
-   */
-  public static final int MAX_ATTEMPT_NUM = 5;
 }
