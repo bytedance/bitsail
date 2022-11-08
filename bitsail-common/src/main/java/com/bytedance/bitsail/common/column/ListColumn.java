@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+@Deprecated
 public class ListColumn<V extends Column> extends Column implements List<V> {
   private static final long serialVersionUID = 1L;
 

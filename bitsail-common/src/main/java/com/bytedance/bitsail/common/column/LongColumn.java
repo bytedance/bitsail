@@ -34,6 +34,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
+@Deprecated
 public class LongColumn extends Column {
 
   public LongColumn(final String data) {

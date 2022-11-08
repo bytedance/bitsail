@@ -36,6 +36,7 @@ import java.util.Date;
 
 @SuppressWarnings("checkstyle:MagicNumber")
 
+@Deprecated
 public class DateColumn extends Column {
 
   private DateType subType = DateType.DATETIME;
