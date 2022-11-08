@@ -15,21 +15,32 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.redis.constant;
+package com.bytedance.bitsail.connector.redis.config;
 
-public class RedisConstants {
-  /**
-   * connector name
-   */
-  public static final String REDIS_CONNECTOR_NAME = "redis";
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
-  /**
-   * column in sorted_set or hash
-   */
-  public static final int SORTED_SET_OR_HASH_COLUMN_SIZE = 3;
+import java.io.Serializable;
 
+@Builder
+@AllArgsConstructor
+@Data
+public class JedisPoolOptions implements Serializable {
   /**
-   * retryer retry times
+   * Jedis pool max total connection
    */
-  public static final int MAX_ATTEMPT_NUM = 5;
+  private int maxTotalConnection;
+  /**
+   * Jedis pool max idle connection
+   */
+  private int maxIdleConnection;
+  /**
+   * Jedis pool min idle connection
+   */
+  private int minIdleConnection;
+  /**
+   * Jedis pool max wait time in millis
+   */
+  private int maxWaitTimeInMillis;
 }

@@ -32,28 +32,29 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <enforcer.skip>true</enforcer.skip>
         <commons.pool2.version>2.11.1</commons.pool2.version>
     </properties>
 
     <artifactId>connector-redis</artifactId>
     <dependencies>
         <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-connector-redis</artifactId>
+            <version>${revision}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>${jedis.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
             <version>${commons.collections4}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-redis</artifactId>
-            <version>${revision}</version>
             <scope>compile</scope>
         </dependency>
 

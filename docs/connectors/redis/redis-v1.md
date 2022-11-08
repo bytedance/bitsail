@@ -81,9 +81,13 @@ The following mentioned parameters should be added to `job.writer` block when us
 | client_timeout_ms | No | | Timeout of redis connection. Default 60000 ms |
 | ttl | No | | Ttl of inserted data. Default -1 means not setting ttl |
 | ttl_type | No  | "DAY", "HOUR", "MINUTE", "SECOND" |  Time unit of ttl. Default "DAY" |
-| write_batch_interval | No | | Redis instruction write batch size. Default 50 | 
-| redis_data_type | No | "string"<br/>"set"<br/>"hash"<br/>"sorted_set" | Data type to insert. Default "string" | 
-| password | No | | Password of redis | 
+| write_batch_interval | No | | Redis instruction write batch size. Default 50 |
+| redis_data_type | No | "string"<br/>"set"<br/>"hash"<br/>"sorted_set" | Data type to insert. Default "string" |
+| password | No | | Password of redis |
+| connection_pool_max_total | No | | Jedis pool max total connection |
+| connection_pool_max_idle | No | | jedis pool max idle connection |
+| connection_pool_min_idle | No | | Jedis pool min idle connection |
+| connection_pool_max_wait_time | No | | Jedis pool max wait time in millis |
 
 
 ## Related document

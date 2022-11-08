@@ -65,4 +65,3 @@ public enum JedisDataType {
    */
   PUBSUB
 }
-

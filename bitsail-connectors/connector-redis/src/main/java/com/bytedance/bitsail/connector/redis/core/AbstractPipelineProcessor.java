@@ -24,8 +24,7 @@ import com.bytedance.bitsail.connector.redis.core.api.PipelineProcessor;
 import com.bytedance.bitsail.connector.redis.core.api.SplitPolicy;
 import com.bytedance.bitsail.connector.redis.core.jedis.JedisCommand;
 import com.bytedance.bitsail.connector.redis.core.jedis.JedisPluginErrorCode;
-import com.bytedance.bitsail.connector.redis.error.UnexpectedException;
-import com.bytedance.bitsail.connector.redis.sink.RedisWriter;
+import com.bytedance.bitsail.connector.redis.error.RedisUnexpectedException;
 
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
@@ -44,6 +43,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static com.bytedance.bitsail.connector.redis.constant.RedisConstants.MAX_ATTEMPT_NUM;
 
 /**
  * Wrapping up the native Jedis pipeline, making it retryable.
@@ -273,9 +274,9 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
   public boolean needRetry() {
 
     if (CollectionUtils.isNotEmpty(unexpectedFailedRecords)) {
-      throw new UnexpectedException(printErrorMessage(), unexpectedFailedRecords.get(0).getSecond());
+      throw new RedisUnexpectedException(printErrorMessage(), unexpectedFailedRecords.get(0).getSecond());
     }
-    boolean needRetry = attemptNumber.get() < RedisWriter.MAX_ATTEMPT_NUM
+    boolean needRetry = attemptNumber.get() < MAX_ATTEMPT_NUM
         && CollectionUtils.isNotEmpty(needRetriedRecords);
 
     if (!needRetry) {
@@ -290,7 +291,7 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
           LOG.error("pipeline finally failed after {} attempts. {}", attemptNumber.get(), printErrorMessage());
           throw new BitSailException(JedisPluginErrorCode.PIPELINE_ERROR, printErrorMessage());
         } else {
-          throw new UnexpectedException(printErrorMessage(), unexpectedFailedRecords.get(0).getSecond());
+          throw new RedisUnexpectedException(printErrorMessage(), unexpectedFailedRecords.get(0).getSecond());
         }
       }
     } else {
@@ -416,4 +417,3 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
     return (processorId & (logSampleInterval - 1)) == 0;
   }
 }
-

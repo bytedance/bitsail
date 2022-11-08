@@ -59,4 +59,3 @@ public interface FailureHandler {
   void caughtUnexpectedError(Command command, Throwable failure, PipelineProcessor processor);
 
 }
-

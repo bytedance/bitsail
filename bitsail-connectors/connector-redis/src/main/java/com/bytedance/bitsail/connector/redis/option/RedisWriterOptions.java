@@ -91,5 +91,32 @@ public interface RedisWriterOptions extends WriterOptions.BaseWriterOptions {
   ConfigOption<Integer> LOG_SAMPLE_INTERVAL =
       key(WRITER_PREFIX + "log_sample_interval")
           .defaultValue(256);
-}
 
+  /**
+   * Jedis pool max total connection
+   */
+  ConfigOption<Integer> JEDIS_POOL_MAX_TOTAL_CONNECTIONS =
+      key(WRITER_PREFIX + "connection_pool_max_total")
+          .defaultValue(2);
+
+  /**
+   * Jedis pool max idle connection
+   */
+  ConfigOption<Integer> JEDIS_POOL_MAX_IDLE_CONNECTIONS =
+      key(WRITER_PREFIX + "connection_pool_max_idle")
+          .defaultValue(2);
+
+  /**
+   * Jedis pool min idle connection
+   */
+  ConfigOption<Integer> JEDIS_POOL_MIN_IDLE_CONNECTIONS =
+      key(WRITER_PREFIX + "connection_pool_min_idle")
+          .defaultValue(0);
+
+  /**
+   * Jedis pool max wait time in millis
+   */
+  ConfigOption<Integer> JEDIS_POOL_MAX_WAIT_TIME_IN_MILLIS =
+      key(WRITER_PREFIX + "connection_pool_max_wait_time")
+          .defaultValue(60000);
+}

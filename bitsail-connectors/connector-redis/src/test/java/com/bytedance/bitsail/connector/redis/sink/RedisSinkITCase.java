@@ -53,7 +53,7 @@ public class RedisSinkITCase {
   public void testBatch() throws Exception {
     BitSailConfiguration jobConfiguration = JobConfUtils.fromClasspath("fake_to_redis_hash.json");
     jobConfiguration.set(FakeReaderOptions.TOTAL_COUNT, TOTAL_COUNT);
-    jobConfiguration.set(CommonOptions.JOB_TYPE, "BATCH");
+    jobConfiguration.set(CommonOptions.JOB_TYPE, "batch");
     jobConfiguration.set(FakeReaderOptions.RATE, 1000);
     jobConfiguration.set(RedisWriterOptions.HOST, redisHost);
     jobConfiguration.set(RedisWriterOptions.PORT, redisPort);
@@ -67,7 +67,7 @@ public class RedisSinkITCase {
   public void testStreaming() throws Exception {
     BitSailConfiguration jobConfiguration = JobConfUtils.fromClasspath("fake_to_redis_hash.json");
     jobConfiguration.set(FakeReaderOptions.TOTAL_COUNT, TOTAL_COUNT);
-    jobConfiguration.set(CommonOptions.JOB_TYPE, "STREAMING");
+    jobConfiguration.set(CommonOptions.JOB_TYPE, "streaming");
     jobConfiguration.set(CommonOptions.CheckPointOptions.CHECKPOINT_ENABLE, true);
     jobConfiguration.set(RedisWriterOptions.HOST, redisHost);
     jobConfiguration.set(RedisWriterOptions.PORT, redisPort);

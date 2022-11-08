@@ -119,4 +119,3 @@ public enum JedisCommand {
     this.rowTypeInfo = new RowTypeInfo(typeInformations);
   }
 }
-

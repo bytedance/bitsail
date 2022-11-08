@@ -89,4 +89,3 @@ public class RedisPipelineProcessor extends AbstractPipelineProcessor {
     }
   }
 }
-

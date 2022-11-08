@@ -27,8 +27,9 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
-import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
+import com.bytedance.bitsail.connector.redis.config.JedisPoolOptions;
 import com.bytedance.bitsail.connector.redis.config.RedisOptions;
 import com.bytedance.bitsail.connector.redis.core.TtlType;
 import com.bytedance.bitsail.connector.redis.core.jedis.JedisCommand;
@@ -42,15 +43,17 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
+
+import static com.bytedance.bitsail.connector.redis.constant.RedisConstants.REDIS_CONNECTOR_NAME;
 
 public class RedisSink<CommitT extends Serializable> implements Sink<Row, CommitT, EmptyState> {
   private static final Logger LOG = LoggerFactory.getLogger(RedisSink.class);
   private static final long serialVersionUID = -2257717951626656731L;
   private RedisOptions redisOptions;
+  private JedisPoolOptions jedisPoolOptions;
   /**
    * Complex type command with ttl.
    */
@@ -59,10 +62,9 @@ public class RedisSink<CommitT extends Serializable> implements Sink<Row, Commit
    * Command used in the job.
    */
   private JedisCommandDescription commandDescription;
-
   @Override
   public String getWriterName() {
-    return "redis";
+    return REDIS_CONNECTOR_NAME;
   }
 
   private void initRedisOptions(BitSailConfiguration writerConfiguration) {
@@ -103,19 +105,30 @@ public class RedisSink<CommitT extends Serializable> implements Sink<Row, Commit
         .build();
   }
 
-  @Override
-  public void configure(BitSailConfiguration commonConfiguration, BitSailConfiguration writerConfiguration) throws Exception {
-    initRedisOptions(writerConfiguration);
+  private void initJedisPoolOptions(BitSailConfiguration writerConfiguration) {
+    LOG.info("Start to init JedisPoolOptions!");
+    jedisPoolOptions = JedisPoolOptions.builder()
+        .maxTotalConnection(writerConfiguration.get(RedisWriterOptions.JEDIS_POOL_MAX_TOTAL_CONNECTIONS))
+        .maxIdleConnection(writerConfiguration.get(RedisWriterOptions.JEDIS_POOL_MAX_IDLE_CONNECTIONS))
+        .minIdleConnection(writerConfiguration.get(RedisWriterOptions.JEDIS_POOL_MIN_IDLE_CONNECTIONS))
+        .maxWaitTimeInMillis(writerConfiguration.get(RedisWriterOptions.JEDIS_POOL_MAX_WAIT_TIME_IN_MILLIS))
+        .build();
   }
 
   @Override
-  public Writer<Row, CommitT, EmptyState> createWriter(Writer.Context<EmptyState> context) throws IOException {
-    return new RedisWriter<>(redisOptions);
+  public void configure(BitSailConfiguration commonConfiguration, BitSailConfiguration writerConfiguration) {
+    initRedisOptions(writerConfiguration);
+    initJedisPoolOptions(writerConfiguration);
+  }
+
+  @Override
+  public Writer<Row, CommitT, EmptyState> createWriter(Writer.Context<EmptyState> context) {
+    return new RedisWriter<>(redisOptions, jedisPoolOptions);
   }
 
   @Override
   public TypeInfoConverter createTypeInfoConverter() {
-    return new FileMappingTypeInfoConverter(getWriterName());
+    return new BitSailTypeInfoConverter();
   }
 
   @Override
@@ -135,7 +148,7 @@ public class RedisSink<CommitT extends Serializable> implements Sink<Row, Commit
     return ttl * ttlType.getContainSeconds();
   }
 
-  protected RowTypeInfo getRowTypeInfo(List<ColumnInfo> columns) {
+  private RowTypeInfo getRowTypeInfo(List<ColumnInfo> columns) {
     return commandDescription.getJedisCommand().getRowTypeInfo();
   }
 

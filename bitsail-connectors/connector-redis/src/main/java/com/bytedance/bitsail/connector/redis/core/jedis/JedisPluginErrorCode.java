@@ -46,4 +46,3 @@ public enum JedisPluginErrorCode implements ErrorCode {
         this.description);
   }
 }
-

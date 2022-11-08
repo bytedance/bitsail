@@ -20,13 +20,13 @@ package com.bytedance.bitsail.connector.redis.error;
 /**
  * Job fails when catch this exception.
  **/
-public class UnexpectedException extends RuntimeException {
+public class RedisUnexpectedException extends RuntimeException {
 
-  public UnexpectedException(String message) {
+  public RedisUnexpectedException(String message) {
     super(message);
   }
 
-  public UnexpectedException(String message, Throwable cause) {
+  public RedisUnexpectedException(String message, Throwable cause) {
     super(message, cause);
   }
 }

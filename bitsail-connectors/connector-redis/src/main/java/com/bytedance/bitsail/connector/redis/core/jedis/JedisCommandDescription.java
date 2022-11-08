@@ -100,4 +100,3 @@ public class JedisCommandDescription implements Serializable {
     this(jedisCommand, additionalKey, null);
   }
 }
-

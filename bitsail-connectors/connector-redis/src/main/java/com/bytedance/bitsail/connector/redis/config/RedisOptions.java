@@ -42,7 +42,7 @@ public class RedisOptions implements Serializable {
   private int ttlInSeconds;
 
   /**
-   * Batch send by pipeline after 'batchInterval' records.
+   * Also BatchSize, Batch send by pipeline after 'batchInterval' records.
    */
   private int batchInterval;
 
@@ -58,7 +58,7 @@ public class RedisOptions implements Serializable {
   private RowTypeInfo rowTypeInfo;
 
   /**
-   * Log interval of pipelines.
+   * Log interval of pipelines, Send log every 'logSampleInterval' times flush (Each flush corresponds to one pipeline)
    */
   private int logSampleInterval;
 
