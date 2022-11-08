@@ -25,8 +25,8 @@ import com.bytedance.bitsail.connector.kudu.source.reader.KuduScannerConstructor
 import com.bytedance.bitsail.connector.kudu.source.split.AbstractKuduSplitConstructor;
 import com.bytedance.bitsail.connector.kudu.source.split.KuduSourceSplit;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -70,7 +70,7 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
       return;
     }
     String splitConfStr = jobConf.get(KuduReaderOptions.SPLIT_CONFIGURATION);
-    this.splitConf = JSON.parseObject(splitConfStr, SplitConfiguration.class);
+    this.splitConf = new ObjectMapper().readValue(splitConfStr, SplitConfiguration.class);
 
     this.available = splitConf.isValid(schema);
     if (!available) {
@@ -79,7 +79,7 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
     }
 
     this.valueGetter = splitConf.initKeyExtractor(schema);
-    fillSplitConf(jobConf, client);
+    this.available = fillSplitConf(jobConf, client);
     if (!available) {
       return;
     }
@@ -93,13 +93,12 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
   }
 
   @Override
-  protected void fillSplitConf(BitSailConfiguration jobConf, KuduClient client) throws IOException {
-    if (splitConf.splitNum == null || splitConf.splitNum <= 0) {
-      splitConf.setSplitNum(jobConf.get(KuduReaderOptions.READER_PARALLELISM_NUM));
+  protected boolean fillSplitConf(BitSailConfiguration jobConf, KuduClient client) throws IOException {
+    if (splitConf.getSplitNum() == null || splitConf.getSplitNum() <= 0) {
+      splitConf.setSplitNum(jobConf.getUnNecessaryOption(KuduReaderOptions.READER_PARALLELISM_NUM, 1));
     }
-
-    if (splitConf.isComplete()) {
-      return;
+    if (splitConf.getLower() != null && splitConf.getUpper() != null && splitConf.getLower() <= splitConf.getUpper()) {
+      return true;
     }
 
     // If left or right border is not defined, scan the whole table's column to get min and max value.
@@ -116,9 +115,8 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
           Long value = valueGetter.apply(result);
 
           if (value == null) {
-            available = false;
             LOG.error("Found null row in column {}, {} cannot work.", splitConf.getName(), this.getClass().getName());
-            return;
+            return false;
           }
 
           if (needUpdateLower) {
@@ -139,6 +137,7 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
       splitConf.setSplitNum(maxSplitNum.intValue());
       LOG.info("Resize split num to {}.", splitConf.getSplitNum());
     }
+    return true;
   }
 
   @Override
@@ -185,16 +184,16 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
   @ToString(of = {"name", "splitNum", "lower", "upper"})
   public static class SplitConfiguration {
 
-    @JSONField(name = "name")
+    @JsonProperty("name")
     private String name;
 
-    @JSONField(name = "lower_bound")
+    @JsonProperty("lower_bound")
     private Long lower;
 
-    @JSONField(name = "upper_bound")
+    @JsonProperty("upper_bound")
     private Long upper;
 
-    @JSONField(name = "split_num")
+    @JsonProperty("split_num")
     private Integer splitNum;
 
     public void updateLower(long value) {
@@ -211,10 +210,6 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
 
     public long computeStep() {
       return Double.valueOf(Math.ceil((upper - lower + 1) * 1.0 / splitNum)).longValue();
-    }
-
-    public boolean isComplete() {
-      return lower != null && upper != null && lower <= upper;
     }
 
     public boolean isValid(Schema schema) {

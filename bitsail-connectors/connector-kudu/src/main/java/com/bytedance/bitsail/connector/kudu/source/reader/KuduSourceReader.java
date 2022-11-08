@@ -41,6 +41,8 @@ import java.util.List;
 public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
   private static final Logger LOG = LoggerFactory.getLogger(KuduSourceReader.class);
 
+  private final int subTaskId;
+
   private final String tableName;
 
   private final KuduFactory kuduFactory;
@@ -56,7 +58,8 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
   private KuduScanner currentScanner;
   private long currentScanCount;
 
-  public KuduSourceReader(BitSailConfiguration jobConf) {
+  public KuduSourceReader(BitSailConfiguration jobConf, int subTaskId) {
+    this.subTaskId = subTaskId;
     this.tableName = jobConf.getNecessaryOption(KuduReaderOptions.KUDU_TABLE_NAME, KuduErrorCode.REQUIRED_VALUE);
 
     this.kuduFactory = KuduFactory.initReaderFactory(jobConf);
@@ -77,7 +80,7 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
 
     if (currentScanner == null) {
       this.currentSplit = splits.poll();
-      LOG.info("Begin to read split: {}=[{}]", currentSplit.uniqSplitId(), currentSplit.toFormatString(kuduFactory.getSchema(tableName)));
+      LOG.info("Task {} begins to read split: {}=[{}]", subTaskId, currentSplit.uniqSplitId(), currentSplit.toFormatString(kuduFactory.getSchema(tableName)));
       this.currentScanner = scannerConstructor.createScanner(kuduFactory.getClient(), tableName, currentSplit);
       this.currentScanCount = 0;
     }
@@ -93,7 +96,7 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
     } else {
       currentScanner.close();
       currentScanner = null;
-      LOG.info("Finish reading {} rows from split: {}", currentScanCount, currentSplit.uniqSplitId());
+      LOG.info("Task {} finishes reading {} rows from split: {}", subTaskId, currentScanCount, currentSplit.uniqSplitId());
     }
   }
 

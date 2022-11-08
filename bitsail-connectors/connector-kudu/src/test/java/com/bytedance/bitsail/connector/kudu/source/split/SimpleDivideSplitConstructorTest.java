@@ -23,7 +23,7 @@ import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
 import com.bytedance.bitsail.connector.kudu.source.split.strategy.SimpleDivideSplitConstructor;
 import com.bytedance.bitsail.connector.kudu.source.split.strategy.SimpleDivideSplitConstructor.SplitConfiguration;
 
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Schema;
@@ -68,7 +68,7 @@ public class SimpleDivideSplitConstructorTest {
 
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
     jobConf.set(KuduReaderOptions.KUDU_TABLE_NAME, tableName);
-    jobConf.set(KuduReaderOptions.SPLIT_CONFIGURATION, JSON.toJSONString(splitConf));
+    jobConf.set(KuduReaderOptions.SPLIT_CONFIGURATION, new ObjectMapper().writeValueAsString(splitConf));
 
     SimpleDivideSplitConstructor constructor = new SimpleDivideSplitConstructor(jobConf, mockClient);
     Assert.assertEquals(3, constructor.estimateSplitNum());
@@ -93,5 +93,21 @@ public class SimpleDivideSplitConstructorTest {
       Assert.assertTrue(lowerPredicates.get(i).equals(predicates.get(0)) || lowerPredicates.get(i).equals(predicates.get(1)));
       Assert.assertTrue(upperPredicates.get(i).equals(predicates.get(0)) || upperPredicates.get(i).equals(predicates.get(1)));
     }
+  }
+
+  @Test
+  public void testParsePartialSplitConf() throws Exception {
+    SplitConfiguration splitConf = new SplitConfiguration();
+    splitConf.setName("key");
+    splitConf.setLower(0L);
+    splitConf.setUpper(1000L);
+
+    BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
+    jobConf.set(KuduReaderOptions.KUDU_TABLE_NAME, tableName);
+    jobConf.set(KuduReaderOptions.SPLIT_CONFIGURATION, new ObjectMapper().writeValueAsString(splitConf));
+    jobConf.set(KuduReaderOptions.READER_PARALLELISM_NUM, 3);
+
+    SimpleDivideSplitConstructor constructor = new SimpleDivideSplitConstructor(jobConf, mockClient);
+    Assert.assertEquals(3, constructor.estimateSplitNum());
   }
 }

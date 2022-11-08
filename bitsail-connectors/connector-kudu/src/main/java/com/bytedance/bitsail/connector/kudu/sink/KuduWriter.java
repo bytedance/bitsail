@@ -110,14 +110,7 @@ public class KuduWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
 
   @Override
   public List<EmptyState> snapshotState(long checkpointId) throws IOException {
-    flush(false);
-
-    // Close old kudu session.
-    kuduFactory.closeCurrentSession();
-    handleSessionPendingErrors(kuduSession);
-
-    // Create a new session for the next period.
-    this.kuduSession = kuduFactory.getSession();
+    this.flush(false);
     return Collections.emptyList();
   }
 

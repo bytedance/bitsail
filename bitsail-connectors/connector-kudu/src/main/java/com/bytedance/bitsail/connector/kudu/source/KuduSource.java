@@ -61,7 +61,7 @@ public class KuduSource implements Source<Row, KuduSourceSplit, EmptyState>, Par
 
   @Override
   public SourceReader<Row, KuduSourceSplit> createReader(SourceReader.Context readerContext) {
-    return new KuduSourceReader(jobConf);
+    return new KuduSourceReader(jobConf, readerContext.getIndexOfSubtask());
   }
 
   @Override
