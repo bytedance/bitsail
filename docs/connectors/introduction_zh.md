@@ -32,3 +32,5 @@
 - [Jdbc连接器](./Jdbc/jdbc_zh.md)
   
 - [飞书表格连接器](./larksheet/larksheet_zh.md)
+
+- [Kudu连接器](./kudu/kudu_zh.md)

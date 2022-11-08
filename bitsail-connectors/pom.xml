@@ -37,6 +37,7 @@
         <module>connector-fake</module>
         <module>connector-base</module>
         <module>connector-doris</module>
+        <module>connector-kudu</module>
         <module>connector-rocketmq</module>
     </modules>
 

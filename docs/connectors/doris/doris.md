@@ -46,7 +46,7 @@ It supports common data type in doris:
 - DATE
 - DATETIME
 
-### 主要参数
+### Parameters
 
 
 The following mentioned parameters should be added to `job.writer` block when using, for example:

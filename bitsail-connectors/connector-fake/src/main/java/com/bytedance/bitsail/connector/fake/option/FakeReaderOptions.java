@@ -50,4 +50,8 @@ public interface FakeReaderOptions extends ReaderOptions.BaseReaderOptions {
   ConfigOption<String> TO_TIMESTAMP =
       key(READER_PREFIX + "to_timestamp")
           .defaultValue("2077-07-07 07:07:07");
+
+  ConfigOption<Integer> NULL_PERCENTAGE =
+      key(READER_PREFIX + "null_percentage")
+          .defaultValue(0);
 }
