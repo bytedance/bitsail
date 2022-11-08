@@ -50,7 +50,7 @@ public class KuduSplitFactory {
             break;
           }
         } catch (IOException e) {
-          LOG.warn("Failed to create SimpleDivideSplitConstructor, will try the next constructor type.");
+          LOG.warn("Failed to create SimpleDivideSplitConstructor, will try the next constructor type.", e);
         }
       default:
         throw new BitSailException(KuduErrorCode.SPLIT_ERROR, "Cannot create a split constructor.");

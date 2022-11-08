@@ -25,7 +25,7 @@ import com.bytedance.bitsail.connector.kudu.source.split.strategy.SimpleDivideSp
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.test.KuduTestHarness;
 import org.apache.kudu.test.cluster.MiniKuduCluster;
@@ -60,7 +60,7 @@ public class KuduReaderITCase {
     EmbeddedFlinkCluster.submitJob(jobConf);
   }
 
-  private void updateJobConf(BitSailConfiguration jobConf) {
+  private void updateJobConf(BitSailConfiguration jobConf) throws Exception {
     String masterAddressString = harness.getMasterAddressesAsString();
     List<String> masterAddressList = Arrays.stream(masterAddressString.split(",")).collect(Collectors.toList());
     jobConf.set(KuduReaderOptions.MASTER_ADDRESS_LIST, masterAddressList);
@@ -70,6 +70,6 @@ public class KuduReaderITCase {
     splitConf.setName("key");
     splitConf.setSplitNum(SPLIT_NUM);
     splitConf.setLower((long) (TOTAL_COUNT / 2));
-    jobConf.set(KuduReaderOptions.SPLIT_CONFIGURATION, JSON.toJSONString(splitConf));
+    jobConf.set(KuduReaderOptions.SPLIT_CONFIGURATION, new ObjectMapper().writeValueAsString(splitConf));
   }
 }

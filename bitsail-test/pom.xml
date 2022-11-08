@@ -28,7 +28,7 @@
     <modules>
         <module>bitsail-test-end-to-end</module>
         <module>bitsail-connector-test</module>
-        <module>bitsail-test-itcases</module>
+        <module>bitsail-connector-kudu-test</module>
     </modules>
 
     <properties>
