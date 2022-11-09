@@ -50,6 +50,7 @@ import java.util.regex.Pattern;
 public class SchemaRegistryProvider extends SchemaProvider {
 
   private final TypedProperties config;
+  private static final Pattern PATTERN = Pattern.compile("://(.*?)@");
 
   public SchemaRegistryProvider(TypedProperties props) {
     this.config = props;
@@ -69,7 +70,7 @@ public class SchemaRegistryProvider extends SchemaProvider {
   public String fetchSchemaFromRegistry(String registryUrl) throws IOException {
     URL registry;
     HttpURLConnection connection;
-    Matcher matcher = Pattern.compile("://(.*?)@").matcher(registryUrl);
+    Matcher matcher = PATTERN.matcher(registryUrl);
     if (matcher.find()) {
       String creds = matcher.group(1);
       String urlWithoutCreds = registryUrl.replace(creds + "@", "");
