@@ -1,4 +1,25 @@
-# BitSail
+<!--
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+
+-->
+
+![logo](docs/images/bitsail_logo.png)
 
 [English](README.md) | 简体中文
 
@@ -60,6 +81,30 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <th>Writer</th>
   </tr>
   <tr>
+    <td>Doris</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>ElasticSearch</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Fake</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
+    <td>FTP/SFTP</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
     <td>Hive</td>
     <td>-</td>
     <td>✅</td>
@@ -84,36 +129,6 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <td>✅</td>
   </tr>
   <tr>
-    <td>Kafka</td>
-    <td>-</td>
-    <td>✅</td>
-    <td>✅</td>
-  </tr>
-  <tr>
-    <td>RocketMQ</td>
-    <td>-</td>
-    <td> </td>
-    <td>✅</td>
-  </tr>
-  <tr>
-    <td>Redis</td>
-    <td>-</td>
-    <td> </td>
-    <td>✅</td>
-  </tr>
-  <tr>
-    <td>Doris</td>
-    <td>-</td>
-    <td> </td>
-    <td>✅</td>
-  </tr>
-  <tr>
-    <td>MongoDB</td>
-    <td>-</td>
-    <td>✅</td>
-    <td>✅</td>
-  </tr>
-  <tr>
     <td rowspan="4">JDBC</td>
     <td>MySQL</td>
     <td rowspan="4">✅</td>
@@ -128,20 +143,38 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
   <tr>
     <td>SqlServer</td>
   </tr>
-    <tr>
-    <td>FTP/SFTP</td>
+  <tr>
+    <td>Kafka</td>
     <td>-</td>
     <td>✅</td>
-    <td> </td>
+    <td>✅</td>
   </tr>
   <tr>
-    <td>Fake</td>
+    <td>Kudu</td>
     <td>-</td>
     <td>✅</td>
-    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>MongoDB</td>
+    <td>-</td>
+    <td>✅</td>
+    <td>✅</td>
   </tr>
   <tr>
     <td>Print</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Redis</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>RocketMQ</td>
     <td>-</td>
     <td> </td>
     <td>✅</td>
