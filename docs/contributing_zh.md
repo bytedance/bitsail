@@ -62,7 +62,7 @@ BitSail项目使用了[Google Java Style Guide](https://google.github.io/stylegu
 - [Fork ***BitSail*** 代码库](https://docs.github.com/en/get-started/quickstart/fork-a-repo)
 - 在你的fork的代码库中生成一个新分支
 - 开发你的代码，包括必要的测试用例和编码风格检查
-- 提交对分支的更改并推送到你fork的残酷
+- 提交对分支的更改并推送到你fork的仓库
 - 向 ***BitSail*** 存储库创建pull request
 
 ## 请求代码审查
