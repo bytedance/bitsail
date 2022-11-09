@@ -36,6 +36,7 @@ import java.io.IOException;
  * @desc:
  */
 @SuppressWarnings("checkstyle:MagicNumber")
+@Deprecated
 public final class StringColumnComparator extends ColumnTypeComparator<StringColumn> {
 
   private static final long serialVersionUID = 1L;

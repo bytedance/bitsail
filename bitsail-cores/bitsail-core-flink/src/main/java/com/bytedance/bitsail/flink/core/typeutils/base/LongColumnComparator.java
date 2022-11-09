@@ -37,6 +37,7 @@ import java.math.BigInteger;
  * @desc:
  */
 @SuppressWarnings("checkstyle:MagicNumber")
+@Deprecated
 public class LongColumnComparator extends ColumnTypeComparator<LongColumn> {
 
   private static final long serialVersionUID = 1L;

@@ -62,6 +62,7 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 /**
  * @desc:
  */
+@Deprecated
 public class PrimitiveColumnTypeInfo<T> extends TypeInformation<T> implements AtomicType<T> {
 
   public static final PrimitiveColumnTypeInfo<StringColumn> STRING_COLUMN_TYPE_INFO = new PrimitiveColumnTypeInfo<>(StringColumn.class, new Class<?>[] {},

@@ -37,6 +37,7 @@ import java.util.List;
 
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
+@Deprecated
 public final class ListColumnSerializer<T extends Column> extends TypeSerializer<ListColumn<T>> {
 
   private static final long serialVersionUID = 1119562170939152304L;

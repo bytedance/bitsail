@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 /**
  * @desc:
  */
+@Deprecated
 public class DoubleColumnComparator extends ColumnTypeComparator<DoubleColumn> {
 
   private static final long serialVersionUID = 1L;

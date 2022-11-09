@@ -28,6 +28,7 @@ import java.io.IOException;
 /**
  * @desc:
  */
+@Deprecated
 public class BytesColumnComparator extends ColumnTypeComparator<BytesColumn> {
 
   private static final long serialVersionUID = 1L;

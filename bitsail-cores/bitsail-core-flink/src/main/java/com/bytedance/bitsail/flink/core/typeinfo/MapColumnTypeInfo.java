@@ -38,6 +38,7 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  * @param <V> The type of the values in the map.
  */
 @PublicEvolving
+@Deprecated
 public class MapColumnTypeInfo<K extends Column, V extends Column> extends TypeInformation<MapColumn<K, V>> {
 
   /* The type information for the keys in the map*/
