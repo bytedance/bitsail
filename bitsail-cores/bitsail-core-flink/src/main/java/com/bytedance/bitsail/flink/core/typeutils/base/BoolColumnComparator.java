@@ -34,6 +34,7 @@ import java.io.IOException;
 /**
  * @desc:
  */
+@Deprecated
 public class BoolColumnComparator extends ColumnTypeComparator<BooleanColumn> {
 
   private static final long serialVersionUID = 1L;

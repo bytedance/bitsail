@@ -25,7 +25,6 @@ package com.bytedance.bitsail.flink.core.typeutils.base;
 
 import com.bytedance.bitsail.common.column.BooleanColumn;
 
-import org.apache.flink.annotation.Internal;
 import org.apache.flink.api.common.typeutils.SimpleTypeSerializerSnapshot;
 import org.apache.flink.api.common.typeutils.TypeSerializerSnapshot;
 import org.apache.flink.api.common.typeutils.base.TypeSerializerSingleton;
@@ -37,7 +36,7 @@ import java.io.IOException;
 /**
  * @desc:
  */
-@Internal
+@Deprecated
 public class BoolColumnSerializer extends TypeSerializerSingleton<BooleanColumn> {
 
   public static final BoolColumnSerializer INSTANCE = new BoolColumnSerializer();

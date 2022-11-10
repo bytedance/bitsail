@@ -34,6 +34,7 @@ import java.io.IOException;
 /**
  * @desc:
  */
+@Deprecated
 public abstract class ColumnTypeComparator<T extends Column> extends TypeComparator<T> implements java.io.Serializable {
 
   private static final long serialVersionUID = 1L;

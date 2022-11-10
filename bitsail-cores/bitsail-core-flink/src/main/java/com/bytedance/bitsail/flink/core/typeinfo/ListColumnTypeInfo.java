@@ -42,6 +42,7 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  * @param <T> The type of the elements in the list.
  */
 @PublicEvolving
+@Deprecated
 public final class ListColumnTypeInfo<T extends Column> extends TypeInformation<ListColumn<T>> {
 
   private static final long serialVersionUID = 1L;

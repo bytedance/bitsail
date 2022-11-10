@@ -48,11 +48,11 @@ import static com.bytedance.bitsail.common.typeinfo.TypeInfos.STRING_TYPE_INFO;
  */
 public class FlinkRowConvertSerializer implements RowSerializer<Row> {
 
-  private List<ColumnInfo> columns;
+  private final List<ColumnInfo> columns;
 
-  private TypeInfo<?>[] typeInfos;
+  private final TypeInfo<?>[] typeInfos;
 
-  private BitSailConfiguration commonConfiguration;
+  private final BitSailConfiguration commonConfiguration;
 
   public FlinkRowConvertSerializer(TypeInfo<?>[] typeInfos,
                                    List<ColumnInfo> columns,
@@ -66,12 +66,12 @@ public class FlinkRowConvertSerializer implements RowSerializer<Row> {
   public Row serialize(com.bytedance.bitsail.common.row.Row row) throws IOException {
     Object[] fields = row.getFields();
     int arity = ArrayUtils.getLength(fields);
-    Row flinkRow = new Row(arity);
+    Row flinkRow = new Row(org.apache.flink.types.RowKind.fromByteValue(row.getKind().toByteValue()), arity);
     for (int index = 0; index < arity; index++) {
       TypeInfo<?> typeInfo = typeInfos[index];
       Object field = row.getField(index);
       if (field instanceof Column) {
-        field = deserialize((Column) field, typeInfo, columns.get(index).getName());
+        field = deserializeColumn((Column) field, typeInfo, columns.get(index).getName());
       }
       flinkRow.setField(index, field);
     }
@@ -87,7 +87,7 @@ public class FlinkRowConvertSerializer implements RowSerializer<Row> {
       Object field = serialized.getField(index);
       String name = columns.get(index).getName();
       if (field instanceof Column) {
-        fields[index] = deserialize((Column) field, typeInfo, name);
+        fields[index] = deserializeColumn((Column) field, typeInfo, name);
       } else {
         fields[index] = field;
       }
@@ -97,7 +97,7 @@ public class FlinkRowConvertSerializer implements RowSerializer<Row> {
         fields);
   }
 
-  private Object deserialize(Column object, TypeInfo<?> typeInfo, String name) throws BitSailException {
+  private Object deserializeColumn(Column object, TypeInfo<?> typeInfo, String name) throws BitSailException {
     if (Objects.isNull(object)) {
       return null;
     }
@@ -108,7 +108,7 @@ public class FlinkRowConvertSerializer implements RowSerializer<Row> {
         throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
             String.format("Column %s is not list type, value: %s", name, object));
       }
-      return getListValue((List<Column>) object, (ListTypeInfo<?>) typeInfo, name);
+      return getListColumnValue((List<Column>) object, (ListTypeInfo<?>) typeInfo, name);
     }
 
     if (Map.class.isAssignableFrom(typeInfoTypeClass)) {
@@ -116,42 +116,42 @@ public class FlinkRowConvertSerializer implements RowSerializer<Row> {
         throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
             String.format("Column %s is not map type, value: %s", name, object));
       }
-      return getMapValue((MapColumn<Column, Column>) object, (MapTypeInfo<?, ?>) typeInfo, name);
+      return getMapColumnValue((MapColumn<Column, Column>) object, (MapTypeInfo<?, ?>) typeInfo, name);
     }
 
-    return getBasicTypeValue((Column) object, typeInfo);
+    return getBasicTypeColumnValue((Column) object, typeInfo);
   }
 
-  private List<?> getListValue(List<Column> columns, ListTypeInfo<?> listTypeInfo, String name) {
+  private List<?> getListColumnValue(List<Column> columns, ListTypeInfo<?> listTypeInfo, String name) {
     TypeInfo<?> elementTypeInfo = listTypeInfo.getElementTypeInfo();
     List<Object> objects = new ArrayList<>();
     if (Objects.nonNull(columns)) {
       for (Column column : columns) {
-        objects.add(deserialize(column, elementTypeInfo, name));
+        objects.add(deserializeColumn(column, elementTypeInfo, name));
       }
     }
     return objects;
   }
 
-  private Map<?, ?> getMapValue(Map<Column, Column> columnMap, MapTypeInfo<?, ?> mapTypeInfo, String name) {
+  private Map<?, ?> getMapColumnValue(Map<Column, Column> columnMap, MapTypeInfo<?, ?> mapTypeInfo, String name) {
     TypeInfo<?> keyTypeInfo = mapTypeInfo.getKeyTypeInfo();
     TypeInfo<?> valueTypeInfo = mapTypeInfo.getValueTypeInfo();
 
     Map<Object, Object> maps = new HashMap<>();
     if (Objects.nonNull(columnMap)) {
       columnMap.forEach((key, value) -> {
-        Object keyValue = deserialize(key, keyTypeInfo, name);
+        Object keyValue = deserializeColumn(key, keyTypeInfo, name);
         if (Objects.isNull(keyValue)) {
           throw new BitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT, "");
         }
-        Object mapValue = deserialize(value, valueTypeInfo, name);
+        Object mapValue = deserializeColumn(value, valueTypeInfo, name);
         maps.put(keyValue, mapValue);
       });
     }
     return maps;
   }
 
-  private Object getBasicTypeValue(Column column, TypeInfo<?> typeInfo) {
+  private Object getBasicTypeColumnValue(Column column, TypeInfo<?> typeInfo) {
     Class<?> typeInfoTypeClass = typeInfo.getTypeClass();
     if (null == column.getRawData()) {
       return null;

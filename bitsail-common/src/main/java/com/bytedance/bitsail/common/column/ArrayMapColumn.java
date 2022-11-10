@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 // Use list to store map column, replace use map to store map column.
+@Deprecated
 public class ArrayMapColumn<K extends Column, V extends Column> extends Column {
 
   private static final long serialVersionUID = 1L;

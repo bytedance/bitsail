@@ -34,6 +34,7 @@ import org.apache.flink.api.common.typeutils.TypeSerializer;
  * @desc: Snapshot class for the {@link ListColumnSerializer}.
  **/
 
+@Deprecated
 public class ListColumnSerializerSnapshot<T extends Column> extends CompositeTypeSerializerSnapshot<ListColumn<T>, ListColumnSerializer<T>> {
   private static final int CURRENT_VERSION = 1;
 

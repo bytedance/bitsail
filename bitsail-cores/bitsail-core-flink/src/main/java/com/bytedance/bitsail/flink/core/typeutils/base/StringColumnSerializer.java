@@ -25,7 +25,6 @@ package com.bytedance.bitsail.flink.core.typeutils.base;
 
 import com.bytedance.bitsail.common.column.StringColumn;
 
-import org.apache.flink.annotation.Internal;
 import org.apache.flink.api.common.typeutils.SimpleTypeSerializerSnapshot;
 import org.apache.flink.api.common.typeutils.TypeSerializerSnapshot;
 import org.apache.flink.api.common.typeutils.base.TypeSerializerSingleton;
@@ -38,7 +37,7 @@ import java.io.IOException;
 /**
  * @desc:
  */
-@Internal
+@Deprecated
 public final class StringColumnSerializer extends TypeSerializerSingleton<StringColumn> {
 
   public static final StringColumnSerializer INSTANCE = new StringColumnSerializer();
