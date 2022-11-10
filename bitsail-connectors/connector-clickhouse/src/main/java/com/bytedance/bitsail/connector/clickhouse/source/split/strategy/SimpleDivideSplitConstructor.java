@@ -29,8 +29,8 @@ import com.bytedance.bitsail.connector.clickhouse.util.ClickhouseJdbcUtils;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -67,7 +67,7 @@ public class SimpleDivideSplitConstructor {
 
     // construct basic split conf (name)
     if (!jobConf.fieldExists(ClickhouseReaderOptions.SPLIT_CONFIGURATION)) {
-      this.splitConf = new SplitConfiguration.SplitConfigurationBuilder().build();
+      this.splitConf = new SplitConfiguration();
     } else {
       String splitConfStr = jobConf.get(ClickhouseReaderOptions.SPLIT_CONFIGURATION);
       this.splitConf = new ObjectMapper().readValue(splitConfStr, SplitConfiguration.class);
@@ -85,7 +85,7 @@ public class SimpleDivideSplitConstructor {
         .findFirst()
         .orElseThrow(() -> BitSailException.asBitSailException(ClickhouseErrorCode.CONFIG_ERROR,
             "Split field does not show in columns."));
-    Preconditions.checkState(SUPPORTED_TYPE.contains(splitColumn.getName()), "Unsupported split column: " + splitColumn);
+    Preconditions.checkState(SUPPORTED_TYPE.contains(splitColumn.getType().trim().toUpperCase()), "Unsupported split column: " + splitColumn);
 
     // set split num
     if (splitConf.getSplitNum() == null || splitConf.getSplitNum() <= 0) {
@@ -95,9 +95,8 @@ public class SimpleDivideSplitConstructor {
     // set lower/upper bound
     boolean needUpdateLower = splitConf.getLower() == null;
     boolean needUpdateUpper = splitConf.getUpper() == null;
-    boolean valid = splitConf.getLower() <= splitConf.getUpper();
 
-    if (needUpdateLower || needUpdateUpper || !valid) {
+    if (needUpdateLower || needUpdateUpper) {
       Pair<Long, Long> newBound;
       try (ClickhouseConnectionHolder connectionHolder = new ClickhouseConnectionHolder(jobConf)) {
         newBound = queryBound(needUpdateLower, needUpdateUpper, jobConf, connectionHolder);
@@ -122,6 +121,11 @@ public class SimpleDivideSplitConstructor {
       }
     }
 
+    if (splitConf.getLower() > splitConf.getUpper()) {
+      LOG.error("Found invalid split conf [{}], will directly read the table.", splitConf);
+      splitConf = null;
+    }
+
     // finish initialization
     LOG.info("SimpleDivideSplitConstructor is initialized.");
   }
@@ -130,9 +134,9 @@ public class SimpleDivideSplitConstructor {
                                       boolean queryMax,
                                       BitSailConfiguration jobConf,
                                       ClickhouseConnectionHolder holder) throws SQLException {
-    String dbName = jobConf.getNecessaryOption(ClickhouseReaderOptions.CH_DATABASE_NAME,
+    String dbName = jobConf.getNecessaryOption(ClickhouseReaderOptions.DB_NAME,
         ClickhouseErrorCode.REQUIRED_VALUE);
-    String tableName = jobConf.getNecessaryOption(ClickhouseReaderOptions.CH_TABLE_NAME,
+    String tableName = jobConf.getNecessaryOption(ClickhouseReaderOptions.TABLE_NAME,
         ClickhouseErrorCode.REQUIRED_VALUE);
     String filterSql = jobConf.get(ClickhouseReaderOptions.SQL_FILTER);
     String splitField = splitConf.getName();
@@ -153,6 +157,7 @@ public class SimpleDivideSplitConstructor {
     Statement statement = connection.createStatement();
     ResultSet resultSet = statement.executeQuery(finalSql);
 
+    resultSet.next();
     if (queryMin && queryMax) {
       return Pair.newPair(resultSet.getLong(1), resultSet.getLong(2));
     } else if (queryMin) {
@@ -203,10 +208,10 @@ public class SimpleDivideSplitConstructor {
     return estimatedSplitNum;
   }
 
-  @Builder
+  @NoArgsConstructor
   @Data
   @ToString(of = {"name", "splitNum", "lower", "upper"})
-  private static class SplitConfiguration {
+  public static class SplitConfiguration {
     @JsonProperty("name")
     private String name;
 

@@ -78,9 +78,9 @@ public class ClickhouseSourceReader implements SourceReader<Row, ClickhouseSourc
   public ClickhouseSourceReader(BitSailConfiguration jobConf, int subTaskId) {
     this.subTaskId = subTaskId;
 
-    this.dbName = jobConf.getNecessaryOption(ClickhouseReaderOptions.CH_DATABASE_NAME,
+    this.dbName = jobConf.getNecessaryOption(ClickhouseReaderOptions.DB_NAME,
         ClickhouseErrorCode.REQUIRED_VALUE);
-    this.tableName = jobConf.getNecessaryOption(ClickhouseReaderOptions.CH_TABLE_NAME,
+    this.tableName = jobConf.getNecessaryOption(ClickhouseReaderOptions.TABLE_NAME,
         ClickhouseErrorCode.REQUIRED_VALUE);
     this.columnInfos = jobConf.getNecessaryOption(ClickhouseReaderOptions.COLUMNS,
         ClickhouseErrorCode.REQUIRED_VALUE);

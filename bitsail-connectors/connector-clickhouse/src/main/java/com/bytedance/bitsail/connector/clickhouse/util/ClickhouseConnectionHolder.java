@@ -45,7 +45,7 @@ public class ClickhouseConnectionHolder implements AutoCloseable {
   public ClickhouseConnectionHolder(BitSailConfiguration jobConf) {
     this.jdbcUrl = jobConf.getNecessaryOption(ClickhouseReaderOptions.JDBC_URL,
         ClickhouseErrorCode.REQUIRED_VALUE);
-    this.dbName = jobConf.getNecessaryOption(ClickhouseReaderOptions.CH_DATABASE_NAME,
+    this.dbName = jobConf.getNecessaryOption(ClickhouseReaderOptions.DB_NAME,
         ClickhouseErrorCode.REQUIRED_VALUE);
 
     this.userName = jobConf.get(ClickhouseReaderOptions.USER_NAME);
@@ -69,6 +69,7 @@ public class ClickhouseConnectionHolder implements AutoCloseable {
       properties.setUser(userName);
       properties.setPassword(password);
     }
+    LOG.info("Connect to clickhouse by: [{}]", url);
     BalancedClickhouseDataSource dataSource = new BalancedClickhouseDataSource(url, properties);
     if (dataSource.getAllClickhouseUrls().size() > 1) {
       int enabledUrlSize = dataSource.actualize();

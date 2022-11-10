@@ -32,16 +32,6 @@ public interface ClickhouseReaderOptions extends ReaderOptions.BaseReaderOptions
       key(READER_PREFIX + "jdbc_url")
           .noDefaultValue(String.class);
 
-  @Essential
-  ConfigOption<String> CH_DATABASE_NAME =
-      key(READER_PREFIX + "db_name")
-          .noDefaultValue(String.class);
-
-  @Essential
-  ConfigOption<String> CH_TABLE_NAME =
-      key(READER_PREFIX + "table_name")
-          .noDefaultValue(String.class);
-
   ConfigOption<String> SPLIT_FIELD =
       key(READER_PREFIX + "split_field")
           .noDefaultValue(String.class);

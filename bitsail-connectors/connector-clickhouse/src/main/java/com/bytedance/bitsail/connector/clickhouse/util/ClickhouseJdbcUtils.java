@@ -15,18 +15,13 @@
 
 package com.bytedance.bitsail.connector.clickhouse.util;
 
-import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.connector.clickhouse.error.ClickhouseErrorCode;
 import com.bytedance.bitsail.connector.clickhouse.source.split.ClickhouseSourceSplit;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +29,6 @@ import java.util.stream.Collectors;
 public class ClickhouseJdbcUtils {
   private static final Logger LOG = LoggerFactory.getLogger(ClickhouseJdbcUtils.class);
 
-  private static final String JDBC_PREFIX = "jdbc:";
   private static final String SLASH = "/";
   private static final String QUOTE_IDENTIFIER = "`";
 
@@ -44,17 +38,10 @@ public class ClickhouseJdbcUtils {
   private static final String SELECT_MIN_MAX_TEMPLATE = "SELECT MIN(%s), MAX(%s) FROM %s";
 
   public static String constructJdbcUrl(String url, String database) {
-    URI uri;
-    try {
-      URIBuilder uriBuilder = new URIBuilder(url);
-      if (StringUtils.isNotEmpty(database)) {
-        uriBuilder.setPath(SLASH + database);
-      }
-      uri = uriBuilder.build();
-    } catch (URISyntaxException e) {
-      throw new BitSailException(ClickhouseErrorCode.CONFIG_ERROR, "Failed to build connection from url: " + url);
+    if (StringUtils.isNotEmpty(database)) {
+      return url + SLASH + database;
     }
-    return JDBC_PREFIX + uri.toString();
+    return url;
   }
 
   public static String getQuerySql(String database, String table, List<ColumnInfo> columnInfos) {
