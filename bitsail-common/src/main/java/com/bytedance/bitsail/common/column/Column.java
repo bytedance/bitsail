@@ -24,6 +24,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
+/**
+ * Legacy type system. Please use {@link com.bytedance.bitsail.common.typeinfo.TypeInfo} instead.
+ * This class will be removed in the future.
+ */
+@Deprecated
 public abstract class Column implements Serializable, Comparable<Column> {
 
   private static final long serialVersionUID = 1L;

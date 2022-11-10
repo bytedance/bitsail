@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
+@Deprecated
 public class StringColumn extends Column {
 
   public StringColumn() {

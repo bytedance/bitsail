@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
+@Deprecated
 public class BooleanColumn extends Column {
   public BooleanColumn(Boolean bool) {
     super(bool, 1);

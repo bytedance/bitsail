@@ -35,6 +35,7 @@ import org.apache.flink.api.common.typeutils.TypeSerializerSnapshot;
  * @desc: Snapshot class for the {@link MapColumnSerializer}.
  **/
 
+@Deprecated
 public class MapColumnSerializerSnapshot<K extends Column, V extends Column> extends CompositeTypeSerializerSnapshot<MapColumn<K, V>, MapColumnSerializer<K, V>> {
 
   private static final int CURRENT_VERSION = 1;

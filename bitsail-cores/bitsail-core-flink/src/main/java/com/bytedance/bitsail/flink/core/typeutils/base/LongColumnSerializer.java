@@ -38,6 +38,7 @@ import java.math.BigInteger;
  * @desc:
  */
 @SuppressWarnings("checkstyle:MagicNumber")
+@Deprecated
 public class LongColumnSerializer extends TypeSerializerSingleton<LongColumn> {
 
   public static final LongColumnSerializer INSTANCE = new LongColumnSerializer();

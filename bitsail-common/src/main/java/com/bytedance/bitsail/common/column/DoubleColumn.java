@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
+@Deprecated
 public class DoubleColumn extends Column {
   private static final String NAN = "NaN";
   private static final String POSITIVE_INFINITY = "+Infinity";

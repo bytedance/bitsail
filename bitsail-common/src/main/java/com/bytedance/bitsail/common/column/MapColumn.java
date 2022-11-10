@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+@Deprecated
 public class MapColumn<K extends Column, V extends Column> extends Column implements Map<K, V> {
 
   private static final long serialVersionUID = 1L;
