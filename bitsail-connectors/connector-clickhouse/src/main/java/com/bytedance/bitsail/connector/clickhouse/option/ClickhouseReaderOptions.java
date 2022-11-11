@@ -27,6 +27,12 @@ import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
 
 public interface ClickhouseReaderOptions extends ReaderOptions.BaseReaderOptions {
+  /**
+   * Standard format:
+   * jdbc:(ch|clickhouse)[:protocol]://endpoint[,endpoint][/database][?parameters][#tags]<br/>
+   *  - endpoint: [protocol://]host[:port][/database][?parameters][#tags]<br/>
+   *  - protocol: (grpc|grpcs|http|https|tcp|tcps)
+   */
   @Essential
   ConfigOption<String> JDBC_URL =
       key(READER_PREFIX + "jdbc_url")

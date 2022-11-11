@@ -26,9 +26,9 @@ import com.bytedance.bitsail.connector.clickhouse.source.split.ClickhouseSourceS
 import com.bytedance.bitsail.connector.clickhouse.util.ClickhouseConnectionHolder;
 import com.bytedance.bitsail.connector.clickhouse.util.ClickhouseJdbcUtils;
 
+import com.clickhouse.jdbc.ClickHouseConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.yandex.clickhouse.ClickHouseConnection;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;

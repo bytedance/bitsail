@@ -19,12 +19,10 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.clickhouse.error.ClickhouseErrorCode;
 import com.bytedance.bitsail.connector.clickhouse.option.ClickhouseReaderOptions;
 
-import org.apache.commons.lang3.StringUtils;
+import com.clickhouse.jdbc.ClickHouseConnection;
+import com.clickhouse.jdbc.ClickHouseDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.yandex.clickhouse.BalancedClickhouseDataSource;
-import ru.yandex.clickhouse.ClickHouseConnection;
-import ru.yandex.clickhouse.settings.ClickHouseProperties;
 
 import java.sql.SQLException;
 import java.util.Properties;
@@ -63,24 +61,17 @@ public class ClickhouseConnectionHolder implements AutoCloseable {
       return connection;
     }
 
-    String url = ClickhouseJdbcUtils.constructJdbcUrl(jdbcUrl, dbName);
-    ClickHouseProperties properties = new ClickHouseProperties(connectionProperties);
-    if (StringUtils.isNotEmpty(userName)) {
-      properties.setUser(userName);
-      properties.setPassword(password);
-    }
-    LOG.info("Connect to clickhouse by: [{}]", url);
-    BalancedClickhouseDataSource dataSource = new BalancedClickhouseDataSource(url, properties);
-    if (dataSource.getAllClickhouseUrls().size() > 1) {
-      int enabledUrlSize = dataSource.actualize();
-      LOG.info("There are {} urls enabled.", enabledUrlSize);
-    }
     try {
-      this.connection = dataSource.getConnection();
+      ClickHouseDataSource dataSource = new ClickHouseDataSource(jdbcUrl, new Properties());
+      if (userName != null && !userName.isEmpty()) {
+        connection = dataSource.getConnection(userName, password);
+      } else {
+        connection = dataSource.getConnection();
+      }
+      LOG.info("Successfully connect to clickhouse by: [{}]", connection.getUri());
     } catch (SQLException e) {
       throw new RuntimeException("Failed to create connection.", e);
     }
-    LOG.info("Connection created.");
 
     return connection;
   }

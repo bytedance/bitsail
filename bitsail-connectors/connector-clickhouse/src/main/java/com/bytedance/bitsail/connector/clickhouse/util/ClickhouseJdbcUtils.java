@@ -29,20 +29,12 @@ import java.util.stream.Collectors;
 public class ClickhouseJdbcUtils {
   private static final Logger LOG = LoggerFactory.getLogger(ClickhouseJdbcUtils.class);
 
-  private static final String SLASH = "/";
   private static final String QUOTE_IDENTIFIER = "`";
 
   private static final String SELECT_TEMPLATE = "SELECT %s FROM %s";
   private static final String SELECT_MAX_TEMPLATE = "SELECT MAX(%s) FROM %s";
   private static final String SELECT_MIN_TEMPLATE = "SELECT MIN(%s) FROM %s";
   private static final String SELECT_MIN_MAX_TEMPLATE = "SELECT MIN(%s), MAX(%s) FROM %s";
-
-  public static String constructJdbcUrl(String url, String database) {
-    if (StringUtils.isNotEmpty(database)) {
-      return url + SLASH + database;
-    }
-    return url;
-  }
 
   public static String getQuerySql(String database, String table, List<ColumnInfo> columnInfos) {
     String columns = columnInfos.stream()

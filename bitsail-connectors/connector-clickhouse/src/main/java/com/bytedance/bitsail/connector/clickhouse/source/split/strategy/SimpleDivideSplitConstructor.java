@@ -26,6 +26,7 @@ import com.bytedance.bitsail.connector.clickhouse.source.split.ClickhouseSourceS
 import com.bytedance.bitsail.connector.clickhouse.util.ClickhouseConnectionHolder;
 import com.bytedance.bitsail.connector.clickhouse.util.ClickhouseJdbcUtils;
 
+import com.clickhouse.jdbc.ClickHouseConnection;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
@@ -35,7 +36,6 @@ import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.yandex.clickhouse.ClickHouseConnection;
 
 import java.io.IOException;
 import java.sql.ResultSet;

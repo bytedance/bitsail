@@ -20,13 +20,13 @@ import com.clickhouse.client.ClickHouseCredentials;
 import com.clickhouse.client.ClickHouseFile;
 import com.clickhouse.client.ClickHouseNode;
 import com.clickhouse.client.ClickHouseProtocol;
+import com.clickhouse.jdbc.ClickHouseConnection;
+import com.clickhouse.jdbc.ClickHouseDataSource;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.ClickHouseContainer;
 import org.testcontainers.utility.DockerImageName;
-import ru.yandex.clickhouse.BalancedClickhouseDataSource;
-import ru.yandex.clickhouse.ClickHouseConnection;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -171,7 +171,7 @@ public class ClickhouseContainerHolder {
 
   private ResultSet performQuery(String sql) throws SQLException {
     String jdbcUrl = container.getJdbcUrl();
-    BalancedClickhouseDataSource dataSource = new BalancedClickhouseDataSource(jdbcUrl);
+    ClickHouseDataSource dataSource = new ClickHouseDataSource(jdbcUrl);
     try (ClickHouseConnection connection = dataSource.getConnection()) {
       Statement statement = connection.createStatement();
       statement.execute(sql);
