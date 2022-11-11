@@ -15,6 +15,11 @@
 
 package com.bytedance.bitsail.connector.clickhouse;
 
+import com.clickhouse.client.ClickHouseClient;
+import com.clickhouse.client.ClickHouseCredentials;
+import com.clickhouse.client.ClickHouseFile;
+import com.clickhouse.client.ClickHouseNode;
+import com.clickhouse.client.ClickHouseProtocol;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +28,8 @@ import org.testcontainers.utility.DockerImageName;
 import ru.yandex.clickhouse.BalancedClickhouseDataSource;
 import ru.yandex.clickhouse.ClickHouseConnection;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -129,6 +136,22 @@ public class ClickhouseContainerHolder {
     LOG.info("Successfully insert {} rows into table [{}]", totalCount, TABLE);
   }
 
+  public void importData() throws Exception {
+    ClickHouseNode server = getServer();
+    Path csvFile = Paths.get(this.getClass().getClassLoader().getResource("example_data.csv").getPath());
+    ClickHouseFile file = ClickHouseFile.of(csvFile);
+
+    try (ClickHouseClient client = ClickHouseClient.newInstance(server.getProtocol())) {
+      client.connect(server).write()
+          .table(TABLE)
+          .data(file)
+          .executeAndWait();
+    }
+
+    long count = countTable();
+    LOG.info("Successfully import {} rows", count);
+  }
+
   @SuppressWarnings("checkstyle:MagicNumber")
   private String generateRow(int index) throws Exception {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -154,5 +177,14 @@ public class ClickhouseContainerHolder {
       statement.execute(sql);
       return statement.getResultSet();
     }
+  }
+
+  private ClickHouseNode getServer() {
+    return ClickHouseNode.builder()
+        .host("localhost")
+        .port(ClickHouseProtocol.HTTP, container.getMappedPort(HTTP_PORT))
+        .database("default")
+        .credentials(ClickHouseCredentials.fromUserAndPassword(container.getUsername(), container.getPassword()))
+        .build();
   }
 }
