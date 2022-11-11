@@ -22,7 +22,7 @@
       "table_name": "test_opensource",
       "metastore_properties": "{\"hive.metastore.uris\":\"<Your-Hive-Metastore-Address>\"}",
       "partition": "date=20180101",
-      "parallelism_num": 2,
+      "reader_parallelism_num": 2,
       "source_engine": "hive"
     }
   }
