@@ -116,7 +116,7 @@ public class DorisPartitionHelper {
       try (ResultSet resultSet = statement.executeQuery(querySequenceColumn)) {
         while (resultSet.next()) {
           log.info("field: {}, type: {}", resultSet.getString("Field"), resultSet.getString("Type"));
-          if (resultSet.getString("Field").equals("__DORIS_SEQUENCE_COL__")) {
+          if ("__DORIS_SEQUENCE_COL__".equals(resultSet.getString("Field"))) {
             seqColumnType = resultSet.getString("Type");
           }
         }

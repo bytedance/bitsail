@@ -103,7 +103,8 @@ public class DorisPartitionManager {
       boolean needResetDynamicPartition = false;
       try {
         if (partitionHelper.isDynamicPartition()) {
-          partitionHelper.setDynamicPartitionEnableConf(false);   // unable to create partition when dynamic partition enabled
+          // unable to create partition when dynamic partition enabled
+          partitionHelper.setDynamicPartitionEnableConf(false);
           needResetDynamicPartition = true;
         }
         for (DorisPartition partition : partitions) {

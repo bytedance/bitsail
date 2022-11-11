@@ -20,7 +20,7 @@ package com.bytedance.bitsail.connector.doris.error;
 import com.bytedance.bitsail.common.exception.ErrorCode;
 
 public enum DorisErrorCode implements ErrorCode {
-
+  // Failed to init write proxy
   PROXY_INIT_FAILED("DorisWriter-01", "Failed to init write proxy"),
   REQUIRED_VALUE("DorisWriter-02", "You missed parameter which is required, please check your configuration."),
   UNSUPPORTED_TABLE_MODEL("DorisWriter-03", "Unsupported doris table model."),
