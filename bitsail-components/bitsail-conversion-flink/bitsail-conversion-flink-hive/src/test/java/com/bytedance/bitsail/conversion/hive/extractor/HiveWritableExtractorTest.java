@@ -51,6 +51,6 @@ public class HiveWritableExtractorTest {
     HiveObjectConversion conversion = HiveInspectors
         .getConversion(objectInspector, typeInfoList.get(4), new HiveShimV121());
     Assert.assertEquals(conversion.toHiveObject(new LongColumn(1L)),
-        Long.valueOf(1L).intValue());
+        Long.valueOf(1L).byteValue());
   }
 }

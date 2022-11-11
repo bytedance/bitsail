@@ -85,7 +85,7 @@ public class HiveInspectors {
       } else if (inspector instanceof StringObjectInspector) {
         conversion = BitSailColumnConversion::toHiveString;
       } else if (inspector instanceof JavaByteObjectInspector) {
-        conversion = BitSailColumnConversion::toHiveInt;
+        conversion = BitSailColumnConversion::toHiveByte;
       } else if (inspector instanceof ByteObjectInspector
           || inspector instanceof BinaryObjectInspector) {
         conversion = BitSailColumnConversion::toHiveBytes;
