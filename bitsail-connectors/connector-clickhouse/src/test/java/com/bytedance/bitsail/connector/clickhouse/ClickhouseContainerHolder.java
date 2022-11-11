@@ -23,6 +23,8 @@ import com.clickhouse.client.ClickHouseProtocol;
 import com.clickhouse.jdbc.ClickHouseConnection;
 import com.clickhouse.jdbc.ClickHouseDataSource;
 import com.google.common.collect.Lists;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.ClickHouseContainer;
@@ -30,6 +32,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -109,13 +112,11 @@ public class ClickhouseContainerHolder {
   }
 
   public long countTable() throws SQLException {
-    ResultSet resultSet = performQuery(COUNT_SQL);
-    resultSet.next();
-    return resultSet.getLong(1);
-  }
-
-  public ResultSet scan() throws SQLException {
-    return performQuery(SCAN_SQL);
+    try (CloseableResultSet rs = performQuery(COUNT_SQL)) {
+      ResultSet resultSet = rs.getResultSet();
+      resultSet.next();
+      return resultSet.getLong(1);
+    }
   }
 
   public void insertData(int totalCount) throws Exception {
@@ -169,14 +170,14 @@ public class ClickhouseContainerHolder {
     return data.stream().collect(Collectors.joining(", ", "(", ")"));
   }
 
-  private ResultSet performQuery(String sql) throws SQLException {
+  private CloseableResultSet performQuery(String sql) throws SQLException {
     String jdbcUrl = container.getJdbcUrl();
     ClickHouseDataSource dataSource = new ClickHouseDataSource(jdbcUrl);
-    try (ClickHouseConnection connection = dataSource.getConnection()) {
-      Statement statement = connection.createStatement();
-      statement.execute(sql);
-      return statement.getResultSet();
-    }
+    ClickHouseConnection connection = dataSource.getConnection();
+    Statement statement = connection.createStatement();
+    statement.execute(sql);
+
+    return new CloseableResultSet(statement.getResultSet(), connection);
   }
 
   private ClickHouseNode getServer() {
@@ -186,5 +187,19 @@ public class ClickhouseContainerHolder {
         .database("default")
         .credentials(ClickHouseCredentials.fromUserAndPassword(container.getUsername(), container.getPassword()))
         .build();
+  }
+
+  @AllArgsConstructor
+  private static class CloseableResultSet implements AutoCloseable {
+    @Getter
+    private final ResultSet resultSet;
+    private final Connection connection;
+
+    @Override
+    public void close() throws SQLException {
+      if (connection != null) {
+        connection.close();
+      }
+    }
   }
 }
