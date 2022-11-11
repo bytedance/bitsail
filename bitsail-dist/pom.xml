@@ -118,6 +118,13 @@
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-fake</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-connector-hadoop</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>

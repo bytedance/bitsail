@@ -55,6 +55,8 @@ public final class BitSailColumnConversion {
       switch (primitiveType) {
         case BOOLEAN:
           return ((Column) o).asBoolean();
+        case BYTE:
+          return ((Column) o).asLong().byteValue();
         case LONG:
           return toIntOrBigintHiveObject((Column) o, false);
         case INT:
@@ -103,6 +105,10 @@ public final class BitSailColumnConversion {
 
   public static Object toHiveInt(Object o) {
     return toHivePrimitiveObject(o, PrimitiveCategory.INT);
+  }
+
+  public static Object toHiveByte(Object o) {
+    return toHivePrimitiveObject(o, PrimitiveCategory.BYTE);
   }
 
   public static Object toHiveShort(Object o) {

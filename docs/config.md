@@ -150,7 +150,7 @@ Other parameters please check the [connector](./connectors)
                 }
             ],
             "write_mode":"overwrite",
-            "parallelism_num":1
+            "writer_parallelism_num":1
         }
 }
 

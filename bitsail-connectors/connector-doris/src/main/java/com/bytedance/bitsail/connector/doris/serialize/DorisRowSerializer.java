@@ -45,11 +45,16 @@ public class DorisRowSerializer implements Serializable {
   protected DorisRowConverter rowConverter;
 
   protected enum DELETED_FLAG {
+    // not delete is 0
     NOT_DELETED("0"),
     DELETED("1");
 
-    String value;
+    final String value;
 
+    /**
+     * delete flag
+     *
+     */
     DELETED_FLAG(String value) {
       this.value = value;
     }
