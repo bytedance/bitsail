@@ -29,12 +29,12 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <clickhouse-jdbc-dirver.version>0.3.2</clickhouse-jdbc-dirver.version>
+        <clickhouse-jdbc-dirver.version>0.3.2-patch11</clickhouse-jdbc-dirver.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>ru.yandex.clickhouse</groupId>
+            <groupId>com.clickhouse</groupId>
             <artifactId>clickhouse-jdbc</artifactId>
             <version>${clickhouse-jdbc-dirver.version}</version>
         </dependency>
