@@ -17,6 +17,13 @@
 
 package com.bytedance.bitsail.conversion.hive.extractor;
 
+import com.bytedance.bitsail.common.column.LongColumn;
+import com.bytedance.bitsail.conversion.hive.HiveInspectors;
+import com.bytedance.bitsail.conversion.hive.HiveObjectConversion;
+
+import com.bytedance.bitsail.shaded.hive.shim.HiveShimV121;
+
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,11 +41,16 @@ public class HiveWritableExtractorTest {
 
   @Test
   public void testParseHiveTypeInfo() {
-    String columnTypeStr = "bigint,string,array<double>,map<int,string>";
+    String columnTypeStr = "bigint,string,array<double>,map<int,string>,tinyint";
     List<TypeInfo> typeInfoList = HiveWritableExtractor.getHiveTypeInfos(columnTypeStr);
     Assert.assertEquals("bigint", typeInfoList.get(0).getTypeName());
     Assert.assertEquals("string", typeInfoList.get(1).getTypeName());
     Assert.assertEquals("array<double>", typeInfoList.get(2).getTypeName());
     Assert.assertEquals("map<int,string>", typeInfoList.get(3).getTypeName());
+    ObjectInspector objectInspector = HiveInspectors.getObjectInspector(typeInfoList.get(4));
+    HiveObjectConversion conversion = HiveInspectors
+        .getConversion(objectInspector, typeInfoList.get(4), new HiveShimV121());
+    Assert.assertEquals(conversion.toHiveObject(new LongColumn(1L)),
+        Long.valueOf(1L).byteValue());
   }
 }

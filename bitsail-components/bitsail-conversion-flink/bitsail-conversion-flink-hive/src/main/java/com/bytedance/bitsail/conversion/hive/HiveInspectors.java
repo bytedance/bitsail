@@ -49,6 +49,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.HiveCharObjectIns
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.HiveDecimalObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.HiveVarcharObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.IntObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.JavaByteObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.LongObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.ShortObjectInspector;
@@ -83,6 +84,8 @@ public class HiveInspectors {
         conversion = BitSailColumnConversion::toHiveBoolean;
       } else if (inspector instanceof StringObjectInspector) {
         conversion = BitSailColumnConversion::toHiveString;
+      } else if (inspector instanceof JavaByteObjectInspector) {
+        conversion = BitSailColumnConversion::toHiveByte;
       } else if (inspector instanceof ByteObjectInspector
           || inspector instanceof BinaryObjectInspector) {
         conversion = BitSailColumnConversion::toHiveBytes;
