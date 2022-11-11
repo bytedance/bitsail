@@ -40,7 +40,7 @@
         }
       ],
       "partition_name": "datetime",
-      "parallelism_num": 1
+      "writer_parallelism_num": 1
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource",
