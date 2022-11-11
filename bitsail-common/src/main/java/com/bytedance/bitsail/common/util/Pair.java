@@ -77,8 +77,8 @@ public class Pair<T1, T2> implements Serializable {
   @Override
   @SuppressWarnings("unchecked")
   public boolean equals(Object other) {
-    return other instanceof Pair && equals(first, ((Pair) other).first) &&
-        equals(second, ((Pair) other).second);
+    return other instanceof Pair && equals(first, ((Pair<?, ?>) other).first) &&
+        equals(second, ((Pair<?, ?>) other).second);
   }
 
   /**
