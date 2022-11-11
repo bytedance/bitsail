@@ -56,6 +56,9 @@ public class ClickhouseConnectionHolder implements AutoCloseable {
     }
   }
 
+  /**
+   * Refrence: <a href="https://github.com/ClickHouse/clickhouse-jdbc/tree/develop/clickhouse-jdbc#upgrade-to-032">Clickhouse-jdbc</a>
+   */
   public ClickHouseConnection connect() {
     if (connection != null) {
       return connection;

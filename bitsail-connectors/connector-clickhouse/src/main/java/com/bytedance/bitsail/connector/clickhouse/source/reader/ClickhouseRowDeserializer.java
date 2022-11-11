@@ -16,11 +16,12 @@
 package com.bytedance.bitsail.connector.clickhouse.source.reader;
 
 import com.bytedance.bitsail.common.BitSailException;
-import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.typeinfo.BasicTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 import com.bytedance.bitsail.connector.clickhouse.error.ClickhouseErrorCode;
-import com.bytedance.bitsail.connector.clickhouse.option.ClickhouseReaderOptions;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -37,13 +38,11 @@ public class ClickhouseRowDeserializer {
   private final List<FiledConverter> converters;
   private final int fieldSize;
 
-  public ClickhouseRowDeserializer(BitSailConfiguration jobConf) {
-    List<ColumnInfo> columnInfos = jobConf.get(ClickhouseReaderOptions.COLUMNS);
-
-    this.fieldSize = columnInfos.size();
+  public ClickhouseRowDeserializer(TypeInfo<?>[] typeInfos) {
+    this.fieldSize = typeInfos.length;
     this.converters = new ArrayList<>();
     for (int i = 0; i < fieldSize; ++i) {
-      converters.add(initFieldConverter(i + 1, columnInfos.get(i)));
+      converters.add(initFieldConverter(i + 1, typeInfos[i]));
     }
   }
 
@@ -59,65 +58,57 @@ public class ClickhouseRowDeserializer {
     return row;
   }
 
-  private FiledConverter initFieldConverter(int index, ColumnInfo columnInfo) {
-    String typeName = columnInfo.getType().trim().toUpperCase();
-    if (typeName.contains("DECIMAL")) {
-      typeName = "DECIMAL";
+  private FiledConverter initFieldConverter(int index, TypeInfo<?> typeInfo) {
+    if (!(typeInfo instanceof BasicTypeInfo)) {
+      throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_COLUMN_TYPE, typeInfo.getTypeClass().getName() + " is not supported yet.");
     }
 
-    switch (typeName) {
-      case "INT8":
-        return resultSet -> resultSet.getByte(index);
-      case "UINT8":
-      case "INT16":
-        return resultSet -> resultSet.getShort(index);
-      case "UINT16":
-      case "INT":
-      case "INT32":
-        return resultSet -> resultSet.getInt(index);
-      case "UINT32":
-      case "LONG":
-      case "INT64":
-        return resultSet -> resultSet.getLong(index);
-      case "UINT64":
-      case "BIGINT":
-        return resultSet -> {
-          BigDecimal dec = resultSet.getBigDecimal(index);
-          return dec == null ? null : dec.toBigInteger();
-        };
-
-      case "FLOAT":
-      case "FLOAT32":
-        return resultSet -> resultSet.getFloat(index);
-      case "DOUBLE":
-      case "FLOAT64":
-        return resultSet -> resultSet.getDouble(index);
-      case "DECIMAL":
-        return resultSet -> resultSet.getBigDecimal(index);
-
-      case "CHAR":
-      case "VARCHAR":
-      case "TEXT":
-      case "STRING":
-        return resultSet -> resultSet.getString(index);
-
-      case "DATE":
-        return resultSet -> resultSet.getDate(index);
-      case "DATETIME":
-      case "TIMESTAMP":
-        return resultSet -> resultSet.getTimestamp(index);
-      case "TIME":
-        return resultSet -> resultSet.getTime(index);
-
-      case "BOOLEAN":
-        return resultSet -> resultSet.getBoolean(index);
-
-      case "NULL":
-        return resultSet -> null;
-
-      default:
-        throw new UnsupportedOperationException("Unsupported data type: " + typeName);
+    Class<?> curClass = typeInfo.getTypeClass();
+    if (TypeInfos.BYTE_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getByte(index);
     }
+    if (TypeInfos.SHORT_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getShort(index);
+    }
+    if (TypeInfos.INT_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getInt(index);
+    }
+    if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getLong(index);
+    }
+    if (TypeInfos.BIG_INTEGER_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> {
+        BigDecimal dec = resultSet.getBigDecimal(index);
+        return dec == null ? null : dec.toBigInteger();
+      };
+    }
+    if (TypeInfos.FLOAT_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getFloat(index);
+    }
+    if (TypeInfos.DOUBLE_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getDouble(index);
+    }
+    if (TypeInfos.BIG_DECIMAL_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getBigDecimal(index);
+    }
+    if (TypeInfos.STRING_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getString(index);
+    }
+    if (TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getDate(index);
+    }
+    if (TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getTimestamp(index);
+    }
+    if (TypeInfos.SQL_TIME_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getTime(index);
+    }
+    if (TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getBoolean(index);
+    }
+    if (TypeInfos.VOID_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> null;
+    }
+    throw new UnsupportedOperationException("Unsupported data type: " + typeInfo);
   }
-
 }
