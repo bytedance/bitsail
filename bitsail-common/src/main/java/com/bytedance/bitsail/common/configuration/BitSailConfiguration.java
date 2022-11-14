@@ -857,11 +857,11 @@ public class BitSailConfiguration implements Serializable {
   }
 
   private int getIndex(final String index) {
-    return Integer.valueOf(index.replace("[", "").replace("]", ""));
+    return Integer.parseInt(index.replace("[", "").replace("]", ""));
   }
 
   private boolean isSuitForRoot(final Object object) {
-    return null != object && (object instanceof List || object instanceof Map);
+    return (object instanceof List || object instanceof Map);
 
   }
 
@@ -916,7 +916,7 @@ public class BitSailConfiguration implements Serializable {
   }
 
   private Map<String, String> flatten(Map.Entry<String, Object> in) {
-    if (!Map.class.isInstance(in.getValue())) {
+    if (!(in.getValue() instanceof Map)) {
       return Collections.singletonMap(in.getKey(), in.getValue().toString());
     }
 
@@ -930,6 +930,7 @@ public class BitSailConfiguration implements Serializable {
   }
 
   private enum ConfigType {
+    //Basic data type enumeration
     Boolean, Character, Double, Float, Integer, List, Long, Map, String
   }
 }
