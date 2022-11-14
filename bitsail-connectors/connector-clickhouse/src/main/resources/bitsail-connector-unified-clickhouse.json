@@ -1,5 +1,5 @@
 {
-  "name": "bitsail-connector-unified-kudu",
+  "name": "bitsail-connector-unified-clickhouse",
   "classes": [
     "com.bytedance.bitsail.connector.clickhouse.source.ClickhouseSource"
   ],

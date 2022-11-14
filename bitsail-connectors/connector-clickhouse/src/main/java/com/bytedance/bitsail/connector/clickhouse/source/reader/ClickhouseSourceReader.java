@@ -20,7 +20,6 @@ import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.connector.clickhouse.error.ClickhouseErrorCode;
 import com.bytedance.bitsail.connector.clickhouse.option.ClickhouseReaderOptions;
 import com.bytedance.bitsail.connector.clickhouse.source.split.ClickhouseSourceSplit;
@@ -76,8 +75,8 @@ public class ClickhouseSourceReader implements SourceReader<Row, ClickhouseSourc
    */
   private ClickhouseSourceSplit curSplit;
 
-  public ClickhouseSourceReader(BitSailConfiguration jobConf, int subTaskId, TypeInfo<?>[] typeInfos) {
-    this.subTaskId = subTaskId;
+  public ClickhouseSourceReader(BitSailConfiguration jobConf, SourceReader.Context readerContext) {
+    this.subTaskId = readerContext.getIndexOfSubtask();
 
     this.dbName = jobConf.getNecessaryOption(ClickhouseReaderOptions.DB_NAME,
         ClickhouseErrorCode.REQUIRED_VALUE);
@@ -93,7 +92,7 @@ public class ClickhouseSourceReader implements SourceReader<Row, ClickhouseSourc
 
     this.splits = new ConcurrentLinkedDeque<>();
     this.connectionHolder = new ClickhouseConnectionHolder(jobConf);
-    this.rowDeserializer = new ClickhouseRowDeserializer(typeInfos);
+    this.rowDeserializer = new ClickhouseRowDeserializer(readerContext.getTypeInfos());
     LOG.info("Clickhouse source reader {} is initialized.", subTaskId);
   }
 

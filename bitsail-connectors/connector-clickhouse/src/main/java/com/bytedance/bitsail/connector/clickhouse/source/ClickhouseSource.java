@@ -56,7 +56,7 @@ public class ClickhouseSource implements Source<Row, ClickhouseSourceSplit, Empt
 
   @Override
   public SourceReader<Row, ClickhouseSourceSplit> createReader(SourceReader.Context readerContext) {
-    return new ClickhouseSourceReader(jobConf, readerContext.getIndexOfSubtask(), readerContext.getTypeInfos());
+    return new ClickhouseSourceReader(jobConf, readerContext);
   }
 
   @Override
