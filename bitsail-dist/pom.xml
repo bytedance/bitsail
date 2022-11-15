@@ -216,6 +216,13 @@
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-clickhouse</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-connector-ftp</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>

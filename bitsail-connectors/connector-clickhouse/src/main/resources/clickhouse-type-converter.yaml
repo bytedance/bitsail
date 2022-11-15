@@ -1,0 +1,113 @@
+engine.type.to.bitsail.type.converter:
+  - source.type: int8
+    target.type: byte
+
+  - source.type: uint8
+    target.type: short
+
+  - source.type: int16
+    target.type: short
+
+  - source.type: uint16
+    target.type: int
+
+  - source.type: int32
+    target.type: int
+
+  - source.type: int
+    target.type: int
+
+  - source.type: uint32
+    target.type: long
+
+  - source.type: int64
+    target.type: long
+
+  - source.type: long
+    target.type: long
+
+  - source.type: uint64
+    target.type: bigint
+
+  - source.type: bigint
+    target.type: bigint
+
+  - source.type: float
+    target.type: float
+
+  - source.type: float32
+    target.type: float
+
+  - source.type: double
+    target.type: double
+
+  - source.type: float64
+    target.type: double
+
+  - source.type: decimal
+    target.type: bigdecimal
+
+  - source.type: char
+    target.type: string
+
+  - source.type: varchar
+    target.type: string
+
+  - source.type: text
+    target.type: string
+
+  - source.type: string
+    target.type: string
+
+  - source.type: date
+    target.type: date.date
+
+  - source.type: datetime
+    target.type: timestamp
+
+  - source.type: timestamp
+    target.type: timestamp
+
+  - source.type: time
+    target.type: date.time
+
+  - source.type: boolean
+    target.type: boolean
+
+  - source.type: null
+    target.type: void
+
+
+bitsail.type.to.engine.type.converter:
+  - source.type: boolean
+    target.type: boolean
+
+  - source.type: byte
+    target.type: int8
+
+  - source.type: short
+    target.type: int16
+
+  - source.type: int
+    target.type: int32
+
+  - source.type: long
+    target.type: int64
+
+  - source.type: float
+    target.type: float32
+
+  - source.type: double
+    target.type: float64
+
+  - source.type: date.date
+    target.type: date
+
+  - source.type: date.datetime
+    target.type: timestamp
+
+  - source.type: bigdecimal
+    target.type: decimal
+
+  - source.type: string
+    target.type: string
