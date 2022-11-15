@@ -53,8 +53,6 @@ public class MapColumn<K extends Column, V extends Column> extends Column implem
    */
   public MapColumn(Class<K> keyClass, Class<V> valueClass) {
     super(null, 0);
-    //this.keyClass = ReflectionUtil.getTemplateType1(this.getClass());
-    //this.valueClass = ReflectionUtil.getTemplateType2(this.getClass());
     this.keyClass = keyClass;
     this.valueClass = valueClass;
 
@@ -68,8 +66,6 @@ public class MapColumn<K extends Column, V extends Column> extends Column implem
    */
   public MapColumn(Map<K, V> map, Class<K> keyClass, Class<V> valueClass) {
     super(map, 0);
-    //this.keyClass = ReflectionUtil.getTemplateType1(this.getClass());
-    //this.valueClass = ReflectionUtil.getTemplateType2(this.getClass());
     this.keyClass = keyClass;
     this.valueClass = valueClass;
 
@@ -164,8 +160,6 @@ public class MapColumn<K extends Column, V extends Column> extends Column implem
   @Override
   public String toString() {
     return JSON.toJSONString(this.map);
-    //return JSON.toJSONString(this.getRawData());
-    //return this.map.toString();
   }
 
   /*
@@ -194,13 +188,10 @@ public class MapColumn<K extends Column, V extends Column> extends Column implem
     }
     final MapColumn<?, ?> other = (MapColumn<?, ?>) obj;
     if (this.map == null) {
-      if (other.map != null) {
-        return false;
-      }
-    } else if (!this.map.equals(other.map)) {
-      return false;
+      return other.map == null;
+    } else {
+      return this.map.equals(other.map);
     }
-    return true;
   }
 
   /*

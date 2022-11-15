@@ -62,9 +62,9 @@ public class BitSailConfiguration implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private Set<String> secretKeyPathSet =
-      new HashSet<String>();
+      new HashSet<>();
 
-  private Object root = null;
+  private Object root;
 
   private BitSailConfiguration(final String json) {
     try {
@@ -186,7 +186,7 @@ public class BitSailConfiguration implements Serializable {
     String path = option.key();
     this.checkPath(path);
     try {
-      return (T) this.findObjectByConfig(path, option);
+      return this.findObjectByConfig(path, option);
     } catch (Exception e) {
       throw BitSailException.asBitSailException(errorCode,
           String.format("Invalid configuration, [%s] must be set.", path));
@@ -274,7 +274,7 @@ public class BitSailConfiguration implements Serializable {
     } catch (Exception e) {
       throw BitSailException.asBitSailException(
           CommonErrorCode.CONFIG_ERROR,
-          String.format(String.format("Failed to get int configuration value from path = [%s]", path)));
+          String.format("Failed to get int configuration value from path = [%s]", path));
     }
   }
 
@@ -289,7 +289,7 @@ public class BitSailConfiguration implements Serializable {
     } catch (Exception e) {
       throw BitSailException.asBitSailException(
           CommonErrorCode.CONFIG_ERROR,
-          String.format(String.format("Failed to get long configuration value from path = [%s]", path)));
+          String.format("Failed to get long configuration value from path = [%s]", path));
     }
   }
 
@@ -304,7 +304,7 @@ public class BitSailConfiguration implements Serializable {
     } catch (Exception e) {
       throw BitSailException.asBitSailException(
           CommonErrorCode.CONFIG_ERROR,
-          String.format(String.format(String.format("Failed to get float configuration value from path = [%s]", path))));
+          String.format("Failed to get float configuration value from path = [%s]", path));
     }
   }
 
@@ -319,7 +319,7 @@ public class BitSailConfiguration implements Serializable {
     } catch (Exception e) {
       throw BitSailException.asBitSailException(
           CommonErrorCode.CONFIG_ERROR,
-          String.format(String.format(String.format("Failed to get double configuration value from path = [%s]", path))));
+          String.format("Failed to get double configuration value from path = [%s]", path));
     }
   }
 
@@ -330,7 +330,7 @@ public class BitSailConfiguration implements Serializable {
       return null;
     }
 
-    List<T> result = new ArrayList<T>();
+    List<T> result = new ArrayList<>();
 
     List<Object> origin = (List<Object>) object;
     for (final Object each : origin) {
@@ -379,7 +379,7 @@ public class BitSailConfiguration implements Serializable {
       return null;
     }
 
-    Map<String, T> result = new HashMap<String, T>();
+    Map<String, T> result = new HashMap<>();
     for (final String key : map.keySet()) {
       result.put(key, (T) map.get(key));
     }
@@ -460,7 +460,7 @@ public class BitSailConfiguration implements Serializable {
   }
 
   public Set<String> getKeys() {
-    Set<String> collect = new HashSet<String>();
+    Set<String> collect = new HashSet<>();
     this.getKeysRecursive(this.getInternal(), "", collect);
     return collect;
   }
@@ -553,17 +553,11 @@ public class BitSailConfiguration implements Serializable {
       return;
     }
 
-    boolean isList = current instanceof List;
-    if (isList) {
-      List<Object> lists = (List<Object>) current;
-      for (int i = 0; i < lists.size(); i++) {
-        getKeysRecursive(lists.get(i), path + String.format("[%d]", i),
-            collect);
-      }
-      return;
+    List<Object> lists = (List<Object>) current;
+    for (int i = 0; i < lists.size(); i++) {
+      getKeysRecursive(lists.get(i), path + String.format("[%d]", i),
+          collect);
     }
-
-    return;
   }
 
   public Object getInternal() {
@@ -591,7 +585,7 @@ public class BitSailConfiguration implements Serializable {
     }
 
     if (object instanceof List) {
-      List<Object> result = new ArrayList<Object>();
+      List<Object> result = new ArrayList<>();
       for (final Object each : (List<Object>) object) {
         result.add(extractFromConfiguration(each));
       }
@@ -599,7 +593,7 @@ public class BitSailConfiguration implements Serializable {
     }
 
     if (object instanceof Map) {
-      Map<String, Object> result = new HashMap<String, Object>();
+      Map<String, Object> result = new HashMap<>();
       for (final String key : ((Map<String, Object>) object).keySet()) {
         result.put(key,
             extractFromConfiguration(((Map<String, Object>) object)
@@ -635,14 +629,14 @@ public class BitSailConfiguration implements Serializable {
       String path = paths.get(i);
 
       if (isPathMap(path)) {
-        Map<String, Object> mapping = new HashMap<String, Object>();
+        Map<String, Object> mapping = new HashMap<>();
         mapping.put(path, child);
         child = mapping;
         continue;
       }
 
       if (isPathList(path)) {
-        List<Object> lists = new ArrayList<Object>(
+        List<Object> lists = new ArrayList<>(
             this.getIndex(path) + 1);
         expand(lists, this.getIndex(path) + 1);
         lists.set(this.getIndex(path), child);
@@ -675,7 +669,7 @@ public class BitSailConfiguration implements Serializable {
 
       boolean isCurrentMap = current instanceof Map;
       if (!isCurrentMap) {
-        mapping = new HashMap<String, Object>();
+        mapping = new HashMap<>();
         mapping.put(
             path,
             buildObject(paths.subList(index + 1, paths.size()),
@@ -706,7 +700,7 @@ public class BitSailConfiguration implements Serializable {
 
       boolean isCurrentList = current instanceof List;
       if (!isCurrentList) {
-        lists = expand(new ArrayList<Object>(), listIndexer + 1);
+        lists = expand(new ArrayList<>(), listIndexer + 1);
         lists.set(
             listIndexer,
             buildObject(paths.subList(index + 1, paths.size()),
@@ -793,10 +787,8 @@ public class BitSailConfiguration implements Serializable {
     for (final String each : split2List(path)) {
       if (isPathMap(each)) {
         target = findObjectInMap(target, each);
-        continue;
       } else {
         target = findObjectInList(target, each);
-        continue;
       }
     }
 
@@ -837,7 +829,7 @@ public class BitSailConfiguration implements Serializable {
               "The configuration is illegal, can't find element %s in the list value.", index));
     }
 
-    return ((List<Object>) target).get(Integer.valueOf(index));
+    return ((List<Object>) target).get(Integer.parseInt(index));
   }
 
   private List<Object> expand(List<Object> list, int size) {
@@ -892,7 +884,7 @@ public class BitSailConfiguration implements Serializable {
         "$[");
   }
 
-  public Map<String, String> getUnNecessaryMap(final ConfigOption option) {
+  public Map<String, String> getUnNecessaryMap(final ConfigOption<?> option) {
     if (!this.fieldExists(option)) {
       return new HashMap<>();
     }
@@ -923,9 +915,7 @@ public class BitSailConfiguration implements Serializable {
     String prefix = in.getKey();
     Map<String, Object> values = (Map<String, Object>) in.getValue();
     Map<String, Object> flattenMap = new HashMap<>();
-    values.keySet().forEach(key -> {
-      flattenMap.put(prefix + "." + key, values.get(key));
-    });
+    values.keySet().forEach(key -> flattenMap.put(prefix + "." + key, values.get(key)));
     return flatten(flattenMap);
   }
 

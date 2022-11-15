@@ -44,11 +44,11 @@ public class DoubleColumn extends Column {
   }
 
   public DoubleColumn(Long data) {
-    this(data == null ? (String) null : String.valueOf(data));
+    this(data == null ? null : String.valueOf(data));
   }
 
   public DoubleColumn(Integer data) {
-    this(data == null ? (String) null : String.valueOf(data));
+    this(data == null ? null : String.valueOf(data));
   }
 
   public DoubleColumn(final Double data) {
@@ -60,11 +60,11 @@ public class DoubleColumn extends Column {
   }
 
   public DoubleColumn(final BigDecimal data) {
-    this(null == data ? (String) null : data.toPlainString());
+    this(null == data ? null : data.toPlainString());
   }
 
   public DoubleColumn(final BigInteger data) {
-    this(null == data ? (String) null : data.toString());
+    this(null == data ? null : data.toString());
   }
 
   public DoubleColumn() {

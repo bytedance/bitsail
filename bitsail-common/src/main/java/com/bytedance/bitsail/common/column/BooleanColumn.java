@@ -52,7 +52,6 @@ public class BooleanColumn extends Column {
       }
       this.setByteSize(1);
     }
-    return;
   }
 
   public BooleanColumn() {

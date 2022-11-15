@@ -107,7 +107,7 @@ public class StringColumn extends Column {
     } catch (Exception e) {
       throw BitSailException.asBitSailException(
           CommonErrorCode.CONVERT_NOT_SUPPORT,
-          String.format("String[%s] can't convert to Date.", this.toString()));
+          String.format("String[%s] can't convert to Date.", this));
     }
   }
 
@@ -150,7 +150,7 @@ public class StringColumn extends Column {
       throw BitSailException.asBitSailException(
           CommonErrorCode.CONVERT_NOT_SUPPORT,
           String.format("String[%s] can't convert to Double.",
-              (String) this.getRawData()));
+              this.getRawData()));
     }
   }
 
@@ -178,8 +178,6 @@ public class StringColumn extends Column {
           CommonErrorCode.CONVERT_NOT_SUPPORT,
           String.format("String[\"%s\"] is a special type of Double which can't convert to other type.", data));
     }
-
-    return;
   }
 
   @Override

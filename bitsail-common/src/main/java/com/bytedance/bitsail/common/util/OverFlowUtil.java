@@ -29,9 +29,6 @@ import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-/**
- * @desc:
- */
 public class OverFlowUtil {
   public static final BigInteger MAX_LONG = BigInteger
       .valueOf(Long.MAX_VALUE);
@@ -57,7 +54,7 @@ public class OverFlowUtil {
     if (isOverFlow) {
       throw BitSailException.asBitSailException(
           CommonErrorCode.CONVERT_OVER_FLOW,
-          String.format("[%s] convert to long overflow.", integer.toString()));
+          String.format("[%s] convert to long overflow.", integer));
     }
   }
 

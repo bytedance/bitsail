@@ -27,7 +27,7 @@ public enum FrameworkErrorCode implements ErrorCode {
 
   private final String describe;
 
-  private FrameworkErrorCode(String code, String describe) {
+  FrameworkErrorCode(String code, String describe) {
     this.code = code;
     this.describe = describe;
   }

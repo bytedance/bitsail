@@ -77,10 +77,6 @@ public class SchemaHelper {
 
   /**
    * if cols1.size>cols2.size return cols1 - cols2 else return cols2 - cols1
-   *
-   * @param cols1
-   * @param cols2
-   * @return
    */
   public static List<ColumnInfo> getComplementaryColumns(LinkedHashMap<String, String> cols1, LinkedHashMap<String, String> cols2) {
     LinkedHashMap<String, String> temp;
@@ -92,9 +88,7 @@ public class SchemaHelper {
       cols2 = temp;
     }
     cols2.forEach((x, y) -> cols2Copy.put(convert2ColumnName(x), y));
-    Iterator it1 = cols1.entrySet().iterator();
-    while (it1.hasNext()) {
-      Map.Entry<String, String> entry1 = (Map.Entry<String, String>) it1.next();
+    for (Map.Entry<String, String> entry1 : cols1.entrySet()) {
       String colName1 = entry1.getKey();
       String colType1 = entry1.getValue();
       if (!cols2Copy.containsKey(convert2ColumnName(colName1))) {

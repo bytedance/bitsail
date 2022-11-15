@@ -191,10 +191,6 @@ public class HttpManager {
 
   /**
    * generate http request body by contentType
-   *
-   * @param body
-   * @param contentType
-   * @return
    */
   public static StringEntity getEntityByContentType(Map<String, Object> body, ContentType contentType) {
     StringEntity entity;
@@ -216,10 +212,6 @@ public class HttpManager {
 
   /**
    * encapsulate the apache httpclient response, and close the response after wrapping
-   *
-   * @param response
-   * @return
-   * @throws IOException
    */
   public static WrappedResponse wrapAndClose(CloseableHttpResponse response) throws IOException {
     try {

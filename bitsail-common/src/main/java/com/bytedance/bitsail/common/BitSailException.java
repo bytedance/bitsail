@@ -28,9 +28,6 @@ import com.bytedance.bitsail.common.exception.ErrorCode;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-/**
- * @desc:
- */
 public class BitSailException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 

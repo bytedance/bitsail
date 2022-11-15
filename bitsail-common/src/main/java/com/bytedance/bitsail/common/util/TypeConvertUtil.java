@@ -17,9 +17,6 @@
 
 package com.bytedance.bitsail.common.util;
 
-/**
- * @desc:
- */
 public class TypeConvertUtil {
 
   public enum StorageEngine {

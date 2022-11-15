@@ -23,10 +23,6 @@
 
 package com.bytedance.bitsail.common.util;
 
-/**
- * Desc:
- */
-
 import java.io.Serializable;
 
 /**
@@ -67,7 +63,7 @@ public class Pair<T1, T2> implements Serializable {
    * @return a new pair containing the passed arguments
    */
   public static <T1, T2> Pair<T1, T2> newPair(T1 a, T2 b) {
-    return new Pair<T1, T2>(a, b);
+    return new Pair<>(a, b);
   }
 
   private static boolean equals(Object x, Object y) {
@@ -75,7 +71,6 @@ public class Pair<T1, T2> implements Serializable {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public boolean equals(Object other) {
     return other instanceof Pair && equals(first, ((Pair<?, ?>) other).first) &&
         equals(second, ((Pair<?, ?>) other).second);

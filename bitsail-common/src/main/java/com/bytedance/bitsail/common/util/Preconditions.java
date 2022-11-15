@@ -25,11 +25,8 @@ package com.bytedance.bitsail.common.util;
 
 import javax.annotation.Nullable;
 
-/**
- * @desc:
- */
 public class Preconditions {
-// ------------------------------------------------------------------------
+  // ------------------------------------------------------------------------
   //  Null checks
   // ------------------------------------------------------------------------
 
@@ -234,7 +231,7 @@ public class Preconditions {
   public static void checkElementIndex(int index, int size, @Nullable String errorMessage) {
     checkArgument(size >= 0, "Size was negative.");
     if (index < 0 || index >= size) {
-      throw new IndexOutOfBoundsException(String.valueOf(errorMessage) + " Index: " + index + ", Size: " + size);
+      throw new IndexOutOfBoundsException(errorMessage + " Index: " + index + ", Size: " + size);
     }
   }
 
@@ -260,7 +257,7 @@ public class Preconditions {
       if (placeholderStart == -1) {
         break;
       }
-      builder.append(template.substring(templateStart, placeholderStart));
+      builder.append(template, templateStart, placeholderStart);
       builder.append(args[i++]);
       templateStart = placeholderStart + 2;
     }

@@ -22,7 +22,7 @@ import com.bytedance.bitsail.common.util.Preconditions;
 import com.alibaba.fastjson.TypeReference;
 
 /**
- * @desc: {@code ConfigOptions} are used to build a {@link ConfigOption}.
+ * {@code ConfigOptions} are used to build a {@link ConfigOption}.
  * The option is typically built in one of the following pattern:
  *
  * <pre>{@code
@@ -109,7 +109,7 @@ public class ConfigOptions {
     }
 
     public <T> ConfigOption<T> onlyReference(TypeReference<T> reference) {
-      return new ConfigOption<T>(key, null, reference);
+      return new ConfigOption<>(key, null, reference);
     }
   }
 }

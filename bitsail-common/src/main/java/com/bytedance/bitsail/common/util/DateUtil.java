@@ -164,7 +164,7 @@ public class DateUtil {
         cal.setTimeInMillis(addMill);
         time = cal.getTimeInMillis();
       } catch (Exception e) {
-        throw new IllegalArgumentException("Can't convert " + data + " to MillSecond, Exception: " + e.toString());
+        throw new IllegalArgumentException("Can't convert " + data + " to MillSecond, Exception: " + e);
       }
     }
     return time;

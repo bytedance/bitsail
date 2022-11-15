@@ -334,9 +334,6 @@ public class DdlSyncManager {
     log.info("sync ddl finished, cost: {}s", stopWatch.getTime() / 1000);
   }
 
-  /**
-   * @throws Exception
-   */
   private void doIntersectAlignment() throws Exception {
     if (null == readerExternalEngineConnector || null == writerExternalEngineConnector) {
       throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
@@ -373,9 +370,6 @@ public class DdlSyncManager {
     log.info("auto_get_columns is source_only, get columns from DB finished, final reader columns {}.", columnInfos);
   }
 
-  /**
-   * @throws Exception
-   */
   public void doExternalColumnAlignment(SchemaColumnAligner.ColumnAlignmentStrategy strategy) throws Exception {
     if (!commonConf.get(CommonOptions.SYNC_DDL)) {
       log.info("sync_ddl switch is off, will not auto sync ddl.");

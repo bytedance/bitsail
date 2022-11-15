@@ -50,7 +50,7 @@ public class ListColumn<V extends Column> extends Column implements List<V> {
 
     this.valueClass = valueClass;
 
-    this.list = new ArrayList<V>();
+    this.list = new ArrayList<>();
   }
 
   /**
@@ -65,7 +65,7 @@ public class ListColumn<V extends Column> extends Column implements List<V> {
 
     this.valueClass = valueClass;
 
-    this.list = new ArrayList<V>(c);
+    this.list = new ArrayList<>(c);
 
     int size = 0;
     for (V o : this.list) {
@@ -184,13 +184,10 @@ public class ListColumn<V extends Column> extends Column implements List<V> {
     }
     final ListColumn<?> other = (ListColumn<?>) obj;
     if (this.list == null) {
-      if (other.list != null) {
-        return false;
-      }
-    } else if (!this.list.equals(other.list)) {
-      return false;
+      return other.list == null;
+    } else {
+      return this.list.equals(other.list);
     }
-    return true;
   }
 
   /*

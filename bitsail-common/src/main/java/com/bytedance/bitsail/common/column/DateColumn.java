@@ -90,7 +90,7 @@ public class DateColumn extends Column {
     } catch (Exception e) {
       throw BitSailException.asBitSailException(
           CommonErrorCode.CONVERT_NOT_SUPPORT,
-          String.format("Date[%s] can't convert to String .", this.toString()));
+          String.format("Date[%s] can't convert to String .", this));
     }
   }
 

@@ -51,7 +51,7 @@ public class MongoTypeInfoConverter extends FileMappingTypeInfoConverter {
       return getMapTypeInfoFromMongoDBType(engineType);
     } else {
       throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-          "MongDB engine, invalid MongoDB type: " + engineType);
+          "MongoDB engine, invalid MongoDB type: " + engineType);
     }
   }
 
@@ -76,7 +76,7 @@ public class MongoTypeInfoConverter extends FileMappingTypeInfoConverter {
           "MongoDB engine, invalid MongoDB array type: " + type);
     }
     String elementType = type.substring(ARRAY_TYPE.length() + 1, type.length() - 1);
-    TypeInfo<?> elementTypeInformation = getTypeInfo(elementType);
+    TypeInfo<?> elementTypeInformation = fromTypeString(elementType);
     return new ListTypeInfo<>(elementTypeInformation);
 
   }
@@ -95,22 +95,8 @@ public class MongoTypeInfoConverter extends FileMappingTypeInfoConverter {
     String valueType = parts[1];
 
     TypeInfo<?> keyTypeInformation = getBasicTypeInfoFromMongoDBType(keyType);
-    TypeInfo<?> valueTypeInformation = getTypeInfo(valueType);
+    TypeInfo<?> valueTypeInformation = fromTypeString(valueType);
     return new MapTypeInfo<>(keyTypeInformation, valueTypeInformation);
-  }
-
-  public TypeInfo<?> getTypeInfo(String type) {
-    type = trim(type);
-    if (isBasicType(type)) {
-      return getBasicTypeInfoFromMongoDBType(type);
-    } else if (isArrayType(type)) {
-      return getListTypeInfoFromMongoDBType(type);
-    } else if (isObjectType(type)) {
-      return getMapTypeInfoFromMongoDBType(type);
-    } else {
-      throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-          "MongoDB engine, invalid MongoDB type: " + type);
-    }
   }
 
   public TypeInfo<?> getBasicTypeInfoFromMongoDBType(String mongoType) {

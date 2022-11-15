@@ -32,13 +32,14 @@ import java.util.Arrays;
 import java.util.Collections;
 
 /**
- * @param <T> The type of value associated with the configuration option.
- * @desc: A {@code ConfigOption} describes a configuration parameter. It encapsulates
+ * A {@code ConfigOption} describes a configuration parameter. It encapsulates
  * the configuration key, deprecated older versions of the key, and an optional
  * default value for the configuration parameter.
  *
  * <p>{@code ConfigOptions} are built via the {@link ConfigOptions} class.
  * Once created, a config option is immutable.
+ *
+ * @param <T> The type of value associated with the configuration option.
  */
 public class ConfigOption<T> {
 
@@ -176,7 +177,7 @@ public class ConfigOption<T> {
    * @return The option's deprecated keys.
    */
   public Iterable<String> deprecatedKeys() {
-    return deprecatedKeys == EMPTY ? Collections.<String>emptyList() : Arrays.asList(deprecatedKeys);
+    return deprecatedKeys == EMPTY ? Collections.emptyList() : Arrays.asList(deprecatedKeys);
   }
 
   // ------------------------------------------------------------------------

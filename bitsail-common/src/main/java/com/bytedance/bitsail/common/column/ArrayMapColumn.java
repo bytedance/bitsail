@@ -99,7 +99,7 @@ public class ArrayMapColumn<K extends Column, V extends Column> extends Column {
 
   @Override
   public Map<Object, Object> getRawData() {
-    Map<Object, Object> m = new HashMap<Object, Object>(this.keys.size());
+    Map<Object, Object> m = new HashMap<>(this.keys.size());
     int len = this.keys.size();
     for (int i = 0; i < len; i++) {
       m.put(keys.get(i).getRawData(), values.get(i).getRawData());

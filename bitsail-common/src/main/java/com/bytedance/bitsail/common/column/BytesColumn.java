@@ -58,7 +58,7 @@ public class BytesColumn extends Column {
     } catch (Exception e) {
       throw BitSailException.asBitSailException(
           CommonErrorCode.CONVERT_NOT_SUPPORT,
-          String.format("Bytes[%s] can't convert to String .", this.toString()), e);
+          String.format("Bytes[%s] can't convert to String .", this), e);
     }
   }
 

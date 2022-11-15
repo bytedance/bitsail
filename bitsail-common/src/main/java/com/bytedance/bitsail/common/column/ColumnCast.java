@@ -99,7 +99,7 @@ public final class ColumnCast {
     for (DateTimeFormatter formatter : formatters) {
       try {
         TemporalAccessor parse = formatter.parse(dateStr);
-        LocalDateTime localDateTime = null;
+        LocalDateTime localDateTime;
         LocalDate localDate = LocalDate.from(parse);
         if (parse.isSupported(ChronoField.HOUR_OF_DAY)
             || parse.isSupported(ChronoField.HOUR_OF_DAY)
