@@ -31,12 +31,15 @@ import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.types.Row;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -72,10 +75,60 @@ public class FlinkRowConvertSerializer implements RowSerializer<Row> {
       Object field = row.getField(index);
       if (field instanceof Column) {
         field = deserializeColumn((Column) field, typeInfo, columns.get(index).getName());
+      } else {
+        if (!compareValueTypeInfo(field, typeInfo)) {
+          //todo transform
+          throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
+              String.format("column %s type info %s not match with value type %s.",
+                  columns.get(index).getName(), typeInfo, field.getClass()));
+        }
       }
       flinkRow.setField(index, field);
     }
     return flinkRow;
+  }
+
+  private static boolean compareValueTypeInfo(Object value,
+                                              TypeInfo<?> typeInfo) {
+    if (Objects.isNull(value)) {
+      return true;
+    }
+
+    if (typeInfo instanceof MapTypeInfo) {
+      if (!(value instanceof Map)) {
+        return false;
+      }
+      Map<?, ?> map = (Map<?, ?>) value;
+      if (MapUtils.isEmpty(map)) {
+        return true;
+      }
+
+      MapTypeInfo<?, ?> mapTypeInfo = (MapTypeInfo<?, ?>) typeInfo;
+      TypeInfo<?> keyTypeInfo = mapTypeInfo.getKeyTypeInfo();
+      TypeInfo<?> valueTypeInfo = mapTypeInfo.getValueTypeInfo();
+
+      Iterator<?> keyIterator = map.keySet().iterator();
+      Object next = keyIterator.next();
+
+      return compareValueTypeInfo(next, keyTypeInfo)
+          && compareValueTypeInfo(map.get(next), valueTypeInfo);
+    }
+
+    if (typeInfo instanceof ListTypeInfo) {
+      if ((!(value instanceof List))) {
+        return false;
+      }
+      List<?> list = (List<?>) value;
+      if (CollectionUtils.isEmpty(list)) {
+        return true;
+      }
+      ListTypeInfo<?> listTypeInfo = (ListTypeInfo<?>) typeInfo;
+      TypeInfo<?> elementTypeInfo = listTypeInfo.getElementTypeInfo();
+
+      return compareValueTypeInfo(list.get(0), elementTypeInfo);
+
+    }
+    return value.getClass().isAssignableFrom(typeInfo.getTypeClass());
   }
 
   @Override

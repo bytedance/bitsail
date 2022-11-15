@@ -37,8 +37,10 @@ import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.flink.core.delagate.writer.DelegateFlinkCommitter;
 import com.bytedance.bitsail.flink.core.delagate.writer.DelegateFlinkWriter;
 import com.bytedance.bitsail.flink.core.execution.FlinkExecutionEnviron;
-import com.bytedance.bitsail.flink.core.runtime.messenger.impl.StringBatchMessenger;
+import com.bytedance.bitsail.flink.core.runtime.messenger.impl.FlinkAccumulatorStatisticsMessenger;
+import com.bytedance.bitsail.flink.core.util.AccumulatorRestorer;
 
+import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -66,7 +68,7 @@ public class FlinkWriterBuilder<InputT, CommitT extends Serializable, WriterStat
   private BitSailConfiguration writerConfiguration;
 
   private MessengerContext messengerContext;
-  private Messenger<String> messenger;
+  private Messenger messenger;
   private AbstractDirtyCollector dirtyCollector;
   private DirtyRecordChecker dirtyRecordChecker;
 
@@ -89,7 +91,7 @@ public class FlinkWriterBuilder<InputT, CommitT extends Serializable, WriterStat
         .messengerGroup(MessengerGroup.WRITER)
         .instanceId(commonConfiguration.get(CommonOptions.INTERNAL_INSTANCE_ID))
         .build();
-    this.messenger = new StringBatchMessenger(messengerContext);
+    this.messenger = new FlinkAccumulatorStatisticsMessenger(messengerContext, commonConfiguration);
     this.dirtyCollector = DirtyCollectorFactory.initDirtyCollector(commonConfiguration, messengerContext);
     this.dirtyRecordChecker = new DirtyRecordChecker(commonConfiguration);
 
@@ -156,7 +158,7 @@ public class FlinkWriterBuilder<InputT, CommitT extends Serializable, WriterStat
 
   @Override
   public void commit(ProcessResult processResult) throws Exception {
-    messenger.restoreMessengerCounter(processResult);
+    AccumulatorRestorer.restoreAccumulator((ProcessResult<JobExecutionResult>) processResult, messengerContext);
     dirtyCollector.restoreDirtyRecords(processResult);
     LOG.info("Checking dirty records during output...");
     dirtyRecordChecker.check(processResult, MessengerGroup.WRITER);

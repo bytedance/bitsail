@@ -20,6 +20,7 @@ package com.bytedance.bitsail.flink.core.legacy.connector;
 import com.bytedance.bitsail.base.dirty.AbstractDirtyCollector;
 import com.bytedance.bitsail.base.dirty.DirtyCollectorFactory;
 import com.bytedance.bitsail.base.execution.ProcessResult;
+import com.bytedance.bitsail.base.messenger.BaseStatisticsMessenger;
 import com.bytedance.bitsail.base.messenger.Messenger;
 import com.bytedance.bitsail.base.messenger.MessengerFactory;
 import com.bytedance.bitsail.base.messenger.checker.DirtyRecordChecker;
@@ -27,7 +28,6 @@ import com.bytedance.bitsail.base.messenger.checker.LowVolumeTestChecker;
 import com.bytedance.bitsail.base.messenger.common.MessengerGroup;
 import com.bytedance.bitsail.base.messenger.context.MessengerContext;
 import com.bytedance.bitsail.base.messenger.context.SimpleMessengerContext;
-import com.bytedance.bitsail.base.messenger.impl.NoOpMessenger;
 import com.bytedance.bitsail.base.metrics.MetricManager;
 import com.bytedance.bitsail.base.metrics.manager.BitSailMetricManager;
 import com.bytedance.bitsail.base.metrics.manager.CallTracer;
@@ -41,6 +41,7 @@ import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.util.Pair;
 import com.bytedance.bitsail.flink.core.runtime.RuntimeContextInjectable;
+import com.bytedance.bitsail.flink.core.util.AccumulatorRestorer;
 import com.bytedance.bitsail.flink.core.util.RowUtil;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -50,6 +51,7 @@ import lombok.val;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ClassLoaderObjectInputStream;
 import org.apache.commons.lang.SerializationUtils;
+import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.io.RichInputFormat;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.core.io.InputSplit;
@@ -85,7 +87,7 @@ public abstract class InputFormatPlugin<OT extends Row, T extends InputSplit> ex
   protected BitSailConfiguration commonConfig;
   protected BitSailConfiguration inputSliceConfig;
 
-  protected Messenger<Row> messenger;
+  protected Messenger messenger;
   protected MessengerContext messengerContext;
 
   protected transient MetricManager metricManager;
@@ -174,7 +176,7 @@ public abstract class InputFormatPlugin<OT extends Row, T extends InputSplit> ex
   @Override
   public void onSuccessComplete(ProcessResult result) throws Exception {
     LOG.info("Checking dirty records during input...");
-    messenger.restoreMessengerCounter(result);
+    AccumulatorRestorer.restoreAccumulator((ProcessResult<JobExecutionResult>) result, messengerContext);
     dirtyCollector.restoreDirtyRecords(result);
     dirtyRecordChecker.check(result, MessengerGroup.READER);
   }
@@ -303,10 +305,11 @@ public abstract class InputFormatPlugin<OT extends Row, T extends InputSplit> ex
         try {
           resetReuse(reuse);
           buildRow(reuse, mandatoryEncoding);
-          messenger.addSuccessRecord(reuse);
-          metricManager.reportRecord(RowUtil.getRowBytesSize(reuse), SUCCESS);
+          long rowBytesSize = RowUtil.getRowBytesSize(reuse);
+          messenger.addSuccessRecord(rowBytesSize);
+          metricManager.reportRecord(rowBytesSize, SUCCESS);
         } catch (BitSailException de) {
-          messenger.addFailedRecord(reuse, de);
+          messenger.addFailedRecord(de);
           dirtyCollector.collectDirty(reuse, de, System.currentTimeMillis());
           LOG.debug("Read one record failed.", de);
           metricManager.reportRecord(0, FAILED);
@@ -385,7 +388,7 @@ public abstract class InputFormatPlugin<OT extends Row, T extends InputSplit> ex
 
   @VisibleForTesting
   public void setEmptyMessenger() {
-    this.messenger = new NoOpMessenger<>();
+    this.messenger = new BaseStatisticsMessenger(messengerContext);
   }
 
   @VisibleForTesting

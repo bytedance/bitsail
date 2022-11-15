@@ -58,7 +58,6 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
     this.source = source;
     this.commonConfiguration = commonConfiguration;
     this.readerConfiguration = readerConfiguration;
-    //todo exception for columns.
     List<ColumnInfo> columnInfos = readerConfiguration
         .get(ReaderOptions.BaseReaderOptions.COLUMNS);
     this.typeInfos = TypeInfoUtils

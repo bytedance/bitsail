@@ -90,7 +90,7 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
   private boolean endOfInput = false;
 
   @Setter
-  private Messenger<String> messenger;
+  private Messenger messenger;
 
   @Setter
   private AbstractDirtyCollector dirtyCollector;
@@ -197,13 +197,13 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
         } else {
           writer.write(element.getValue());
         }
-        messenger.addSuccessRecord(value.toString());
+        messenger.addSuccessRecord(value.toString().length());
         metricManager.reportRecord(0, MessageType.SUCCESS);
       } catch (BitSailException e) {
         Row dirtyRow = new Row(2);
         dirtyRow.setField(1, value.toString());
 
-        messenger.addFailedRecord(value.toString(), e);
+        messenger.addFailedRecord(e);
         dirtyCollector.collectDirty(dirtyRow, e, System.currentTimeMillis());
         LOG.debug("Failed to write one record. - {}", value, e);
         metricManager.reportRecord(0, MessageType.FAILED);

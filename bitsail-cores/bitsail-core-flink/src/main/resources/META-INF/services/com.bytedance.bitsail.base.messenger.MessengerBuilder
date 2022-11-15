@@ -15,4 +15,4 @@
 # limitations under the License.
 #
 
-com.bytedance.bitsail.flink.core.runtime.messenger.FlinkBatchMessengerBuilder
+com.bytedance.bitsail.flink.core.runtime.messenger.FlinkAccumulatorMessengerBuilder
