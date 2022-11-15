@@ -26,6 +26,11 @@
     <artifactId>bitsail-flink-row-parser</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+        </dependency>
+
         <!-- Modules -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
