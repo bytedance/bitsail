@@ -30,7 +30,6 @@ public class LongColumnTest {
     LongColumn column = new LongColumn(1554888238);
     assertEquals("2019-04-10T17:23:58+08:00[Asia/Shanghai]",
         column.asDate().toInstant().atZone(ZoneId.of("Asia/Shanghai")).toString());
-    assertEquals("2019-04-10T17:23:58+08:00[Asia/Shanghai]",
-        column.asLocalDateTime().atZone(ZoneId.of("Asia/Shanghai")).toString());
+    assertEquals("2019-04-10", column.asLocalDateTime().toLocalDate().toString());
   }
 }
