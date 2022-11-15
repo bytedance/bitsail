@@ -24,11 +24,13 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.PartitionInfo;
+import org.apache.kafka.common.header.internals.RecordHeader;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.Future;
 
@@ -83,28 +85,24 @@ public class KafkaProducer {
     partitionList = getPartitionsByTopic(topic);
   }
 
-  public Future<RecordMetadata> send(String value) {
-    return producer.send(new ProducerRecord<>(topic, value));
+  public Future<RecordMetadata> send(KafkaRecord record) {
+    return producer.send(generateProducerRecord(record));
   }
 
-  public Future<RecordMetadata> send(String value, Callback callback) {
-    return producer.send(new ProducerRecord<>(topic, value), callback);
+  public Future<RecordMetadata> send(KafkaRecord record, Callback callback) {
+    return producer.send(generateProducerRecord(record), callback);
   }
 
-  public Future<RecordMetadata> send(String value, int partitionId) {
-    return producer.send(new ProducerRecord<>(topic, partitionId, null, value));
-  }
-
-  public Future<RecordMetadata> send(String value, int partitionId, Callback callback) {
-    return producer.send(new ProducerRecord<>(topic, partitionId, null, value), callback);
-  }
-
-  public Future<RecordMetadata> send(String key, String value) {
-    return producer.send(new ProducerRecord<>(topic, key, value));
-  }
-
-  public Future<RecordMetadata> send(String key, String value, Callback callback) {
-    return producer.send(new ProducerRecord<>(topic, key, value), callback);
+  /**
+   * convert {@link KafkaRecord} to {@link ProducerRecord}
+   */
+  private ProducerRecord generateProducerRecord(KafkaRecord record) {
+    ProducerRecord producerRecord = new ProducerRecord(topic, record.getPartitionId(), record.getTimestamp(), record.getKey(), record.getValue());
+    Map<String, String> headers = record.getHeaders();
+    if (Objects.nonNull(headers)) {
+      headers.keySet().stream().forEach(key -> producerRecord.headers().add(new RecordHeader(key, headers.get(key).getBytes())));
+    }
+    return producerRecord;
   }
 
   /**
