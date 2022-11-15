@@ -30,6 +30,7 @@ import com.alibaba.fastjson.JSON;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -120,6 +121,12 @@ public class MapColumn<K extends Column, V extends Column> extends Column implem
   public Date asDate() {
     throw BitSailException.asBitSailException(
         CommonErrorCode.CONVERT_NOT_SUPPORT, "Map can't convert to Date .");
+  }
+
+  @Override
+  public LocalDateTime asLocalDateTime() {
+    throw BitSailException.asBitSailException(
+        CommonErrorCode.CONVERT_NOT_SUPPORT, "Map can't convert to LocalDateTime .");
   }
 
   @Override

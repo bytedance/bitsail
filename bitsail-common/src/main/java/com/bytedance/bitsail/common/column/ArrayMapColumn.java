@@ -25,6 +25,7 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +73,12 @@ public class ArrayMapColumn<K extends Column, V extends Column> extends Column {
   public Date asDate() {
     throw BitSailException.asBitSailException(
         CommonErrorCode.CONVERT_NOT_SUPPORT, "Map can't convert to Date .");
+  }
+
+  @Override
+  public LocalDateTime asLocalDateTime() {
+    throw BitSailException.asBitSailException(
+        CommonErrorCode.CONVERT_NOT_SUPPORT, "Map can't convert to LocalDateTime .");
   }
 
   @Override

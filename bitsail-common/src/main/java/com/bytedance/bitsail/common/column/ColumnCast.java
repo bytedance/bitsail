@@ -90,6 +90,16 @@ public final class ColumnCast {
   }
 
   public static Date string2Date(StringColumn column) {
+    LocalDateTime localDateTime = string2LocalDateTimeWithoutTimeZone(column);
+    return Date.from(localDateTime.atZone(dateTimeZone).toInstant());
+  }
+
+  public static LocalDateTime string2LocalDateTime(StringColumn column) {
+    LocalDateTime localDateTime = string2LocalDateTimeWithoutTimeZone(column);
+    return localDateTime.atZone(dateTimeZone).toLocalDateTime();
+  }
+
+  public static LocalDateTime string2LocalDateTimeWithoutTimeZone(StringColumn column) {
     checkState();
     if (null == column.asString()) {
       return null;
@@ -110,7 +120,7 @@ public final class ColumnCast {
         } else {
           localDateTime = localDate.atStartOfDay();
         }
-        return Date.from(localDateTime.atZone(dateTimeZone).toInstant());
+        return localDateTime;
       } catch (Exception e) {
         LOG.debug("Formatter = {} parse string {} failed.", formatter, dateStr, e);
         //ignore

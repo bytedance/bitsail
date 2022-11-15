@@ -32,6 +32,9 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 @Deprecated
@@ -145,6 +148,17 @@ public class LongColumn extends Column {
 
     //Only support seconds
     return new Date(this.asLong() * 1000);
+  }
+
+  @SuppressWarnings("checkstyle:MagicNumber")
+  @Override
+  public LocalDateTime asLocalDateTime() {
+    if (null == this.getRawData()) {
+      return null;
+    }
+
+    // only support seconds
+    return Instant.ofEpochMilli(this.asLong() * 1000).atZone(ZoneOffset.systemDefault()).toLocalDateTime();
   }
 
   @Override

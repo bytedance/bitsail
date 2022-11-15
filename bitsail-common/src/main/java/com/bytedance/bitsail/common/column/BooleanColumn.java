@@ -28,6 +28,7 @@ import com.bytedance.bitsail.common.exception.CommonErrorCode;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Deprecated
@@ -117,6 +118,12 @@ public class BooleanColumn extends Column {
   public Date asDate() {
     throw BitSailException.asBitSailException(
         CommonErrorCode.CONVERT_NOT_SUPPORT, "Bool can't convert to Date .");
+  }
+
+  @Override
+  public LocalDateTime asLocalDateTime() {
+    throw BitSailException.asBitSailException(
+        CommonErrorCode.CONVERT_NOT_SUPPORT, "Bool can't convert to LocalDateTime .");
   }
 
   @Override
