@@ -15,19 +15,40 @@
       "random_null_rate": 0,
       "columns": [
         {
-          "index": 0,
           "name": "varchar_type",
           "type": "string"
         },
         {
-          "index": 1,
           "name": "text_type",
           "type": "string"
         },
         {
-          "index": 2,
           "name": "bigint_type",
           "type": "long"
+        },
+        {
+          "name": "sql_date_type",
+          "type": "date.date"
+        },
+        {
+          "name": "sql_time_type",
+          "type": "date.time"
+        },
+        {
+          "name": "sql_datetime_type",
+          "type": "date.datetime"
+        },
+        {
+          "name": "local_date_type",
+          "type": "date"
+        },
+        {
+          "name": "local_time_type",
+          "type": "time"
+        },
+        {
+          "name": "local_datetime_type",
+          "type": "timestamp"
         }
       ]
     },
@@ -37,19 +58,40 @@
       "batch_size": 10,
       "columns": [
         {
-          "index": 0,
           "name": "varchar_type",
           "type": "string"
         },
         {
-          "index": 1,
           "name": "text_type",
           "type": "string"
         },
         {
-          "index": 2,
           "name": "bigint_type",
           "type": "long"
+        },
+        {
+          "name": "sql_date_type",
+          "type": "date.date"
+        },
+        {
+          "name": "sql_time_type",
+          "type": "date.time"
+        },
+        {
+          "name": "sql_datetime_type",
+          "type": "date.datetime"
+        },
+        {
+          "name": "local_date_type",
+          "type": "date"
+        },
+        {
+          "name": "local_time_type",
+          "type": "time"
+        },
+        {
+          "name": "local_datetime_type",
+          "type": "timestamp"
         }
       ]
     }

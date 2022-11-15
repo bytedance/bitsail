@@ -177,6 +177,12 @@ public class FlinkRowConvertSerializer implements RowSerializer<Row> {
       return column.asDouble();
     } else if (TypeInfos.BIG_DECIMAL_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
       return column.asBigDecimal();
+    } else if (TypeInfos.LOCAL_DATE_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      return column.asLocalDateTime().toLocalDate();
+    } else if (TypeInfos.LOCAL_DATE_TIME_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      return column.asLocalDateTime();
+    } else if (TypeInfos.LOCAL_TIME_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      return column.asLocalDateTime().toLocalTime();
     } else if (TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
       return new java.sql.Date(column.asDate().getTime());
     } else if (TypeInfos.SQL_TIME_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {

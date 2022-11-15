@@ -31,6 +31,9 @@ import org.apache.flink.types.Row;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -146,6 +149,12 @@ public class RowBytesParser extends BytesParser {
       return column.asLong().byteValue();
     } else if (typeClass == Date.class) {
       return column.asDate();
+    } else if (typeClass == LocalDateTime.class) {
+      return column.asLocalDateTime();
+    } else if (typeClass == LocalDate.class) {
+      return column.asLocalDateTime().toLocalDate();
+    } else if (typeClass == LocalTime.class) {
+      return column.asLocalDateTime().toLocalTime();
     } else if (typeClass == java.sql.Date.class) {
       return new java.sql.Date(column.asDate().getTime());
     } else if (typeClass == java.sql.Time.class) {
