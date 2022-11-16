@@ -96,8 +96,8 @@ public class TableCatalogManager {
             .get(TableCatalogOptions.COLUMN_ALIGN_STRATEGY)));
     this.tableCatalogSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL);
     this.tableCatalogAddSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_IGNORE_ADD);
-    this.tableCatalogDeleteSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_IGNORE_UPDATE);
-    this.tableCatalogUpdateSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_IGNORE_DROP);
+    this.tableCatalogDeleteSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_IGNORE_DROP);
+    this.tableCatalogUpdateSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_IGNORE_UPDATE);
   }
 
   public void alignmentCatalogTable() throws Exception {

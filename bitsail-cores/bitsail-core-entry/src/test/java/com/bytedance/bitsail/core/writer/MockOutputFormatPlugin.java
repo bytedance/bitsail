@@ -19,6 +19,8 @@
 
 package com.bytedance.bitsail.core.writer;
 
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.flink.core.legacy.connector.OutputFormatPlugin;
 
 import org.apache.flink.types.Row;
@@ -60,5 +62,10 @@ public class MockOutputFormatPlugin extends OutputFormatPlugin<Row> {
   @Override
   public void tryCleanupOnError() throws Exception {
 
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new BitSailTypeInfoConverter();
   }
 }

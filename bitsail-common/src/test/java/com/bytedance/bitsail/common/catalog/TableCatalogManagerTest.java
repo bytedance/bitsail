@@ -48,7 +48,6 @@ public class TableCatalogManagerTest {
     writerConfiguration = BitSailConfiguration.newDefault();
   }
 
-  @SuppressWarnings("checkstyle:EmptyLineSeparator")
   @Test
   public void testTableCatalogAlignmentIntersect() throws Exception {
     List<ColumnInfo> readerColumns = Lists.newArrayList();
@@ -120,7 +119,6 @@ public class TableCatalogManagerTest {
     commonConfiguration.set(TableCatalogOptions.COLUMN_ALIGN_STRATEGY,
         TableCatalogStrategy.SOURCE_ONLY.name());
     commonConfiguration.set(TableCatalogOptions.SYNC_DDL, true);
-    commonConfiguration.set(TableCatalogOptions.SYNC_DDL_IGNORE_ADD, true);
 
     FakeTableCatalog readerFakeTableCatalog = new FakeTableCatalog(readerColumns, CatalogTableDefinition.builder()
         .database("a")
@@ -171,8 +169,6 @@ public class TableCatalogManagerTest {
 
     commonConfiguration.set(TableCatalogOptions.COLUMN_ALIGN_STRATEGY, TableCatalogStrategy.SOURCE_ONLY.name());
     commonConfiguration.set(TableCatalogOptions.SYNC_DDL, true);
-    commonConfiguration.set(TableCatalogOptions.SYNC_DDL_IGNORE_UPDATE, true);
-    commonConfiguration.set(TableCatalogOptions.SYNC_DDL_IGNORE_ADD, true);
 
     FakeTableCatalog readerFakeTableCatalog = new FakeTableCatalog(readerColumns, CatalogTableDefinition.builder()
         .database("a")

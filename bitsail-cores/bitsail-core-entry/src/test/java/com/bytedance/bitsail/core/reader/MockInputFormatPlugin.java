@@ -20,6 +20,8 @@
 package com.bytedance.bitsail.core.reader;
 
 import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatPlugin;
 
 import org.apache.flink.api.common.io.statistics.BaseStatistics;
@@ -78,5 +80,10 @@ public class MockInputFormatPlugin extends InputFormatPlugin {
   @Override
   public void close() throws IOException {
 
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new BitSailTypeInfoConverter();
   }
 }
