@@ -38,8 +38,8 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.util.stream.Stream;
 
-public class MySQLTableCatalogTest {
-  private static final Logger LOG = LoggerFactory.getLogger(MySQLTableCatalogTest.class);
+public class MySQLTableCatalogITCase {
+  private static final Logger LOG = LoggerFactory.getLogger(MySQLTableCatalogITCase.class);
 
   private static final String MYSQL_DOCKER_IMAGER = "mysql:8.0.29";
 
