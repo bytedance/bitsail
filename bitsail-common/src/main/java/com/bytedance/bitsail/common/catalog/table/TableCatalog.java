@@ -61,7 +61,8 @@ public interface TableCatalog extends Serializable {
   /**
    * Create table
    */
-  void createTable(CatalogTable catalogTable);
+  void createTable(CatalogTableDefinition catalogTableDefinition,
+                   CatalogTable catalogTable);
 
   /**
    * Alter table

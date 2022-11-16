@@ -22,6 +22,8 @@ package com.bytedance.bitsail.common.catalog;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ConfigOption;
 
+import com.google.common.annotations.Beta;
+
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 
 public interface TableCatalogOptions extends CommonOptions {
@@ -63,5 +65,13 @@ public interface TableCatalogOptions extends CommonOptions {
    */
   ConfigOption<Boolean> SYNC_DDL_IGNORE_UPDATE =
       key(COMMON_PREFIX + "sync_ddl_ignore_update")
+          .defaultValue(false);
+
+  /**
+   * Only test in develop
+   */
+  @Beta
+  ConfigOption<Boolean> SYNC_DDL_CREATE_TABLE =
+      key(COMMON_PREFIX + "sync_ddl_create_table")
           .defaultValue(false);
 }

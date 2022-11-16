@@ -65,6 +65,7 @@ public class TableCatalogManager {
   private boolean tableCatalogAddSync;
   private boolean tableCatalogDeleteSync;
   private boolean tableCatalogUpdateSync;
+  private boolean tableCatalogCreateTableNotExists;
 
   private CatalogTable readerCatalogTable;
   private CatalogTable writerCatalogTable;
@@ -98,6 +99,7 @@ public class TableCatalogManager {
     this.tableCatalogAddSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_IGNORE_ADD);
     this.tableCatalogDeleteSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_IGNORE_DROP);
     this.tableCatalogUpdateSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_IGNORE_UPDATE);
+    this.tableCatalogCreateTableNotExists = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_CREATE_TABLE);
   }
 
   public void alignmentCatalogTable() throws Exception {
@@ -112,44 +114,60 @@ public class TableCatalogManager {
     //start table column catalog
     startTableCatalog();
 
-    CatalogTableDefinition readerTableDefinition = readerTableCatalog.createCatalogTableDefinition();
-    CatalogTableDefinition writerTableDefinition = readerTableCatalog.createCatalogTableDefinition();
-    if (!readerTableCatalog.tableExists(readerTableDefinition)) {
-      throw BitSailException.asBitSailException(TableCatalogErrorCode.TABLE_CATALOG_TABLE_NOT_EXISTS,
-          String.format("Reader table definition %s not exists.", readerTableDefinition));
+    try {
+      CatalogTableDefinition readerTableDefinition = readerTableCatalog.createCatalogTableDefinition();
+      CatalogTableDefinition writerTableDefinition = readerTableCatalog.createCatalogTableDefinition();
+      if (!readerTableCatalog.tableExists(readerTableDefinition)) {
+        throw BitSailException.asBitSailException(TableCatalogErrorCode.TABLE_CATALOG_TABLE_NOT_EXISTS,
+            String.format("Reader table definition %s not exists.", readerTableDefinition));
+      }
+
+      // get reader catalog table.
+      readerCatalogTable = readerTableCatalog.getCatalogTable(readerTableDefinition);
+
+      if (!writerTableCatalog.tableExists(writerTableDefinition)) {
+
+        if (!tableCatalogCreateTableNotExists) {
+          throw BitSailException.asBitSailException(TableCatalogErrorCode.TABLE_CATALOG_TABLE_NOT_EXISTS,
+              String.format("Writer table definition %s not exists.", writerTableDefinition));
+        }
+        // try to create table when not exists.
+        writerTableCatalog.createTable(writerTableDefinition, readerCatalogTable);
+      }
+
+      // get writer catalog table.
+      writerCatalogTable = writerTableCatalog.getCatalogTable(writerTableDefinition);
+
+      // gtt base table schema.
+      CatalogTableSchema catalogTableSchema = tableCatalogStrategy
+          .apply(readerCatalogTable, writerCatalogTable);
+
+      LOG.info("Base catalog table schema {}.", catalogTableSchema);
+
+      if (tableCatalogSync) {
+        // get need changed columns.
+        CatalogTableAlterDefinition catalogTableAlterDefinition =
+            calNecessaryCatalogSchema(catalogTableSchema);
+        alterCatalogSchema(catalogTableAlterDefinition);
+      } else {
+        // directly use base table schema.
+        finalCatalogColumns.addAll(catalogTableSchema.getColumns());
+      }
+
+      List<ColumnInfo> finalReaderColumnInfos = transform(finalCatalogColumns, readerTypeInfoConverter);
+      List<ColumnInfo> finalWriterColumnInfos = transform(finalCatalogColumns, writerTypeInfoConverter);
+
+      readerConfiguration.set(ReaderOptions.BaseReaderOptions.COLUMNS, finalReaderColumnInfos);
+      LOG.info("Final reader's columns: {}", finalReaderColumnInfos);
+
+      writerConfiguration.set(WriterOptions.BaseWriterOptions.COLUMNS, finalWriterColumnInfos);
+      LOG.info("Final writer's columns: {}", finalWriterColumnInfos);
+
+    } finally {
+      // close table catalog connection in finally.
+      closeTableCatalog();
     }
-    readerCatalogTable = readerTableCatalog.getCatalogTable(readerTableDefinition);
 
-    if (!writerTableCatalog.tableExists(writerTableDefinition)) {
-      writerTableCatalog.createTable(readerCatalogTable);
-      throw BitSailException.asBitSailException(TableCatalogErrorCode.TABLE_CATALOG_TABLE_NOT_EXISTS,
-          String.format("Writer table definition %s not exists.", writerTableDefinition));
-
-    }
-    writerCatalogTable = writerTableCatalog.getCatalogTable(writerTableDefinition);
-    CatalogTableSchema catalogTableSchema = tableCatalogStrategy
-        .apply(readerCatalogTable, writerCatalogTable);
-
-    LOG.info("Base catalog table schema {}.", catalogTableSchema);
-
-    if (tableCatalogSync) {
-      CatalogTableAlterDefinition catalogTableAlterDefinition =
-          calNecessaryCatalogSchema(catalogTableSchema);
-      alterCatalogSchema(catalogTableAlterDefinition);
-    } else {
-      finalCatalogColumns.addAll(catalogTableSchema.getColumns());
-    }
-
-    List<ColumnInfo> finalReaderColumnInfos = transform(finalCatalogColumns, readerTypeInfoConverter);
-    List<ColumnInfo> finalWriterColumnInfos = transform(finalCatalogColumns, writerTypeInfoConverter);
-
-    readerConfiguration.set(ReaderOptions.BaseReaderOptions.COLUMNS, finalReaderColumnInfos);
-    LOG.info("Final reader's columns: {}", finalReaderColumnInfos);
-
-    writerConfiguration.set(WriterOptions.BaseWriterOptions.COLUMNS, finalWriterColumnInfos);
-    LOG.info("Final writer's columns: {}", finalWriterColumnInfos);
-
-    closeTableCatalog();
   }
 
   private List<ColumnInfo> transform(List<CatalogTableColumn> catalogTableColumns,
