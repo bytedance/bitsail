@@ -138,7 +138,7 @@ public class TableCatalogManager {
       // get writer catalog table.
       writerCatalogTable = writerTableCatalog.getCatalogTable(writerTableDefinition);
 
-      // gtt base table schema.
+      // get base table schema.
       CatalogTableSchema catalogTableSchema = tableCatalogStrategy
           .apply(readerCatalogTable, writerCatalogTable);
 
