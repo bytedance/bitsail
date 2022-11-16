@@ -20,7 +20,6 @@ package com.bytedance.bitsail.flink.core.legacy.connector;
 import com.bytedance.bitsail.base.dirty.AbstractDirtyCollector;
 import com.bytedance.bitsail.base.dirty.DirtyCollectorFactory;
 import com.bytedance.bitsail.base.execution.ProcessResult;
-import com.bytedance.bitsail.base.messenger.BaseStatisticsMessenger;
 import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.base.messenger.BaseStatisticsMessenger;
 import com.bytedance.bitsail.base.messenger.Messenger;
