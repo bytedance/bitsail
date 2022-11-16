@@ -50,6 +50,7 @@
             <artifactId>guava-retrying</artifactId>
         </dependency>
 
+        <!-- Utils -->
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>

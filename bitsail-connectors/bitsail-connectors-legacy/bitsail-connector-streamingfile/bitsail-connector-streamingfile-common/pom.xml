@@ -30,6 +30,12 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.8.2</version>
+        </dependency>
+
         <!-- CanalEntry -->
         <dependency>
             <groupId>com.alibaba.otter</groupId>
