@@ -19,9 +19,9 @@ package com.bytedance.bitsail.connector.legacy.jdbc.source;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.ddl.source.SourceEngineConnector;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 import com.bytedance.bitsail.common.util.TypeConvertUtil.StorageEngine;
 import com.bytedance.bitsail.connector.legacy.jdbc.converter.JdbcValueConverter;
@@ -141,6 +141,11 @@ public class JDBCInputFormat extends InputFormatPlugin<Row, InputSplit> implemen
         connection.setConnectionParameters(connectionParameters);
       }
     }
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new FileMappingTypeInfoConverter(getStorageEngine().name());
   }
 
   @Override
@@ -526,7 +531,7 @@ public class JDBCInputFormat extends InputFormatPlugin<Row, InputSplit> implemen
     this.queryTemplateFormat = sqlTemplateFormat;
     this.splitParameterInfo = paramProvider.getParameterValues();
     this.fetchSize = fetchSize;
-    rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columns, new FileMappingTypeInfoConverter(getStorageEngine().name()));
+    rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columns, createTypeInfoConverter());
 
     LOG.info("Row Type Info: " + rowTypeInfo);
     LOG.info("Validate plugin configuration parameters finished.");
@@ -611,11 +616,6 @@ public class JDBCInputFormat extends InputFormatPlugin<Row, InputSplit> implemen
     }
     sql.append("(").append(getQuoteColumn(splitPK)).append(" >= ? AND ").append(getQuoteColumn(splitPK)).append(" < ?)");
     return sql.toString();
-  }
-
-  @Override
-  public SourceEngineConnector initSourceSchemaManager(BitSailConfiguration commonConf, BitSailConfiguration readerConf) throws Exception {
-    return new JDBCSourceEngineConnectorBase(commonConf, readerConf);
   }
 
   /**

@@ -17,8 +17,6 @@
 
 package com.bytedance.bitsail.connector.legacy.jdbc.source;
 
-import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.ddl.source.SourceEngineConnector;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.util.TypeConvertUtil.StorageEngine;
 import com.bytedance.bitsail.connector.legacy.jdbc.converter.JdbcValueConverter;
@@ -96,11 +94,6 @@ public class OracleInputFormat extends JDBCInputFormat {
   @Override
   public StorageEngine getStorageEngine() {
     return StorageEngine.oracle;
-  }
-
-  @Override
-  public SourceEngineConnector initSourceSchemaManager(BitSailConfiguration commonConf, BitSailConfiguration readerConf) throws Exception {
-    return new OracleSourceEngineConnector(commonConf, readerConf);
   }
 
   @Override

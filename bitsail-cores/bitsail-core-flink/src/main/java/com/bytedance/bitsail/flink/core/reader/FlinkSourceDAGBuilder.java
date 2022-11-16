@@ -26,10 +26,12 @@ import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.ProcessResult;
 import com.bytedance.bitsail.base.extension.GlobalCommittable;
 import com.bytedance.bitsail.base.extension.ParallelismComputable;
+import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.flink.core.delagate.reader.source.DelegateFlinkSource;
 import com.bytedance.bitsail.flink.core.delagate.reader.source.operator.DelegateSourceOperatorFactory;
 import com.bytedance.bitsail.flink.core.execution.FlinkExecutionEnviron;
@@ -55,7 +57,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public class FlinkSourceDAGBuilder<T, SplitT extends SourceSplit, StateT extends Serializable>
-    implements DataReaderDAGBuilder, ParallelismComputable, GlobalCommittable {
+    implements DataReaderDAGBuilder, ParallelismComputable, GlobalCommittable, TypeInfoConverterFactory {
   private static final Logger LOG = LoggerFactory.getLogger(FlinkSourceDAGBuilder.class);
 
   private final Source<T, SplitT, StateT> source;
@@ -148,5 +150,10 @@ public class FlinkSourceDAGBuilder<T, SplitT extends SourceSplit, StateT extends
   @Override
   public void abort() throws Exception {
 
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return source.createTypeInfoConverter();
   }
 }

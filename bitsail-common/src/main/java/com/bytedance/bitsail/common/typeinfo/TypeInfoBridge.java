@@ -19,10 +19,14 @@
 
 package com.bytedance.bitsail.common.typeinfo;
 
+import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
+
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class TypeInfoBridge {
 
@@ -30,6 +34,9 @@ public class TypeInfoBridge {
       Maps.newHashMap();
 
   public static final Map<String, TypeInfo<?>> TYPE_INFO_NAME_MAPPING =
+      Maps.newHashMap();
+
+  public static final Map<Class<?>, Types> TYPE_INFO_TYPES_MAPPING =
       Maps.newHashMap();
 
   static {
@@ -60,11 +67,25 @@ public class TypeInfoBridge {
         TYPE_INFO_NAME_MAPPING.put(StringUtils.upperCase(type.getTypeStringNickName()),
             TYPE_INFO_MAPPING.get(type));
       }
+      TYPE_INFO_TYPES_MAPPING.put(TYPE_INFO_MAPPING.get(type).getTypeClass(), type);
     }
   }
 
   public static TypeInfo<?> bridgeTypeInfo(String typeString) {
     return TYPE_INFO_NAME_MAPPING.get(typeString);
+  }
+
+  public static String bridgeTypes(TypeInfo<?> typeInfo) {
+    Class<?> typeClass = typeInfo.getTypeClass();
+
+    Types types = TYPE_INFO_TYPES_MAPPING.get(typeClass);
+    if (Objects.nonNull(types)) {
+      return StringUtils.isNotEmpty(types.getTypeStringNickName()) ?
+          types.getTypeStringNickName() :
+          types.name().toLowerCase();
+    }
+    throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,
+        String.format("Not support bridge complex type info %s.", typeInfo));
   }
 
 }

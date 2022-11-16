@@ -17,6 +17,8 @@
 
 package com.bytedance.bitsail.connector.legacy.print.sink;
 
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.flink.core.legacy.connector.OutputFormatPlugin;
 
 import org.apache.flink.api.common.functions.util.PrintSinkOutputWriter;
@@ -58,5 +60,10 @@ public class PrintSink extends OutputFormatPlugin<Row> {
   @Override
   public void tryCleanupOnError() throws Exception {
 
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new BitSailTypeInfoConverter();
   }
 }

@@ -19,6 +19,8 @@ package com.bytedance.bitsail.connector.legacy.kafka.sink;
 
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.connector.legacy.kafka.common.KafkaFormatErrorCode;
 import com.bytedance.bitsail.connector.legacy.kafka.option.KafkaWriterOptions;
 import com.bytedance.bitsail.flink.core.constants.TypeSystem;
@@ -94,7 +96,7 @@ public class KafkaOutputFormat extends OutputFormatPlugin<Row> implements Result
       partitionFieldsIndices = getPartitionFieldsIndices(columns, partitionFieldsNames);
     }
 
-    this.rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columns);
+    this.rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columns, createTypeInfoConverter());
     log.info("Output Row Type Info: " + rowTypeInfo);
   }
 
@@ -231,5 +233,10 @@ public class KafkaOutputFormat extends OutputFormatPlugin<Row> implements Result
     if (Objects.nonNull(kafkaProducer)) {
       kafkaProducer.close();
     }
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new BitSailTypeInfoConverter();
   }
 }

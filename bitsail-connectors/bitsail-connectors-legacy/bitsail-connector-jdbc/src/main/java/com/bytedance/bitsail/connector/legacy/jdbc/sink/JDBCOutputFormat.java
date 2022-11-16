@@ -183,7 +183,7 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
     writeModeProxy = buildWriteModeProxy(writeMode);
     writeModeProxy.prepareOnClient();
 
-    rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columns, getTypeConverter());
+    rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columns, createTypeInfoConverter());
     log.info("Output Row Type Info: " + rowTypeInfo);
 
     // generated values
@@ -191,10 +191,6 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
     log.info("Clear query generated: " + clearQuery);
     log.info("Insert query generated: " + query);
     log.info("Validate plugin configuration parameters finished.");
-  }
-
-  public TypeInfoConverter getTypeConverter() {
-    return new JdbcTypeInfoConverter(getStorageEngine().name());
   }
 
   public String getDbURL(String dbURL, String connectionParameters) {
@@ -629,6 +625,11 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
       log.info("Executing pre query: " + preQuery);
       jdbcQueryHelper.executeQueryInNewConnection(preQuery, true);
     }
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new JdbcTypeInfoConverter(getStorageEngine().name());
   }
 
   @Override

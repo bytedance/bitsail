@@ -20,6 +20,7 @@ package com.bytedance.bitsail.flink.core.legacy.connector;
 import com.bytedance.bitsail.base.dirty.AbstractDirtyCollector;
 import com.bytedance.bitsail.base.dirty.DirtyCollectorFactory;
 import com.bytedance.bitsail.base.execution.ProcessResult;
+import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.base.messenger.BaseStatisticsMessenger;
 import com.bytedance.bitsail.base.messenger.Messenger;
 import com.bytedance.bitsail.base.messenger.MessengerFactory;
@@ -35,7 +36,6 @@ import com.bytedance.bitsail.base.ratelimit.Channel;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.column.ColumnCast;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.ddl.source.SourceEngineConnector;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ReaderOptions;
@@ -78,7 +78,7 @@ import static com.bytedance.bitsail.base.messenger.common.MessageType.SUCCESS;
  * @desc:
  */
 public abstract class InputFormatPlugin<OT extends Row, T extends InputSplit> extends RichInputFormat<OT, T> implements
-    Pluggable {
+    Pluggable, TypeInfoConverterFactory {
 
   private static final Logger LOG = LoggerFactory.getLogger(InputFormatPlugin.class);
 
@@ -377,14 +377,6 @@ public abstract class InputFormatPlugin<OT extends Row, T extends InputSplit> ex
   public abstract boolean isSplitEnd() throws IOException;
 
   public abstract T[] createSplits(int minNumSplits) throws IOException;
-
-  public SourceEngineConnector initSourceSchemaManager(BitSailConfiguration commonConf, BitSailConfiguration readerConf) throws Exception {
-    return null;
-  }
-
-  public boolean supportSchemaCheck() {
-    return false;
-  }
 
   @VisibleForTesting
   public void setEmptyMessenger() {

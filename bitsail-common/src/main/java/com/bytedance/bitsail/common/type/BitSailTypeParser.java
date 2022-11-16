@@ -44,7 +44,7 @@ public class BitSailTypeParser {
   private static final String SPLIT_TOKEN = ",";
 
   public static String fromTypeInfo(TypeInfo<?> typeInfo) {
-    throw new UnsupportedOperationException();
+    return TypeInfoBridge.bridgeTypes(typeInfo);
   }
 
   public static List<TypeProperty> fromTypePropertyString(String typePropertyString) {

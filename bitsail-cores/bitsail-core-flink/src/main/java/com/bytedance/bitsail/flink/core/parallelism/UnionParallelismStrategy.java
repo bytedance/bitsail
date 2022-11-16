@@ -31,7 +31,7 @@ public enum UnionParallelismStrategy {
 
   public int computeUnionParallelism(List<ParallelismAdvice> readerParallelismAdvices) {
     List<Integer> parallelismList = readerParallelismAdvices.stream().map(
-        advice -> advice.getAdviceParallelism()).collect(Collectors.toList());
+        ParallelismAdvice::getAdviceParallelism).collect(Collectors.toList());
 
     switch (this) {
       case MAX:
