@@ -100,10 +100,6 @@ public class BitSailSystemConfiguration implements Serializable {
     } else if (new File(RUNTIME_FILE_DIR).exists()) {
       confDir = RUNTIME_FILE_DIR;
     }
-//    else {
-//      throw BITSAILException.asBITSAILException(CommonErrorCode.CONFIG_ERROR, "No system configuration found.");
-//
-//    }
     return confDir;
   }
 

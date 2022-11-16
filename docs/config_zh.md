@@ -156,7 +156,7 @@
                 }
             ],
             "write_mode":"overwrite",
-            "parallelism_num":1
+            "writer_parallelism_num":1
         }
 }
 

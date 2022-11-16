@@ -122,7 +122,11 @@ public class SimpleTimeLimiter implements TimeLimiter {
     return false;
   }
 
-  // TODO: replace with version in common.reflect if and when it's open-sourced
+  /**
+   *
+   * TODO: replace with version in common.reflect if and when it's open-sourced
+   *
+   */
   private static <T> T newProxy(
       Class<T> interfaceType, InvocationHandler handler) {
     Object object = Proxy.newProxyInstance(interfaceType.getClassLoader(),
@@ -164,7 +168,12 @@ public class SimpleTimeLimiter implements TimeLimiter {
     return newProxy(interfaceType, handler);
   }
 
-  // TODO: should this actually throw only ExecutionException?
+
+  /**
+   *
+   * TODO: should this actually throw only ExecutionException?
+   *
+   */
   @Override
   public <T> T callWithTimeout(Callable<T> callable, long timeoutDuration,
                                TimeUnit timeoutUnit, boolean amInterruptible) throws Exception {

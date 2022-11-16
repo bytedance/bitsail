@@ -131,7 +131,7 @@ cd ${BITSAIL_HOME}/bitsail-dist/target/bitsail-dist-0.1.0-SNAPSHOT-bin/bitsail-a
 
 Use [examples/Fake_Print_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Print_Example.json) as example to start a BitSail job:
 
-- `<job-manager-address>`: the address of job manager, should be host:port.
+- `<job-manager-address>`: the address of job manager, should be host:port, _e.g._ `localhost:8081`.
 
 ```shell
 bash bin/bitsail run \

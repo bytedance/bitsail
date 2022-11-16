@@ -221,12 +221,36 @@ public class KafkaOutputFormat extends OutputFormatPlugin<Row> implements Result
     return kafkaProducer.choosePartitionIdByFields(fields);
   }
 
+  private void send(KafkaRecord record) {
+    kafkaProducer.send(record, callback);
+  }
+
   private void send(String value) {
-    kafkaProducer.send(value, callback);
+    kafkaProducer.send(KafkaRecord.builder().value(value).build(), callback);
+  }
+
+  private void send(String key, String value) {
+    kafkaProducer.send(KafkaRecord.builder().key(key).value(value).build(), callback);
   }
 
   private void sendByPartitionId(String value, int partitionId) {
-    kafkaProducer.send(value, partitionId, callback);
+    kafkaProducer.send(KafkaRecord.builder().value(value).partitionId(partitionId).build(), callback);
+  }
+
+  private void sendByPartitionId(String key, String value, int partitionId) {
+    kafkaProducer.send(KafkaRecord.builder().key(key).value(value).partitionId(partitionId).build(), callback);
+  }
+
+  private void sendWithHeaders(String value, Map<String, String> headers) {
+    kafkaProducer.send(KafkaRecord.builder().value(value).headers(headers).build(), callback);
+  }
+
+  private void sendWithHeaders(String key, String value, Map<String, String> headers) {
+    kafkaProducer.send(KafkaRecord.builder().key(key).value(value).headers(headers).build(), callback);
+  }
+
+  private void sendWithHeaders(String key, String value, int partitionId, Map<String, String> headers) {
+    kafkaProducer.send(KafkaRecord.builder().key(key).value(value).partitionId(partitionId).headers(headers).build(), callback);
   }
 
   private void closeProducer() {

@@ -101,9 +101,8 @@ public class HttpManager {
     }
     StringEntity entity = new StringEntity(jsonStr, "UTF-8");
     httpPost.setEntity(entity);
-    CloseableHttpResponse response = closeableHttpClient
+    return closeableHttpClient
         .execute(httpPost);
-    return response;
   }
 
   public static WrappedResponse sendPost(String url, Map<String, String> headers, Map<String, Object> body, ContentType contentType) throws IOException {
@@ -227,8 +226,7 @@ public class HttpManager {
       int statusCode = response.getStatusLine().getStatusCode();
       String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
       EntityUtils.consume(response.getEntity());
-      WrappedResponse wrappedResponse = new WrappedResponse(statusCode, responseString);
-      return wrappedResponse;
+      return new WrappedResponse(statusCode, responseString);
     } finally {
       response.close();
     }

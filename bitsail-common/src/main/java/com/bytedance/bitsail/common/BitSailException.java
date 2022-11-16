@@ -34,8 +34,8 @@ import java.io.StringWriter;
 public class BitSailException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
-  private ErrorCode errorCode;
-  private String errorMessage;
+  private final ErrorCode errorCode;
+  private final String errorMessage;
 
   public BitSailException(ErrorCode errorCode, String errorMessage) {
     super(errorCode.toString() + " - " + errorMessage);
