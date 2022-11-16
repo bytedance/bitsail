@@ -39,7 +39,7 @@ public class AccumulatorRestorer {
 
   public static void restoreAccumulator(ProcessResult<JobExecutionResult> processResult,
                                         MessengerContext messengerContext) {
-    if (Objects.isNull(processResult)) {
+    if (Objects.isNull(processResult) || Objects.isNull(processResult.getJobExecutionResult())) {
       return;
     }
     JobExecutionResult jobExecutionResult = processResult.getJobExecutionResult();
