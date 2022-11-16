@@ -246,6 +246,7 @@ public abstract class OutputFormatPlugin<E extends Row> extends RichOutputFormat
   @VisibleForTesting
   public void setEmptyMessenger() {
     this.messenger = new BaseStatisticsMessenger(messengerContext);
+    this.messenger.open();
   }
 
   @VisibleForTesting
