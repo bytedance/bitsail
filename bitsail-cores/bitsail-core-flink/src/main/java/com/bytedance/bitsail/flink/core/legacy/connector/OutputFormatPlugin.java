@@ -20,13 +20,13 @@ package com.bytedance.bitsail.flink.core.legacy.connector;
 import com.bytedance.bitsail.base.dirty.AbstractDirtyCollector;
 import com.bytedance.bitsail.base.dirty.DirtyCollectorFactory;
 import com.bytedance.bitsail.base.execution.ProcessResult;
+import com.bytedance.bitsail.base.messenger.BaseStatisticsMessenger;
 import com.bytedance.bitsail.base.messenger.Messenger;
 import com.bytedance.bitsail.base.messenger.MessengerFactory;
 import com.bytedance.bitsail.base.messenger.checker.DirtyRecordChecker;
 import com.bytedance.bitsail.base.messenger.common.MessengerGroup;
 import com.bytedance.bitsail.base.messenger.context.MessengerContext;
 import com.bytedance.bitsail.base.messenger.context.SimpleMessengerContext;
-import com.bytedance.bitsail.base.messenger.impl.NoOpMessenger;
 import com.bytedance.bitsail.base.metrics.MetricManager;
 import com.bytedance.bitsail.base.metrics.manager.BitSailMetricManager;
 import com.bytedance.bitsail.base.metrics.manager.CallTracer;
@@ -39,11 +39,13 @@ import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.util.Pair;
 import com.bytedance.bitsail.flink.core.runtime.RuntimeContextInjectable;
+import com.bytedance.bitsail.flink.core.util.AccumulatorRestorer;
 import com.bytedance.bitsail.flink.core.util.RowUtil;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import org.apache.flink.annotation.PublicEvolving;
+import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.io.CleanupWhenUnsuccessful;
 import org.apache.flink.api.common.io.FinalizeOnMaster;
 import org.apache.flink.api.common.io.InitializeOnMaster;
@@ -79,7 +81,7 @@ public abstract class OutputFormatPlugin<E extends Row> extends RichOutputFormat
 
   protected BitSailConfiguration outputSliceConfig = null;
 
-  protected Messenger<Row> messenger;
+  protected Messenger messenger;
   protected MessengerContext messengerContext;
 
   protected AbstractDirtyCollector dirtyCollector;
@@ -181,7 +183,7 @@ public abstract class OutputFormatPlugin<E extends Row> extends RichOutputFormat
    */
   @Override
   public void onSuccessComplete(ProcessResult result) throws Exception {
-    messenger.restoreMessengerCounter(result);
+    AccumulatorRestorer.restoreAccumulator((ProcessResult<JobExecutionResult>) result, messengerContext);
     dirtyCollector.restoreDirtyRecords(result);
     LOG.info("Checking dirty records during output...");
     dirtyRecordChecker.check(result, MessengerGroup.WRITER);
@@ -197,10 +199,11 @@ public abstract class OutputFormatPlugin<E extends Row> extends RichOutputFormat
     try (CallTracer ignore = metricManager.recordTimer(RECORD_INVOKE_LATENCY).get()) {
       try {
         writeRecordInternal(record);
-        messenger.addSuccessRecord(record);
-        metricManager.reportRecord(RowUtil.getRowBytesSize(record), SUCCESS);
+        long rowBytesSize = RowUtil.getRowBytesSize(record);
+        messenger.addSuccessRecord(rowBytesSize);
+        metricManager.reportRecord(rowBytesSize, SUCCESS);
       } catch (BitSailException e) {
-        messenger.addFailedRecord(record, e);
+        messenger.addFailedRecord(e);
         dirtyCollector.collectDirty(record, e, System.currentTimeMillis());
         LOG.debug("Write one record failed. - " + record.toString(), e);
         metricManager.reportRecord(0, FAILED);
@@ -242,7 +245,8 @@ public abstract class OutputFormatPlugin<E extends Row> extends RichOutputFormat
 
   @VisibleForTesting
   public void setEmptyMessenger() {
-    this.messenger = new NoOpMessenger<>();
+    this.messenger = new BaseStatisticsMessenger(messengerContext);
+    this.messenger.open();
   }
 
   @VisibleForTesting

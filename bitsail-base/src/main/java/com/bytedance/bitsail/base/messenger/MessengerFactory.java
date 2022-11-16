@@ -24,15 +24,15 @@ import com.bytedance.bitsail.common.option.CommonOptions;
 
 public class MessengerFactory {
 
-  public static <T> Messenger<T> initMessenger(BitSailConfiguration commonConfiguration,
-                                               MessengerContext messengerContext) {
+  public static Messenger initMessenger(BitSailConfiguration commonConfiguration,
+                                        MessengerContext messengerContext) {
     String messengerType = commonConfiguration.get(CommonOptions.MESSENGER_TYPE);
 
     DefaultComponentBuilderLoader<MessengerBuilder> componentBuilderLoader =
         new DefaultComponentBuilderLoader<MessengerBuilder>(MessengerBuilder.class);
 
-    MessengerBuilder<?> messengerBuilder = componentBuilderLoader.loadComponent(messengerType);
+    MessengerBuilder messengerBuilder = componentBuilderLoader.loadComponent(messengerType);
 
-    return (Messenger<T>) messengerBuilder.createMessenger(messengerContext);
+    return messengerBuilder.createMessenger(messengerContext, commonConfiguration);
   }
 }

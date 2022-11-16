@@ -20,28 +20,88 @@
 package com.bytedance.bitsail.flink.core.delagate.reader.source;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
+import com.bytedance.bitsail.base.dirty.AbstractDirtyCollector;
+import com.bytedance.bitsail.base.messenger.Messenger;
+import com.bytedance.bitsail.base.messenger.common.MessageType;
+import com.bytedance.bitsail.base.metrics.MetricManager;
+import com.bytedance.bitsail.base.metrics.manager.CallTracer;
+import com.bytedance.bitsail.base.ratelimit.Channel;
+import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConvertSerializer;
+import com.bytedance.bitsail.flink.core.util.RowUtil;
 
 import org.apache.flink.api.connector.source.ReaderOutput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import static com.bytedance.bitsail.base.constants.BaseMetricsNames.RECORD_CHANNEL_FLOW_CONTROL;
+
 public class DelegateSourcePipeline<T> implements SourcePipeline<T> {
-  private ReaderOutput<T> readerOutput;
+  private static final Logger LOG = LoggerFactory.getLogger(DelegateSourcePipeline.class);
+
+  private final ReaderOutput<T> readerOutput;
 
   //todo flink row converter and watermark.
-  private FlinkRowConvertSerializer flinkRowConvertSerializer;
+  private final FlinkRowConvertSerializer flinkRowConvertSerializer;
+
+  private final AbstractDirtyCollector dirtyCollector;
+
+  private final Messenger messenger;
+
+  private final MetricManager metricManager;
+
+  private final BitSailConfiguration commonConfiguration;
+
+  private Channel trafficLimiter;
 
   public DelegateSourcePipeline(ReaderOutput<T> readerOutput,
-                                FlinkRowConvertSerializer flinkRowConvertSerializer) {
+                                FlinkRowConvertSerializer flinkRowConvertSerializer,
+                                MetricManager metricManager,
+                                Messenger messenger,
+                                AbstractDirtyCollector dirtyCollectorFactory,
+                                BitSailConfiguration commonConfiguration) {
     this.readerOutput = readerOutput;
     this.flinkRowConvertSerializer = flinkRowConvertSerializer;
+    this.metricManager = metricManager;
+    this.messenger = messenger;
+    this.dirtyCollector = dirtyCollectorFactory;
+    this.commonConfiguration = commonConfiguration;
+    preparePipeline();
+  }
+
+  private void preparePipeline() {
+    long recordSpeed = commonConfiguration.get(CommonOptions.READER_TRANSPORT_CHANNEL_SPEED_RECORD);
+    long byteSpeed = commonConfiguration.get(CommonOptions.READER_TRANSPORT_CHANNEL_SPEED_BYTE);
+    trafficLimiter = new Channel(recordSpeed, byteSpeed);
   }
 
   @Override
   public void output(T record) throws IOException {
-    org.apache.flink.types.Row serialize = flinkRowConvertSerializer.serialize((Row) record);
+    org.apache.flink.types.Row serialize;
+    try {
+      serialize = flinkRowConvertSerializer.serialize((Row) record);
+      long rowBytesSize = RowUtil.getRowBytesSize(serialize);
+      messenger.addSuccessRecord(rowBytesSize);
+      metricManager.reportRecord(rowBytesSize, MessageType.SUCCESS);
+    } catch (BitSailException e) {
+      LOG.debug("Failed to write one record. - {}", record, e);
+      messenger.addFailedRecord(e);
+      dirtyCollector.collectDirty(record, e, System.currentTimeMillis());
+      metricManager.reportRecord(0, MessageType.FAILED);
+      return;
+    }
+    try (CallTracer ignore = metricManager.recordTimer(RECORD_CHANNEL_FLOW_CONTROL).get()) {
+      trafficLimiter.checkFlowControl(
+          messenger.getSuccessRecords(),
+          messenger.getSuccessRecordBytes(),
+          messenger.getFailedRecords()
+      );
+    }
     readerOutput.collect((T) serialize);
   }
 

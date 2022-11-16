@@ -17,13 +17,16 @@
 
 package com.bytedance.bitsail.base.messenger.checker;
 
+import com.bytedance.bitsail.base.messenger.BaseStatisticsMessenger;
 import com.bytedance.bitsail.base.messenger.Messenger;
-import com.bytedance.bitsail.base.messenger.impl.NoOpMessenger;
+import com.bytedance.bitsail.base.messenger.common.MessengerGroup;
+import com.bytedance.bitsail.base.messenger.context.SimpleMessengerContext;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.val;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -31,7 +34,16 @@ import static org.junit.Assert.assertFalse;
 
 public class LowVolumeTestCheckerTest {
 
-  private final Messenger<?> messenger = new NoOpMessenger<>();
+  private Messenger messenger;
+
+  @Before
+  public void before() {
+    messenger = new BaseStatisticsMessenger(SimpleMessengerContext
+        .builder()
+        .messengerGroup(MessengerGroup.READER)
+        .build());
+    messenger.open();
+  }
 
   @Test
   public void check_noThreshold() {

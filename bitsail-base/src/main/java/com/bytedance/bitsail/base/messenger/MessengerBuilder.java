@@ -19,12 +19,14 @@ package com.bytedance.bitsail.base.messenger;
 
 import com.bytedance.bitsail.base.component.ComponentBuilder;
 import com.bytedance.bitsail.base.messenger.context.MessengerContext;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
 /**
  * Created 2022/8/31
  */
-public interface MessengerBuilder<T> extends ComponentBuilder<Messenger<T>> {
+public interface MessengerBuilder extends ComponentBuilder<Messenger> {
 
-  Messenger<T> createMessenger(MessengerContext messengerContext);
+  Messenger createMessenger(MessengerContext messengerContext,
+                            BitSailConfiguration commonConfiguration);
 
 }
