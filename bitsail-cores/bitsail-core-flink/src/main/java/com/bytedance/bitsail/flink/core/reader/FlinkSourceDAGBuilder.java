@@ -22,20 +22,31 @@ package com.bytedance.bitsail.flink.core.reader;
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
 import com.bytedance.bitsail.base.connector.reader.v1.Source;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplit;
+import com.bytedance.bitsail.base.dirty.AbstractDirtyCollector;
+import com.bytedance.bitsail.base.dirty.DirtyCollectorFactory;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.ProcessResult;
 import com.bytedance.bitsail.base.extension.GlobalCommittable;
 import com.bytedance.bitsail.base.extension.ParallelismComputable;
+import com.bytedance.bitsail.base.messenger.Messenger;
+import com.bytedance.bitsail.base.messenger.MessengerFactory;
+import com.bytedance.bitsail.base.messenger.checker.DirtyRecordChecker;
+import com.bytedance.bitsail.base.messenger.common.MessengerGroup;
+import com.bytedance.bitsail.base.messenger.context.MessengerContext;
+import com.bytedance.bitsail.base.messenger.context.SimpleMessengerContext;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.flink.core.delagate.reader.source.DelegateFlinkSource;
 import com.bytedance.bitsail.flink.core.delagate.reader.source.operator.DelegateSourceOperatorFactory;
 import com.bytedance.bitsail.flink.core.execution.FlinkExecutionEnviron;
 import com.bytedance.bitsail.flink.core.plugins.InputAdapter;
+import com.bytedance.bitsail.flink.core.util.AccumulatorRestorer;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -60,7 +71,15 @@ public class FlinkSourceDAGBuilder<T, SplitT extends SourceSplit, StateT extends
 
   private final Source<T, SplitT, StateT> source;
 
+  private MessengerContext messengerContext;
+
   private DelegateFlinkSource<T, SplitT, StateT> delegateFlinkSource;
+
+  private AbstractDirtyCollector dirtyCollector;
+
+  private DirtyRecordChecker dirtyRecordChecker;
+
+  private Messenger messenger;
 
   public FlinkSourceDAGBuilder(Source<T, SplitT, StateT> source) {
     this.source = source;
@@ -69,9 +88,20 @@ public class FlinkSourceDAGBuilder<T, SplitT extends SourceSplit, StateT extends
   @Override
   public void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration) throws Exception {
     this.source.configure(execution, readerConfiguration);
+    this.messengerContext = SimpleMessengerContext.builder()
+        .messengerGroup(MessengerGroup.READER)
+        .instanceId(execution.getCommonConfiguration().get(CommonOptions.INTERNAL_INSTANCE_ID))
+        .build();
+    this.dirtyCollector = DirtyCollectorFactory.initDirtyCollector(execution.getCommonConfiguration(),
+        messengerContext);
+    this.messenger = MessengerFactory.initMessenger(execution.getCommonConfiguration(),
+        messengerContext);
+    this.dirtyRecordChecker = new DirtyRecordChecker(execution.getCommonConfiguration());
     this.delegateFlinkSource = new DelegateFlinkSource<>(source,
         execution.getCommonConfiguration(),
-        readerConfiguration);
+        readerConfiguration,
+        dirtyCollector,
+        messenger);
   }
 
   public DataStream<T> fromSource(FlinkExecutionEnviron executionEnviron,
@@ -142,7 +172,11 @@ public class FlinkSourceDAGBuilder<T, SplitT extends SourceSplit, StateT extends
 
   @Override
   public void commit(ProcessResult<?> processResult) throws Exception {
-
+    AccumulatorRestorer.restoreAccumulator((ProcessResult<JobExecutionResult>) processResult,
+        messengerContext);
+    dirtyCollector.restoreDirtyRecords(processResult);
+    LOG.info("Checking dirty records during output...");
+    dirtyRecordChecker.check(processResult, MessengerGroup.READER);
   }
 
   @Override

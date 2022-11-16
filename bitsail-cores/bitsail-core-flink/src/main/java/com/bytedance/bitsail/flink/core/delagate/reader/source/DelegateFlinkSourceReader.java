@@ -20,11 +20,7 @@
 package com.bytedance.bitsail.flink.core.delagate.reader.source;
 
 import com.bytedance.bitsail.base.dirty.AbstractDirtyCollector;
-import com.bytedance.bitsail.base.dirty.DirtyCollectorFactory;
 import com.bytedance.bitsail.base.messenger.Messenger;
-import com.bytedance.bitsail.base.messenger.MessengerFactory;
-import com.bytedance.bitsail.base.messenger.common.MessengerGroup;
-import com.bytedance.bitsail.base.messenger.context.SimpleMessengerContext;
 import com.bytedance.bitsail.base.metrics.MetricManager;
 import com.bytedance.bitsail.base.metrics.manager.BitSailMetricManager;
 import com.bytedance.bitsail.base.metrics.manager.CallTracer;
@@ -81,7 +77,9 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
       String readerName,
       TypeInfo<?>[] typeInfos,
       BitSailConfiguration commonConfiguration,
-      BitSailConfiguration readerConfiguration) {
+      BitSailConfiguration readerConfiguration,
+      AbstractDirtyCollector dirtyCollector,
+      Messenger messenger) {
     this.sourceReaderFunction = sourceReaderFunction;
     this.sourceReaderContext = (DelegateSourceReaderContext) sourceReaderContext;
     this.commonConfiguration = commonConfiguration;
@@ -102,6 +100,8 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
             Pair.newPair("task", String.valueOf(sourceReaderContext.getIndexOfSubtask()))
         )
     );
+    this.dirtyCollector = dirtyCollector;
+    this.messenger = messenger;
     prepareSourceReader();
   }
 
@@ -135,12 +135,6 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
         sourceTypeInfos,
         columnInfos,
         commonConfiguration);
-    SimpleMessengerContext messengerContext = SimpleMessengerContext.builder()
-        .messengerGroup(MessengerGroup.READER)
-        .instanceId(commonConfiguration.get(CommonOptions.INTERNAL_INSTANCE_ID))
-        .build();
-    this.dirtyCollector = DirtyCollectorFactory.initDirtyCollector(commonConfiguration, messengerContext);
-    this.messenger = MessengerFactory.initMessenger(commonConfiguration, messengerContext);
     if (this.messenger instanceof RuntimeContextInjectable) {
       ((RuntimeContextInjectable) messenger).setRuntimeContext(sourceReaderContext.getRuntimeContext());
     }

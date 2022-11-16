@@ -89,7 +89,7 @@ public class DirtyRecordChecker implements Serializable {
     }
 
     final long total = failed + succeeded;
-    log.info("Found {} success records.", succeeded);
+    log.info("Group {} found {} success records.", messengerGroup.name(), succeeded);
     if (total == 0) {
       return;
     }
@@ -97,8 +97,8 @@ public class DirtyRecordChecker implements Serializable {
     // log all dirty records found
     String formatDirtyStr = formatDirty(sampleDirtyRecords);
     if (failed > 0) {
-      log.info("Found {} dirty records, threshold {}. They are:\n{}",
-          failed, failedCountThreshold, formatDirtyStr);
+      log.info("Group {} found {} dirty records, threshold {}. They are:\n{}",
+          messengerGroup.name(), failed, failedCountThreshold, formatDirtyStr);
     }
 
     // throw exception when there are too many dirty records and failedCountThreshold > 0
