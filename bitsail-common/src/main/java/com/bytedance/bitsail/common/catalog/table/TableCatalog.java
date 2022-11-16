@@ -46,7 +46,7 @@ public interface TableCatalog extends Serializable {
   /**
    * Get the reference table for the table catalog.
    */
-  CatalogTableDefinition referenceTable();
+  CatalogTableDefinition createCatalogTableDefinition();
 
   /**
    * Check the table exits or not.

@@ -17,42 +17,62 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.hive.common;
+package com.bytedance.bitsail.connector.legacy.jdbc.catalog;
 
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.catalog.table.CatalogTable;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableColumn;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableDefinition;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableSchema;
 import com.bytedance.bitsail.common.catalog.table.TableCatalog;
 import com.bytedance.bitsail.common.catalog.table.TableOperation;
-import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
-
-import com.bytedance.bitsail.shaded.hive.client.HiveMetaClientUtil;
+import com.bytedance.bitsail.connector.legacy.jdbc.exception.JDBCPluginErrorCode;
+import com.bytedance.bitsail.connector.legacy.jdbc.model.TableInfo;
+import com.bytedance.bitsail.connector.legacy.jdbc.utils.MysqlUtil;
 
 import lombok.Builder;
-import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-@Builder
-public class HiveTableCatalog implements TableCatalog {
-  private static final Logger LOG = LoggerFactory.getLogger(HiveTableCatalog.class);
+public class MySQLTableCatalog implements TableCatalog {
+  private static final Logger LOG = LoggerFactory.getLogger(MySQLTableCatalog.class);
 
-  private final String namespace;
   private final String database;
   private final String table;
-  private final HiveConf hiveConf;
-
+  private final String schema;
+  private final String username;
+  private final String password;
+  private final String url;
+  private final String customizedSQL;
+  private final boolean useCustomizedSQL;
   private TypeInfoConverter typeInfoConverter;
+
+  @Builder
+  public MySQLTableCatalog(String database,
+                           String table,
+                           String schema,
+                           String username,
+                           String password,
+                           String url,
+                           String customizedSQL) {
+    this.database = database;
+    this.table = table;
+    this.schema = schema;
+    this.username = username;
+    this.password = password;
+    this.url = url;
+    this.customizedSQL = customizedSQL;
+    this.useCustomizedSQL = StringUtils.isNotEmpty(customizedSQL);
+  }
 
   @Override
   public void open(TypeInfoConverter typeInfoConverter) {
     this.typeInfoConverter = typeInfoConverter;
-    //ignore
   }
 
   @Override
@@ -71,34 +91,45 @@ public class HiveTableCatalog implements TableCatalog {
 
   @Override
   public boolean tableExists(CatalogTableDefinition catalogTableDefinition) {
-    //todo real check.
+    //todo doesn't check
     return true;
   }
 
   @Override
   public CatalogTable getCatalogTable(CatalogTableDefinition catalogTableDefinition) {
+    TableInfo tableInfo;
     try {
-      List<ColumnInfo> columnInfo = HiveMetaClientUtil.getColumnInfo(hiveConf,
-          catalogTableDefinition.getDatabase(),
-          catalogTableDefinition.getTable());
-
-      return CatalogTable.builder()
-          .catalogTableDefinition(catalogTableDefinition)
-          .catalogTableSchema(getCatalogTableSchema(columnInfo))
-          .build();
+      if (useCustomizedSQL) {
+        tableInfo = MysqlUtil.getInstance()
+            .getCustomizedSQLTableInfo(url, username, password, database, customizedSQL);
+      } else {
+        tableInfo = MysqlUtil.getInstance()
+            .getTableInfo(url, username, password, database, schema, table, null, null);
+      }
     } catch (Exception e) {
-      LOG.error("Acquire hive catalog table failed", e);
-      throw new IllegalStateException();
+      LOG.error("Failed to get table info by the definition {}.", catalogTableDefinition);
+      throw BitSailException.asBitSailException(JDBCPluginErrorCode.INTERNAL_ERROR, e);
     }
+    return CatalogTable
+        .builder()
+        .catalogTableDefinition(catalogTableDefinition)
+        .catalogTableSchema(CatalogTableSchema.builder()
+            .columns(convertTableColumn(
+                typeInfoConverter,
+                tableInfo.getColumnInfoList())
+            ).build()
+        ).build();
   }
 
   @Override
   public void createTable(CatalogTable catalogTable) {
     throw new UnsupportedOperationException();
+
   }
 
   @Override
-  public void alterTable(TableOperation tableOperation, CatalogTable table) {
+  public void alterTable(TableOperation tableOperation,
+                         CatalogTable table) {
     throw new UnsupportedOperationException();
   }
 
@@ -109,14 +140,8 @@ public class HiveTableCatalog implements TableCatalog {
   }
 
   @Override
-  public boolean compareTypeCompatible(TypeInfo<?> original, TypeInfo<?> compared) {
+  public boolean compareTypeCompatible(TypeInfo<?> original,
+                                       TypeInfo<?> compared) {
     return original.getTypeClass() == compared.getTypeClass();
-  }
-
-  private CatalogTableSchema getCatalogTableSchema(List<ColumnInfo> columnInfos) {
-    List<CatalogTableColumn> tableColumns = convertTableColumn(typeInfoConverter, columnInfos);
-    return CatalogTableSchema.builder()
-        .columns(tableColumns)
-        .build();
   }
 }

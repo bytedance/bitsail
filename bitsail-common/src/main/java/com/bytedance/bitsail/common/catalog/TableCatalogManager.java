@@ -112,8 +112,8 @@ public class TableCatalogManager {
     //start table column catalog
     startTableCatalog();
 
-    CatalogTableDefinition readerTableDefinition = readerTableCatalog.referenceTable();
-    CatalogTableDefinition writerTableDefinition = readerTableCatalog.referenceTable();
+    CatalogTableDefinition readerTableDefinition = readerTableCatalog.createCatalogTableDefinition();
+    CatalogTableDefinition writerTableDefinition = readerTableCatalog.createCatalogTableDefinition();
     if (!readerTableCatalog.tableExists(readerTableDefinition)) {
       throw BitSailException.asBitSailException(TableCatalogErrorCode.TABLE_CATALOG_TABLE_NOT_EXISTS,
           String.format("Reader table definition %s not exists.", readerTableDefinition));

@@ -81,7 +81,7 @@ public class FakeTableCatalog implements TableCatalog {
   }
 
   @Override
-  public CatalogTableDefinition referenceTable() {
+  public CatalogTableDefinition createCatalogTableDefinition() {
     return tableDefinition;
   }
 

@@ -48,7 +48,7 @@ public enum TableCatalogStrategy implements Serializable {
               Sets.newHashSet(writerColumns))
           .copyInto(Sets.newHashSet());
 
-      return new CatalogTableSchema(Lists.newArrayList(intersect.iterator()), null);
+      return new CatalogTableSchema(Lists.newArrayList(intersect.iterator()));
     }
   },
 

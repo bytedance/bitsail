@@ -24,25 +24,32 @@ import com.bytedance.bitsail.base.connector.BuilderGroup;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.common.catalog.table.TableCatalog;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-
-import org.apache.hadoop.hive.conf.HiveConf;
+import com.bytedance.bitsail.common.exception.FrameworkErrorCode;
+import com.bytedance.bitsail.connector.legacy.hive.option.HiveReaderOptions;
+import com.bytedance.bitsail.connector.legacy.hive.option.HiveWriterOptions;
+import com.bytedance.bitsail.connector.legacy.hive.util.HiveConfUtils;
 
 public class HiveTableCatalogFactory implements TableCatalogFactory {
-
-  private HiveConf hiveConf;
-
-  public HiveTableCatalogFactory(HiveConf hiveConf) {
-    this.hiveConf = hiveConf;
-  }
 
   @Override
   public TableCatalog createTableCatalog(BuilderGroup builderGroup,
                                          ExecutionEnviron executionEnviron,
                                          BitSailConfiguration connectorConfiguration) {
-    return new HiveTableCatalog(
-        executionEnviron.getCommonConfiguration(),
-        connectorConfiguration,
-        hiveConf);
+    if (BuilderGroup.READER.equals(builderGroup)) {
+      String database = connectorConfiguration
+          .getNecessaryOption(HiveReaderOptions.DB_NAME, FrameworkErrorCode.REQUIRED_VALUE);
+      String table = connectorConfiguration
+          .getNecessaryOption(HiveReaderOptions.TABLE_NAME, FrameworkErrorCode.REQUIRED_VALUE);
+      return HiveTableCatalog
+          .builder()
+          .database(database)
+          .table(table)
+          .namespace(null)
+          .hiveConf(HiveConfUtils.fromJsonProperties(
+              connectorConfiguration.get(HiveWriterOptions.HIVE_METASTORE_PROPERTIES)))
+          .build();
+    }
+    throw new UnsupportedOperationException();
   }
 
   @Override

@@ -17,38 +17,28 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.common.catalog.table;
+package com.bytedance.bitsail.connector.legacy.hive.util;
 
-import lombok.Builder;
-import lombok.Getter;
+import com.bytedance.bitsail.common.util.JsonSerializer;
 
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
+import com.bytedance.bitsail.shaded.hive.client.HiveMetaClientUtil;
 
-@Getter
-@Builder
-public class CatalogTableSchema implements Serializable {
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.conf.HiveConf;
 
-  private final List<CatalogTableColumn> columns;
+import java.util.Map;
 
-  private final List<CatalogTableColumn> primaryKeys;
+public class HiveConfUtils {
 
-  public CatalogTableSchema(List<CatalogTableColumn> columns) {
-    this(columns, Collections.emptyList());
+  public static HiveConf fromJsonProperties(String jsonProperties) {
+    Map<String, String> hiveProperties =
+        JsonSerializer.parseToMap(jsonProperties);
+    return HiveMetaClientUtil.getHiveConf(hiveProperties);
   }
 
-  public CatalogTableSchema(List<CatalogTableColumn> columns,
-                            List<CatalogTableColumn> primaryKeys) {
-    this.columns = columns;
-    this.primaryKeys = primaryKeys;
-  }
-
-  @Override
-  public String toString() {
-    return "CatalogTableSchema{" +
-        "columns=" + columns +
-        ", primaryKeys=" + primaryKeys +
-        '}';
+  public HiveConf fromHiveConfPath(String location) {
+    HiveConf hiveConf = new HiveConf();
+    hiveConf.addResource(new Path(location));
+    return hiveConf;
   }
 }
