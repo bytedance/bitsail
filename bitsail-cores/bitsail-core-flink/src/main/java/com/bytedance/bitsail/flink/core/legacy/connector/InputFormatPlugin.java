@@ -381,6 +381,7 @@ public abstract class InputFormatPlugin<OT extends Row, T extends InputSplit> ex
   @VisibleForTesting
   public void setEmptyMessenger() {
     this.messenger = new BaseStatisticsMessenger(messengerContext);
+    this.messenger.open();
   }
 
   @VisibleForTesting

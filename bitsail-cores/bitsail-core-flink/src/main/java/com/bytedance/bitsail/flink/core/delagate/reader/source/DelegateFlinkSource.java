@@ -20,6 +20,8 @@
 package com.bytedance.bitsail.flink.core.delagate.reader.source;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplit;
+import com.bytedance.bitsail.base.dirty.AbstractDirtyCollector;
+import com.bytedance.bitsail.base.messenger.Messenger;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.ReaderOptions;
@@ -51,10 +53,14 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
   private final BitSailConfiguration commonConfiguration;
   private final BitSailConfiguration readerConfiguration;
   private final TypeInfo<?>[] typeInfos;
+  private final AbstractDirtyCollector dirtyCollector;
+  private final Messenger messenger;
 
   public DelegateFlinkSource(com.bytedance.bitsail.base.connector.reader.v1.Source<T, SplitT, StateT> source,
                              BitSailConfiguration commonConfiguration,
-                             BitSailConfiguration readerConfiguration) {
+                             BitSailConfiguration readerConfiguration,
+                             AbstractDirtyCollector dirtyCollector,
+                             Messenger messenger) {
     this.source = source;
     this.commonConfiguration = commonConfiguration;
     this.readerConfiguration = readerConfiguration;
@@ -63,6 +69,8 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
     this.typeInfos = TypeInfoUtils
         .getTypeInfos(source.createTypeInfoConverter(),
             columnInfos);
+    this.dirtyCollector = dirtyCollector;
+    this.messenger = messenger;
   }
 
   @Override
@@ -78,7 +86,9 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
         source.getReaderName(),
         typeInfos,
         commonConfiguration,
-        readerConfiguration
+        readerConfiguration,
+        dirtyCollector,
+        messenger
     );
   }
 
