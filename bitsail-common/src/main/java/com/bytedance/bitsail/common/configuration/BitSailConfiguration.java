@@ -62,7 +62,7 @@ public class BitSailConfiguration implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private Set<String> secretKeyPathSet =
-      new HashSet<String>();
+      new HashSet<>();
 
   private Object root = null;
 

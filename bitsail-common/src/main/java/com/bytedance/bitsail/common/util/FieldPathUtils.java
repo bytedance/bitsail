@@ -61,7 +61,7 @@ public class FieldPathUtils {
     return LIST_VALUE_PATTERN.matcher(column);
   }
 
-  public static enum PathType {
+  public enum PathType {
 
     /**
      * Array list

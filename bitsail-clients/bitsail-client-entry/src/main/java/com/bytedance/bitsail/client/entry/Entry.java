@@ -89,7 +89,7 @@ public class Entry {
           .load(entry.sysConfiguration, entry.baseCommandArgs);
 
       exit = securityContext.doAs(
-        () -> entry.runCommand());
+          entry::runCommand);
 
       System.exit(exit);
     } catch (Exception e) {
@@ -103,7 +103,7 @@ public class Entry {
   public static BaseCommandArgs loadCommandArguments(String[] args) {
     if (args.length < 1) {
       CommandArgsParser.printHelp();
-      System.out.println("Please specify an action. Supported action are" + CommandAction.RUN_COMMAND);
+      System.out.println("Please specify an action. Supported action are " + CommandAction.RUN_COMMAND);
       System.exit(EntryConstants.ERROR_EXIT_CODE_COMMAND_ERROR);
     }
     final String mainCommand = args[0];

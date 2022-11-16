@@ -30,7 +30,7 @@ public class PackageResolver {
 
   static String BITSAIL_HOME_KEY = "BITSAIL_HOME";
 
-  private static String LIBS_PATH = "./libs";
+  private static final String LIBS_PATH = "./libs";
   private static String CLIENT_PATH = LIBS_PATH + "/clients";
   private static String COMPONENTS_PATH = LIBS_PATH + "components";
   private static String CONNECTORS_PATH = LIBS_PATH + "connectors";
