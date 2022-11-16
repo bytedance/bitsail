@@ -19,6 +19,7 @@ package com.bytedance.bitsail.flink.core.execution.configurer;
 
 import com.bytedance.bitsail.base.catalog.TableCatalogFactory;
 import com.bytedance.bitsail.base.catalog.TableCatalogFactoryHelper;
+import com.bytedance.bitsail.base.connector.BuilderGroup;
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
 import com.bytedance.bitsail.base.connector.transformer.DataTransformDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
@@ -100,8 +101,8 @@ public class FlinkDAGBuilderInterceptor {
     BitSailConfiguration writerConfiguration = executionEnviron.getWriterConfigurations().get(0);
 
     TableCatalogManager catalogManager = TableCatalogManager.builder()
-        .readerTableCatalog(readerCatalogFactory.createTableCatalog(executionEnviron, readerConfiguration))
-        .writerTableCatalog(writerCatalogFactory.createTableCatalog(executionEnviron, writerConfiguration))
+        .readerTableCatalog(readerCatalogFactory.createTableCatalog(BuilderGroup.READER, executionEnviron, readerConfiguration))
+        .writerTableCatalog(writerCatalogFactory.createTableCatalog(BuilderGroup.WRITER, executionEnviron, writerConfiguration))
         .readerTypeInfoConverter(readerTypeInfoConverter)
         .writerTypeInfoConverter(writerTypeInfoConverter)
         .commonConfiguration(executionEnviron.getCommonConfiguration())

@@ -19,8 +19,11 @@
 
 package com.bytedance.bitsail.common.catalog.table;
 
+import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+
+import com.google.common.collect.Lists;
 
 import java.io.Serializable;
 import java.util.List;
@@ -73,5 +76,19 @@ public interface TableCatalog extends Serializable {
                          List<CatalogTableColumn> catalogTableColumns);
 
   boolean compareTypeCompatible(TypeInfo<?> original, TypeInfo<?> compared);
+
+  default List<CatalogTableColumn> convertTableColumn(TypeInfoConverter typeInfoConverter,
+                                                      List<ColumnInfo> columnInfos) {
+    List<CatalogTableColumn> tableColumns = Lists.newArrayList();
+    for (ColumnInfo columnInfo : columnInfos) {
+      tableColumns.add(
+          CatalogTableColumn.builder()
+              .name(columnInfo.getName())
+              .type(typeInfoConverter.fromTypeString(columnInfo.getType()))
+              .build()
+      );
+    }
+    return tableColumns;
+  }
 
 }

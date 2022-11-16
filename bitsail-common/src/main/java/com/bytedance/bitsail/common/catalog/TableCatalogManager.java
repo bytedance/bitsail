@@ -169,7 +169,7 @@ public class TableCatalogManager {
     if (!catalogTableAlterDefinition.isNotEmpty()) {
       return;
     }
-    if (tableCatalogAddSync &&
+    if (!tableCatalogAddSync &&
         CollectionUtils.isNotEmpty(catalogTableAlterDefinition.getPendingAddColumns())) {
       writerTableCatalog.alterTableColumns(
           TableOperation.ALTER_COLUMNS_ADD,
@@ -177,7 +177,7 @@ public class TableCatalogManager {
       );
     }
 
-    if (tableCatalogDeleteSync &&
+    if (!tableCatalogDeleteSync &&
         CollectionUtils.isNotEmpty(catalogTableAlterDefinition.getPendingDeleteColumns())) {
       writerTableCatalog.alterTableColumns(
           TableOperation.ALTER_COLUMNS_DELETE,
@@ -185,7 +185,7 @@ public class TableCatalogManager {
       );
     }
 
-    if (tableCatalogUpdateSync &&
+    if (!tableCatalogUpdateSync &&
         CollectionUtils.isNotEmpty(catalogTableAlterDefinition.getPendingUpdateColumns())) {
       writerTableCatalog.alterTableColumns(
           TableOperation.ALTER_COLUMNS_UPDATE,

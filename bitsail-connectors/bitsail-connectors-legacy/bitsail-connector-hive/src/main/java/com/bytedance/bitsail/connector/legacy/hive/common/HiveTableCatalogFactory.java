@@ -20,6 +20,7 @@
 package com.bytedance.bitsail.connector.legacy.hive.common;
 
 import com.bytedance.bitsail.base.catalog.TableCatalogFactory;
+import com.bytedance.bitsail.base.connector.BuilderGroup;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.common.catalog.table.TableCatalog;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
@@ -35,7 +36,8 @@ public class HiveTableCatalogFactory implements TableCatalogFactory {
   }
 
   @Override
-  public TableCatalog createTableCatalog(ExecutionEnviron executionEnviron,
+  public TableCatalog createTableCatalog(BuilderGroup builderGroup,
+                                         ExecutionEnviron executionEnviron,
                                          BitSailConfiguration connectorConfiguration) {
     return new HiveTableCatalog(
         executionEnviron.getCommonConfiguration(),

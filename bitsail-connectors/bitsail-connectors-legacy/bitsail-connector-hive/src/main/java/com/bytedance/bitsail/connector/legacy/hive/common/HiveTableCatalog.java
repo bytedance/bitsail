@@ -34,7 +34,6 @@ import com.bytedance.bitsail.connector.legacy.hive.option.HiveReaderOptions;
 
 import com.bytedance.bitsail.shaded.hive.client.HiveMetaClientUtil;
 
-import com.google.common.collect.Lists;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,15 +130,7 @@ public class HiveTableCatalog implements TableCatalog {
   }
 
   private CatalogTableSchema getCatalogTableSchema(List<ColumnInfo> columnInfos) {
-    List<CatalogTableColumn> tableColumns = Lists.newArrayList();
-    for (ColumnInfo columnInfo : columnInfos) {
-      tableColumns.add(
-          CatalogTableColumn.builder()
-              .name(columnInfo.getName())
-              .type(typeInfoConverter.fromTypeString(columnInfo.getType()))
-              .build()
-      );
-    }
+    List<CatalogTableColumn> tableColumns = convertTableColumn(typeInfoConverter, columnInfos);
     return CatalogTableSchema.builder()
         .columns(tableColumns)
         .primaryKeys(null)

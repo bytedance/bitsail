@@ -21,12 +21,14 @@ package com.bytedance.bitsail.base.catalog;
 
 import com.bytedance.bitsail.base.component.DefaultComponentBuilderLoader;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class TableCatalogFactoryHelper {
 
   public static TableCatalogFactory getTableCatalogFactory(String connectorName) {
     DefaultComponentBuilderLoader<TableCatalogFactory> loader =
         new DefaultComponentBuilderLoader<>(TableCatalogFactory.class);
 
-    return loader.loadComponent(connectorName, false);
+    return loader.loadComponent(StringUtils.lowerCase(connectorName), false);
   }
 }

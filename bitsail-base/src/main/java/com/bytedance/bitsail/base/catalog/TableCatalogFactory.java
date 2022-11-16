@@ -20,6 +20,7 @@
 package com.bytedance.bitsail.base.catalog;
 
 import com.bytedance.bitsail.base.component.ComponentBuilder;
+import com.bytedance.bitsail.base.connector.BuilderGroup;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.common.catalog.table.TableCatalog;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
@@ -37,7 +38,8 @@ public interface TableCatalogFactory extends Serializable, ComponentBuilder {
    * @param executionEnviron       execution environment
    * @param connectorConfiguration configuration for the reader/writer
    */
-  TableCatalog createTableCatalog(ExecutionEnviron executionEnviron,
+  TableCatalog createTableCatalog(BuilderGroup builderGroup,
+                                  ExecutionEnviron executionEnviron,
                                   BitSailConfiguration connectorConfiguration);
 
 }

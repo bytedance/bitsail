@@ -18,7 +18,6 @@
 package com.bytedance.bitsail.connector.legacy.hive.source;
 
 import com.bytedance.bitsail.base.execution.ProcessResult;
-import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;

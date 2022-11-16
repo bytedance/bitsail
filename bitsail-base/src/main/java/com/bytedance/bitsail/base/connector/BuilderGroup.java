@@ -17,22 +17,11 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.base.catalog;
+package com.bytedance.bitsail.base.connector;
 
-import com.bytedance.bitsail.base.execution.ExecutionEnviron;
-import com.bytedance.bitsail.common.catalog.table.TableCatalog;
-import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+public enum BuilderGroup {
 
-public class DefaultTableCatalogFactory implements TableCatalogFactory {
-
-  @Override
-  public TableCatalog createTableCatalog(ExecutionEnviron executionEnviron,
-                                         BitSailConfiguration connectorConfiguration) {
-    return null;
-  }
-
-  @Override
-  public String getComponentName() {
-    return null;
-  }
+  READER,
+  WRITER,
+  TRANSFORMER;
 }
