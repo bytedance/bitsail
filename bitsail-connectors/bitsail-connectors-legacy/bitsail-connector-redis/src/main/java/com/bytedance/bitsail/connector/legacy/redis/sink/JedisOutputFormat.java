@@ -238,7 +238,7 @@ public abstract class JedisOutputFormat extends OutputFormatPlugin<Row> implemen
         flush();
       }
     } catch (BitSailException e) {
-      messenger.addFailedRecord(sample, e);
+      messenger.addFailedRecord(e);
       dirtyCollector.collectDirty(sample, e, System.currentTimeMillis());
       LOG.warn("flush the last pipeline occurs dts exception, caused by dirty records.", e);
     } catch (Exception e) {

@@ -20,16 +20,10 @@
 package com.bytedance.bitsail.flink.core.delagate.reader.source;
 
 import com.bytedance.bitsail.base.dirty.AbstractDirtyCollector;
-import com.bytedance.bitsail.base.dirty.DirtyCollectorFactory;
 import com.bytedance.bitsail.base.messenger.Messenger;
-import com.bytedance.bitsail.base.messenger.common.MessageType;
-import com.bytedance.bitsail.base.messenger.common.MessengerGroup;
-import com.bytedance.bitsail.base.messenger.context.SimpleMessengerContext;
 import com.bytedance.bitsail.base.metrics.MetricManager;
 import com.bytedance.bitsail.base.metrics.manager.BitSailMetricManager;
 import com.bytedance.bitsail.base.metrics.manager.CallTracer;
-import com.bytedance.bitsail.base.ratelimit.Channel;
-import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
@@ -37,6 +31,8 @@ import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.util.Pair;
 import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConvertSerializer;
+import com.bytedance.bitsail.flink.core.delagate.reader.source.operator.DelegateSourceReaderContext;
+import com.bytedance.bitsail.flink.core.runtime.RuntimeContextInjectable;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -58,9 +54,8 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
 
   private final Function<com.bytedance.bitsail.base.connector.reader.v1.SourceReader.Context,
       com.bytedance.bitsail.base.connector.reader.v1.SourceReader<T, SplitT>> sourceReaderFunction;
-  private final SourceReaderContext sourceReaderContext;
+  private final DelegateSourceReaderContext sourceReaderContext;
   private final BitSailConfiguration commonConfiguration;
-  private final BitSailConfiguration readerConfiguration;
   private final TypeInfo<?>[] sourceTypeInfos;
   private final String[] fieldNames;
   private final List<ColumnInfo> columnInfos;
@@ -71,12 +66,8 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
   private transient FlinkRowConvertSerializer flinkRowConvertSerializer;
   private transient CompletableFuture<Void> available;
 
-  //todo support rate limit.
-  private transient Messenger<String> messenger;
-  private transient Channel channel;
-  //todo support dirty collector.
+  private transient Messenger messenger;
   private transient AbstractDirtyCollector dirtyCollector;
-
   private transient MetricManager metricManager;
 
   public DelegateFlinkSourceReader(
@@ -86,11 +77,12 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
       String readerName,
       TypeInfo<?>[] typeInfos,
       BitSailConfiguration commonConfiguration,
-      BitSailConfiguration readerConfiguration) {
+      BitSailConfiguration readerConfiguration,
+      AbstractDirtyCollector dirtyCollector,
+      Messenger messenger) {
     this.sourceReaderFunction = sourceReaderFunction;
-    this.sourceReaderContext = sourceReaderContext;
+    this.sourceReaderContext = (DelegateSourceReaderContext) sourceReaderContext;
     this.commonConfiguration = commonConfiguration;
-    this.readerConfiguration = readerConfiguration;
     this.readerName = readerName;
     this.sourceTypeInfos = typeInfos;
     this.columnInfos = readerConfiguration.get(ReaderOptions.BaseReaderOptions.COLUMNS);
@@ -104,16 +96,12 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
         false,
         ImmutableList.of(
             Pair.newPair("instance", String.valueOf(commonConfiguration.get(CommonOptions.INSTANCE_ID))),
-            Pair.newPair("type", readerName),
+            Pair.newPair("type", this.readerName),
             Pair.newPair("task", String.valueOf(sourceReaderContext.getIndexOfSubtask()))
         )
     );
-    this.dirtyCollector = DirtyCollectorFactory.initDirtyCollector(commonConfiguration,
-        SimpleMessengerContext
-            .builder()
-            .messengerGroup(MessengerGroup.READER)
-            .instanceId(commonConfiguration.get(CommonOptions.INTERNAL_INSTANCE_ID))
-            .build());
+    this.dirtyCollector = dirtyCollector;
+    this.messenger = messenger;
     prepareSourceReader();
   }
 
@@ -147,12 +135,16 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
         sourceTypeInfos,
         columnInfos,
         commonConfiguration);
+    if (this.messenger instanceof RuntimeContextInjectable) {
+      ((RuntimeContextInjectable) messenger).setRuntimeContext(sourceReaderContext.getRuntimeContext());
+    }
   }
 
   @Override
   public void start() {
-    this.sourceReader.start();
     this.metricManager.start();
+    this.messenger.open();
+    this.sourceReader.start();
   }
 
   @Override
@@ -168,16 +160,18 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
   private void pollNext(DelegateSourcePipeline<T> pipeline) throws Exception {
     try (CallTracer ignore = metricManager.recordTimer(RECORD_INVOKE_LATENCY).get()) {
       sourceReader.pollNext(pipeline);
-
-      metricManager.reportRecord(0, MessageType.SUCCESS);
-    } catch (BitSailException e) {
-      metricManager.reportRecord(0, MessageType.FAILED);
     }
   }
 
   private void getOrCreateSourcePipeline(ReaderOutput<T> output) {
     if (Objects.isNull(pipeline)) {
-      pipeline = new DelegateSourcePipeline<>(output, flinkRowConvertSerializer);
+      pipeline = new DelegateSourcePipeline<>(
+          output,
+          flinkRowConvertSerializer,
+          metricManager,
+          messenger,
+          dirtyCollector,
+          commonConfiguration);
     }
   }
 
@@ -215,5 +209,7 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
   @Override
   public void close() throws Exception {
     sourceReader.close();
+    messenger.commit();
+    dirtyCollector.close();
   }
 }

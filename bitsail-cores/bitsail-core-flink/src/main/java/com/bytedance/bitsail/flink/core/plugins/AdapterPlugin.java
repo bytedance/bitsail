@@ -60,7 +60,7 @@ public abstract class AdapterPlugin extends RichFlatMapFunction<Row, Row> implem
 
   @Setter
   protected MessengerContext messengerContext;
-  protected Messenger<Row> messenger;
+  protected Messenger messenger;
   private AbstractDirtyCollector dirtyCollector;
 
   @Getter
@@ -126,7 +126,7 @@ public abstract class AdapterPlugin extends RichFlatMapFunction<Row, Row> implem
       transform(outputRow, inputRow);
       output.collect(outputRow);
     } catch (BitSailException e) {
-      messenger.addFailedRecord(inputRow, e);
+      messenger.addFailedRecord(e);
       dirtyCollector.collectDirty(inputRow, e, System.currentTimeMillis());
       LOG.debug("Transform one record failed. - " + inputRow.toString(), e);
     } catch (Exception e) {

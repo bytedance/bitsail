@@ -15,26 +15,27 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.flink.core.runtime.messenger.impl;
+package com.bytedance.bitsail.flink.core.runtime.messenger;
 
+import com.bytedance.bitsail.base.messenger.Messenger;
+import com.bytedance.bitsail.base.messenger.MessengerBuilder;
 import com.bytedance.bitsail.base.messenger.context.MessengerContext;
-import com.bytedance.bitsail.flink.core.runtime.messenger.AbstractBatchMessenger;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.flink.core.runtime.messenger.impl.FlinkAccumulatorStatisticsMessenger;
 
-public class StringBatchMessenger extends AbstractBatchMessenger<String> {
+/**
+ * Created 2022/8/31
+ */
+public class FlinkAccumulatorMessengerBuilder implements MessengerBuilder {
 
-  public StringBatchMessenger(MessengerContext messengerContext) {
-    super(messengerContext);
+  @Override
+  public String getComponentName() {
+    return "flink";
   }
 
   @Override
-  public void addSuccessRecord(String message) {
-    successRecordsCounter.inc();
-    successRecordsMeter.markEvent();
-  }
-
-  @Override
-  public void addFailedRecord(String message, Throwable throwable) {
-    failedRecordsMeter.markEvent();
-    failedRecordsCounter.inc();
+  public Messenger createMessenger(MessengerContext messengerContext,
+                                   BitSailConfiguration commonConfiguration) {
+    return new FlinkAccumulatorStatisticsMessenger(messengerContext, commonConfiguration);
   }
 }
