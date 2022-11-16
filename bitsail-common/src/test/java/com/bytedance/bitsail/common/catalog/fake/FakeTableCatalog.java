@@ -103,7 +103,7 @@ public class FakeTableCatalog implements TableCatalog {
   }
 
   @Override
-  public void createTable(CatalogTable catalogTable) {
+  public void createTable(CatalogTableDefinition catalogTableDefinition, CatalogTable catalogTable) {
 
   }
 
@@ -128,5 +128,10 @@ public class FakeTableCatalog implements TableCatalog {
   @Override
   public boolean compareTypeCompatible(TypeInfo<?> original, TypeInfo<?> compared) {
     return original.getTypeClass() == compared.getTypeClass();
+  }
+
+  @Override
+  public List<CatalogTableColumn> convertTableColumn(TypeInfoConverter typeInfoConverter, List<ColumnInfo> columnInfos) {
+    return TableCatalog.super.convertTableColumn(typeInfoConverter, columnInfos);
   }
 }

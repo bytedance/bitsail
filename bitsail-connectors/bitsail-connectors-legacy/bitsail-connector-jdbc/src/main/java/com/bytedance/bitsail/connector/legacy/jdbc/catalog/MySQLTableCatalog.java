@@ -122,9 +122,8 @@ public class MySQLTableCatalog implements TableCatalog {
   }
 
   @Override
-  public void createTable(CatalogTable catalogTable) {
+  public void createTable(CatalogTableDefinition catalogTableDefinition, CatalogTable catalogTable) {
     throw new UnsupportedOperationException();
-
   }
 
   @Override
