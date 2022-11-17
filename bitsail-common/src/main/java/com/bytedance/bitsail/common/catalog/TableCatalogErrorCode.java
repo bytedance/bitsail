@@ -26,9 +26,9 @@ public enum TableCatalogErrorCode implements ErrorCode {
   TABLE_CATALOG_TABLE_NOT_EXISTS("Table-Catalog-1", "Catalog table not exists."),
 
   ;
-  private String code;
+  private final String code;
 
-  private String description;
+  private final String description;
 
   TableCatalogErrorCode(String code, String description) {
     this.code = code;

@@ -33,7 +33,7 @@ import java.io.Serializable;
 public interface TableCatalogFactory extends Serializable, ComponentBuilder {
 
   /**
-   * create a connector for operating schema of the reader/writer
+   * Create a table catalog.
    *
    * @param executionEnviron       execution environment
    * @param connectorConfiguration configuration for the reader/writer

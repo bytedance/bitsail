@@ -74,4 +74,8 @@ public interface TableCatalogOptions extends CommonOptions {
   ConfigOption<Boolean> SYNC_DDL_CREATE_TABLE =
       key(COMMON_PREFIX + "sync_ddl_create_table")
           .defaultValue(false);
+
+  ConfigOption<Boolean> SYNC_DDL_CASE_INSENSITIVE =
+      key(COMMON_PREFIX + "sync_ddl_case_insensitive")
+          .defaultValue(true);
 }

@@ -49,6 +49,7 @@ public class HiveTableCatalogFactory implements TableCatalogFactory {
               connectorConfiguration.get(HiveWriterOptions.HIVE_METASTORE_PROPERTIES)))
           .build();
     }
+    //TODO
     throw new UnsupportedOperationException();
   }
 

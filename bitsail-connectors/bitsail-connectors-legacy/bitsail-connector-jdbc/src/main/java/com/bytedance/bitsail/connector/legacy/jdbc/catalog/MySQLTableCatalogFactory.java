@@ -61,7 +61,8 @@ public class MySQLTableCatalogFactory implements TableCatalogFactory {
           .url(getClusterUrl(connections))
           .build();
     }
-    throw new IllegalArgumentException();
+    //TODO
+    throw new UnsupportedOperationException();
   }
 
   public static String getClusterUrl(List<ClusterInfo> connections) {

@@ -62,10 +62,11 @@ public class TableCatalogManager {
 
   private TableCatalogStrategy tableCatalogStrategy;
   private boolean tableCatalogSync;
-  private boolean tableCatalogAddSync;
-  private boolean tableCatalogDeleteSync;
-  private boolean tableCatalogUpdateSync;
+  private boolean ignoreTableCatalogAddSync;
+  private boolean ignoreTableCatalogDeleteSync;
+  private boolean ignoreTableCatalogUpdateSync;
   private boolean tableCatalogCreateTableNotExists;
+  private boolean tableCatalogNameCaseInsensitive;
 
   private CatalogTable readerCatalogTable;
   private CatalogTable writerCatalogTable;
@@ -96,10 +97,11 @@ public class TableCatalogManager {
         TableCatalogStrategy.valueOf(StringUtils.upperCase(commonConfiguration
             .get(TableCatalogOptions.COLUMN_ALIGN_STRATEGY)));
     this.tableCatalogSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL);
-    this.tableCatalogAddSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_IGNORE_ADD);
-    this.tableCatalogDeleteSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_IGNORE_DROP);
-    this.tableCatalogUpdateSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_IGNORE_UPDATE);
+    this.ignoreTableCatalogAddSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_IGNORE_ADD);
+    this.ignoreTableCatalogDeleteSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_IGNORE_DROP);
+    this.ignoreTableCatalogUpdateSync = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_IGNORE_UPDATE);
     this.tableCatalogCreateTableNotExists = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_CREATE_TABLE);
+    this.tableCatalogNameCaseInsensitive = commonConfiguration.get(TableCatalogOptions.SYNC_DDL_CASE_INSENSITIVE);
   }
 
   public void alignmentCatalogTable() throws Exception {
@@ -187,7 +189,7 @@ public class TableCatalogManager {
     if (!catalogTableAlterDefinition.isNotEmpty()) {
       return;
     }
-    if (!tableCatalogAddSync &&
+    if (!ignoreTableCatalogAddSync &&
         CollectionUtils.isNotEmpty(catalogTableAlterDefinition.getPendingAddColumns())) {
       writerTableCatalog.alterTableColumns(
           TableOperation.ALTER_COLUMNS_ADD,
@@ -195,7 +197,7 @@ public class TableCatalogManager {
       );
     }
 
-    if (!tableCatalogDeleteSync &&
+    if (!ignoreTableCatalogDeleteSync &&
         CollectionUtils.isNotEmpty(catalogTableAlterDefinition.getPendingDeleteColumns())) {
       writerTableCatalog.alterTableColumns(
           TableOperation.ALTER_COLUMNS_DELETE,
@@ -203,7 +205,7 @@ public class TableCatalogManager {
       );
     }
 
-    if (!tableCatalogUpdateSync &&
+    if (!ignoreTableCatalogUpdateSync &&
         CollectionUtils.isNotEmpty(catalogTableAlterDefinition.getPendingUpdateColumns())) {
       writerTableCatalog.alterTableColumns(
           TableOperation.ALTER_COLUMNS_UPDATE,
@@ -218,14 +220,20 @@ public class TableCatalogManager {
     Map<String, TypeInfo<?>> writeTableColumnMapping = writeCatalogTableSchema
         .getColumns()
         .stream()
-        .collect(Collectors.toMap(CatalogTableColumn::getName, CatalogTableColumn::getType));
+        .collect(Collectors.toMap(
+            column -> tableCatalogNameCaseInsensitive ?
+                StringUtils.lowerCase(column.getName()) :
+                column.getName(),
+            CatalogTableColumn::getType));
 
     List<String> writePrimaryTableColumnMapping = Lists.newArrayList();
     if (CollectionUtils.isNotEmpty(writeCatalogTableSchema.getPrimaryKeys())) {
       writePrimaryTableColumnMapping.addAll(writeCatalogTableSchema
           .getPrimaryKeys()
           .stream()
-          .map(column -> StringUtils.lowerCase(column.getName()))
+          .map(column -> tableCatalogNameCaseInsensitive ?
+              StringUtils.lowerCase(column.getName()) :
+              column.getName())
           .collect(Collectors.toList()));
     }
 
@@ -235,7 +243,11 @@ public class TableCatalogManager {
     List<CatalogTableColumn> pendingUpdateTableColumns = Lists.newArrayList();
     List<CatalogTableColumn> pendingDeleteTableColumns = Lists.newArrayList();
     for (CatalogTableColumn catalogTableColumn : baseCatalogTableSchema.getColumns()) {
-      String baseCatalogColumnName = StringUtils.lowerCase(catalogTableColumn.getName());
+
+      String baseCatalogColumnName = tableCatalogNameCaseInsensitive ?
+          StringUtils.lowerCase(catalogTableColumn.getName()) :
+          catalogTableColumn.getName();
+
       if (writePrimaryTableColumnMapping.contains(baseCatalogColumnName)) {
         finalCatalogColumns.add(catalogTableColumn);
         continue;
