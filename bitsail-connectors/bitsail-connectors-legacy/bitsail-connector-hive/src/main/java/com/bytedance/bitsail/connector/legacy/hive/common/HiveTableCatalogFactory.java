@@ -46,11 +46,22 @@ public class HiveTableCatalogFactory implements TableCatalogFactory {
           .table(table)
           .namespace(null)
           .hiveConf(HiveConfUtils.fromJsonProperties(
+              connectorConfiguration.get(HiveReaderOptions.HIVE_METASTORE_PROPERTIES)))
+          .build();
+    } else {
+      String database = connectorConfiguration
+          .getNecessaryOption(HiveWriterOptions.DB_NAME, FrameworkErrorCode.REQUIRED_VALUE);
+      String table = connectorConfiguration
+          .getNecessaryOption(HiveWriterOptions.TABLE_NAME, FrameworkErrorCode.REQUIRED_VALUE);
+      return HiveTableCatalog
+          .builder()
+          .database(database)
+          .table(table)
+          .namespace(null)
+          .hiveConf(HiveConfUtils.fromJsonProperties(
               connectorConfiguration.get(HiveWriterOptions.HIVE_METASTORE_PROPERTIES)))
           .build();
     }
-    //TODO
-    throw new UnsupportedOperationException();
   }
 
   @Override
