@@ -20,6 +20,7 @@
 package com.bytedance.bitsail.base.connector.reader.v1;
 
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
+import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
@@ -29,7 +30,8 @@ import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import java.io.IOException;
 import java.io.Serializable;
 
-public interface Source<T, SplitT extends SourceSplit, StateT extends Serializable> extends Serializable {
+public interface Source<T, SplitT extends SourceSplit, StateT extends Serializable>
+    extends Serializable, TypeInfoConverterFactory {
 
   /**
    * Run in client side for source initialize;

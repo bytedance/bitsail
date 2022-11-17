@@ -182,45 +182,6 @@ public interface CommonOptions {
       key(COMMON_PREFIX + "low_volume_test_count_threshold")
           .defaultValue(-1L);
 
-  ConfigOption<String> COLUMN_ALIGN_STRATEGY =
-      key(COMMON_PREFIX + "column_align_strategy")
-          .defaultValue("disable");
-
-  /**
-   * Whether enable the ddl sync feature.
-   */
-  ConfigOption<Boolean> SYNC_DDL =
-      key(COMMON_PREFIX + "sync_ddl")
-          .defaultValue(false);
-
-  ConfigOption<Boolean> SYNC_DDL_SKIP_ERROR_COLUMNS =
-      key(COMMON_PREFIX + "sync_ddl_skip_error_columns")
-          .defaultValue(true);
-
-  ConfigOption<Boolean> SYNC_DDL_PRE_EXECUTE =
-      key(COMMON_PREFIX + "sync_ddl_pre_execute")
-          .defaultValue(false);
-
-  /**
-   * Ignore ddl delete fields.
-   */
-  ConfigOption<Boolean> SYNC_DDL_IGNORE_DROP =
-      key(COMMON_PREFIX + "sync_ddl_ignore_drop")
-          .defaultValue(true);
-  /**
-   * Ignore ddl new added fields.
-   */
-  ConfigOption<Boolean> SYNC_DDL_IGNORE_ADD =
-      key(COMMON_PREFIX + "sync_ddl_ignore_add")
-          .defaultValue(false);
-
-  /**
-   * Ignore ddl updated fields.
-   */
-  ConfigOption<Boolean> SYNC_DDL_IGNORE_UPDATE =
-      key(COMMON_PREFIX + "sync_ddl_ignore_update")
-          .defaultValue(false);
-
   ConfigOption<Boolean> DRY_RUN =
       key(COMMON_PREFIX + "dry_run")
           .defaultValue(false);

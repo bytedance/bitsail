@@ -142,8 +142,7 @@ public class HiveParquetOutputFailoverTest {
     return BitSailConfiguration.newDefault()
         .set(CommonOptions.INTERNAL_INSTANCE_ID, getInstanceId())
         .set(CommonOptions.USER_NAME, "root")
-        .set(CommonOptions.JOB_ID, getJobId())
-        .set(CommonOptions.SYNC_DDL, false);
+        .set(CommonOptions.JOB_ID, getJobId());
   }
 
   protected String getInstanceId() {

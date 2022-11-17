@@ -17,6 +17,7 @@
 
 package com.bytedance.bitsail.base.connector.writer.v1;
 
+import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
@@ -31,7 +32,8 @@ import java.util.Optional;
 /**
  * Created 2022/6/10
  */
-public interface Sink<InputT, CommitT extends Serializable, WriterStateT extends Serializable> extends Serializable {
+public interface Sink<InputT, CommitT extends Serializable, WriterStateT extends Serializable>
+    extends Serializable, TypeInfoConverterFactory {
 
   /**
    * @return The name of writer operation.

@@ -19,6 +19,7 @@ package com.bytedance.bitsail.connector.legacy.redis.sink;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.connector.legacy.redis.RedisPipelineProcessor;
 import com.bytedance.bitsail.connector.legacy.redis.constant.RedisConstants;
 import com.bytedance.bitsail.connector.legacy.redis.core.TtlType;
@@ -143,6 +144,11 @@ public class RedisOutputFormat extends JedisOutputFormat {
   @Override
   public int getMaxParallelism() {
     return MAX_PARALLELISM_OUTPUT_REDIS;
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return null;
   }
 }
 

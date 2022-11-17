@@ -20,6 +20,7 @@ package com.bytedance.bitsail.connector.legacy.jdbc.options;
 import com.bytedance.bitsail.common.annotation.Essential;
 import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.WriterOptions;
+import com.bytedance.bitsail.connector.legacy.jdbc.model.ConnectionInfo;
 
 import com.alibaba.fastjson.TypeReference;
 
@@ -60,10 +61,9 @@ public interface JdbcWriterOptions extends WriterOptions.BaseWriterOptions {
           });
 
   @Essential
-  ConfigOption<List<Map<String, Object>>> CONNECTIONS =
+  ConfigOption<List<ConnectionInfo>> CONNECTIONS =
       key(WRITER_PREFIX + "connections")
-          .onlyReference(new TypeReference<List<Map<String, Object>>>() {
-          });
+          .onlyReference(new TypeReference<List<ConnectionInfo>>(){});
 
   ConfigOption<String> CONNECTION_PARAMETERS =
       key(WRITER_PREFIX + "connection_parameters")

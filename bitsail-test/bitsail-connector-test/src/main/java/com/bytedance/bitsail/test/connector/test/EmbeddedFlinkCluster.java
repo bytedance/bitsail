@@ -17,6 +17,7 @@
 
 package com.bytedance.bitsail.test.connector.test;
 
+import com.bytedance.bitsail.common.catalog.TableCatalogOptions;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.core.command.CoreCommandArgs;
@@ -50,7 +51,7 @@ public class EmbeddedFlinkCluster {
 
   private static void overwriteConfiguration(BitSailConfiguration globalConfiguration) {
     globalConfiguration.set(CommonOptions.JOB_ID, DEFAULT_JOB_ID)
-        .set(CommonOptions.SYNC_DDL, false)
+        .set(TableCatalogOptions.SYNC_DDL, false)
         .set(CommonOptions.DRY_RUN, true)
         .set(CommonOptions.ENABLE_DYNAMIC_LOADER, false);
   }

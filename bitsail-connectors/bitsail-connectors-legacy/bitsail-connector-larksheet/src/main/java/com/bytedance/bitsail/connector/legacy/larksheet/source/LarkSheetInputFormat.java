@@ -21,6 +21,8 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.column.Column;
 import com.bytedance.bitsail.common.column.StringColumn;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.connector.legacy.larksheet.api.SheetConfig;
 import com.bytedance.bitsail.connector.legacy.larksheet.api.TokenHolder;
 import com.bytedance.bitsail.connector.legacy.larksheet.error.LarkSheetFormatErrorCode;
@@ -30,7 +32,7 @@ import com.bytedance.bitsail.connector.legacy.larksheet.meta.SheetMeta;
 import com.bytedance.bitsail.connector.legacy.larksheet.option.LarkSheetReaderOptions;
 import com.bytedance.bitsail.connector.legacy.larksheet.util.LarkSheetUtil;
 import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatPlugin;
-import com.bytedance.bitsail.flink.core.typeinfo.PrimitiveColumnTypeInfo;
+import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
 
 import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
@@ -105,6 +107,11 @@ public class LarkSheetInputFormat extends InputFormatPlugin<Row, InputSplit>
    * the list of sheet information
    */
   private List<SheetInfo> sheetInfoList;
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new BitSailTypeInfoConverter();
+  }
 
   /**
    * Some features when transforming data.
@@ -303,18 +310,7 @@ public class LarkSheetInputFormat extends InputFormatPlugin<Row, InputSplit>
    * @param readerColumns Columns defined in job configuration.
    */
   private RowTypeInfo buildRowTypeInfo(List<ColumnInfo> readerColumns) {
-    int size = readerColumns.size();
-    PrimitiveColumnTypeInfo[] typeInfos = new PrimitiveColumnTypeInfo[size];
-    String[] names = new String[size];
-
-    for (int i = 0; i < size; i++) {
-      typeInfos[i] = PrimitiveColumnTypeInfo.STRING_COLUMN_TYPE_INFO;
-      names[i] = readerColumns.get(i).getName();
-    }
-
-    RowTypeInfo rowTypeInfo = new RowTypeInfo(typeInfos, names);
-    LOG.info("Row type info: {}", this.rowTypeInfo);
-    return rowTypeInfo;
+    return ColumnFlinkTypeInfoUtil.getRowTypeInformation(createTypeInfoConverter(), readerColumns);
   }
 
   /**
