@@ -37,4 +37,13 @@ public class CatalogTableDefinition implements Serializable {
     this.schema = schema;
     this.table = table;
   }
+
+  @Override
+  public String toString() {
+    return "CatalogTableDefinition{" +
+        "database='" + database + '\'' +
+        ", schema='" + schema + '\'' +
+        ", table='" + table + '\'' +
+        '}';
+  }
 }

@@ -77,13 +77,13 @@ public class FlinkDAGBuilderInterceptor {
         .getTableCatalogFactory(dataWriterDAGBuilder.getWriterName());
 
     if (Objects.isNull(readerCatalogFactory) || Objects.isNull(writerCatalogFactory)) {
-      LOG.warn("Ignore align engine catalog, reader or writer not support engine catalog.");
+      LOG.warn("Ignore align engine catalog, reader or writer not support table catalog factory.");
       return;
     }
 
     if (!(dataReaderDAGBuilder instanceof TypeInfoConverterFactory) ||
         !(dataWriterDAGBuilder instanceof TypeInfoConverterFactory)) {
-      LOG.warn("Ignore align engine catalog, reader or writer not support engine catalog.");
+      LOG.warn("Ignore align engine catalog, reader or writer not support type info converter.");
       return;
     }
 
@@ -93,7 +93,7 @@ public class FlinkDAGBuilderInterceptor {
         .createTypeInfoConverter();
 
     if (Objects.isNull(readerTypeInfoConverter) || Objects.isNull(writerTypeInfoConverter)) {
-      LOG.warn("Ignore align engine catalog, reader or writer not support engine catalog.");
+      LOG.warn("Ignore align engine catalog, reader or writer type info converter is null.");
       return;
     }
 

@@ -27,17 +27,18 @@ import com.bytedance.bitsail.common.catalog.table.TableCatalog;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.exception.FrameworkErrorCode;
-import com.bytedance.bitsail.common.util.TypeConvertUtil;
 import com.bytedance.bitsail.connector.legacy.jdbc.exception.JDBCPluginErrorCode;
 import com.bytedance.bitsail.connector.legacy.jdbc.model.ClusterInfo;
 import com.bytedance.bitsail.connector.legacy.jdbc.model.ConnectionInfo;
 import com.bytedance.bitsail.connector.legacy.jdbc.options.JdbcReaderOptions;
+import com.bytedance.bitsail.connector.legacy.jdbc.options.JdbcWriterOptions;
 
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.List;
 
 public class MySQLTableCatalogFactory implements TableCatalogFactory {
+
   @Override
   public TableCatalog createTableCatalog(BuilderGroup builderGroup,
                                          ExecutionEnviron executionEnviron,
@@ -61,11 +62,19 @@ public class MySQLTableCatalogFactory implements TableCatalogFactory {
           .url(getClusterUrl(connections))
           .build();
     }
-    //TODO
-    throw new UnsupportedOperationException();
+    return MySQLTableCatalog
+        .builder()
+        .username(connectorConfiguration.get(JdbcWriterOptions.USER_NAME))
+        .password(connectorConfiguration.get(JdbcWriterOptions.PASSWORD))
+        .schema(connectorConfiguration.get(JdbcWriterOptions.USER_NAME))
+        .table(connectorConfiguration.get(JdbcWriterOptions.TABLE_NAME))
+        .database(connectorConfiguration.get(JdbcWriterOptions.DB_NAME))
+        .url(connectorConfiguration.get(JdbcWriterOptions.CONNECTIONS)
+            .get(0).getUrl())
+        .build();
   }
 
-  public static String getClusterUrl(List<ClusterInfo> connections) {
+  private static String getClusterUrl(List<ClusterInfo> connections) {
     if (CollectionUtils.isEmpty(connections)) {
       throw BitSailException.asBitSailException(
           JDBCPluginErrorCode.REQUIRED_VALUE,
@@ -78,6 +87,6 @@ public class MySQLTableCatalogFactory implements TableCatalogFactory {
 
   @Override
   public String getComponentName() {
-    return TypeConvertUtil.StorageEngine.mysql.name();
+    return "JDBC";
   }
 }

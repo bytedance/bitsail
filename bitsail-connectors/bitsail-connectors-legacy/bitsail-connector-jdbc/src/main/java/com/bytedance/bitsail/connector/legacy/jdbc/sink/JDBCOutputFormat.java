@@ -27,10 +27,10 @@ import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.type.filemapping.JdbcTypeInfoConverter;
 import com.bytedance.bitsail.common.util.Pair;
 import com.bytedance.bitsail.common.util.TypeConvertUtil.StorageEngine;
-import com.bytedance.bitsail.connector.legacy.jdbc.constants.Key;
 import com.bytedance.bitsail.connector.legacy.jdbc.constants.WriteModeProxy;
 import com.bytedance.bitsail.connector.legacy.jdbc.exception.JDBCPluginErrorCode;
 import com.bytedance.bitsail.connector.legacy.jdbc.extension.DatabaseInterface;
+import com.bytedance.bitsail.connector.legacy.jdbc.model.ConnectionInfo;
 import com.bytedance.bitsail.connector.legacy.jdbc.model.SqlType;
 import com.bytedance.bitsail.connector.legacy.jdbc.options.JdbcWriterOptions;
 import com.bytedance.bitsail.connector.legacy.jdbc.utils.JDBCConnHolder;
@@ -42,7 +42,6 @@ import com.bytedance.bitsail.flink.core.constants.TypeSystem;
 import com.bytedance.bitsail.flink.core.legacy.connector.OutputFormatPlugin;
 import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -144,10 +143,9 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
     deleteThreshold = outputSliceConfig.get(JdbcWriterOptions.DELETE_THRESHOLD);
     deleteIntervalMs = outputSliceConfig.get(JdbcWriterOptions.DELETE_INTERVAL_MS);
 
-    List<Map<String, Object>> connectionList = outputSliceConfig.getNecessaryOption(JdbcWriterOptions.CONNECTIONS,
+    List<ConnectionInfo> connections = outputSliceConfig.getNecessaryOption(JdbcWriterOptions.CONNECTIONS,
         JDBCPluginErrorCode.REQUIRED_VALUE);
-    List<JSONObject> connections = connectionList.stream().map(JSONObject::new).collect(Collectors.toList());
-    dbURL = (connections.get(0)).getString(Key.DB_URL);
+    dbURL = connections.get(0).getUrl();
 
     String connectionParameters = outputSliceConfig.getUnNecessaryOption(JdbcWriterOptions.CONNECTION_PARAMETERS, null);
     dbURL = getDbURL(dbURL, connectionParameters);

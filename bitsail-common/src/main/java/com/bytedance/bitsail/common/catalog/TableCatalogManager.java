@@ -191,6 +191,8 @@ public class TableCatalogManager {
     }
     if (!ignoreTableCatalogAddSync &&
         CollectionUtils.isNotEmpty(catalogTableAlterDefinition.getPendingAddColumns())) {
+      LOG.info("Writer catalog table {} try to add column: {}.", writerCatalogTable,
+          catalogTableAlterDefinition.getPendingAddColumns());
       writerTableCatalog.alterTableColumns(
           TableOperation.ALTER_COLUMNS_ADD,
           catalogTableAlterDefinition.getPendingAddColumns()
@@ -199,6 +201,8 @@ public class TableCatalogManager {
 
     if (!ignoreTableCatalogUpdateSync &&
         CollectionUtils.isNotEmpty(catalogTableAlterDefinition.getPendingUpdateColumns())) {
+      LOG.info("Writer catalog table {} try to update column: {}.", writerCatalogTable,
+          catalogTableAlterDefinition.getPendingUpdateColumns());
       writerTableCatalog.alterTableColumns(
           TableOperation.ALTER_COLUMNS_UPDATE,
           catalogTableAlterDefinition.getPendingUpdateColumns()
@@ -207,6 +211,8 @@ public class TableCatalogManager {
 
     if (!ignoreTableCatalogDeleteSync &&
         CollectionUtils.isNotEmpty(catalogTableAlterDefinition.getPendingDeleteColumns())) {
+      LOG.info("Writer catalog table {} try to delete column: {}.", writerCatalogTable,
+          catalogTableAlterDefinition.getPendingDeleteColumns());
       writerTableCatalog.alterTableColumns(
           TableOperation.ALTER_COLUMNS_DELETE,
           catalogTableAlterDefinition.getPendingDeleteColumns()

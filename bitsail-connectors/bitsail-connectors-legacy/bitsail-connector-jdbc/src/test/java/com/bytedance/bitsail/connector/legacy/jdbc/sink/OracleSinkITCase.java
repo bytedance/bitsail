@@ -18,12 +18,12 @@
 package com.bytedance.bitsail.connector.legacy.jdbc.sink;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.connector.legacy.jdbc.model.ConnectionInfo;
 import com.bytedance.bitsail.connector.legacy.jdbc.options.JdbcWriterOptions;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,6 @@ import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.lifecycle.Startables;
 
-import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -71,11 +70,11 @@ public class OracleSinkITCase {
   public void testInsertModeOracle() throws Exception {
     BitSailConfiguration globalConfiguration = JobConfUtils.fromClasspath("scripts/fake_to_oracle_sink.json");
 
-    Map<String, Object> connection = Maps.newHashMap();
-    connection.put("db_url", container.getJdbcUrl());
-    connection.put("host", container.getHost());
-    connection.put("port", container.getFirstMappedPort());
-    globalConfiguration.set(JdbcWriterOptions.CONNECTIONS, Lists.newArrayList(connection));
+    ConnectionInfo connectionInfo = new ConnectionInfo();
+    connectionInfo.setHost(container.getHost());
+    connectionInfo.setPort(container.getFirstMappedPort());
+    connectionInfo.setUrl(container.getJdbcUrl());
+    globalConfiguration.set(JdbcWriterOptions.CONNECTIONS, Lists.newArrayList(connectionInfo));
     EmbeddedFlinkCluster.submitJob(globalConfiguration);
   }
 }
