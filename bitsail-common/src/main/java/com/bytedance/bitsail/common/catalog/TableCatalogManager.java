@@ -197,6 +197,14 @@ public class TableCatalogManager {
       );
     }
 
+    if (!ignoreTableCatalogUpdateSync &&
+        CollectionUtils.isNotEmpty(catalogTableAlterDefinition.getPendingUpdateColumns())) {
+      writerTableCatalog.alterTableColumns(
+          TableOperation.ALTER_COLUMNS_UPDATE,
+          catalogTableAlterDefinition.getPendingUpdateColumns()
+      );
+    }
+
     if (!ignoreTableCatalogDeleteSync &&
         CollectionUtils.isNotEmpty(catalogTableAlterDefinition.getPendingDeleteColumns())) {
       writerTableCatalog.alterTableColumns(
@@ -205,13 +213,6 @@ public class TableCatalogManager {
       );
     }
 
-    if (!ignoreTableCatalogUpdateSync &&
-        CollectionUtils.isNotEmpty(catalogTableAlterDefinition.getPendingUpdateColumns())) {
-      writerTableCatalog.alterTableColumns(
-          TableOperation.ALTER_COLUMNS_UPDATE,
-          catalogTableAlterDefinition.getPendingUpdateColumns()
-      );
-    }
   }
 
   private CatalogTableAlterDefinition calNecessaryCatalogSchema(CatalogTableSchema baseCatalogTableSchema) {
