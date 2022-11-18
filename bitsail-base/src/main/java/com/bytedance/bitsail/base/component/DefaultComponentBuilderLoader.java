@@ -45,14 +45,21 @@ public class DefaultComponentBuilderLoader<T> implements Serializable {
   }
 
   public T loadComponent(String componentName) {
+    return this.loadComponent(componentName, true);
+  }
+
+  public T loadComponent(String componentName, boolean failOnMiss) {
     if (!loaded) {
       loadAllComponents();
       loaded = true;
     }
     componentName = StringUtils.lowerCase(componentName);
     if (!components.containsKey(componentName)) {
-      throw new BitSailException(CommonErrorCode.CONFIG_ERROR,
-          String.format("Component %s not in interface %s support until now.", componentName, clazz));
+      if (failOnMiss) {
+        throw new BitSailException(CommonErrorCode.CONFIG_ERROR,
+            String.format("Component %s not in interface %s support until now.", componentName, clazz));
+      }
+      return null;
     }
     return components.get(componentName);
   }

@@ -20,6 +20,7 @@ package com.bytedance.bitsail.flink.core.legacy.connector;
 import com.bytedance.bitsail.base.dirty.AbstractDirtyCollector;
 import com.bytedance.bitsail.base.dirty.DirtyCollectorFactory;
 import com.bytedance.bitsail.base.execution.ProcessResult;
+import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.base.messenger.BaseStatisticsMessenger;
 import com.bytedance.bitsail.base.messenger.Messenger;
 import com.bytedance.bitsail.base.messenger.MessengerFactory;
@@ -34,7 +35,6 @@ import com.bytedance.bitsail.base.ratelimit.Channel;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.column.ColumnCast;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.ddl.sink.SinkEngineConnector;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.util.Pair;
@@ -67,7 +67,7 @@ import static com.bytedance.bitsail.base.messenger.common.MessageType.SUCCESS;
  * @desc:
  */
 public abstract class OutputFormatPlugin<E extends Row> extends RichOutputFormat<E> implements
-    InitializeOnMaster, CleanupWhenUnsuccessful, Pluggable, FinalizeOnMaster {
+    InitializeOnMaster, CleanupWhenUnsuccessful, Pluggable, FinalizeOnMaster, TypeInfoConverterFactory {
 
   private static final Logger LOG = LoggerFactory.getLogger(OutputFormatPlugin.class);
 
@@ -237,10 +237,6 @@ public abstract class OutputFormatPlugin<E extends Row> extends RichOutputFormat
 
   public boolean uniformedParallelism() {
     return false;
-  }
-
-  public SinkEngineConnector initSinkSchemaManager(BitSailConfiguration commonConf, BitSailConfiguration writerConf) throws Exception {
-    return null;
   }
 
   @VisibleForTesting

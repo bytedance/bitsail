@@ -26,6 +26,7 @@ import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.Mode;
 import com.bytedance.bitsail.base.execution.ProcessResult;
 import com.bytedance.bitsail.base.extension.GlobalCommittable;
+import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.base.messenger.Messenger;
 import com.bytedance.bitsail.base.messenger.checker.DirtyRecordChecker;
 import com.bytedance.bitsail.base.messenger.common.MessengerGroup;
@@ -34,6 +35,7 @@ import com.bytedance.bitsail.base.messenger.context.SimpleMessengerContext;
 import com.bytedance.bitsail.base.ratelimit.Channel;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.flink.core.delagate.writer.DelegateFlinkCommitter;
 import com.bytedance.bitsail.flink.core.delagate.writer.DelegateFlinkWriter;
 import com.bytedance.bitsail.flink.core.execution.FlinkExecutionEnviron;
@@ -54,7 +56,7 @@ import java.util.Optional;
  * Created 2022/6/10
  */
 public class FlinkWriterBuilder<InputT, CommitT extends Serializable, WriterStateT extends Serializable>
-    extends FlinkDataWriterDAGBuilder<InputT> implements GlobalCommittable {
+    extends FlinkDataWriterDAGBuilder<InputT> implements GlobalCommittable, TypeInfoConverterFactory {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlinkWriterBuilder.class);
 
@@ -172,5 +174,10 @@ public class FlinkWriterBuilder<InputT, CommitT extends Serializable, WriterStat
   @Override
   public void onDestroy() {
 
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return sink.createTypeInfoConverter();
   }
 }

@@ -31,7 +31,7 @@ import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.flink.core.FlinkJobMode;
 import com.bytedance.bitsail.flink.core.execution.configurer.BitSailRuntimePluginConfigurer;
-import com.bytedance.bitsail.flink.core.execution.configurer.FlinkDAGBuilderConfigurer;
+import com.bytedance.bitsail.flink.core.execution.configurer.FlinkDAGBuilderInterceptor;
 import com.bytedance.bitsail.flink.core.execution.configurer.StreamExecutionEnvironmentConfigurer;
 import com.bytedance.bitsail.flink.core.execution.utils.ExecutionUtils;
 import com.bytedance.bitsail.flink.core.parallelism.FlinkParallelismAdvisor;
@@ -131,9 +131,8 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
     });
 
     /* try to do schema alignment and configure each DAG builder */
-    FlinkDAGBuilderConfigurer dagBuilderConfigurer = new FlinkDAGBuilderConfigurer(this);
-    dagBuilderConfigurer.doSchemaAlignment(readerBuilders, writerBuilders);
-    dagBuilderConfigurer.configureDAGBuilders(readerBuilders, writerBuilders);
+    FlinkDAGBuilderInterceptor interceptor = new FlinkDAGBuilderInterceptor(this);
+    interceptor.intercept(readerBuilders, null, writerBuilders);
 
     /* get parallelism advice for each dag builder */
     parallelismAdvisor = new FlinkParallelismAdvisor(commonConfiguration, readerConfigurations, writerConfigurations);

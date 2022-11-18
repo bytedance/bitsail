@@ -20,6 +20,7 @@ package com.bytedance.bitsail.connector.legacy.mongodb.sink;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.type.filemapping.MongoTypeInfoConverter;
 import com.bytedance.bitsail.connector.legacy.mongodb.common.MongoConnConfig;
 import com.bytedance.bitsail.connector.legacy.mongodb.common.MongoConnOptions;
@@ -111,7 +112,7 @@ public class MongoDBOutputFormat extends OutputFormatPlugin<Row> implements Resu
       String uniqueKeysStr = outputSliceConfig.getNecessaryOption(MongoDBWriterOptions.UNIQUE_KEY, MongoDBPluginsErrorCode.REQUIRED_VALUE);
       this.uniqueKeyList = Arrays.asList(StringUtils.split(uniqueKeysStr, ","));
     }
-    this.rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columnInfos, new MongoTypeInfoConverter());
+    this.rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columnInfos, createTypeInfoConverter());
     LOG.info("Output Row Type Info: " + rowTypeInfo);
   }
 
@@ -344,5 +345,10 @@ public class MongoDBOutputFormat extends OutputFormatPlugin<Row> implements Resu
     build.socketTimeout(outputSliceConfig.get(MongoDBWriterOptions.SOCKET_TIMEOUT_MS));
     build.writeConcern(outputSliceConfig.get(MongoDBWriterOptions.WRITE_CONCERN));
     return build.build();
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new MongoTypeInfoConverter();
   }
 }

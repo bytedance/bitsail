@@ -21,13 +21,13 @@ import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.ProcessResult;
 import com.bytedance.bitsail.base.extension.GlobalCommittable;
 import com.bytedance.bitsail.base.extension.ParallelismComputable;
-import com.bytedance.bitsail.base.extension.SchemaAlignmentable;
+import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.ddl.ExternalEngineConnector;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.ReaderOptions;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.flink.core.constants.TypeSystem;
 import com.bytedance.bitsail.flink.core.execution.FlinkExecutionEnviron;
 import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatPlugin;
@@ -58,7 +58,7 @@ import java.util.concurrent.TimeUnit;
  * Created 2022/4/21
  */
 public class PluginableInputFormatDAGBuilder<T extends Row, Split extends InputSplit> extends FlinkDataReaderDAGBuilder<T>
-    implements GlobalCommittable, SchemaAlignmentable {
+    implements GlobalCommittable, TypeInfoConverterFactory {
   private static final Logger LOG = LoggerFactory.getLogger(PluginableInputFormatDAGBuilder.class);
 
   @Getter
@@ -135,24 +135,6 @@ public class PluginableInputFormatDAGBuilder<T extends Row, Split extends InputS
   }
 
   @Override
-  public ExternalEngineConnector createExternalEngineConnector(ExecutionEnviron executionEnviron,
-                                                               BitSailConfiguration readerConfiguration) {
-    BitSailConfiguration commonConfiguration = executionEnviron.getCommonConfiguration();
-    ExternalEngineConnector sourceEngineConnector = null;
-    try {
-      sourceEngineConnector = inputFormatPlugin.initSourceSchemaManager(commonConfiguration, readerConfiguration);
-    } catch (Exception e) {
-      LOG.error("failed to init source engine connector for {}", this.getReaderName());
-    }
-    return sourceEngineConnector;
-  }
-
-  @Override
-  public boolean isSchemaComparable() {
-    return inputFormatPlugin.supportSchemaCheck();
-  }
-
-  @Override
   public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConf,
                                                 BitSailConfiguration readerConf,
                                                 ParallelismAdvice upstreamAdvice) throws Exception {
@@ -188,6 +170,11 @@ public class PluginableInputFormatDAGBuilder<T extends Row, Split extends InputS
     if (Objects.nonNull(inputFormatPlugin)) {
       inputFormatPlugin.onDestroy();
     }
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return inputFormatPlugin.createTypeInfoConverter();
   }
 
   @VisibleForTesting

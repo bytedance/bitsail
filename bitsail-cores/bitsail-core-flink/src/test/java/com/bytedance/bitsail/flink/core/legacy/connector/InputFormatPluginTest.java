@@ -18,6 +18,8 @@
 package com.bytedance.bitsail.flink.core.legacy.connector;
 
 import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 
 import org.apache.flink.api.common.io.statistics.BaseStatistics;
 import org.apache.flink.core.io.GenericInputSplit;
@@ -39,6 +41,11 @@ public class InputFormatPluginTest {
     AtomicInteger splitsCreateCalledTime = new AtomicInteger(0);
 
     final InputFormatPlugin input = new InputFormatPlugin<Row, InputSplit>() {
+      @Override
+      public TypeInfoConverter createTypeInfoConverter() {
+        return new BitSailTypeInfoConverter();
+      }
+
       @Override
       public BaseStatistics getStatistics(BaseStatistics cachedStatistics) {
         return null;

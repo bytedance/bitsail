@@ -26,6 +26,7 @@ import com.bytedance.bitsail.common.column.StringColumn;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.connector.legacy.fake.option.FakeReaderOptions;
 import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatPlugin;
 import com.bytedance.bitsail.flink.core.typeinfo.PrimitiveColumnTypeInfo;
@@ -206,7 +207,7 @@ public class FakeSource extends InputFormatPlugin<Row, InputSplit> implements Re
     rate = inputSliceConfig.get(FakeReaderOptions.RATE);
     randomNullInt = (int) Math.floor(inputSliceConfig.get(FakeReaderOptions.RANDOM_NULL_RATE) * 10);
     this.columnInfos = inputSliceConfig.get(ReaderOptions.BaseReaderOptions.COLUMNS);
-    this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(new BitSailTypeInfoConverter(), columnInfos);
+    this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(createTypeInfoConverter(), columnInfos);
     this.uniqueFields = initUniqueFieldsMapping(inputSliceConfig.get(FakeReaderOptions.UNIQUE_FIELDS));
     this.useBitSailType = inputSliceConfig.get(FakeReaderOptions.USE_BITSAIL_TYPE);
 
@@ -267,6 +268,11 @@ public class FakeSource extends InputFormatPlugin<Row, InputSplit> implements Re
   @Override
   public TypeInformation<Row> getProducedType() {
     return rowTypeInfo;
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new BitSailTypeInfoConverter();
   }
 
   private static class FakeInputSplit implements InputSplit {

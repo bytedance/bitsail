@@ -20,11 +20,11 @@ package com.bytedance.bitsail.flink.core.writer;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.ProcessResult;
 import com.bytedance.bitsail.base.extension.GlobalCommittable;
-import com.bytedance.bitsail.base.extension.SchemaAlignmentable;
+import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.ddl.ExternalEngineConnector;
 import com.bytedance.bitsail.common.option.WriterOptions;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.flink.core.constants.TypeSystem;
 import com.bytedance.bitsail.flink.core.legacy.connector.OutputFormatPlugin;
 import com.bytedance.bitsail.flink.core.option.FlinkCommonOptions;
@@ -45,7 +45,8 @@ import java.util.Objects;
 /**
  * Created 2022/4/21
  */
-public class PluginableOutputFormatDAGBuilder<OUT extends Row> extends FlinkDataWriterDAGBuilder<OUT> implements GlobalCommittable, SchemaAlignmentable {
+public class PluginableOutputFormatDAGBuilder<OUT extends Row> extends FlinkDataWriterDAGBuilder<OUT> implements GlobalCommittable,
+    TypeInfoConverterFactory {
   private static final Logger LOG = LoggerFactory.getLogger(PluginableOutputFormatDAGBuilder.class);
 
   @Getter
@@ -106,19 +107,6 @@ public class PluginableOutputFormatDAGBuilder<OUT extends Row> extends FlinkData
   }
 
   @Override
-  public ExternalEngineConnector createExternalEngineConnector(ExecutionEnviron executionEnviron,
-                                                               BitSailConfiguration writerConfiguration) {
-    BitSailConfiguration commonConfiguration = executionEnviron.getCommonConfiguration();
-    ExternalEngineConnector sinkEngineConnector = null;
-    try {
-      sinkEngineConnector = outputFormatPlugin.initSinkSchemaManager(commonConfiguration, writerConfiguration);
-    } catch (Exception e) {
-      LOG.error("failed to init sink engine connector for {}", this.getWriterName());
-    }
-    return sinkEngineConnector;
-  }
-
-  @Override
   public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConf,
                                                 BitSailConfiguration writerConf,
                                                 ParallelismAdvice upstreamAdvice) {
@@ -155,5 +143,10 @@ public class PluginableOutputFormatDAGBuilder<OUT extends Row> extends FlinkData
   @VisibleForTesting
   public void setOutputFormatPlugin(OutputFormatPlugin outputFormatPlugin) {
     this.outputFormatPlugin = outputFormatPlugin;
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return outputFormatPlugin.createTypeInfoConverter();
   }
 }

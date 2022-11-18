@@ -21,6 +21,7 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.column.Column;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 import com.bytedance.bitsail.connector.hbase.HBaseHelper;
 import com.bytedance.bitsail.connector.hbase.auth.KerberosAuthenticator;
@@ -393,7 +394,7 @@ public class HBaseOutputFormat extends OutputFormatPlugin<Row> implements Result
     List<ColumnInfo> columns = outputSliceConfig.getNecessaryOption(HBaseWriterOptions.COLUMNS, HBasePluginErrorCode.REQUIRED_VALUE);
     columnNames = columns.stream().map(ColumnInfo::getName).collect(Collectors.toList());
     columnTypes = columns.stream().map(ColumnInfo::getType).collect(Collectors.toList());
-    rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columns, new FileMappingTypeInfoConverter(StringUtils.lowerCase(getType())));
+    rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columns, createTypeInfoConverter());
   }
 
   @Override
@@ -448,4 +449,8 @@ public class HBaseOutputFormat extends OutputFormatPlugin<Row> implements Result
     return expressBuilder.toString();
   }
 
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new FileMappingTypeInfoConverter(StringUtils.lowerCase(getType()));
+  }
 }

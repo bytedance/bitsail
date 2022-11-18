@@ -18,6 +18,8 @@
 package com.bytedance.bitsail.connector.legacy.rocketmq.sink;
 
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.legacy.rocketmq.config.RocketMQSinkConfig;
 import com.bytedance.bitsail.connector.legacy.rocketmq.constant.RocketMQConstants;
@@ -201,6 +203,11 @@ public class RocketMQOutputFormat extends OutputFormatPlugin<Row> implements Res
     msg.setTags(tag);
 
     return msg;
+  }
+
+  @Override
+  public TypeInfoConverter createTypeInfoConverter() {
+    return new BitSailTypeInfoConverter();
   }
 }
 
