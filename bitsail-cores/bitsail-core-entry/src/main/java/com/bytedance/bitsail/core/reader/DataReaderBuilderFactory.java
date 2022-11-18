@@ -59,22 +59,21 @@ public class DataReaderBuilderFactory {
   public static <T> DataReaderDAGBuilder getDataReaderDAGBuilder(Mode mode,
                                                                  BitSailConfiguration globalConfiguration,
                                                                  PluginExplorer pluginExplorer) throws Exception {
-    T reader = DataReaderBuilderFactory.<T>constructReader(globalConfiguration, pluginExplorer);
+    T reader = DataReaderBuilderFactory.constructReader(globalConfiguration, pluginExplorer);
     if (reader instanceof DataReaderDAGBuilder) {
       return (DataReaderDAGBuilder) reader;
     }
     if (reader instanceof InputFormatPlugin) {
-      return new PluginableInputFormatDAGBuilder((InputFormatPlugin) reader);
+      return new PluginableInputFormatDAGBuilder<>((InputFormatPlugin<?, ?>) reader);
     }
     if (reader instanceof Source) {
-      return new FlinkSourceDAGBuilder((Source) reader);
+      return new FlinkSourceDAGBuilder<>((Source<?, ?, ?>) reader);
     }
 
     throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
         "Reader class is not supported ");
   }
 
-  @SuppressWarnings("unchecked")
   private static <T> T constructReader(BitSailConfiguration globalConfiguration,
                                        PluginExplorer pluginExplorer) {
     String readerClassName = globalConfiguration.get(ReaderOptions.READER_CLASS);

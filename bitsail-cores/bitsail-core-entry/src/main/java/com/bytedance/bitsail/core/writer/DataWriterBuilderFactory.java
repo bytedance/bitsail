@@ -38,7 +38,6 @@ import java.util.stream.Collectors;
 /**
  * Created 2022/4/21
  */
-@SuppressWarnings("unchecked")
 public class DataWriterBuilderFactory {
   private static final Logger LOG = LoggerFactory.getLogger(DataWriterBuilderFactory.class);
 
@@ -48,7 +47,7 @@ public class DataWriterBuilderFactory {
     return writerConfigurations.stream()
         .map(writerConf -> {
           try {
-            return (DataWriterDAGBuilder) getDataWriterDAGBuilder(mode, writerConf, pluginExplorer);
+            return getDataWriterDAGBuilder(mode, writerConf, pluginExplorer);
           } catch (Exception e) {
             LOG.error("failed to create writer DAG builder");
             throw new RuntimeException(e);
@@ -62,21 +61,20 @@ public class DataWriterBuilderFactory {
                                                                  PluginExplorer pluginExplorer) throws Exception {
 
     String writerClassName = globalConfiguration.get(WriterOptions.WRITER_CLASS);
-    T writer = DataWriterBuilderFactory.<T>constructWriter(writerClassName, pluginExplorer);
+    T writer = DataWriterBuilderFactory.constructWriter(writerClassName, pluginExplorer);
     if (writer instanceof Sink) {
-      return new FlinkWriterBuilder((Sink<?, ?, ?>) writer);
+      return new FlinkWriterBuilder<>((Sink<?, ?, ?>) writer);
     }
     if (writer instanceof DataWriterDAGBuilder) {
       return (DataWriterDAGBuilder) writer;
     }
     if (writer instanceof OutputFormatPlugin) {
-      return new PluginableOutputFormatDAGBuilder((OutputFormatPlugin<?>) writer);
+      return new PluginableOutputFormatDAGBuilder<>((OutputFormatPlugin<?>) writer);
     }
     throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
         String.format("Writer %s is not support.", writerClassName));
   }
 
-  @SuppressWarnings("unchecked")
   private static <T> T constructWriter(String writerClassName,
                                        PluginExplorer pluginExplorer) {
     LOG.info("Writer class name is {}", writerClassName);
