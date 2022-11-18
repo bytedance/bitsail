@@ -1,18 +1,20 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package com.bytedance.bitsail.base.packages;
@@ -37,7 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class PackageManagerTest {
+public class FileSystemPluginExplorerTest {
 
   private final String[] plugins = {"plugin/test1", "plugin/test2", "plugin/test3"};
   private BitSailConfiguration jobConf;
@@ -46,24 +48,23 @@ public class PackageManagerTest {
   @Before
   public void init() throws URISyntaxException {
     jobConf = BitSailConfiguration.newDefault();
-    jobConf.set(CommonOptions.DRY_RUN, false);
     jobConf.set(CommonOptions.PRINT_LOADED_URLS, false);
-    jobConf.set(CommonOptions.ENABLE_DYNAMIC_LOADER, true);
     jobConf.set(CommonOptions.JOB_PLUGIN_LIB_PATH, "plugin");
     jobConf.set(CommonOptions.JOB_PLUGIN_CONF_PATH, "plugin_conf");
     jobConf.set(CommonOptions.STATIC_LIB_DIR, "plugin");
     jobConf.set(CommonOptions.STATIC_LIB_CONF_FILE, "static_lib.json");
     jobConf.set(CommonOptions.JOB_PLUGIN_ROOT_PATH,
-        Objects.requireNonNull(Paths.get(PackageManager.class.getResource("/classloader/").toURI()).toString()));
+        Objects.requireNonNull(Paths.get(FileSystemPluginExplorer.class.getResource("/classloader/").toURI()).toString()));
 
     mockedEnv = Mockito.mock(ExecutionEnviron.class);
     Mockito.doNothing().when(mockedEnv).registerLibraries(Mockito.anyList());
   }
 
   @Test
-  public void testDynamicLoadPackage() {
-    PackageManager packageManager = PackageManager.getInstance(mockedEnv, jobConf);
-    packageManager.loadDynamicLibrary("test2", (Function<ClassLoader, Object>) Object::toString);
+  public void testLoadPluginInstance() {
+    FileSystemPluginExplorer pluginExplorer = new FileSystemPluginExplorer();
+    pluginExplorer.configure(mockedEnv, jobConf);
+    pluginExplorer.loadPluginInstance("test2", (Function<ClassLoader, Object>) Object::toString);
     verifyRegisterLib();
   }
 

@@ -38,6 +38,10 @@ public interface CommonOptions {
       key(COMMON_PREFIX + "static_lib_conf_file")
           .defaultValue("static_libs/static_lib_conf.json");
 
+  ConfigOption<String> PLUGIN_EXPLORER_NAME =
+      key(COMMON_PREFIX + "plugin_explorer_name")
+          .defaultValue("filesystem");
+
   ConfigOption<String> STATIC_LIB_DIR =
       key(COMMON_PREFIX + "static_lib_dir")
           .defaultValue("static_libs");

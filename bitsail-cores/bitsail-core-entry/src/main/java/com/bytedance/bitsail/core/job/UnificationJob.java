@@ -22,7 +22,8 @@ import com.bytedance.bitsail.base.connector.transformer.DataTransformDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.Mode;
-import com.bytedance.bitsail.base.packages.PackageManager;
+import com.bytedance.bitsail.base.packages.PluginExplorer;
+import com.bytedance.bitsail.base.packages.PluginExplorerFactory;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.configuration.ConfigParser;
 import com.bytedance.bitsail.common.option.CommonOptions;
@@ -49,7 +50,7 @@ public class UnificationJob<T> implements Serializable {
   private final List<BitSailConfiguration> writerConfigurations;
 
   private final ExecutionEnviron execution;
-  private final PackageManager packageManager;
+  private final PluginExplorer pluginExplorer;
   private final Mode mode;
 
   private final long jobId;
@@ -69,7 +70,8 @@ public class UnificationJob<T> implements Serializable {
 
     mode = Mode.getJobRunMode(globalConfiguration.get(CommonOptions.JOB_TYPE));
     execution = ExecutionEnvironFactory.getExecutionEnviron(coreCommandArgs, mode, globalConfiguration);
-    packageManager = PackageManager.getInstance(execution, globalConfiguration);
+    pluginExplorer = PluginExplorerFactory.getPluginExplorer(globalConfiguration.get(CommonOptions.PLUGIN_EXPLORER_NAME));
+    pluginExplorer.configure(execution, execution.getCommonConfiguration());
 
     jobId = ConfigParser.getJobId(globalConfiguration);
     jobName = globalConfiguration.get(CommonOptions.JOB_NAME);
@@ -94,6 +96,7 @@ public class UnificationJob<T> implements Serializable {
 
   /**
    * Prepare the job DAG and configure runtime configuration.
+   *
    * @throws Exception
    */
   private void prepare() throws Exception {
@@ -101,12 +104,12 @@ public class UnificationJob<T> implements Serializable {
     dataReaderDAGBuilders = DataReaderBuilderFactory
         .getDataReaderDAGBuilderList(mode,
             readerConfigurations,
-            packageManager);
+            pluginExplorer);
 
     dataWriterDAGBuilders = DataWriterBuilderFactory
         .getDataWriterDAGBuilderList(mode,
             writerConfigurations,
-            packageManager);
+            pluginExplorer);
 
     execution.configure(dataReaderDAGBuilders,
         dataTransformDAGBuilder,
@@ -116,6 +119,7 @@ public class UnificationJob<T> implements Serializable {
 
   /**
    * Run the validation process before submitting the job to the cluster.
+   *
    * @return
    */
   private boolean validate() throws Exception {
@@ -134,6 +138,7 @@ public class UnificationJob<T> implements Serializable {
 
   /**
    * Run the job.
+   *
    * @throws Exception
    */
   private void process() throws Exception {
