@@ -100,7 +100,7 @@ public class PluginStore {
         }
         pluginClasses.forEach(clazz -> libraryNamesMapping.put(clazz, plugin));
 
-        LOG.info("Finished load plugin {}.", plugin.getPluginName());
+        LOG.debug("Finished load plugin {}.", plugin.getPluginName());
       }
 
     } catch (Exception e) {
