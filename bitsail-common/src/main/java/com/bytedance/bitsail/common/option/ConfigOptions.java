@@ -109,7 +109,7 @@ public class ConfigOptions {
     }
 
     public <T> ConfigOption<T> onlyReference(TypeReference<T> reference) {
-      return new ConfigOption<T>(key, null, reference);
+      return new ConfigOption<>(key, null, reference);
     }
   }
 }
