@@ -40,6 +40,7 @@ import java.util.Map;
 public class DeserializationSchemaFactory {
   private static final String STREAMING_FILE_DESERIALIZATION_SCHEMA_KEY = "streaming_file";
   private static final String JSON_DESERIALIZATION_SCHEMA_KEY = "json";
+  private static final String PB_DESERIALIZATION_SCHEMA_KEY = "protobuf";
 
   public static KafkaDeserializationSchema<Row> getDeserializationSchema(BitSailConfiguration configuration) {
     String formatType = configuration.get(BaseMessageQueueReaderOptions.FORMAT_TYPE);
@@ -62,6 +63,14 @@ public class DeserializationSchemaFactory {
       return new CountKafkaDeserializationSchemaWrapper<>(configuration,
           new JsonRowDeserializationSchema.Builder(rowTypeInfo)
               .build());
+    }
+
+    if (StringUtils.equalsIgnoreCase(PB_DESERIALIZATION_SCHEMA_KEY, formatType)) {
+      try {
+        return new CountKafkaDeserializationSchemaWrapper<>(configuration, new PbDeserializationSchema(configuration));
+      } catch (Exception e) {
+        throw new IllegalArgumentException("Pb parser encountered error during initialization.", e);
+      }
     }
 
     throw new IllegalArgumentException(String.format("Unsupported %s format type.", formatType));

@@ -1,0 +1,39 @@
+{
+  "job": {
+    "common": {
+      "job_type": "STREAMING",
+      "job_plugin_lib_dir": "plugin",
+      "job_plugin_conf_dir": "plugin_conf",
+      "enable_dynamic_loader": true,
+      "instance_id": "1",
+      "internal_instance_id": "1",
+      "extra_properties": {
+        "update-mode": "append"
+      },
+      "proto": {
+        "descriptor": "CqIDChZrYWZrYV9mdWxsX3R5cGVzLnByb3RvIv8CCglQcm90b1Rlc3QSFgoGZmllbGQxGAEgASgBUgZmaWVsZDESFgoGZmllbGQyGAIgASgCUgZmaWVsZDISFgoGZmllbGQzGAMgASgFUgZmaWVsZDMSFgoGZmllbGQ0GAQgASgDUgZmaWVsZDQSFgoGZmllbGQ1GAUgASgNUgZmaWVsZDUSFgoGZmllbGQ2GAYgASgEUgZmaWVsZDYSFgoGZmllbGQ3GAcgASgRUgZmaWVsZDcSFgoGZmllbGQ4GAggASgSUgZmaWVsZDgSFgoGZmllbGQ5GAkgASgHUgZmaWVsZDkSGAoHZmllbGQxMBgKIAEoBlIHZmllbGQxMBIYCgdmaWVsZDExGAsgASgPUgdmaWVsZDExEhgKB2ZpZWxkMTIYDCABKBBSB2ZpZWxkMTISGAoHZmllbGQxMxgNIAEoCFIHZmllbGQxMxIYCgdmaWVsZDE0GA4gASgJUgdmaWVsZDE0EhgKB2ZpZWxkMTUYDyABKAxSB2ZpZWxkMTViBnByb3RvMw==",
+        "class_name": "ProtoTest"
+      }
+    },
+    "reader": {
+      "connector": {
+        "connector": {
+          "bootstrap.servers": "PLAINTEXT://localhost:9092",
+          "topic": "testTopic",
+          "startup-mode": "earliest-offset",
+          "group": {
+            "id": "test_consumer"
+          }
+        }
+      },
+      "enable_count_mode": true,
+      "count_mode_record_threshold": 1000,
+      "format_type": "protobuf",
+      "child_connector_type": "kafka",
+      "class": "com.bytedance.bitsail.connector.legacy.kafka.source.KafkaSourceFunctionDAGBuilder"
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink"
+    }
+  }
+}

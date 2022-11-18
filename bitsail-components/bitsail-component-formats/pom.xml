@@ -32,6 +32,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>bitsail-component-format-json</module>
+        <module>bitsail-component-format-pb</module>
     </modules>
 
     <dependencies>
