@@ -24,8 +24,8 @@ import com.bytedance.bitsail.common.exception.ErrorCode;
 public enum PluginErrorCode implements ErrorCode {
   PLUGIN_COMMON_ERROR("Plugin-Error-01", "Plugin explorer common error."),
   PLUGIN_REGISTER_ERROR("Plugin-Error-02", "Register plugin to execution failed."),
-  PLUGIN_NOT_FOUND_ERROR("Plugin-Error-03", "Plugin not found"),
-  PLUGIN_NEW_INSTANCE_ERROR("Plugin-Error-04", "Plugin new instance failed"),
+  PLUGIN_NOT_FOUND_ERROR("Plugin-Error-03", "Plugin not found."),
+  PLUGIN_NEW_INSTANCE_ERROR("Plugin-Error-04", "Plugin new instance failed."),
   PLUGIN_FILE_NOT_FOUND_ERROR("Plugin-Error-05", "Plugin library not exists.");
 
   private final String code;
