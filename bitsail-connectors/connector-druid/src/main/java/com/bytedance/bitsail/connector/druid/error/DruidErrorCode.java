@@ -19,14 +19,14 @@ package com.bytedance.bitsail.connector.druid.error;
 
 import com.bytedance.bitsail.common.exception.ErrorCode;
 
-public enum DruidPluginErrorCode implements ErrorCode {
-  REQUIRED_VALUE("DruidPlugin-01", "You missed parameter which is required, please check your configuration."),
-  UNSUPPORTED_OPERATION("DruidPlugin-02", "Operation is not supported");
+public enum DruidErrorCode implements ErrorCode {
+  REQUIRED_VALUE("Druid-01", "You missed parameter which is required, please check your configuration."),
+  UNSUPPORTED_COLUMN_TYPE("Druid-02", "Column type is not supported");
 
   private final String code;
   private final String description;
 
-  DruidPluginErrorCode(String code, String description) {
+  DruidErrorCode(String code, String description) {
     this.code = code;
     this.description = description;
   }

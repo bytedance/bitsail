@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.bytedance.bitsail.common.option.WriterOptions.BaseWriterOptions.COLUMNS;
-import static com.bytedance.bitsail.connector.druid.error.DruidPluginErrorCode.REQUIRED_VALUE;
+import static com.bytedance.bitsail.connector.druid.error.DruidErrorCode.REQUIRED_VALUE;
 import static com.bytedance.bitsail.connector.druid.option.DruidWriterOptions.COORDINATOR_URL;
 import static com.bytedance.bitsail.connector.druid.option.DruidWriterOptions.DATASOURCE;
 import static org.junit.Assert.assertEquals;

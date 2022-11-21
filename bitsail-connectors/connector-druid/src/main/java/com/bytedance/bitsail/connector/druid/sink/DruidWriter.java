@@ -37,7 +37,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.druid.data.input.impl.CsvInputFormat;
 import org.apache.druid.data.input.impl.DimensionSchema;
 import org.apache.druid.data.input.impl.DimensionsSpec;
@@ -53,6 +52,8 @@ import org.apache.druid.indexing.common.task.batch.parallel.ParallelIndexSupervi
 import org.apache.druid.java.util.common.granularity.Granularities;
 import org.apache.druid.segment.indexing.DataSchema;
 import org.apache.druid.segment.indexing.granularity.UniformGranularitySpec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -66,13 +67,14 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import static com.bytedance.bitsail.common.option.WriterOptions.BaseWriterOptions.COLUMNS;
-import static com.bytedance.bitsail.connector.druid.error.DruidPluginErrorCode.REQUIRED_VALUE;
-import static com.bytedance.bitsail.connector.druid.error.DruidPluginErrorCode.UNSUPPORTED_OPERATION;
+import static com.bytedance.bitsail.connector.druid.error.DruidErrorCode.REQUIRED_VALUE;
+import static com.bytedance.bitsail.connector.druid.error.DruidErrorCode.UNSUPPORTED_COLUMN_TYPE;
 import static com.bytedance.bitsail.connector.druid.option.DruidWriterOptions.COORDINATOR_URL;
 import static com.bytedance.bitsail.connector.druid.option.DruidWriterOptions.DATASOURCE;
 
-@Slf4j
 public class DruidWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(DruidWriter.class);
   private static final String DEFAULT_LINE_DELIMITER = "\n";
   private static final String DEFAULT_FIELD_DELIMITER = ",";
   private static final String TIMESTAMP_SPEC_COLUMN_NAME = "timestamp";
@@ -134,8 +136,8 @@ public class DruidWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     // timestamp column is a required field to add in Druid.
     // See https://druid.apache.org/docs/24.0.0/ingestion/data-model.html#primary-timestamp
     joiner.add(String.valueOf(processTime));
-    this.data.append(joiner);
-    this.data.append(DEFAULT_LINE_DELIMITER);
+    data.append(joiner);
+    data.append(DEFAULT_LINE_DELIMITER);
   }
 
   /**
@@ -143,7 +145,7 @@ public class DruidWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
    */
   @Override
   public void flush(final boolean endOfInput) throws IOException {
-    final ParallelIndexIOConfig ioConfig = provideDruidIOConfig(this.data);
+    final ParallelIndexIOConfig ioConfig = provideDruidIOConfig(data);
     final ParallelIndexSupervisorTask indexTask = provideIndexTask(ioConfig);
     final String inputJSON = provideInputJSONString(indexTask);
     final byte[] input = inputJSON.getBytes();
@@ -157,7 +159,7 @@ public class DruidWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
       while ((responseLine = br.readLine()) != null) {
         response.append(responseLine.trim());
       }
-      log.info("Druid write task has been sent, and the response is {}", response);
+      LOG.info("Druid write task has been sent, and the response is {}", response);
     }
   }
 
@@ -191,9 +193,13 @@ public class DruidWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     return mapper;
   }
 
+  /**
+   * Provide DataSchema from BitSailConfiguration. One necessary information to provide is DimensionSchema list, which
+   * states data type of columns. More details in https://druid.apache.org/docs/latest/ingestion/ingestion-spec.html
+   */
   private DataSchema provideDruidDataSchema(final BitSailConfiguration writerConfig) {
     final String datasource = writerConfig.getNecessaryOption(DATASOURCE, REQUIRED_VALUE);
-    final List<DimensionSchema> dimensionSchemas = this.columnInfos.stream()
+    final List<DimensionSchema> dimensionSchemas = columnInfos.stream()
             .map(this::transformToDimensionSchema)
             .collect(Collectors.toList());
     return new DataSchema(
@@ -220,12 +226,17 @@ public class DruidWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     } else if (TypeInfos.LONG_TYPE_INFO.equals(typeInfo)) {
       dimensionSchema = new LongDimensionSchema(columnName);
     } else {
-      throw new BitSailException(UNSUPPORTED_OPERATION,
+      throw new BitSailException(UNSUPPORTED_COLUMN_TYPE,
               "Column type name " + columnName + " type " + columnType + " is not supported.");
     }
     return dimensionSchema;
   }
 
+  /**
+   * Provide ioConfig that influences how data is read from a source system. Here we generate a CSV file from writing
+   * data and use the Native batch Ingestion method (https://druid.apache.org/docs/latest/ingestion/index.html#batch)
+   * to load from CSV file. More details in https://druid.apache.org/docs/latest/ingestion/ingestion-spec.html#ioconfig.
+   */
   @VisibleForTesting
   ParallelIndexIOConfig provideDruidIOConfig(final StringBuffer data) {
     final List<String> formatList = columnInfos.stream().map(ColumnInfo::getName).collect(Collectors.toList());
@@ -239,6 +250,10 @@ public class DruidWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     );
   }
 
+  /**
+   * Provide ParallelIndexSupervisorTask that can run multiple indexing tasks concurrently. See more information in
+   * https://druid.apache.org/docs/latest/ingestion/native-batch.html
+   */
   @VisibleForTesting
   ParallelIndexSupervisorTask provideIndexTask(final ParallelIndexIOConfig ioConfig) {
     return new ParallelIndexSupervisorTask(
@@ -250,6 +265,10 @@ public class DruidWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     );
   }
 
+  /**
+   * Provide JSON to be sent via HTTP request. Please see payload example in
+   * https://druid.apache.org/docs/latest/ingestion/ingestion-spec.html
+   */
   @VisibleForTesting
   String provideInputJSONString(final ParallelIndexSupervisorTask indexTask) throws JsonProcessingException {
     String taskJSON = mapper.writeValueAsString(indexTask);
