@@ -57,7 +57,7 @@ public class LocalFSPluginFinderTest {
     LocalFSPluginFinder pluginFinder = new LocalFSPluginFinder();
     pluginFinder.configure(mockedEnv, jobConf);
     Object instance = pluginFinder.findPluginInstance(
-        "com.bytedance.bitsail.base.packages.LocalFSPluginExplorer");
+        "com.bytedance.bitsail.base.packages.LocalFSPluginFinder");
     Assert.assertNotNull(instance);
   }
 }
