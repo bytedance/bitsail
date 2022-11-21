@@ -20,7 +20,7 @@ package com.bytedance.bitsail.core.reader;
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
 import com.bytedance.bitsail.base.connector.reader.v1.Source;
 import com.bytedance.bitsail.base.execution.Mode;
-import com.bytedance.bitsail.base.packages.PackageManager;
+import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
@@ -43,11 +43,11 @@ public class DataReaderBuilderFactory {
 
   public static <T> List<DataReaderDAGBuilder> getDataReaderDAGBuilderList(Mode mode,
                                                                            List<BitSailConfiguration> readerConfigurations,
-                                                                           PackageManager packageManager) {
+                                                                           PluginFinder pluginFinder) {
     return readerConfigurations.stream()
         .map(readerConf -> {
           try {
-            return getDataReaderDAGBuilder(mode, readerConf, packageManager);
+            return getDataReaderDAGBuilder(mode, readerConf, pluginFinder);
           } catch (Exception e) {
             LOG.error("failed to create reader DAG builder");
             throw new RuntimeException(e);
@@ -58,33 +58,26 @@ public class DataReaderBuilderFactory {
 
   public static <T> DataReaderDAGBuilder getDataReaderDAGBuilder(Mode mode,
                                                                  BitSailConfiguration globalConfiguration,
-                                                                 PackageManager packageManager) throws Exception {
-    Class<T> readerClass = DataReaderBuilderFactory.<T>getReaderClass(globalConfiguration, packageManager);
-    if (DataReaderDAGBuilder.class.isAssignableFrom(readerClass)) {
-      return (DataReaderDAGBuilder) readerClass.getConstructor().newInstance();
+                                                                 PluginFinder pluginFinder) throws Exception {
+    T reader = DataReaderBuilderFactory.constructReader(globalConfiguration, pluginFinder);
+    if (reader instanceof DataReaderDAGBuilder) {
+      return (DataReaderDAGBuilder) reader;
     }
-    if (InputFormatPlugin.class.isAssignableFrom(readerClass)) {
-      return new PluginableInputFormatDAGBuilder((InputFormatPlugin) readerClass.getConstructor().newInstance());
+    if (reader instanceof InputFormatPlugin) {
+      return new PluginableInputFormatDAGBuilder<>((InputFormatPlugin<?, ?>) reader);
     }
-    if (Source.class.isAssignableFrom(readerClass)) {
-      return new FlinkSourceDAGBuilder((Source) readerClass.getConstructor().newInstance());
+    if (reader instanceof Source) {
+      return new FlinkSourceDAGBuilder<>((Source<?, ?, ?>) reader);
     }
 
     throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
-        "Reader " + readerClass.getName() + "class is not supported ");
+        "Reader class is not supported ");
   }
 
-  @SuppressWarnings("unchecked")
-  private static <T> Class<T> getReaderClass(BitSailConfiguration globalConfiguration,
-                                             PackageManager packageManager) {
+  private static <T> T constructReader(BitSailConfiguration globalConfiguration,
+                                       PluginFinder pluginFinder) {
     String readerClassName = globalConfiguration.get(ReaderOptions.READER_CLASS);
     LOG.info("Reader class name is {}", readerClassName);
-    return (Class<T>) packageManager.loadDynamicLibrary(readerClassName, classLoader -> {
-      try {
-        return classLoader.loadClass(readerClassName);
-      } catch (Exception e) {
-        throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR, e);
-      }
-    });
+    return pluginFinder.findPluginInstance(readerClassName);
   }
 }

@@ -51,8 +51,6 @@ public class EmbeddedFlinkCluster {
 
   private static void overwriteConfiguration(BitSailConfiguration globalConfiguration) {
     globalConfiguration.set(CommonOptions.JOB_ID, DEFAULT_JOB_ID)
-        .set(TableCatalogOptions.SYNC_DDL, false)
-        .set(CommonOptions.DRY_RUN, true)
-        .set(CommonOptions.ENABLE_DYNAMIC_LOADER, false);
+        .set(TableCatalogOptions.SYNC_DDL, false);
   }
 }

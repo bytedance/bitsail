@@ -96,9 +96,6 @@ public class StreamingFileSystemSinkHdfsITCase {
 
   protected void updateConfiguration(BitSailConfiguration jobConfiguration) {
     jobConfiguration.set(CommonOptions.JOB_TYPE, "STREAMING");
-    jobConfiguration.set(CommonOptions.JOB_PLUGIN_LIB_PATH, "plugin");
-    jobConfiguration.set(CommonOptions.JOB_PLUGIN_CONF_PATH, "plugin_conf");
-    jobConfiguration.set(CommonOptions.ENABLE_DYNAMIC_LOADER, true);
     jobConfiguration.set(ReaderOptions.READER_CLASS, "com.bytedance.bitsail.connector.legacy.kafka.source" +
         ".KafkaSourceFunctionDAGBuilder");
     jobConfiguration.set(WriterOptions.WRITER_CLASS, "com.bytedance.bitsail.connector.legacy.streamingfile.sink" +

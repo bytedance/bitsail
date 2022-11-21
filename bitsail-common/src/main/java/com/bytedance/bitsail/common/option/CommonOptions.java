@@ -38,15 +38,19 @@ public interface CommonOptions {
       key(COMMON_PREFIX + "static_lib_conf_file")
           .defaultValue("static_libs/static_lib_conf.json");
 
+  ConfigOption<String> PLUGIN_EXPLORER_NAME =
+      key(COMMON_PREFIX + "plugin_explorer_name")
+          .defaultValue("localFS");
+
   ConfigOption<String> STATIC_LIB_DIR =
       key(COMMON_PREFIX + "static_lib_dir")
           .defaultValue("static_libs");
 
-  ConfigOption<String> JOB_PLUGIN_LIB_PATH =
+  ConfigOption<String> JOB_PLUGIN_DIR_NAME =
       key(COMMON_PREFIX + "job_plugin_lib_dir")
           .defaultValue("connectors");
 
-  ConfigOption<String> JOB_PLUGIN_CONF_PATH =
+  ConfigOption<String> JOB_PLUGIN_MAPPING_DIR_NAME =
       key(COMMON_PREFIX + "job_plugin_conf_dir")
           .defaultValue("connectors/mapping");
 
@@ -182,20 +186,10 @@ public interface CommonOptions {
       key(COMMON_PREFIX + "low_volume_test_count_threshold")
           .defaultValue(-1L);
 
-  ConfigOption<Boolean> DRY_RUN =
-      key(COMMON_PREFIX + "dry_run")
-          .defaultValue(false);
-
-  ConfigOption<Boolean> ENABLE_DYNAMIC_LOADER =
-      key(COMMON_PREFIX + "enable_dynamic_loader")
-          .defaultValue(true);
-
-  ConfigOption<Boolean> PRINT_LOADED_URLS =
-      key(COMMON_PREFIX + "print_loaded_urls")
-          .defaultValue(false);
   ConfigOption<Boolean> MULTI_SOURCE_ENABLED =
       key(COMMON_PREFIX + "multi_source_enable")
           .defaultValue(false);
+
   // todo: will be deprecated in the future
   ConfigOption<Map<String, String>> EXTRA_PROPERTIES =
       key(COMMON_PREFIX + "extra_properties")

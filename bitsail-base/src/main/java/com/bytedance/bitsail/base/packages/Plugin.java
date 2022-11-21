@@ -21,21 +21,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
+@NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Getter
+@Setter
+@Builder
 public class Plugin {
-  @JsonProperty("names")
-  private final String pluginName;
+  @JsonProperty("name")
+  private String pluginName;
 
   @JsonProperty("class")
-  private final String className;
+  private String className;
 
   @JsonProperty("classes")
-  private final List<String> classNames;
+  private List<String> classNames;
 
-  private final List<String> libs;
+  private List<String> libs;
 }

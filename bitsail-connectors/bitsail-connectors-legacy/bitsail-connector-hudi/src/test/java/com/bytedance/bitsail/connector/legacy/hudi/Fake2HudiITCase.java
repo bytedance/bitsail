@@ -56,9 +56,6 @@ public class Fake2HudiITCase {
 
   protected void setStreamingConfiguration(BitSailConfiguration jobConfiguration) {
     jobConfiguration.set(CommonOptions.JOB_TYPE, "batch");
-    jobConfiguration.set(CommonOptions.JOB_PLUGIN_LIB_PATH, "plugin");
-    jobConfiguration.set(CommonOptions.JOB_PLUGIN_CONF_PATH, "plugin_conf");
-    jobConfiguration.set(CommonOptions.ENABLE_DYNAMIC_LOADER, true);
     jobConfiguration.set(CommonOptions.INSTANCE_ID, 1L);
   }
 

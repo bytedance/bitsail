@@ -61,9 +61,6 @@ public class HudiCompactionITCase extends TestWriteBase {
 
   private void setCompactionConfiguration(BitSailConfiguration jobConfiguration) {
     jobConfiguration.set(CommonOptions.JOB_TYPE, "BATCH");
-    jobConfiguration.set(CommonOptions.JOB_PLUGIN_LIB_PATH, "plugin");
-    jobConfiguration.set(CommonOptions.JOB_PLUGIN_CONF_PATH, "plugin_conf");
-    jobConfiguration.set(CommonOptions.ENABLE_DYNAMIC_LOADER, true);
 
     // set reader
     jobConfiguration.set(ReaderOptions.READER_CLASS, "com.bytedance.bitsail.connector.legacy.hudi.dag" +

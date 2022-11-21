@@ -20,7 +20,7 @@ package com.bytedance.bitsail.core.writer;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.v1.Sink;
 import com.bytedance.bitsail.base.execution.Mode;
-import com.bytedance.bitsail.base.packages.PackageManager;
+import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
@@ -38,17 +38,16 @@ import java.util.stream.Collectors;
 /**
  * Created 2022/4/21
  */
-@SuppressWarnings("unchecked")
 public class DataWriterBuilderFactory {
   private static final Logger LOG = LoggerFactory.getLogger(DataWriterBuilderFactory.class);
 
   public static <T> List<DataWriterDAGBuilder> getDataWriterDAGBuilderList(Mode mode,
                                                                            List<BitSailConfiguration> writerConfigurations,
-                                                                           PackageManager packageManager) {
+                                                                           PluginFinder pluginFinder) {
     return writerConfigurations.stream()
         .map(writerConf -> {
           try {
-            return (DataWriterDAGBuilder) getDataWriterDAGBuilder(mode, writerConf, packageManager);
+            return getDataWriterDAGBuilder(mode, writerConf, pluginFinder);
           } catch (Exception e) {
             LOG.error("failed to create writer DAG builder");
             throw new RuntimeException(e);
@@ -59,33 +58,26 @@ public class DataWriterBuilderFactory {
 
   public static <T> DataWriterDAGBuilder getDataWriterDAGBuilder(Mode mode,
                                                                  BitSailConfiguration globalConfiguration,
-                                                                 PackageManager packageManager) throws Exception {
+                                                                 PluginFinder pluginFinder) throws Exception {
 
-    Class<T> writerClass = DataWriterBuilderFactory.<T>getWriterClass(globalConfiguration, packageManager);
-    if (Sink.class.isAssignableFrom(writerClass)) {
-      return new FlinkWriterBuilder((Sink<?, ?, ?>) writerClass.getConstructor().newInstance());
+    String writerClassName = globalConfiguration.get(WriterOptions.WRITER_CLASS);
+    T writer = DataWriterBuilderFactory.constructWriter(writerClassName, pluginFinder);
+    if (writer instanceof Sink) {
+      return new FlinkWriterBuilder<>((Sink<?, ?, ?>) writer);
     }
-    if (DataWriterDAGBuilder.class.isAssignableFrom(writerClass)) {
-      return (DataWriterDAGBuilder) writerClass.getConstructor().newInstance();
+    if (writer instanceof DataWriterDAGBuilder) {
+      return (DataWriterDAGBuilder) writer;
     }
-    if (OutputFormatPlugin.class.isAssignableFrom(writerClass)) {
-      return new PluginableOutputFormatDAGBuilder((OutputFormatPlugin<?>) writerClass.getConstructor().newInstance());
+    if (writer instanceof OutputFormatPlugin) {
+      return new PluginableOutputFormatDAGBuilder<>((OutputFormatPlugin<?>) writer);
     }
     throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
-        "Writer " + writerClass.getName() + "class is not supported ");
+        String.format("Writer %s is not support.", writerClassName));
   }
 
-  @SuppressWarnings("unchecked")
-  private static <T> Class<T> getWriterClass(BitSailConfiguration globalConfiguration,
-                                             PackageManager packageManager) {
-    String writerClassName = globalConfiguration.get(WriterOptions.WRITER_CLASS);
+  private static <T> T constructWriter(String writerClassName,
+                                       PluginFinder pluginFinder) {
     LOG.info("Writer class name is {}", writerClassName);
-    return (Class<T>) packageManager.loadDynamicLibrary(writerClassName, classLoader -> {
-      try {
-        return classLoader.loadClass(writerClassName);
-      } catch (Exception e) {
-        throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR, e);
-      }
-    });
+    return pluginFinder.findPluginInstance(writerClassName);
   }
 }

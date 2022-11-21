@@ -22,7 +22,8 @@ package com.bytedance.bitsail.core.reader;
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.Mode;
-import com.bytedance.bitsail.base.packages.PackageManager;
+import com.bytedance.bitsail.base.packages.PluginFinder;
+import com.bytedance.bitsail.base.packages.PluginFinderFactory;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
@@ -43,24 +44,23 @@ public class DataReaderBuilderFactoryTest {
   private BitSailConfiguration legacyPluginConf;
 
   private BitSailConfiguration unsupportedClassConf;
-  private PackageManager packageManager;
+  private PluginFinder pluginFinder;
 
   @Before
   public void init() {
     dagBuilderConf = BitSailConfiguration.newDefault();
-    dagBuilderConf.set(CommonOptions.ENABLE_DYNAMIC_LOADER, false);
     dagBuilderConf.set(ReaderOptions.READER_CLASS, MockDataReaderDAGBuilder.class.getName());
 
     ExecutionEnviron executionEnviron = Mockito.mock(FlinkExecutionEnviron.class);
 
-    packageManager = PackageManager.getInstance(executionEnviron, dagBuilderConf);
+    pluginFinder = PluginFinderFactory
+        .getPluginExplorer(dagBuilderConf.get(CommonOptions.PLUGIN_EXPLORER_NAME));
+    pluginFinder.configure(executionEnviron, dagBuilderConf);
 
     legacyPluginConf = BitSailConfiguration.newDefault();
-    legacyPluginConf.set(CommonOptions.ENABLE_DYNAMIC_LOADER, false);
     legacyPluginConf.set(ReaderOptions.READER_CLASS, MockInputFormatPlugin.class.getName());
 
     unsupportedClassConf = BitSailConfiguration.newDefault();
-    unsupportedClassConf.set(CommonOptions.ENABLE_DYNAMIC_LOADER, false);
     unsupportedClassConf.set(ReaderOptions.READER_CLASS, DataReaderBuilderFactoryTest.class.getName());
   }
 
@@ -68,21 +68,21 @@ public class DataReaderBuilderFactoryTest {
   public void testGetDataReaderDAGBuilder() throws Exception {
 
     DataReaderDAGBuilder dataReaderDAGBuilder = DataReaderBuilderFactory.getDataReaderDAGBuilder(
-        Mode.BATCH, dagBuilderConf, packageManager);
+        Mode.BATCH, dagBuilderConf, pluginFinder);
     assertEquals(dataReaderDAGBuilder.getReaderName(), MockDataReaderDAGBuilder.class.getSimpleName());
   }
 
   @Test
   public void testGetInputFormatPlugin() throws Exception {
     DataReaderDAGBuilder dataReaderDAGBuilder = DataReaderBuilderFactory.getDataReaderDAGBuilder(
-        Mode.BATCH, legacyPluginConf, packageManager);
+        Mode.BATCH, legacyPluginConf, pluginFinder);
     assertEquals(dataReaderDAGBuilder.getReaderName(), MockInputFormatPlugin.class.getSimpleName());
   }
 
   @Test
   public void testGetDataReaderDAGBuilderList() {
     List<DataReaderDAGBuilder> dataReaderDAGBuilderList = DataReaderBuilderFactory.getDataReaderDAGBuilderList(
-        Mode.BATCH, ImmutableList.of(dagBuilderConf, legacyPluginConf), packageManager);
+        Mode.BATCH, ImmutableList.of(dagBuilderConf, legacyPluginConf), pluginFinder);
     assertEquals(dataReaderDAGBuilderList.size(), 2);
     assertEquals(dataReaderDAGBuilderList.get(0).getReaderName(), MockDataReaderDAGBuilder.class.getSimpleName());
     assertEquals(dataReaderDAGBuilderList.get(1).getReaderName(), MockInputFormatPlugin.class.getSimpleName());
@@ -91,7 +91,7 @@ public class DataReaderBuilderFactoryTest {
   @Test(expected = BitSailException.class)
   public void testUnsupportedReaderClass() throws Exception {
     DataReaderBuilderFactory.getDataReaderDAGBuilder(
-        Mode.BATCH, unsupportedClassConf, packageManager);
+        Mode.BATCH, unsupportedClassConf, pluginFinder);
   }
 
 }
