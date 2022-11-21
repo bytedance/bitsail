@@ -49,7 +49,6 @@ public class DataReaderBuilderFactoryTest {
   @Before
   public void init() {
     dagBuilderConf = BitSailConfiguration.newDefault();
-    dagBuilderConf.set(CommonOptions.ENABLE_DYNAMIC_LOADER, false);
     dagBuilderConf.set(ReaderOptions.READER_CLASS, MockDataReaderDAGBuilder.class.getName());
 
     ExecutionEnviron executionEnviron = Mockito.mock(FlinkExecutionEnviron.class);
@@ -59,11 +58,9 @@ public class DataReaderBuilderFactoryTest {
     pluginExplorer.configure(executionEnviron, dagBuilderConf);
 
     legacyPluginConf = BitSailConfiguration.newDefault();
-    legacyPluginConf.set(CommonOptions.ENABLE_DYNAMIC_LOADER, false);
     legacyPluginConf.set(ReaderOptions.READER_CLASS, MockInputFormatPlugin.class.getName());
 
     unsupportedClassConf = BitSailConfiguration.newDefault();
-    unsupportedClassConf.set(CommonOptions.ENABLE_DYNAMIC_LOADER, false);
     unsupportedClassConf.set(ReaderOptions.READER_CLASS, DataReaderBuilderFactoryTest.class.getName());
   }
 

@@ -49,7 +49,6 @@ public class DataWriterBuilderFactoryTest {
   @Before
   public void init() {
     dagBuilderConf = BitSailConfiguration.newDefault();
-    dagBuilderConf.set(CommonOptions.ENABLE_DYNAMIC_LOADER, false);
     dagBuilderConf.set(WriterOptions.WRITER_CLASS, MockDataWriterDAGBuilder.class.getName());
 
     ExecutionEnviron executionEnviron = Mockito.mock(FlinkExecutionEnviron.class);
@@ -59,11 +58,9 @@ public class DataWriterBuilderFactoryTest {
     pluginExplorer.configure(executionEnviron, dagBuilderConf);
 
     legacyPluginConf = BitSailConfiguration.newDefault();
-    legacyPluginConf.set(CommonOptions.ENABLE_DYNAMIC_LOADER, false);
     legacyPluginConf.set(WriterOptions.WRITER_CLASS, MockOutputFormatPlugin.class.getName());
 
     unsupportedClassConf = BitSailConfiguration.newDefault();
-    unsupportedClassConf.set(CommonOptions.ENABLE_DYNAMIC_LOADER, false);
     unsupportedClassConf.set(WriterOptions.WRITER_CLASS, DataWriterBuilderFactoryTest.class.getName());
   }
 

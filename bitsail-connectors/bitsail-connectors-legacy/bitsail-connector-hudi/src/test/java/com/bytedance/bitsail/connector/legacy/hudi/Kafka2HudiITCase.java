@@ -120,9 +120,6 @@ public class Kafka2HudiITCase {
 
   protected void setStreamingConfiguration(BitSailConfiguration jobConfiguration) {
     jobConfiguration.set(CommonOptions.JOB_TYPE, "STREAMING");
-    jobConfiguration.set(CommonOptions.JOB_PLUGIN_LIB_PATH, "plugin");
-    jobConfiguration.set(CommonOptions.JOB_PLUGIN_CONF_PATH, "plugin_conf");
-    jobConfiguration.set(CommonOptions.ENABLE_DYNAMIC_LOADER, true);
   }
 
   protected void setReaderConfiguration(BitSailConfiguration jobConfiguration) {

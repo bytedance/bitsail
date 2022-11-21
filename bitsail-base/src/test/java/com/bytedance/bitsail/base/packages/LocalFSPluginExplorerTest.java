@@ -41,9 +41,8 @@ public class LocalFSPluginExplorerTest {
   @Before
   public void init() throws URISyntaxException {
     jobConf = BitSailConfiguration.newDefault();
-    jobConf.set(CommonOptions.PRINT_LOADED_URLS, false);
-    jobConf.set(CommonOptions.JOB_PLUGIN_LIB_PATH, "plugin");
-    jobConf.set(CommonOptions.JOB_PLUGIN_CONF_PATH, "plugin_conf");
+    jobConf.set(CommonOptions.JOB_PLUGIN_DIR_NAME, "plugin");
+    jobConf.set(CommonOptions.JOB_PLUGIN_MAPPING_DIR_NAME, "plugin_conf");
     jobConf.set(CommonOptions.STATIC_LIB_DIR, "plugin");
     jobConf.set(CommonOptions.STATIC_LIB_CONF_FILE, "static_lib.json");
     jobConf.set(CommonOptions.JOB_PLUGIN_ROOT_PATH,

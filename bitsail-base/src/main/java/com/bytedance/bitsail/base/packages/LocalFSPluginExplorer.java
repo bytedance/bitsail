@@ -54,8 +54,8 @@ public class LocalFSPluginExplorer implements PluginExplorer {
     String frameworkBaseDir = commonConfiguration
         .getUnNecessaryOption(CommonOptions.JOB_PLUGIN_ROOT_PATH, getFrameworkEntryDir().toString());
 
-    String pluginDirName = commonConfiguration.get(CommonOptions.JOB_PLUGIN_LIB_PATH);
-    String pluginMappingDirName = commonConfiguration.get(CommonOptions.JOB_PLUGIN_CONF_PATH);
+    String pluginDirName = commonConfiguration.get(CommonOptions.JOB_PLUGIN_DIR_NAME);
+    String pluginMappingDirName = commonConfiguration.get(CommonOptions.JOB_PLUGIN_MAPPING_DIR_NAME);
 
     Path frameworkBaseDirPath = Paths.get(frameworkBaseDir);
     this.pluginStore = PluginStore.builder()

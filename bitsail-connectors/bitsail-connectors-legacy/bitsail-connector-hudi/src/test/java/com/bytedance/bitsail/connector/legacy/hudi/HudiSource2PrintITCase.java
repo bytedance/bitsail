@@ -56,9 +56,6 @@ public class HudiSource2PrintITCase extends TestWriteBase {
 
   private void setCOWConfiguration(BitSailConfiguration jobConfiguration) {
     jobConfiguration.set(CommonOptions.JOB_TYPE, "BATCH");
-    jobConfiguration.set(CommonOptions.JOB_PLUGIN_LIB_PATH, "plugin");
-    jobConfiguration.set(CommonOptions.JOB_PLUGIN_CONF_PATH, "plugin_conf");
-    jobConfiguration.set(CommonOptions.ENABLE_DYNAMIC_LOADER, true);
     jobConfiguration.set(CommonOptions.JOB_ID, -1L);
     jobConfiguration.set(CommonOptions.INSTANCE_ID, -1L);
 
@@ -76,9 +73,6 @@ public class HudiSource2PrintITCase extends TestWriteBase {
 
   private void setMORConfiguration(BitSailConfiguration jobConfiguration) {
     jobConfiguration.set(CommonOptions.JOB_TYPE, "BATCH");
-    jobConfiguration.set(CommonOptions.JOB_PLUGIN_LIB_PATH, "plugin");
-    jobConfiguration.set(CommonOptions.JOB_PLUGIN_CONF_PATH, "plugin_conf");
-    jobConfiguration.set(CommonOptions.ENABLE_DYNAMIC_LOADER, true);
     jobConfiguration.set(CommonOptions.JOB_ID, -1L);
     jobConfiguration.set(CommonOptions.INSTANCE_ID, -1L);
 
