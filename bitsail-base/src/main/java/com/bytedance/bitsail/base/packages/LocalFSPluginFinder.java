@@ -38,8 +38,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class LocalFSPluginExplorer implements PluginExplorer {
-  private static final Logger LOG = LoggerFactory.getLogger(LocalFSPluginExplorer.class);
+public class LocalFSPluginFinder implements PluginFinder {
+  private static final Logger LOG = LoggerFactory.getLogger(LocalFSPluginFinder.class);
 
   private static final String DEFAULT_PLUGIN_EXPLORER_NAME = "localFS";
 
@@ -67,11 +67,11 @@ public class LocalFSPluginExplorer implements PluginExplorer {
   }
 
   @Override
-  public <T> T loadPluginInstance(String canonicalName, Object... parameters) {
-    return loadPluginInstance(canonicalName, false, parameters);
+  public <T> T findPluginInstance(String canonicalName, Object... parameters) {
+    return findPluginInstance(canonicalName, false, parameters);
   }
 
-  private <T> T loadPluginInstance(String canonicalName, boolean failOnMiss, Object... parameters) {
+  private <T> T findPluginInstance(String canonicalName, boolean failOnMiss, Object... parameters) {
     Class<?> clazz;
     try {
       clazz = pluginClassloader.loadClass(canonicalName);
@@ -95,7 +95,7 @@ public class LocalFSPluginExplorer implements PluginExplorer {
 
     tryAddPluginToClassloader(pluginClassloader, pluginUrls);
     uploadPlugins(execution, pluginUrls);
-    return loadPluginInstance(canonicalName, true, parameters);
+    return findPluginInstance(canonicalName, true, parameters);
   }
 
   @Override

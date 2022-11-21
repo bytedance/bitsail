@@ -23,11 +23,11 @@ import com.bytedance.bitsail.base.component.DefaultComponentBuilderLoader;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class PluginExplorerFactory {
+public class PluginFinderFactory {
 
-  public static PluginExplorer getPluginExplorer(String explorer) {
-    DefaultComponentBuilderLoader<PluginExplorer> loader =
-        new DefaultComponentBuilderLoader<>(PluginExplorer.class);
+  public static PluginFinder getPluginExplorer(String explorer) {
+    DefaultComponentBuilderLoader<PluginFinder> loader =
+        new DefaultComponentBuilderLoader<>(PluginFinder.class);
 
     return loader.loadComponent(StringUtils.lowerCase(explorer));
   }

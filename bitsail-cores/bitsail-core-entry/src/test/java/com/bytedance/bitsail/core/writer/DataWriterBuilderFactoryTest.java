@@ -22,8 +22,8 @@ package com.bytedance.bitsail.core.writer;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.Mode;
-import com.bytedance.bitsail.base.packages.PluginExplorer;
-import com.bytedance.bitsail.base.packages.PluginExplorerFactory;
+import com.bytedance.bitsail.base.packages.PluginFinder;
+import com.bytedance.bitsail.base.packages.PluginFinderFactory;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
@@ -44,7 +44,7 @@ public class DataWriterBuilderFactoryTest {
   private BitSailConfiguration legacyPluginConf;
 
   private BitSailConfiguration unsupportedClassConf;
-  private PluginExplorer pluginExplorer;
+  private PluginFinder pluginFinder;
 
   @Before
   public void init() {
@@ -53,9 +53,9 @@ public class DataWriterBuilderFactoryTest {
 
     ExecutionEnviron executionEnviron = Mockito.mock(FlinkExecutionEnviron.class);
 
-    pluginExplorer = PluginExplorerFactory
+    pluginFinder = PluginFinderFactory
         .getPluginExplorer(dagBuilderConf.get(CommonOptions.PLUGIN_EXPLORER_NAME));
-    pluginExplorer.configure(executionEnviron, dagBuilderConf);
+    pluginFinder.configure(executionEnviron, dagBuilderConf);
 
     legacyPluginConf = BitSailConfiguration.newDefault();
     legacyPluginConf.set(WriterOptions.WRITER_CLASS, MockOutputFormatPlugin.class.getName());
@@ -68,21 +68,21 @@ public class DataWriterBuilderFactoryTest {
   public void testGetDataReaderDAGBuilder() throws Exception {
 
     DataWriterDAGBuilder dataWriterDAGBuilder = DataWriterBuilderFactory.getDataWriterDAGBuilder(
-        Mode.BATCH, dagBuilderConf, pluginExplorer);
+        Mode.BATCH, dagBuilderConf, pluginFinder);
     assertEquals(dataWriterDAGBuilder.getWriterName(), MockDataWriterDAGBuilder.class.getSimpleName());
   }
 
   @Test
   public void testGetInputFormatPlugin() throws Exception {
     DataWriterDAGBuilder dataWriterDAGBuilder = DataWriterBuilderFactory.getDataWriterDAGBuilder(
-        Mode.BATCH, legacyPluginConf, pluginExplorer);
+        Mode.BATCH, legacyPluginConf, pluginFinder);
     assertEquals(dataWriterDAGBuilder.getWriterName(), MockOutputFormatPlugin.class.getSimpleName());
   }
 
   @Test
   public void testGetDataReaderDAGBuilderList() {
     List<DataWriterDAGBuilder> dataWriterDAGBuilderList = DataWriterBuilderFactory.getDataWriterDAGBuilderList(
-        Mode.BATCH, ImmutableList.of(dagBuilderConf, legacyPluginConf), pluginExplorer);
+        Mode.BATCH, ImmutableList.of(dagBuilderConf, legacyPluginConf), pluginFinder);
     assertEquals(dataWriterDAGBuilderList.size(), 2);
     assertEquals(dataWriterDAGBuilderList.get(0).getWriterName(), MockDataWriterDAGBuilder.class.getSimpleName());
     assertEquals(dataWriterDAGBuilderList.get(1).getWriterName(), MockOutputFormatPlugin.class.getSimpleName());
@@ -91,7 +91,7 @@ public class DataWriterBuilderFactoryTest {
   @Test(expected = BitSailException.class)
   public void testUnsupportedReaderClass() throws Exception {
     DataWriterBuilderFactory.getDataWriterDAGBuilder(
-        Mode.BATCH, unsupportedClassConf, pluginExplorer);
+        Mode.BATCH, unsupportedClassConf, pluginFinder);
   }
 
 }

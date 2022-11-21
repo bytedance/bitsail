@@ -32,7 +32,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-public class LocalFSPluginExplorerTest {
+public class LocalFSPluginFinderTest {
 
   private final String[] plugins = {"plugin/test1", "plugin/test2", "plugin/test3"};
   private BitSailConfiguration jobConf;
@@ -46,7 +46,7 @@ public class LocalFSPluginExplorerTest {
     jobConf.set(CommonOptions.STATIC_LIB_DIR, "plugin");
     jobConf.set(CommonOptions.STATIC_LIB_CONF_FILE, "static_lib.json");
     jobConf.set(CommonOptions.JOB_PLUGIN_ROOT_PATH,
-        Objects.requireNonNull(Paths.get(LocalFSPluginExplorer.class.getResource("/classloader/").toURI()).toString()));
+        Objects.requireNonNull(Paths.get(LocalFSPluginFinder.class.getResource("/classloader/").toURI()).toString()));
 
     mockedEnv = Mockito.mock(ExecutionEnviron.class);
     Mockito.doNothing().when(mockedEnv).registerLibraries(Mockito.anyList());
@@ -54,9 +54,9 @@ public class LocalFSPluginExplorerTest {
 
   @Test
   public void testLoadPluginInstance() {
-    LocalFSPluginExplorer pluginExplorer = new LocalFSPluginExplorer();
-    pluginExplorer.configure(mockedEnv, jobConf);
-    Object instance = pluginExplorer.loadPluginInstance(
+    LocalFSPluginFinder pluginFinder = new LocalFSPluginFinder();
+    pluginFinder.configure(mockedEnv, jobConf);
+    Object instance = pluginFinder.findPluginInstance(
         "com.bytedance.bitsail.base.packages.LocalFSPluginExplorer");
     Assert.assertNotNull(instance);
   }

@@ -20,7 +20,7 @@ package com.bytedance.bitsail.core.reader;
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
 import com.bytedance.bitsail.base.connector.reader.v1.Source;
 import com.bytedance.bitsail.base.execution.Mode;
-import com.bytedance.bitsail.base.packages.PluginExplorer;
+import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
@@ -43,11 +43,11 @@ public class DataReaderBuilderFactory {
 
   public static <T> List<DataReaderDAGBuilder> getDataReaderDAGBuilderList(Mode mode,
                                                                            List<BitSailConfiguration> readerConfigurations,
-                                                                           PluginExplorer pluginExplorer) {
+                                                                           PluginFinder pluginFinder) {
     return readerConfigurations.stream()
         .map(readerConf -> {
           try {
-            return getDataReaderDAGBuilder(mode, readerConf, pluginExplorer);
+            return getDataReaderDAGBuilder(mode, readerConf, pluginFinder);
           } catch (Exception e) {
             LOG.error("failed to create reader DAG builder");
             throw new RuntimeException(e);
@@ -58,8 +58,8 @@ public class DataReaderBuilderFactory {
 
   public static <T> DataReaderDAGBuilder getDataReaderDAGBuilder(Mode mode,
                                                                  BitSailConfiguration globalConfiguration,
-                                                                 PluginExplorer pluginExplorer) throws Exception {
-    T reader = DataReaderBuilderFactory.constructReader(globalConfiguration, pluginExplorer);
+                                                                 PluginFinder pluginFinder) throws Exception {
+    T reader = DataReaderBuilderFactory.constructReader(globalConfiguration, pluginFinder);
     if (reader instanceof DataReaderDAGBuilder) {
       return (DataReaderDAGBuilder) reader;
     }
@@ -75,9 +75,9 @@ public class DataReaderBuilderFactory {
   }
 
   private static <T> T constructReader(BitSailConfiguration globalConfiguration,
-                                       PluginExplorer pluginExplorer) {
+                                       PluginFinder pluginFinder) {
     String readerClassName = globalConfiguration.get(ReaderOptions.READER_CLASS);
     LOG.info("Reader class name is {}", readerClassName);
-    return pluginExplorer.loadPluginInstance(readerClassName);
+    return pluginFinder.findPluginInstance(readerClassName);
   }
 }

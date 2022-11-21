@@ -22,8 +22,8 @@ import com.bytedance.bitsail.base.connector.transformer.DataTransformDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.Mode;
-import com.bytedance.bitsail.base.packages.PluginExplorer;
-import com.bytedance.bitsail.base.packages.PluginExplorerFactory;
+import com.bytedance.bitsail.base.packages.PluginFinder;
+import com.bytedance.bitsail.base.packages.PluginFinderFactory;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.configuration.ConfigParser;
 import com.bytedance.bitsail.common.option.CommonOptions;
@@ -50,7 +50,7 @@ public class UnificationJob<T> implements Serializable {
   private final List<BitSailConfiguration> writerConfigurations;
 
   private final ExecutionEnviron execution;
-  private final PluginExplorer pluginExplorer;
+  private final PluginFinder pluginFinder;
   private final Mode mode;
 
   private final long jobId;
@@ -70,8 +70,8 @@ public class UnificationJob<T> implements Serializable {
 
     mode = Mode.getJobRunMode(globalConfiguration.get(CommonOptions.JOB_TYPE));
     execution = ExecutionEnvironFactory.getExecutionEnviron(coreCommandArgs, mode, globalConfiguration);
-    pluginExplorer = PluginExplorerFactory.getPluginExplorer(globalConfiguration.get(CommonOptions.PLUGIN_EXPLORER_NAME));
-    pluginExplorer.configure(execution, execution.getCommonConfiguration());
+    pluginFinder = PluginFinderFactory.getPluginExplorer(globalConfiguration.get(CommonOptions.PLUGIN_EXPLORER_NAME));
+    pluginFinder.configure(execution, execution.getCommonConfiguration());
 
     jobId = ConfigParser.getJobId(globalConfiguration);
     jobName = globalConfiguration.get(CommonOptions.JOB_NAME);
@@ -104,12 +104,12 @@ public class UnificationJob<T> implements Serializable {
     dataReaderDAGBuilders = DataReaderBuilderFactory
         .getDataReaderDAGBuilderList(mode,
             readerConfigurations,
-            pluginExplorer);
+            pluginFinder);
 
     dataWriterDAGBuilders = DataWriterBuilderFactory
         .getDataWriterDAGBuilderList(mode,
             writerConfigurations,
-            pluginExplorer);
+            pluginFinder);
 
     execution.configure(dataReaderDAGBuilders,
         dataTransformDAGBuilder,

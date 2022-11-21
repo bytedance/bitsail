@@ -30,7 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-public interface PluginExplorer extends Serializable, ComponentBuilder<Void> {
+public interface PluginFinder extends Serializable, ComponentBuilder<Void> {
 
   /**
    * Configure plugin explorer.
@@ -39,9 +39,9 @@ public interface PluginExplorer extends Serializable, ComponentBuilder<Void> {
                  BitSailConfiguration commonConfiguration);
 
   /**
-   * load plugin instance from plugin explorer.
+   * find plugin instance from plugin finder.
    */
-  <T> T loadPluginInstance(String clazz, Object... parameters);
+  <T> T findPluginInstance(String clazz, Object... parameters);
 
   /**
    * upload plugin to execution.
@@ -57,7 +57,7 @@ public interface PluginExplorer extends Serializable, ComponentBuilder<Void> {
    */
   default Path getFrameworkEntryDir() {
     try {
-      String entry = Paths.get(LocalFSPluginExplorer.class
+      String entry = Paths.get(PluginFinder.class
           .getProtectionDomain()
           .getCodeSource()
           .getLocation()

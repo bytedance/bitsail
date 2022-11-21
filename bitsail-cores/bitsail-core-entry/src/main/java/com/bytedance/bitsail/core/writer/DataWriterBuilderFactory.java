@@ -20,7 +20,7 @@ package com.bytedance.bitsail.core.writer;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.v1.Sink;
 import com.bytedance.bitsail.base.execution.Mode;
-import com.bytedance.bitsail.base.packages.PluginExplorer;
+import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
@@ -43,11 +43,11 @@ public class DataWriterBuilderFactory {
 
   public static <T> List<DataWriterDAGBuilder> getDataWriterDAGBuilderList(Mode mode,
                                                                            List<BitSailConfiguration> writerConfigurations,
-                                                                           PluginExplorer pluginExplorer) {
+                                                                           PluginFinder pluginFinder) {
     return writerConfigurations.stream()
         .map(writerConf -> {
           try {
-            return getDataWriterDAGBuilder(mode, writerConf, pluginExplorer);
+            return getDataWriterDAGBuilder(mode, writerConf, pluginFinder);
           } catch (Exception e) {
             LOG.error("failed to create writer DAG builder");
             throw new RuntimeException(e);
@@ -58,10 +58,10 @@ public class DataWriterBuilderFactory {
 
   public static <T> DataWriterDAGBuilder getDataWriterDAGBuilder(Mode mode,
                                                                  BitSailConfiguration globalConfiguration,
-                                                                 PluginExplorer pluginExplorer) throws Exception {
+                                                                 PluginFinder pluginFinder) throws Exception {
 
     String writerClassName = globalConfiguration.get(WriterOptions.WRITER_CLASS);
-    T writer = DataWriterBuilderFactory.constructWriter(writerClassName, pluginExplorer);
+    T writer = DataWriterBuilderFactory.constructWriter(writerClassName, pluginFinder);
     if (writer instanceof Sink) {
       return new FlinkWriterBuilder<>((Sink<?, ?, ?>) writer);
     }
@@ -76,8 +76,8 @@ public class DataWriterBuilderFactory {
   }
 
   private static <T> T constructWriter(String writerClassName,
-                                       PluginExplorer pluginExplorer) {
+                                       PluginFinder pluginFinder) {
     LOG.info("Writer class name is {}", writerClassName);
-    return pluginExplorer.loadPluginInstance(writerClassName);
+    return pluginFinder.findPluginInstance(writerClassName);
   }
 }
