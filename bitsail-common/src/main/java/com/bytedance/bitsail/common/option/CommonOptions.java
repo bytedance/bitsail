@@ -40,7 +40,7 @@ public interface CommonOptions {
 
   ConfigOption<String> PLUGIN_EXPLORER_NAME =
       key(COMMON_PREFIX + "plugin_explorer_name")
-          .defaultValue("filesystem");
+          .defaultValue("localFS");
 
   ConfigOption<String> STATIC_LIB_DIR =
       key(COMMON_PREFIX + "static_lib_dir")

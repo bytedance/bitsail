@@ -26,20 +26,13 @@ import com.bytedance.bitsail.common.option.CommonOptions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
-public class FileSystemPluginExplorerTest {
+public class LocalFSPluginExplorerTest {
 
   private final String[] plugins = {"plugin/test1", "plugin/test2", "plugin/test3"};
   private BitSailConfiguration jobConf;
@@ -54,7 +47,7 @@ public class FileSystemPluginExplorerTest {
     jobConf.set(CommonOptions.STATIC_LIB_DIR, "plugin");
     jobConf.set(CommonOptions.STATIC_LIB_CONF_FILE, "static_lib.json");
     jobConf.set(CommonOptions.JOB_PLUGIN_ROOT_PATH,
-        Objects.requireNonNull(Paths.get(FileSystemPluginExplorer.class.getResource("/classloader/").toURI()).toString()));
+        Objects.requireNonNull(Paths.get(LocalFSPluginExplorer.class.getResource("/classloader/").toURI()).toString()));
 
     mockedEnv = Mockito.mock(ExecutionEnviron.class);
     Mockito.doNothing().when(mockedEnv).registerLibraries(Mockito.anyList());
@@ -62,28 +55,10 @@ public class FileSystemPluginExplorerTest {
 
   @Test
   public void testLoadPluginInstance() {
-    FileSystemPluginExplorer pluginExplorer = new FileSystemPluginExplorer();
+    LocalFSPluginExplorer pluginExplorer = new LocalFSPluginExplorer();
     pluginExplorer.configure(mockedEnv, jobConf);
-    pluginExplorer.loadPluginInstance("test2", (Function<ClassLoader, Object>) Object::toString);
-    verifyRegisterLib();
-  }
-
-  private void verifyRegisterLib() {
-    ArgumentCaptor<?> argumentCaptor = ArgumentCaptor.forClass(List.class);
-    Mockito.verify(mockedEnv, Mockito.times(1)).registerLibraries((List<URI>) argumentCaptor.capture());
-    List<String> uriList = ((List<?>) argumentCaptor.getValue()).stream()
-        .map(Object::toString)
-        .collect(Collectors.toList());
-
-    final AtomicInteger index = new AtomicInteger(0);
-    do {
-      AtomicBoolean foundPlugin = new AtomicBoolean(false);
-      uriList.forEach(uri -> {
-        if (uri.contains(plugins[index.get()])) {
-          foundPlugin.set(true);
-        }
-      });
-      Assert.assertTrue(foundPlugin.get());
-    } while (index.incrementAndGet() < plugins.length);
+    Object instance = pluginExplorer.loadPluginInstance(
+        "com.bytedance.bitsail.base.packages.LocalFSPluginExplorer");
+    Assert.assertNotNull(instance);
   }
 }

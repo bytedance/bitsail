@@ -38,10 +38,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class FileSystemPluginExplorer implements PluginExplorer {
-  private static final Logger LOG = LoggerFactory.getLogger(FileSystemPluginExplorer.class);
+public class LocalFSPluginExplorer implements PluginExplorer {
+  private static final Logger LOG = LoggerFactory.getLogger(LocalFSPluginExplorer.class);
 
-  private static final String DEFAULT_PLUGIN_EXPLORER_NAME = "filesystem";
+  private static final String DEFAULT_PLUGIN_EXPLORER_NAME = "localFS";
 
   private ExecutionEnviron execution;
   private PluginStore pluginStore;

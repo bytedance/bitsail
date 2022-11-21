@@ -57,7 +57,7 @@ public interface PluginExplorer extends Serializable, ComponentBuilder<Void> {
    */
   default Path getFrameworkEntryDir() {
     try {
-      String entry = Paths.get(FileSystemPluginExplorer.class
+      String entry = Paths.get(LocalFSPluginExplorer.class
           .getProtectionDomain()
           .getCodeSource()
           .getLocation()
