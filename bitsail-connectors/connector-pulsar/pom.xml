@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>bitsail-connectors</artifactId>
+        <groupId>com.bytedance.bitsail</groupId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>connector-pulsar</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <pulsar.version>2.8.0</pulsar.version>
+
+        <!-- Test Libraries -->
+        <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
+        <assertj-core.version>3.20.2</assertj-core.version>
+        <commons-lang3.version>3.11</commons-lang3.version>
+        <grpc.version>1.33.0</grpc.version>
+        <protoc.version>3.17.3</protoc.version>
+    </properties>
+
+    <dependencies>
+        <!-- basic bitsail dependencioes -->
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-base</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-common</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.streamnative.connectors</groupId>
+            <artifactId>pulsar-flink-connector_${scala.binary.version}</artifactId>
+            <version>${pulsar-flink-connector.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-connector-test</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-test-utils_${scala.binary.version}</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Protobuf & Protobuf Native Schema support. Add it to your pom if you need protobuf -->
+
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protoc.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Tests -->
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-core</artifactId>
+            <version>${flink.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
+            <version>${flink.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+
+        <!-- Pulsar bundles the latest bookkeeper & zookeeper, -->
+        <!-- we don't override the version here. -->
+        <dependency>
+            <groupId>org.apache.pulsar</groupId>
+            <artifactId>testmocks</artifactId>
+            <version>${pulsar.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.testng</groupId>
+                    <artifactId>testng</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.powermock</groupId>
+                    <artifactId>powermock-module-testng</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.pulsar</groupId>
+            <artifactId>pulsar-broker</artifactId>
+            <version>${pulsar.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Pulsar use a newer commons-lang3 in broker. -->
+        <!-- Bump the version only for testing. -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Add Pulsar 2.x as a dependency. -->
+        <!-- Move this to button for avoiding class conflicts with pulsar-broker. -->
+
+        <dependency>
+            <groupId>org.apache.pulsar</groupId>
+            <artifactId>pulsar-client-all</artifactId>
+            <version>${pulsar.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.pulsar</groupId>
+                    <artifactId>pulsar-package-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-annotations</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-component-format-json</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-connector-print</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-bom</artifactId>
+                <version>${grpc.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>

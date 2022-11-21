@@ -1,0 +1,48 @@
+{
+  "job": {
+    "common": {
+      "job_type": "STREAMING",
+      "job_plugin_lib_dir": "plugin",
+      "job_plugin_conf_dir": "plugin_conf",
+      "enable_dynamic_loader": true,
+      "instance_id": "1",
+      "internal_instance_id": "1",
+      "extra_properties": {
+        "update-mode": "append"
+      }
+    },
+    "reader": {
+      "pulsar": {
+        "source": {
+          "enableAutoAcknowledgeMessage": true
+        },
+        "client": {
+          "serviceUrl": "pulsar://lcoalhost:8080"
+        },
+        "admin": {
+          "adminUrl": "http://localhost:6650",
+          "topics": "TBW102",
+          "topicMode": "list"
+        },
+        "consumer": {
+          "startCursorMode": "latest",
+          "subscriptionType": "Exclusive",
+          "consumerName": "my_consumer",
+          "subscriptionName": "my_subscription"
+        }
+      },
+
+      "columns": [
+        {
+          "name": "id",
+          "type": "string"
+        }
+      ],
+      "format_type": "json",
+      "class": "com.bytedance.bitsail.connector.pulsar.source.PulsarSourceV1"
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink"
+    }
+  }
+}

@@ -41,6 +41,7 @@
         <module>connector-rocketmq</module>
         <module>connector-redis</module>
         <module>connector-clickhouse</module>
+        <module>connector-pulsar</module>
     </modules>
 
     <dependencies>
