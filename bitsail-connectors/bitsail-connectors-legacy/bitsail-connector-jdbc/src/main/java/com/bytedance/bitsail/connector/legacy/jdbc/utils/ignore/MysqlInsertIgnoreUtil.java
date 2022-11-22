@@ -20,7 +20,6 @@ package com.bytedance.bitsail.connector.legacy.jdbc.utils.ignore;
 import com.bytedance.bitsail.connector.legacy.jdbc.sink.JDBCOutputFormat;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MysqlInsertIgnoreUtil extends JDBCInsertIgnoreUtil {

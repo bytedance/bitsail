@@ -18,14 +18,9 @@
 package com.bytedance.bitsail.connector.legacy.jdbc.utils.ignore;
 
 import com.bytedance.bitsail.connector.legacy.jdbc.sink.JDBCOutputFormat;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public abstract class JDBCInsertIgnoreUtil implements Serializable {
   public String[] shardKeys;
@@ -37,7 +32,4 @@ public abstract class JDBCInsertIgnoreUtil implements Serializable {
   }
 
   public abstract String genInsertIgnoreTemplate(String table, List<String> columns);
-
-
-
 }
