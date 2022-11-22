@@ -2,7 +2,7 @@
 
 父目录: [druid-connector](./druid_zh.md)
 
-## Kudu写连接器示例配置
+## Druid写连接器示例配置
 
 假设当前有一个测试Druid集群，其master地址为"127.0.0.1:64086"，则可以通过如下配置写入test_druid_datasource资料源。
 
