@@ -20,7 +20,7 @@
 
 ### <span id="jump_api">`RowBuilder` 接口</span>
 
-`RowBuilder`顾名思义，即将原始数据转化按照某种格式转化成Row的的构建器。因此`RowBuilder`的转化方法需要至少两个必须的参数：
+`RowBuilder`顾名思义，即将原始数据转化按照某种格式转化成Row的构建器。因此`RowBuilder`的转化方法需要至少两个必须的参数：
  1. `value`: 原始数据，例如Writables, JSON字符串等
  2. `rowTypeInfo`: 转化row的具体格式，例如字段名称&字段类型 
 

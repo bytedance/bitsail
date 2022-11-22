@@ -7,7 +7,7 @@
 本模块包含多种可用于应用开发的基本功能组件。目前我们支持了五种基本的功能模块：
 
 - `bitsail-component-clients`:
-  - 支持创建各种client，例如`KafkaPruducer`。
+  - 支持创建各种client，例如`KafkaProducer`。
   - 细节可参考：[bitsail_component_clients](./clients/introduction_zh.md)
 
 
