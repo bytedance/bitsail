@@ -17,11 +17,12 @@
 
 package com.bytedance.bitsail.core.execution;
 
+import com.bytedance.bitsail.base.component.DefaultComponentBuilderLoader;
+import com.bytedance.bitsail.base.execution.BaseExecutionEnviron;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.Mode;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.core.command.CoreCommandArgs;
-import com.bytedance.bitsail.flink.core.execution.FlinkExecutionEnviron;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,10 +35,8 @@ public class ExecutionEnvironFactory {
                                                      Mode mode,
                                                      BitSailConfiguration globalConfiguration) {
     String engineName = coreCommandArgs.getEngineName();
-    if (StringUtils.equalsIgnoreCase(engineName, ExecutionEnvirons
-        .FLINK.name())) {
-      return new FlinkExecutionEnviron(globalConfiguration, mode);
-    }
-    throw new UnsupportedOperationException(String.format("Execution environ %s is not supported.", engineName));
+    DefaultComponentBuilderLoader<BaseExecutionEnviron> execution =
+        new DefaultComponentBuilderLoader<>(BaseExecutionEnviron.class);
+    return (ExecutionEnviron) execution.loadComponent(StringUtils.lowerCase(engineName), true);
   }
 }

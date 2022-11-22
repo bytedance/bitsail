@@ -54,7 +54,7 @@ public class DataReaderBuilderFactoryTest {
     ExecutionEnviron executionEnviron = Mockito.mock(FlinkExecutionEnviron.class);
 
     pluginFinder = PluginFinderFactory
-        .getPluginExplorer(dagBuilderConf.get(CommonOptions.PLUGIN_EXPLORER_NAME));
+        .getPluginFinder(dagBuilderConf.get(CommonOptions.PLUGIN_EXPLORER_NAME));
     pluginFinder.configure(executionEnviron, dagBuilderConf);
 
     legacyPluginConf = BitSailConfiguration.newDefault();

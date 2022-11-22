@@ -25,7 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class PluginFinderFactory {
 
-  public static PluginFinder getPluginExplorer(String explorer) {
+  public static PluginFinder getPluginFinder(String explorer) {
     DefaultComponentBuilderLoader<PluginFinder> loader =
         new DefaultComponentBuilderLoader<>(PluginFinder.class);
 

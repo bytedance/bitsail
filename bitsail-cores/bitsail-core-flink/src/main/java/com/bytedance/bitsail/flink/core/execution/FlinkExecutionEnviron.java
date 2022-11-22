@@ -63,7 +63,9 @@ import java.util.List;
 public class FlinkExecutionEnviron extends ExecutionEnviron {
   private static final Logger LOG = LoggerFactory.getLogger(FlinkExecutionEnviron.class);
 
-  private final FlinkJobMode flinkJobMode;
+  private static final String EXECUTION_NAME = "FLINK";
+
+  private FlinkJobMode flinkJobMode;
 
   /**
    * runtime plugins including JobProgress and Metrics
@@ -78,25 +80,18 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
   private StreamExecutionEnvironment executionEnvironment;
   private TableEnvironment tableEnvironment;
 
-  public FlinkExecutionEnviron(BitSailConfiguration globalConfiguration, Mode mode) {
-    super(globalConfiguration, mode);
-    switch (mode) {
-      case STREAMING:
-        this.flinkJobMode = FlinkJobMode.STREAMING;
-        break;
-      case BATCH:
-        this.flinkJobMode = FlinkJobMode.BATCH;
-        break;
-      default:
-        throw new UnsupportedOperationException(String.format("Execution environ %s is not supported.", mode));
-    }
+  @Override
+  public void start(Mode mode, BitSailConfiguration globalConfiguration) {
+    flinkJobMode = Mode.STREAMING.equals(mode) ?
+        FlinkJobMode.STREAMING :
+        FlinkJobMode.BATCH;
 
     this.executionEnvironment = flinkJobMode.getStreamExecutionEnvironment(commonConfiguration);
     this.tableEnvironment = flinkJobMode.getStreamTableEnvironment(executionEnvironment);
   }
 
   @Override
-  public void registerLibraries(List<URI> libraries) {
+  public void uploadPlugins(List<URI> libraries) {
     Configuration configuration = getFlinkConfiguration();
     List<URI> classpath = ConfigUtils
         .decodeListFromConfig(configuration, PipelineOptions.JARS, URI::create);
@@ -119,7 +114,7 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
 
   @Override
   public void configure(List<DataReaderDAGBuilder> readerBuilders,
-                        DataTransformDAGBuilder transformDAGBuilder,
+                        List<DataTransformDAGBuilder> transformDAGBuilders,
                         List<DataWriterDAGBuilder> writerBuilders) throws Exception {
 
     /* initialize and launch runtime plugins */
@@ -146,9 +141,9 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
 
   @Override
   public void run(List<DataReaderDAGBuilder> readerBuilders,
-                  DataTransformDAGBuilder transformDAGBuilder,
+                  List<DataTransformDAGBuilder> transformDAGBuilders,
                   List<DataWriterDAGBuilder> writerBuilders) throws Exception {
-    buildDAG(readerBuilders, transformDAGBuilder, writerBuilders);
+    buildDAG(readerBuilders, transformDAGBuilders, writerBuilders);
 
     try {
       String jobName = commonConfiguration.getUnNecessaryOption(CommonOptions.JOB_NAME,
@@ -172,7 +167,7 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
 
   @Override
   public void terminal(List<DataReaderDAGBuilder> readerBuilders,
-                       DataTransformDAGBuilder transformDAGBuilder,
+                       List<DataTransformDAGBuilder> transformDAGBuilders,
                        List<DataWriterDAGBuilder> writerBuilders) {
     LOG.info("Flink job start terminal.");
 
@@ -221,7 +216,7 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
    *  todo: we will support more flexible dag in future
    */
   private <T> void buildDAG(List<DataReaderDAGBuilder> readerBuilders,
-                            DataTransformDAGBuilder transformDAGBuilder,
+                            List<DataTransformDAGBuilder> transformDAGBuilders,
                             List<DataWriterDAGBuilder> writerBuilders) throws Exception {
     List<DataStream> sources = new ArrayList<>();
     for (int i = 0; i < readerBuilders.size(); ++i) {
@@ -301,5 +296,10 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
         ((GlobalCommittable) writer).abort();
       }
     }
+  }
+
+  @Override
+  public String getComponentName() {
+    return EXECUTION_NAME;
   }
 }

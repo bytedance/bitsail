@@ -59,8 +59,7 @@ public class UnificationJob<T> implements Serializable {
 
   private List<DataReaderDAGBuilder> dataReaderDAGBuilders = Lists.newArrayList();
   private List<DataWriterDAGBuilder> dataWriterDAGBuilders = Lists.newArrayList();
-  //todo
-  private DataTransformDAGBuilder dataTransformDAGBuilder;
+  private List<DataTransformDAGBuilder> dataTransformDAGBuilders = Lists.newArrayList();
 
   public UnificationJob(BitSailConfiguration globalConfiguration, CoreCommandArgs coreCommandArgs) {
     if (globalConfiguration.fieldExists(CommonOptions.INSTANCE_ID)) {
@@ -69,8 +68,15 @@ public class UnificationJob<T> implements Serializable {
     }
 
     mode = Mode.getJobRunMode(globalConfiguration.get(CommonOptions.JOB_TYPE));
-    execution = ExecutionEnvironFactory.getExecutionEnviron(coreCommandArgs, mode, globalConfiguration);
-    pluginFinder = PluginFinderFactory.getPluginExplorer(globalConfiguration.get(CommonOptions.PLUGIN_EXPLORER_NAME));
+
+    //execution init & start
+    execution = ExecutionEnvironFactory
+        .getExecutionEnviron(coreCommandArgs, mode, globalConfiguration);
+    execution.start(globalConfiguration, mode);
+
+    //plugin finder init & configure
+    pluginFinder = PluginFinderFactory
+        .getPluginFinder(globalConfiguration.get(CommonOptions.PLUGIN_EXPLORER_NAME));
     pluginFinder.configure(execution, execution.getCommonConfiguration());
 
     jobId = ConfigParser.getJobId(globalConfiguration);
@@ -79,7 +85,7 @@ public class UnificationJob<T> implements Serializable {
     user = "default_user_name";
 
     Runtime.getRuntime().addShutdownHook(new Thread(
-        () -> execution.terminal(dataReaderDAGBuilders, dataTransformDAGBuilder, dataWriterDAGBuilders),
+        () -> execution.terminal(dataReaderDAGBuilders, dataTransformDAGBuilders, dataWriterDAGBuilders),
         "Terminal"));
 
     this.globalConfiguration = globalConfiguration;
@@ -112,15 +118,13 @@ public class UnificationJob<T> implements Serializable {
             pluginFinder);
 
     execution.configure(dataReaderDAGBuilders,
-        dataTransformDAGBuilder,
+        dataTransformDAGBuilders,
         dataWriterDAGBuilders);
-    LOG.info("Final bitsail configuration: {}", execution.getGlobalConfiguration().desensitizedBeautify());
+    LOG.info("Final global configuration: {}", execution.getGlobalConfiguration().desensitizedBeautify());
   }
 
   /**
    * Run the validation process before submitting the job to the cluster.
-   *
-   * @return
    */
   private boolean validate() throws Exception {
     for (DataReaderDAGBuilder readerDAG : dataReaderDAGBuilders) {
@@ -143,7 +147,7 @@ public class UnificationJob<T> implements Serializable {
    */
   private void process() throws Exception {
     execution.run(dataReaderDAGBuilders,
-        dataTransformDAGBuilder,
+        dataTransformDAGBuilders,
         dataWriterDAGBuilders);
 
     //todo remove shutdown hook after finished, to avoid shutdown hook invoked in normal exit.
