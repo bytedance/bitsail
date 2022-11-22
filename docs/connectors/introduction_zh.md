@@ -34,3 +34,5 @@
 - [飞书表格连接器](./larksheet/larksheet_zh.md)
 
 - [Kudu连接器](./kudu/kudu_zh.md)
+
+- [Druid连接器](./druid/druid_zh.md)
