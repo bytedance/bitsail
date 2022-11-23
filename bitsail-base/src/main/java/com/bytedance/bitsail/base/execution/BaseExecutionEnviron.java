@@ -33,14 +33,14 @@ public interface BaseExecutionEnviron extends Component {
   /**
    * Construct for the execution.
    */
-  void start(Mode mode, BitSailConfiguration globalConfiguration);
+  void configure(Mode mode, BitSailConfiguration globalConfiguration);
 
   /**
    * Configure execution.
    */
-  void configure(List<DataReaderDAGBuilder> readerBuilders,
-                 List<DataTransformDAGBuilder> transformDAGBuilders,
-                 List<DataWriterDAGBuilder> writerBuilders) throws Exception;
+  void beforeExecution(List<DataReaderDAGBuilder> readerBuilders,
+                       List<DataTransformDAGBuilder> transformDAGBuilders,
+                       List<DataWriterDAGBuilder> writerBuilders) throws Exception;
 
 
   /**

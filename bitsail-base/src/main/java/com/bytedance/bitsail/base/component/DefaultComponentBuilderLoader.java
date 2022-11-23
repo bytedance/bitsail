@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.ServiceLoader;
 
@@ -37,7 +38,7 @@ import java.util.ServiceLoader;
 public class DefaultComponentBuilderLoader<T> implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultComponentBuilderLoader.class);
   private final Class<T> clazz;
-  public Map<String, T> components = Maps.newHashMap();
+  private final Map<String, T> components = Maps.newHashMap();
   private volatile boolean loaded;
 
   public DefaultComponentBuilderLoader(Class<T> clazz) {
@@ -49,10 +50,7 @@ public class DefaultComponentBuilderLoader<T> implements Serializable {
   }
 
   public T loadComponent(String componentName, boolean failOnMiss) {
-    if (!loaded) {
-      loadAllComponents();
-      loaded = true;
-    }
+    load();
     componentName = StringUtils.lowerCase(componentName);
     if (!components.containsKey(componentName)) {
       if (failOnMiss) {
@@ -62,6 +60,18 @@ public class DefaultComponentBuilderLoader<T> implements Serializable {
       return null;
     }
     return components.get(componentName);
+  }
+
+  public Collection<T> loadComponents() {
+    load();
+    return components.values();
+  }
+
+  private void load() {
+    if (!loaded) {
+      loadAllComponents();
+      loaded = true;
+    }
   }
 
   private void loadAllComponents() {

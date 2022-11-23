@@ -105,7 +105,7 @@ public class LocalFSPluginFinder implements PluginFinder {
       for (URL pluginUrl : pluginUrls) {
         uris.add(pluginUrl.toURI());
       }
-      execution.registerLibraries(uris);
+      execution.uploadPlugins(uris);
     } catch (Exception e) {
       throw BitSailException.asBitSailException(PluginErrorCode.PLUGIN_REGISTER_ERROR, e);
     }

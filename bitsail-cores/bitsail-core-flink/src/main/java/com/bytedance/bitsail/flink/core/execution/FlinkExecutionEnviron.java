@@ -81,7 +81,8 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
   private TableEnvironment tableEnvironment;
 
   @Override
-  public void start(Mode mode, BitSailConfiguration globalConfiguration) {
+  public void configure(Mode mode, BitSailConfiguration globalConfiguration) {
+    super.configure(mode, globalConfiguration);
     flinkJobMode = Mode.STREAMING.equals(mode) ?
         FlinkJobMode.STREAMING :
         FlinkJobMode.BATCH;
@@ -113,9 +114,9 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
   }
 
   @Override
-  public void configure(List<DataReaderDAGBuilder> readerBuilders,
-                        List<DataTransformDAGBuilder> transformDAGBuilders,
-                        List<DataWriterDAGBuilder> writerBuilders) throws Exception {
+  public void beforeExecution(List<DataReaderDAGBuilder> readerBuilders,
+                              List<DataTransformDAGBuilder> transformDAGBuilders,
+                              List<DataWriterDAGBuilder> writerBuilders) throws Exception {
 
     /* initialize and launch runtime plugins */
     BitSailRuntimePluginConfigurer runtimePluginConfigurer = new BitSailRuntimePluginConfigurer(flinkJobMode);

@@ -49,7 +49,7 @@ public class LocalFSPluginFinderTest {
         Objects.requireNonNull(Paths.get(LocalFSPluginFinder.class.getResource("/classloader/").toURI()).toString()));
 
     mockedEnv = Mockito.mock(ExecutionEnviron.class);
-    Mockito.doNothing().when(mockedEnv).registerLibraries(Mockito.anyList());
+    Mockito.doNothing().when(mockedEnv).uploadPlugins(Mockito.anyList());
   }
 
   @Test

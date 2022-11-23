@@ -21,7 +21,7 @@ import com.bytedance.bitsail.common.catalog.TableCatalogOptions;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.core.command.CoreCommandArgs;
-import com.bytedance.bitsail.core.job.UnificationJob;
+import com.bytedance.bitsail.core.program.UnifiedProgram;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +45,9 @@ public class EmbeddedFlinkCluster {
     LOG.info("Final Configuration: {}.\n", globalConfiguration.desensitizedBeautify());
     CoreCommandArgs coreCommandArgs = new CoreCommandArgs();
     coreCommandArgs.setEngineName("flink");
-    UnificationJob<T> job = new UnificationJob<>(globalConfiguration, coreCommandArgs);
-    job.start();
+    UnifiedProgram unifiedProgram = new UnifiedProgram();
+    unifiedProgram.configure(globalConfiguration, coreCommandArgs);
+    unifiedProgram.submit();
   }
 
   private static void overwriteConfiguration(BitSailConfiguration globalConfiguration) {

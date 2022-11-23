@@ -78,6 +78,10 @@ public interface CommonOptions {
       key(COMMON_PREFIX + "job_type")
           .defaultValue("batch");
 
+  ConfigOption<String> JOB_PROGRAM_TYPE =
+      key(COMMON_PREFIX + "job_program_type")
+          .defaultValue("unified");
+
   @Essential
   ConfigOption<Long> JOB_ID =
       key(COMMON_PREFIX + "job_id")

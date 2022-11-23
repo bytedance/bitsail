@@ -42,7 +42,8 @@ public abstract class ExecutionEnviron implements BaseExecutionEnviron {
    * @param globalConfiguration User defined configurations.
    * @param mode                Indicate the job type.
    */
-  public void start(BitSailConfiguration globalConfiguration, Mode mode) {
+  @Override
+  public void configure(Mode mode, BitSailConfiguration globalConfiguration) {
     this.globalConfiguration = globalConfiguration;
     this.commonConfiguration = ConfigParser.getSysCommonConf(globalConfiguration);
     this.readerConfigurations = ConfigParser.getInputConfList(globalConfiguration);
