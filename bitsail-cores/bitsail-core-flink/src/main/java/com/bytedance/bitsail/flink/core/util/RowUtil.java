@@ -19,9 +19,14 @@ package com.bytedance.bitsail.flink.core.util;
 
 import com.bytedance.bitsail.common.column.Column;
 
-import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
 import org.apache.flink.types.Row;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.security.Timestamp;
+import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -30,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RowUtil {
+  private static final Logger LOG = LoggerFactory.getLogger(RowUtil.class);
 
   public static long getRowBytesSize(Row row) {
     long totalBytes = 0L;
@@ -113,7 +119,14 @@ public class RowUtil {
       return ((Byte[]) field).length;
     }
 
-    if (clazz.isAssignableFrom(Date.class)) {
+    if (clazz == BigDecimal.class
+        || clazz == BigInteger.class) {
+      return 16L;
+    }
+
+    if (clazz.isAssignableFrom(Date.class)
+        || clazz.isAssignableFrom(Timestamp.class)
+        || clazz.isAssignableFrom(Time.class)) {
       return 12L;
     }
 
@@ -127,6 +140,7 @@ public class RowUtil {
       return 15L;
     }
 
-    return ObjectSizeCalculator.getObjectSize(field);
+    LOG.debug("Object value = {} can't supported in current.", field);
+    return 0L;
   }
 }
