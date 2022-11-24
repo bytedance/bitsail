@@ -17,6 +17,7 @@
 
 package com.bytedance.bitsail.base.execution;
 
+import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.configuration.ConfigParser;
 
@@ -35,6 +36,7 @@ public abstract class ExecutionEnviron implements BaseExecutionEnviron {
   protected List<BitSailConfiguration> readerConfigurations;
   protected List<BitSailConfiguration> writerConfigurations;
   protected Mode mode;
+  protected PluginFinder pluginFinder;
 
   /**
    * Constructor for execution environment.
@@ -43,8 +45,9 @@ public abstract class ExecutionEnviron implements BaseExecutionEnviron {
    * @param mode                Indicate the job type.
    */
   @Override
-  public void configure(Mode mode, BitSailConfiguration globalConfiguration) {
+  public void configure(Mode mode, PluginFinder pluginFinder, BitSailConfiguration globalConfiguration) {
     this.globalConfiguration = globalConfiguration;
+    this.pluginFinder = pluginFinder;
     this.commonConfiguration = ConfigParser.getSysCommonConf(globalConfiguration);
     this.readerConfigurations = ConfigParser.getInputConfList(globalConfiguration);
     this.writerConfigurations = ConfigParser.getOutputConfList(globalConfiguration);

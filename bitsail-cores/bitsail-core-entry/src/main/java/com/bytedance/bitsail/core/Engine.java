@@ -18,14 +18,16 @@
 package com.bytedance.bitsail.core;
 
 import com.bytedance.bitsail.base.execution.Mode;
+import com.bytedance.bitsail.base.packages.PluginFinder;
+import com.bytedance.bitsail.base.packages.PluginFinderFactory;
 import com.bytedance.bitsail.base.statistics.VMInfo;
 import com.bytedance.bitsail.client.api.command.CommandArgsParser;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.configuration.ConfigParser;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.core.command.CoreCommandArgs;
-import com.bytedance.bitsail.core.interceptor.ConfigInterceptorHelper;
-import com.bytedance.bitsail.core.program.Program;
+import com.bytedance.bitsail.core.api.command.CoreCommandArgs;
+import com.bytedance.bitsail.core.api.interceptor.ConfigInterceptorHelper;
+import com.bytedance.bitsail.core.api.program.Program;
 import com.bytedance.bitsail.core.program.ProgramFactory;
 import com.bytedance.bitsail.core.util.ExceptionTracker;
 
@@ -84,9 +86,13 @@ public class Engine {
   }
 
   private <T> void run() throws Exception {
-    Program entryProgram = ProgramFactory.createEntryProgram(configuration);
+    PluginFinder pluginFinder = PluginFinderFactory
+        .getPluginFinder(configuration.get(CommonOptions.PLUGIN_FINDER_NAME));
+    pluginFinder.configure(configuration);
+    Program entryProgram = ProgramFactory.createEntryProgram(pluginFinder, coreCommandArgs, configuration);
+
     LOG.info("Final program: {}.", entryProgram.getComponentName());
-    entryProgram.configure(configuration, coreCommandArgs);
+    entryProgram.configure(pluginFinder, configuration, coreCommandArgs);
 
     try {
       if (entryProgram.validate()) {

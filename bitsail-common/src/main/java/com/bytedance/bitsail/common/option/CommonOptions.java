@@ -58,6 +58,14 @@ public interface CommonOptions {
       key(COMMON_PREFIX + "job_plugin_root_path")
           .noDefaultValue(String.class);
 
+  ConfigOption<String> JOB_ENGINE_MAPPING_DIR_NAME =
+      key(COMMON_PREFIX + "job_engine_conf_dir")
+          .defaultValue("engines/mapping");
+
+  ConfigOption<String> JOB_ENGINE_DIR_NAME =
+      key(COMMON_PREFIX + "job_engine_lib_dir")
+          .defaultValue("engines");
+
   ConfigOption<Integer> GLOBAL_PARALLELISM_NUM =
       key(COMMON_PREFIX + "global_parallelism_num")
           .defaultValue(-1);
@@ -77,10 +85,6 @@ public interface CommonOptions {
   ConfigOption<String> JOB_TYPE =
       key(COMMON_PREFIX + "job_type")
           .defaultValue("batch");
-
-  ConfigOption<String> JOB_PROGRAM_TYPE =
-      key(COMMON_PREFIX + "job_program_type")
-          .defaultValue("unified");
 
   @Essential
   ConfigOption<Long> JOB_ID =

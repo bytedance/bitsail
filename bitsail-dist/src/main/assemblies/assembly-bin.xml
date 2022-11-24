@@ -65,6 +65,24 @@ under the License.
             </excludes>
             <outputFileNameMapping>${artifact.file.name}</outputFileNameMapping>
         </dependencySet>
+
+        <!--   engines     -->
+        <dependencySet>
+            <outputDirectory>libs/engines</outputDirectory>
+            <unpack>false</unpack>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <scope>provided</scope>
+            <includes>
+                <include>com.bytedance.bitsail:bitsail-core-*</include>
+            </includes>
+            <excludes>
+                <exclude>com.bytedance.bitsail:bitsail-core-api</exclude>
+                <exclude>com.bytedance.bitsail:bitsail-core-entry</exclude>
+                <exclude>com.bytedance.bitsail:bitsail-core-flink-base</exclude>
+            </excludes>
+            <outputFileNameMapping>${artifact.file.name}</outputFileNameMapping>
+        </dependencySet>
     </dependencySets>
 
     <fileSets>
@@ -117,15 +135,6 @@ under the License.
                     <fileSet>
                         <directory>src/main/resources</directory>
                         <useDefaultExcludes>true</useDefaultExcludes>
-                        <excludes>
-                            <exclude>**</exclude>
-                        </excludes>
-                        <filtered>true</filtered>
-                        <outputDirectory>libs/connectors/mapping/</outputDirectory>
-                    </fileSet>
-                    <fileSet>
-                        <directory>src/main/resources</directory>
-                        <useDefaultExcludes>true</useDefaultExcludes>
                         <includes>
                             <include>*.json</include>
                         </includes>
@@ -163,7 +172,28 @@ under the License.
                 </fileSets>
             </sources>
         </moduleSet>
+
+        <moduleSet>
+            <useAllReactorProjects>true</useAllReactorProjects>
+            <includes>
+                <include>com.bytedance.bitsail:bitsail-core-*-bridge</include>
+            </includes>
+            <sources>
+                <includeModuleDirectory>false</includeModuleDirectory>
+                <fileSets>
+                    <fileSet>
+                        <directory>src/main/resources</directory>
+                        <useDefaultExcludes>true</useDefaultExcludes>
+                        <includes>
+                            <include>*.json</include>
+                        </includes>
+                        <outputDirectory>libs/engines/mapping/</outputDirectory>
+                    </fileSet>
+                </fileSets>
+            </sources>
+        </moduleSet>
     </moduleSets>
+
 
     <files>
         <!--    core    -->

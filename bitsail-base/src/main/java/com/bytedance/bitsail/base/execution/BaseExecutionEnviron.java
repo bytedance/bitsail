@@ -22,18 +22,17 @@ package com.bytedance.bitsail.base.execution;
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
 import com.bytedance.bitsail.base.connector.transformer.DataTransformDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
-import com.bytedance.bitsail.base.extension.Component;
+import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
-import java.net.URI;
 import java.util.List;
 
-public interface BaseExecutionEnviron extends Component {
+public interface BaseExecutionEnviron {
 
   /**
    * Construct for the execution.
    */
-  void configure(Mode mode, BitSailConfiguration globalConfiguration);
+  void configure(Mode mode, PluginFinder pluginFinder, BitSailConfiguration globalConfiguration);
 
   /**
    * Configure execution.
@@ -57,12 +56,5 @@ public interface BaseExecutionEnviron extends Component {
   void terminal(List<DataReaderDAGBuilder> readerBuilders,
                 List<DataTransformDAGBuilder> transformDAGBuilders,
                 List<DataWriterDAGBuilder> writerBuilders);
-
-  /**
-   * Register plugins.
-   */
-  default void uploadPlugins(List<URI> pluginUrls) {
-
-  }
 
 }

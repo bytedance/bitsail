@@ -40,9 +40,15 @@ public class DefaultComponentBuilderLoader<T> implements Serializable {
   private final Class<T> clazz;
   private final Map<String, T> components = Maps.newHashMap();
   private volatile boolean loaded;
+  private final ClassLoader classLoader;
 
   public DefaultComponentBuilderLoader(Class<T> clazz) {
+    this(clazz, DefaultComponentBuilderLoader.class.getClassLoader());
+  }
+
+  public DefaultComponentBuilderLoader(Class<T> clazz, ClassLoader classLoader) {
     this.clazz = Preconditions.checkNotNull(clazz);
+    this.classLoader = classLoader;
   }
 
   public T loadComponent(String componentName) {
@@ -75,7 +81,7 @@ public class DefaultComponentBuilderLoader<T> implements Serializable {
   }
 
   private void loadAllComponents() {
-    ServiceLoader<T> loadedComponents = ServiceLoader.load(clazz);
+    ServiceLoader<T> loadedComponents = ServiceLoader.load(clazz, classLoader);
     for (T component : loadedComponents) {
       if (!(component instanceof Component)) {
         LOG.warn("Component {} not implement from interface component, skip load it.", component);

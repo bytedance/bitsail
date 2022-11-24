@@ -26,7 +26,6 @@ import com.bytedance.bitsail.common.option.CommonOptions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -47,15 +46,12 @@ public class LocalFSPluginFinderTest {
     jobConf.set(CommonOptions.STATIC_LIB_CONF_FILE, "static_lib.json");
     jobConf.set(CommonOptions.JOB_PLUGIN_ROOT_PATH,
         Objects.requireNonNull(Paths.get(LocalFSPluginFinder.class.getResource("/classloader/").toURI()).toString()));
-
-    mockedEnv = Mockito.mock(ExecutionEnviron.class);
-    Mockito.doNothing().when(mockedEnv).uploadPlugins(Mockito.anyList());
   }
 
   @Test
   public void testLoadPluginInstance() {
     LocalFSPluginFinder pluginFinder = new LocalFSPluginFinder();
-    pluginFinder.configure(mockedEnv, jobConf);
+    pluginFinder.configure(jobConf);
     Object instance = pluginFinder.findPluginInstance(
         "com.bytedance.bitsail.base.packages.LocalFSPluginFinder");
     Assert.assertNotNull(instance);

@@ -17,4 +17,4 @@
 # under the License.
 #
 
-com.bytedance.bitsail.core.program.impl.UnifiedProgram
+com.bytedance.bitsail.core.api.program.UnifiedProgram

@@ -20,15 +20,22 @@
 package com.bytedance.bitsail.core.program;
 
 import com.bytedance.bitsail.base.component.DefaultComponentBuilderLoader;
+import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.option.CommonOptions;
+import com.bytedance.bitsail.core.api.command.CoreCommandArgs;
+import com.bytedance.bitsail.core.api.program.Program;
 
 public class ProgramFactory {
 
-  public static Program createEntryProgram(BitSailConfiguration globalConfiguration) {
-    String program = globalConfiguration.get(CommonOptions.JOB_PROGRAM_TYPE);
-    DefaultComponentBuilderLoader<Program> loader = new DefaultComponentBuilderLoader<>(Program.class);
+  public static Program createEntryProgram(PluginFinder pluginFinder,
+                                           CoreCommandArgs commandArgs,
+                                           BitSailConfiguration globalConfiguration) {
+    String engineName = commandArgs.getEngineName();
+    pluginFinder.loadPlugin(engineName);
 
-    return loader.loadComponent(program, true);
+    DefaultComponentBuilderLoader<Program> loader =
+        new DefaultComponentBuilderLoader<>(Program.class, pluginFinder.getClassloader());
+
+    return loader.loadComponent(engineName, true);
   }
 }
