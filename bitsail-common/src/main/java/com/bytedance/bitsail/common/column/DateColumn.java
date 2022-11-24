@@ -28,6 +28,7 @@ import com.bytedance.bitsail.common.exception.CommonErrorCode;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -110,6 +111,18 @@ public class DateColumn extends Column {
           .toInstant().toEpochMilli());
     }
     return new Date((Long) this.getRawData());
+  }
+
+  @Override
+  public LocalDateTime asLocalDateTime() {
+    Object value = this.getRawData();
+    if (null == value || value instanceof LocalDateTime) {
+      return (LocalDateTime) value;
+    }
+    if (value instanceof LocalDate) {
+      return ((LocalDate) value).atStartOfDay();
+    }
+    return Instant.ofEpochMilli((Long) value).atZone(ZoneOffset.systemDefault()).toLocalDateTime();
   }
 
   @Override

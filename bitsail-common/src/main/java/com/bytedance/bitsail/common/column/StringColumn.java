@@ -29,6 +29,7 @@ import com.bytedance.bitsail.common.util.OverFlowUtil;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Deprecated
@@ -107,7 +108,18 @@ public class StringColumn extends Column {
     } catch (Exception e) {
       throw BitSailException.asBitSailException(
           CommonErrorCode.CONVERT_NOT_SUPPORT,
-          String.format("String[%s] can't convert to Date.", this.toString()));
+          String.format("String[%s] can't convert to Date.", this));
+    }
+  }
+
+  @Override
+  public LocalDateTime asLocalDateTime() {
+    try {
+      return ColumnCast.string2LocalDateTime(this);
+    } catch (Exception e) {
+      throw BitSailException.asBitSailException(
+          CommonErrorCode.CONVERT_NOT_SUPPORT,
+          String.format("String[%s] can't convert to LocalDateTime.", this));
     }
   }
 

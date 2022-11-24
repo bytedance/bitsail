@@ -24,6 +24,7 @@ import com.alibaba.fastjson.JSON;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -111,6 +112,12 @@ public class ListColumn<V extends Column> extends Column implements List<V> {
   public Date asDate() {
     throw BitSailException.asBitSailException(
         CommonErrorCode.CONVERT_NOT_SUPPORT, "List can't convert to Date .");
+  }
+
+  @Override
+  public LocalDateTime asLocalDateTime() {
+    throw BitSailException.asBitSailException(
+        CommonErrorCode.CONVERT_NOT_SUPPORT, "List can't convert to LocalDateTime .");
   }
 
   @Override

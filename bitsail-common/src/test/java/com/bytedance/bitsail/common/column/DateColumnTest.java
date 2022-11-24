@@ -115,6 +115,9 @@ public class DateColumnTest {
     Date date = dateColumn.asDate();
     String format = simpleDateFormat.format(date);
     Assert.assertEquals(format, "2022-01-01");
+
+    LocalDate actualDate = dateColumn.asLocalDateTime().toLocalDate();
+    Assert.assertEquals(localDate, actualDate);
   }
 
   @Test
@@ -127,5 +130,8 @@ public class DateColumnTest {
     Date date = dateColumn.asDate();
     String format = simpleDateFormat.format(date);
     Assert.assertEquals(format, "2022-01-01");
+
+    LocalDateTime actualDateTime = dateColumn.asLocalDateTime();
+    Assert.assertEquals(localDateTime, actualDateTime);
   }
 }

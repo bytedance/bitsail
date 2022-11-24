@@ -23,6 +23,7 @@ import com.bytedance.bitsail.common.option.CommonOptions;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -54,6 +55,9 @@ public class StringColumnTest {
         .toInstant()
         .atZone(ZoneId.of(timeZone)).toOffsetDateTime());
     assertEquals(dateStr, timeStr);
+
+    LocalDateTime localDateTime = strColumn.asLocalDateTime();
+    assertEquals(timeStr, formatter.format(localDateTime.atZone(ZoneId.of(timeZone))));
   }
 
   @Test
