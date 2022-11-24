@@ -17,36 +17,13 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.core.program;
+package com.bytedance.bitsail.core.program.builder;
 
-import com.bytedance.bitsail.base.extension.Component;
-import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.core.command.CoreCommandArgs;
+import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 
-import java.io.Serializable;
-
-public interface Program extends Serializable, Component {
-
-  /**
-   * Construct program.
-   */
-  void configure(BitSailConfiguration globalConfiguration,
-                 CoreCommandArgs coreCommandArgs) throws Exception;
-
-  /**
-   * Validate the parameters for the program.
-   */
-  default boolean validate() throws Exception {
-    return true;
+public class MockDataWriterDAGBuilder implements DataWriterDAGBuilder {
+  @Override
+  public String getWriterName() {
+    return MockDataWriterDAGBuilder.class.getSimpleName();
   }
-
-  /**
-   * Submit program.
-   */
-  void submit() throws Exception;
-
-  /**
-   * Create program dag builder factory
-   */
-  ProgramDAGBuilderFactory createProgramBuilderFactory();
 }

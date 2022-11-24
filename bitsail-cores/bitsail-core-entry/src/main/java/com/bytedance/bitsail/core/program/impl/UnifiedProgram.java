@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.core.program;
+package com.bytedance.bitsail.core.program.impl;
 
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
 import com.bytedance.bitsail.base.connector.transformer.DataTransformDAGBuilder;
@@ -31,8 +31,8 @@ import com.bytedance.bitsail.common.configuration.ConfigParser;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.core.command.CoreCommandArgs;
 import com.bytedance.bitsail.core.execution.ExecutionEnvironFactory;
-import com.bytedance.bitsail.core.reader.DataReaderBuilderFactory;
-import com.bytedance.bitsail.core.writer.DataWriterBuilderFactory;
+import com.bytedance.bitsail.core.program.Program;
+import com.bytedance.bitsail.core.program.ProgramDAGBuilderFactory;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -55,6 +55,8 @@ public class UnifiedProgram implements Program {
   private String user;
   private String jobName;
 
+  private ProgramDAGBuilderFactory programBuilderFactory;
+
   private List<DataReaderDAGBuilder> dataReaderDAGBuilders = Lists.newArrayList();
   private List<DataWriterDAGBuilder> dataWriterDAGBuilders = Lists.newArrayList();
   private List<DataTransformDAGBuilder> dataTransformDAGBuilders = Lists.newArrayList();
@@ -75,7 +77,7 @@ public class UnifiedProgram implements Program {
 
     //plugin finder init & configure
     pluginFinder = PluginFinderFactory
-        .getPluginFinder(globalConfiguration.get(CommonOptions.PLUGIN_EXPLORER_NAME));
+        .getPluginFinder(globalConfiguration.get(CommonOptions.PLUGIN_FINDER_NAME));
     pluginFinder.configure(execution, execution.getCommonConfiguration());
 
     jobId = ConfigParser.getJobId(globalConfiguration);
@@ -95,13 +97,14 @@ public class UnifiedProgram implements Program {
   }
 
   private void prepare() throws Exception {
-    dataReaderDAGBuilders = DataReaderBuilderFactory
-        .getDataReaderDAGBuilderList(mode,
+    programBuilderFactory = createProgramBuilderFactory();
+    dataReaderDAGBuilders = programBuilderFactory
+        .getDataReaderDAGBuilders(mode,
             readerConfigurations,
             pluginFinder);
 
-    dataWriterDAGBuilders = DataWriterBuilderFactory
-        .getDataWriterDAGBuilderList(mode,
+    dataWriterDAGBuilders = programBuilderFactory
+        .getDataWriterDAGBuilders(mode,
             writerConfigurations,
             pluginFinder);
 
@@ -117,6 +120,11 @@ public class UnifiedProgram implements Program {
         dataTransformDAGBuilders,
         dataWriterDAGBuilders);
     //todo remove shutdown hook after finished, to avoid shutdown hook invoked in normal exit.
+  }
+
+  @Override
+  public ProgramDAGBuilderFactory createProgramBuilderFactory() {
+    return new UnifiedProgramDAGBuilderFactory();
   }
 
   @Override

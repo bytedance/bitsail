@@ -21,7 +21,7 @@ import com.bytedance.bitsail.common.catalog.TableCatalogOptions;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.core.command.CoreCommandArgs;
-import com.bytedance.bitsail.core.program.UnifiedProgram;
+import com.bytedance.bitsail.core.program.impl.UnifiedProgram;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
