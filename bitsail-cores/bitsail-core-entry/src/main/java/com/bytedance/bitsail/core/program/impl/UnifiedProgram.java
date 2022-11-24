@@ -55,8 +55,6 @@ public class UnifiedProgram implements Program {
   private String user;
   private String jobName;
 
-  private ProgramDAGBuilderFactory programBuilderFactory;
-
   private List<DataReaderDAGBuilder> dataReaderDAGBuilders = Lists.newArrayList();
   private List<DataWriterDAGBuilder> dataWriterDAGBuilders = Lists.newArrayList();
   private List<DataTransformDAGBuilder> dataTransformDAGBuilders = Lists.newArrayList();
@@ -97,7 +95,8 @@ public class UnifiedProgram implements Program {
   }
 
   private void prepare() throws Exception {
-    programBuilderFactory = createProgramBuilderFactory();
+    ProgramDAGBuilderFactory programBuilderFactory = createProgramBuilderFactory();
+
     dataReaderDAGBuilders = programBuilderFactory
         .getDataReaderDAGBuilders(mode,
             readerConfigurations,
