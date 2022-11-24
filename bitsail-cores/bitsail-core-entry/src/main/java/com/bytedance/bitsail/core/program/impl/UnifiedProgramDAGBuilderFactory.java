@@ -64,9 +64,11 @@ public class UnifiedProgramDAGBuilderFactory implements ProgramDAGBuilderFactory
   }
 
   public <T> DataReaderDAGBuilder getDataReaderDAGBuilder(Mode mode,
-                                                          BitSailConfiguration globalConfiguration,
+                                                          BitSailConfiguration readerConfiguration,
                                                           PluginFinder pluginFinder) throws Exception {
-    T reader = constructReader(globalConfiguration, pluginFinder);
+    String readerClassName = readerConfiguration.get(ReaderOptions.READER_CLASS);
+    LOG.info("Reader class name is {}", readerClassName);
+    T reader = construct(readerClassName, pluginFinder);
     if (reader instanceof DataReaderDAGBuilder) {
       return (DataReaderDAGBuilder) reader;
     }
@@ -79,13 +81,6 @@ public class UnifiedProgramDAGBuilderFactory implements ProgramDAGBuilderFactory
 
     throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
         "Reader class is not supported ");
-  }
-
-  private static <T> T constructReader(BitSailConfiguration globalConfiguration,
-                                       PluginFinder pluginFinder) {
-    String readerClassName = globalConfiguration.get(ReaderOptions.READER_CLASS);
-    LOG.info("Reader class name is {}", readerClassName);
-    return pluginFinder.findPluginInstance(readerClassName);
   }
 
   @Override
@@ -109,7 +104,8 @@ public class UnifiedProgramDAGBuilderFactory implements ProgramDAGBuilderFactory
                                                           PluginFinder pluginFinder) throws Exception {
 
     String writerClassName = globalConfiguration.get(WriterOptions.WRITER_CLASS);
-    T writer = constructWriter(writerClassName, pluginFinder);
+    LOG.info("Writer class name is {}", writerClassName);
+    T writer = construct(writerClassName, pluginFinder);
     if (writer instanceof Sink) {
       return new FlinkWriterBuilder<>((Sink<?, ?, ?>) writer);
     }
@@ -123,9 +119,8 @@ public class UnifiedProgramDAGBuilderFactory implements ProgramDAGBuilderFactory
         String.format("Writer %s is not support.", writerClassName));
   }
 
-  private static <T> T constructWriter(String writerClassName,
-                                       PluginFinder pluginFinder) {
-    LOG.info("Writer class name is {}", writerClassName);
-    return pluginFinder.findPluginInstance(writerClassName);
+  private static <T> T construct(String clazz,
+                                 PluginFinder pluginFinder) {
+    return pluginFinder.findPluginInstance(clazz);
   }
 }
