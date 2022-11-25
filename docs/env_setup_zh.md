@@ -15,12 +15,7 @@
 在安装上述必需组件后，您可以在本地的IDE上直接运行已有的集成测试。
 
 ## 从源代码编译
-- Run the build script to package with flink embedded.
-- 运行此脚本在编译时将Flink嵌入到BitSail的包中。
-  `bash build.sh`
-  If you have your own flink package provided by the cluster, you can also package without flink.
-- 如果Flink已经在你们的集群中提供，则可以打包时只包含BitSail相关代码
-  `mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true`
+- 运行此脚本在编译时将Flink嵌入到BitSail的包中。`bash build.sh`。如果Flink已经在你们的集群中提供，则可以打包时只包含BitSail相关代码 `mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true`
 
 完成打包后，输出的文件在此目录下`bitsail-dist/target/`.
 

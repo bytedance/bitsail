@@ -51,12 +51,12 @@ Description：
 
 Metadata Parameters:
 
-| Parameter name | Required | Default | Description                                            | Example       |
-|----------------|----------|---------|--------------------------------------------------------|---------------|
-| user_name      | TRUE     | -       | job's submitter                                        | bitsail       |
-| job_id         | TRUE     | -       | job' unique id                                         | 12345         |
-| instance_id    | TRUE     | -       | job's instance id, maybe use in some scheduler system. | 12345         |
-| job_name       | TRUE     | -       | job's name                                             | bitstail_conf |
+| Parameter name | Required | Default | Description                                            | Example      |
+|----------------|----------|---------|--------------------------------------------------------|--------------|
+| user_name      | TRUE     | -       | job's submitter                                        | bitsail      |
+| job_id         | TRUE     | -       | job' unique id                                         | 12345        |
+| instance_id    | TRUE     | -       | job's instance id, maybe use in some scheduler system. | 12345        |
+| job_name       | TRUE     | -       | job's name                                             | bitsail_conf |
 
 Parameter parallelism：
 
@@ -96,7 +96,7 @@ Examples：
                     }
                 ],
                 "table_name":"your table name",
-                "db_name":"your dtabase name",
+                "db_name":"your database name",
                 "password":"your database connection password",
                 "user_name":"your database connection username",
                 "split_pk":"your table primary key",
