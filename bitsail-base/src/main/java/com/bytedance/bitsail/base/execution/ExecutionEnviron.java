@@ -17,29 +17,26 @@
 
 package com.bytedance.bitsail.base.execution;
 
-import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
-import com.bytedance.bitsail.base.connector.transformer.DataTransformDAGBuilder;
-import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
+import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.configuration.ConfigParser;
 
 import lombok.Getter;
 
-import java.io.Serializable;
-import java.net.URI;
 import java.util.List;
 
 /**
  * Created 2022/4/21
  */
 @Getter
-public abstract class ExecutionEnviron implements Serializable {
+public abstract class ExecutionEnviron implements BaseExecutionEnviron {
 
   protected BitSailConfiguration globalConfiguration;
   protected BitSailConfiguration commonConfiguration;
   protected List<BitSailConfiguration> readerConfigurations;
   protected List<BitSailConfiguration> writerConfigurations;
   protected Mode mode;
+  protected PluginFinder pluginFinder;
 
   /**
    * Constructor for execution environment.
@@ -47,8 +44,10 @@ public abstract class ExecutionEnviron implements Serializable {
    * @param globalConfiguration User defined configurations.
    * @param mode                Indicate the job type.
    */
-  public ExecutionEnviron(BitSailConfiguration globalConfiguration, Mode mode) {
+  @Override
+  public void configure(Mode mode, PluginFinder pluginFinder, BitSailConfiguration globalConfiguration) {
     this.globalConfiguration = globalConfiguration;
+    this.pluginFinder = pluginFinder;
     this.commonConfiguration = ConfigParser.getSysCommonConf(globalConfiguration);
     this.readerConfigurations = ConfigParser.getInputConfList(globalConfiguration);
     this.writerConfigurations = ConfigParser.getOutputConfList(globalConfiguration);
@@ -62,39 +61,5 @@ public abstract class ExecutionEnviron implements Serializable {
     this.commonConfiguration = ConfigParser.getCommonConf(commonConfiguration);
     this.readerConfigurations = ConfigParser.getInputConfList(globalConfiguration);
     this.writerConfigurations = ConfigParser.getOutputConfList(globalConfiguration);
-  }
-
-  /**
-   * Register execution jars in current execution environment.
-   *
-   * @param libraries A url list for jar to register.
-   */
-  public abstract void registerLibraries(List<URI> libraries);
-
-  /**
-   * Configure current execution environment, readers, transformer, and writers.
-   *
-   * @param readerBuilders      Initialized but not configured readers.
-   * @param transformDAGBuilder An initialized but not configured transformer.
-   * @param writerBuilders      Initialized but not configured writers.
-   */
-  public abstract void configure(List<DataReaderDAGBuilder> readerBuilders,
-                                 DataTransformDAGBuilder transformDAGBuilder,
-                                 List<DataWriterDAGBuilder> writerBuilders) throws Exception;
-
-  /**
-   * Run job in the current execution environment.
-   */
-  public abstract void run(List<DataReaderDAGBuilder> readerBuilders,
-                           DataTransformDAGBuilder transformDAGBuilder,
-                           List<DataWriterDAGBuilder> writerBuilders) throws Exception;
-
-  /**
-   * Invoke when job terminal by TERM signal
-   */
-  public void terminal(List<DataReaderDAGBuilder> readerBuilders,
-                       DataTransformDAGBuilder transformDAGBuilder,
-                       List<DataWriterDAGBuilder> writerBuilders) {
-
   }
 }

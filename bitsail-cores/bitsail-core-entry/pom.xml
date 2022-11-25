@@ -34,12 +34,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-core-flink</artifactId>
-            <version>${revision}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
             <version>${snappy.version}</version>
@@ -144,6 +138,12 @@
         <!-- Modules -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-core-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-base</artifactId>
             <exclusions>
                 <exclusion>
@@ -152,6 +152,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-common</artifactId>

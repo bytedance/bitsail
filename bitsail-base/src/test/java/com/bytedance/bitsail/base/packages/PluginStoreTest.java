@@ -49,7 +49,7 @@ public class PluginStoreTest {
   @Test
   public void testPluginNamesMapping() {
     Map<String, Plugin> pluginNamesMapping = pluginStore.getPluginNamesMapping();
-    assertEquals(3, pluginNamesMapping.size());
+    assertEquals(4, pluginNamesMapping.size());
   }
 
   @Test
@@ -66,6 +66,12 @@ public class PluginStoreTest {
 
     pluginLibs = pluginStore.getPluginUrls("com.bytedance.bitsail.batch.test2");
     assertEquals(3, pluginLibs.size());
+  }
+
+  @Test
+  public void testLoadPlugin() {
+    List<URL> pluginUrls = pluginStore.getPluginUrls("test3");
+    Assert.assertEquals(pluginUrls.size(), 1);
   }
 
   @Test
