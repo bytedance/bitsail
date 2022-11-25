@@ -31,16 +31,22 @@ import java.util.List;
 
 public interface ProgramDAGBuilderFactory extends Serializable {
 
+  /**
+   * Get data reader builders from configuration.
+   */
   List<DataReaderDAGBuilder> getDataReaderDAGBuilders(Mode mode,
                                                       List<BitSailConfiguration> readerConfigurations,
                                                       PluginFinder pluginFinder);
 
+  /**
+   * Get data writer builders from configuration.
+   */
   List<DataWriterDAGBuilder> getDataWriterDAGBuilders(Mode mode,
                                                       List<BitSailConfiguration> writerConfigurations,
                                                       PluginFinder pluginFinder);
 
   /**
-   * todo
+   * Get data transform builders from configuration.
    */
   default List<DataTransformDAGBuilder> getDataTransformDAGBuilders(Mode mode,
                                                                     List<BitSailConfiguration> writerConfigurations,

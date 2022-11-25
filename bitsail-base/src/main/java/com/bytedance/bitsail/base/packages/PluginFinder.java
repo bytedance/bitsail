@@ -33,7 +33,7 @@ import java.util.Set;
 public interface PluginFinder extends Serializable, ComponentBuilder<Void> {
 
   /**
-   * Configure plugin explorer.
+   * Configure plugin finder.
    */
   void configure(BitSailConfiguration commonConfiguration);
 

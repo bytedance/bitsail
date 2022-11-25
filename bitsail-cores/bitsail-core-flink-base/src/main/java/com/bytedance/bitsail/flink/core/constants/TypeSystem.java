@@ -19,10 +19,6 @@ package com.bytedance.bitsail.flink.core.constants;
 
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
-/**
- * @class: TypeSystem
- * @desc:
- **/
 public enum TypeSystem {
 
   /**

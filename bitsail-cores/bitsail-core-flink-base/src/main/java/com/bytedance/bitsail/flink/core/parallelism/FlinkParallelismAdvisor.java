@@ -203,11 +203,11 @@ public class FlinkParallelismAdvisor {
   }
 
   public List<Integer> getReaderParallelismList() {
-    return readerParallelismMap.values().stream().map(advice -> advice.getAdviceParallelism()).collect(Collectors.toList());
+    return readerParallelismMap.values().stream().map(ParallelismAdvice::getAdviceParallelism).collect(Collectors.toList());
   }
 
   public List<Integer> getWriterParallelismList() {
-    return writerParallelismMap.values().stream().map(advice -> advice.getAdviceParallelism()).collect(Collectors.toList());
+    return writerParallelismMap.values().stream().map(ParallelismAdvice::getAdviceParallelism).collect(Collectors.toList());
   }
 
   public <T> int getAdviceReaderParallelism(DataReaderDAGBuilder readerDAGBuilder) {

@@ -29,7 +29,7 @@ public interface ConfigInterceptor extends Component {
    * Check interceptor could accept the input global configuration
    */
   default boolean accept(BitSailConfiguration globalConfiguration) {
-    return true;
+    return false;
   }
 
   /**

@@ -41,7 +41,7 @@ import java.util.Set;
 public class LocalFSPluginFinder implements PluginFinder {
   private static final Logger LOG = LoggerFactory.getLogger(LocalFSPluginFinder.class);
 
-  private static final String DEFAULT_PLUGIN_EXPLORER_NAME = "localFS";
+  private static final String DEFAULT_PLUGIN_FINDER_NAME = "localFS";
   private List<PluginStore> pluginStores;
   private URLClassLoader pluginClassloader;
   private Set<URL> foundedPlugins;
@@ -168,6 +168,6 @@ public class LocalFSPluginFinder implements PluginFinder {
 
   @Override
   public String getComponentName() {
-    return DEFAULT_PLUGIN_EXPLORER_NAME;
+    return DEFAULT_PLUGIN_FINDER_NAME;
   }
 }
