@@ -1222,6 +1222,7 @@
                             </rules>
                             <excludes>
                                 <exclude>com/bytedance/bitsail/flink/core/**</exclude>
+                                <exclude>com/bytedance/bitsail/core/flink/**</exclude>
                                 <exclude>com/bytedance/bitsail/client/**</exclude>
                                 <exclude>com/bytedance/bitsail/connector/**</exclude>
                             </excludes>

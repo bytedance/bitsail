@@ -26,8 +26,8 @@ import com.bytedance.bitsail.common.column.MapColumn;
 import com.bytedance.bitsail.common.column.StringColumn;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
-import com.bytedance.bitsail.common.type.filemapping.HiveTypeInfoConverter;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
 import com.google.common.collect.ImmutableList;
@@ -54,10 +54,10 @@ public class FlinkRowConvertSerializerTest {
         new ColumnInfo("col1", "string"),
         new ColumnInfo("col2", "int"),
         new ColumnInfo("col3", "double"),
-        new ColumnInfo("col4", "array<string>"),
+        new ColumnInfo("col4", "list<string>"),
         new ColumnInfo("col5", "map<string,int>")
     );
-    TypeInfoConverter converter = new HiveTypeInfoConverter();
+    TypeInfoConverter converter = new BitSailTypeInfoConverter();
     BitSailConfiguration conf = BitSailConfiguration.newDefault();
     TypeInfo<?>[] typeInfos = new TypeInfo<?>[columns.size()];
     for (int index = 0; index < columns.size(); index++) {
