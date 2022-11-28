@@ -29,7 +29,7 @@ public class MysqlInsertIgnoreUtil extends JDBCInsertIgnoreUtil {
 
   @Override
   public String genInsertIgnoreTemplate(String table, List<String> columns) {
-    return String.format("INSERT INTO %s (%s)\n VALUES (%s) ",
+    return String.format("INSERT IGNORE INTO %s (%s) VALUES (%s)",
         table,
         columns.stream().map(this::getQuoteColumn).collect(Collectors.joining(",")),
         columns.stream().map(col -> "?").collect(Collectors.joining(","))

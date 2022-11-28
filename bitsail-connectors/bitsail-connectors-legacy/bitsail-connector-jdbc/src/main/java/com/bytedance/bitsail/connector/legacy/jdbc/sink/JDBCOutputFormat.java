@@ -37,6 +37,7 @@ import com.bytedance.bitsail.connector.legacy.jdbc.utils.JDBCConnHolder;
 import com.bytedance.bitsail.connector.legacy.jdbc.utils.JdbcQueryHelper;
 import com.bytedance.bitsail.connector.legacy.jdbc.utils.MysqlUtil;
 import com.bytedance.bitsail.connector.legacy.jdbc.utils.ignore.JDBCInsertIgnoreUtil;
+import com.bytedance.bitsail.connector.legacy.jdbc.utils.ignore.MysqlInsertIgnoreUtil;
 import com.bytedance.bitsail.connector.legacy.jdbc.utils.upsert.JDBCUpsertUtil;
 import com.bytedance.bitsail.connector.legacy.jdbc.utils.upsert.MysqlUpsertUtil;
 import com.bytedance.bitsail.flink.core.constants.TypeSystem;
@@ -161,6 +162,9 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
       upsertKeys = initUniqueIndexColumnsMap();
       jdbcUpsertUtil = initUpsertUtils();
     }
+    if (writeMode == WriteMode.ignore) {
+      jdbcInsertIgnoreUtil = initInsertIgnoreUtils();
+    }
 
     partitionName = outputSliceConfig.getUnNecessaryOption(JdbcWriterOptions.PARTITION_NAME, null);
     partitionValue = outputSliceConfig.getUnNecessaryOption(JdbcWriterOptions.PARTITION_VALUE, null);
@@ -279,6 +283,9 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
 
   protected JDBCUpsertUtil initUpsertUtils() {
     return new MysqlUpsertUtil(this, shardKeys, upsertKeys);
+  }
+  protected JDBCInsertIgnoreUtil initInsertIgnoreUtils() {
+    return new MysqlInsertIgnoreUtil(this, shardKeys);
   }
 
   protected List<String> addPartitionColumns(List<String> columnNames, String partitionName, JDBCOutputExtraPartitions extraPartitions) {
