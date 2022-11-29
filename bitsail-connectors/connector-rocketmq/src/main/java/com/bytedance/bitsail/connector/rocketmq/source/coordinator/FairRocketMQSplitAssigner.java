@@ -54,6 +54,6 @@ public class FairRocketMQSplitAssigner implements SplitAssigner<MessageQueue> {
 
   @Override
   public int assignToReader(String splitId, int totalParallelism) {
-    return splitId.hashCode() % totalParallelism;
+    return (splitId.hashCode() & Integer.MAX_VALUE) % totalParallelism;
   }
 }
