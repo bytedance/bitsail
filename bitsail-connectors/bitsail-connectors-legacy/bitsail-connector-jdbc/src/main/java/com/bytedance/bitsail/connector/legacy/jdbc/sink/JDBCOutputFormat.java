@@ -284,6 +284,7 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
   protected JDBCUpsertUtil initUpsertUtils() {
     return new MysqlUpsertUtil(this, shardKeys, upsertKeys);
   }
+
   protected JDBCInsertIgnoreUtil initInsertIgnoreUtils() {
     return new MysqlInsertIgnoreUtil(this, shardKeys);
   }
