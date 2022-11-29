@@ -18,17 +18,14 @@
 package com.bytedance.bitsail.connector.legacy.jdbc.ignore;
 
 import com.bytedance.bitsail.connector.legacy.jdbc.sink.JDBCOutputFormat;
-import com.bytedance.bitsail.connector.legacy.jdbc.sink.OracleOutputFormat;
 import com.bytedance.bitsail.connector.legacy.jdbc.utils.ignore.MysqlInsertIgnoreUtil;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+
 import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class MysqInsertIgnoreUtilTest extends TestCase {
 
@@ -40,7 +37,6 @@ public class MysqInsertIgnoreUtilTest extends TestCase {
     String expectedOverwriteQuery = "INSERT IGNORE INTO BITSAIL_TEST (`COL0`,`COL1`) VALUES (?,?)";
     Assert.assertEquals(expectedOverwriteQuery, upsertUtil.genInsertIgnoreTemplate("BITSAIL_TEST", provideColumns(2)));
   }
-
 
   private List<String> provideColumns(final int size) {
     final List<String> columns = new ArrayList<>();
