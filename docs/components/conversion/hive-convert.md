@@ -22,7 +22,7 @@ Common data types include:
  SMALLINT
  INT
  BIGINT
- Boolean
+ BOOLEAN
  FLOAT
  DOUBLE
  DECIMAL

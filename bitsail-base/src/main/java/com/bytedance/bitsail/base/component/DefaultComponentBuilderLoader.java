@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.ServiceLoader;
 
@@ -37,11 +38,17 @@ import java.util.ServiceLoader;
 public class DefaultComponentBuilderLoader<T> implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultComponentBuilderLoader.class);
   private final Class<T> clazz;
-  public Map<String, T> components = Maps.newHashMap();
+  private final Map<String, T> components = Maps.newHashMap();
   private volatile boolean loaded;
+  private final ClassLoader classLoader;
 
   public DefaultComponentBuilderLoader(Class<T> clazz) {
+    this(clazz, DefaultComponentBuilderLoader.class.getClassLoader());
+  }
+
+  public DefaultComponentBuilderLoader(Class<T> clazz, ClassLoader classLoader) {
     this.clazz = Preconditions.checkNotNull(clazz);
+    this.classLoader = classLoader;
   }
 
   public T loadComponent(String componentName) {
@@ -49,10 +56,7 @@ public class DefaultComponentBuilderLoader<T> implements Serializable {
   }
 
   public T loadComponent(String componentName, boolean failOnMiss) {
-    if (!loaded) {
-      loadAllComponents();
-      loaded = true;
-    }
+    load();
     componentName = StringUtils.lowerCase(componentName);
     if (!components.containsKey(componentName)) {
       if (failOnMiss) {
@@ -64,8 +68,20 @@ public class DefaultComponentBuilderLoader<T> implements Serializable {
     return components.get(componentName);
   }
 
+  public Collection<T> loadComponents() {
+    load();
+    return components.values();
+  }
+
+  private void load() {
+    if (!loaded) {
+      loadAllComponents();
+      loaded = true;
+    }
+  }
+
   private void loadAllComponents() {
-    ServiceLoader<T> loadedComponents = ServiceLoader.load(clazz);
+    ServiceLoader<T> loadedComponents = ServiceLoader.load(clazz, classLoader);
     for (T component : loadedComponents) {
       if (!(component instanceof Component)) {
         LOG.warn("Component {} not implement from interface component, skip load it.", component);

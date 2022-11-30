@@ -38,8 +38,8 @@ public class EngineTest {
         new String[] {
             "-xjob_conf_in_base64", Base64.getEncoder().encodeToString(jobConf.getBytes())
         });
-    assertTrue(engine.getBitSailConfiguration().fieldExists("key"));
-    assertFalse(engine.getBitSailConfiguration().fieldExists("key1"));
+    assertTrue(engine.getConfiguration().fieldExists("key"));
+    assertFalse(engine.getConfiguration().fieldExists("key1"));
   }
 
   @Test
@@ -49,7 +49,7 @@ public class EngineTest {
         new String[] {
             "-xjob_conf", confPath
         });
-    assertTrue(engine.getBitSailConfiguration().fieldExists("key"));
-    assertFalse(engine.getBitSailConfiguration().fieldExists("key1"));
+    assertTrue(engine.getConfiguration().fieldExists("key"));
+    assertFalse(engine.getConfiguration().fieldExists("key1"));
   }
 }

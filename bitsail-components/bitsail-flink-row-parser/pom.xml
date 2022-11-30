@@ -65,7 +65,7 @@
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-core-flink</artifactId>
+            <artifactId>bitsail-core-flink-base</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>

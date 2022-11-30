@@ -87,6 +87,12 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <td>✅</td>
   </tr>
   <tr>
+    <td>Druid</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
     <td>ElasticSearch</td>
     <td>-</td>
     <td> </td>

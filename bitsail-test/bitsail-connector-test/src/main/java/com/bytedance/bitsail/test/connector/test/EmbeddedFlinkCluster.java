@@ -17,11 +17,14 @@
 
 package com.bytedance.bitsail.test.connector.test;
 
+import com.bytedance.bitsail.base.packages.PluginFinder;
+import com.bytedance.bitsail.base.packages.PluginFinderFactory;
 import com.bytedance.bitsail.common.catalog.TableCatalogOptions;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.core.command.CoreCommandArgs;
-import com.bytedance.bitsail.core.job.UnificationJob;
+import com.bytedance.bitsail.core.api.command.CoreCommandArgs;
+import com.bytedance.bitsail.core.api.program.UnifiedProgram;
+import com.bytedance.bitsail.core.flink.bridge.program.FlinkProgram;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +48,11 @@ public class EmbeddedFlinkCluster {
     LOG.info("Final Configuration: {}.\n", globalConfiguration.desensitizedBeautify());
     CoreCommandArgs coreCommandArgs = new CoreCommandArgs();
     coreCommandArgs.setEngineName("flink");
-    UnificationJob<T> job = new UnificationJob<>(globalConfiguration, coreCommandArgs);
-    job.start();
+    UnifiedProgram unifiedProgram = new FlinkProgram();
+    PluginFinder pluginFinder = PluginFinderFactory.getPluginFinder(globalConfiguration.get(CommonOptions.PLUGIN_FINDER_NAME));
+    pluginFinder.configure(globalConfiguration);
+    unifiedProgram.configure(pluginFinder, globalConfiguration, coreCommandArgs);
+    unifiedProgram.submit();
   }
 
   private static void overwriteConfiguration(BitSailConfiguration globalConfiguration) {

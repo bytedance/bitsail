@@ -32,12 +32,16 @@ import java.util.Objects;
 public class JobConfUtils {
 
   public static BitSailConfiguration fromClasspath(String name) throws URISyntaxException, IOException {
+    return BitSailConfiguration.from(fromClasspathToString(name));
+  }
+
+  public static String fromClasspathToString(String name) throws URISyntaxException, IOException {
     ClassLoader classLoader = JobConfUtils.class.getClassLoader();
     URL resource = classLoader.getResource(name);
     if (Objects.isNull(resource)) {
       throw new IllegalArgumentException(String.format("Resources name: %s not found in classpath.",
-          name));
+              name));
     }
-    return BitSailConfiguration.from(new String(Files.readAllBytes(Paths.get(resource.toURI()))));
+    return new String(Files.readAllBytes(Paths.get(resource.toURI())));
   }
 }

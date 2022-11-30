@@ -25,11 +25,11 @@ import org.apache.commons.lang3.StringUtils;
 
 public class PluginFinderFactory {
 
-  public static PluginFinder getPluginExplorer(String explorer) {
+  public static PluginFinder getPluginFinder(String finder) {
     DefaultComponentBuilderLoader<PluginFinder> loader =
         new DefaultComponentBuilderLoader<>(PluginFinder.class);
 
-    return loader.loadComponent(StringUtils.lowerCase(explorer));
+    return loader.loadComponent(StringUtils.lowerCase(finder));
   }
 
 }

@@ -53,12 +53,12 @@
 
 元数据配置：任务的基本信息配置
 
-| 参数名称        | 是否必须 | 默认值 | 参数含义                          | 示例            |
-|-------------|------|-----|-------------------------------|---------------|
-| user_name   | TRUE | -   | 提交作业的用户                       | bitsail       |
-| job_id      | TRUE | -   | 提交作业的id                       | 12345         |
-| instance_id | TRUE | -   | 作业的实例id                       | 12345         |
-| job_name    | TRUE | -   | 作业的名称，用于指定作业在外部资源provider的名称； | bitstail_conf |
+| 参数名称        | 是否必须 | 默认值 | 参数含义                          | 示例           |
+|-------------|------|-----|-------------------------------|--------------|
+| user_name   | TRUE | -   | 提交作业的用户                       | bitsail      |
+| job_id      | TRUE | -   | 提交作业的id                       | 12345        |
+| instance_id | TRUE | -   | 作业的实例id                       | 12345        |
+| job_name    | TRUE | -   | 作业的名称，用于指定作业在外部资源provider的名称； | bitsail_conf |
 
 并行度配置：配置任务的读写并发信息
 
@@ -100,7 +100,7 @@
                     }
                 ],
                 "table_name":"your table name",
-                "db_name":"your dtabase name",
+                "db_name":"your database name",
                 "password":"your database connection password",
                 "user_name":"your database connection username",
                 "split_pk":"your table primary key",

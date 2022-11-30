@@ -40,6 +40,14 @@
             <scope>provided</scope>
         </dependency>
 
+        <!--   engine jars     -->
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-core-flink-bridge</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!--   client jars     -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
@@ -203,6 +211,13 @@
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>connector-doris</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-druid</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>

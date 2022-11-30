@@ -36,3 +36,5 @@
 
 - [Kudu connector](./kudu/kudu.md)
 
+- [Druid connector](./druid/druid.md)
+
