@@ -1,23 +1,23 @@
-# FTP/SFTP连接器使用示例
+# FTP/SFTP connector examples
 
-上级文档: [FTP/SFTP连接器](./ftp_zh.md)
+Parent document: [ftp-connector v1](./ftp-v1.md)
 
-下面展示了如何使用用户参数配置读取如下csv格式文件。
+The following configuration shows how to organize parameter configuration to read the following csv format file.
 
-- 示例csv数据
+- Example csv data
 
 ```csv
 c1,c2
 aaa,bbb
 ```
 
-- 用于读取上述格式文件的配置
+- Configuration file used to read the above file:
 
 ```json
 {
   "job": {
     "reader": {
-      "class": "com.bytedance.bitsail.connector.legacy.ftp.source.FtpInputFormat",
+      "class": "com.bytedance.bitsail.connector.ftp.source.FtpSource",
       "protocol":"FTP",
       "host": "localhost",
       "port": 21,

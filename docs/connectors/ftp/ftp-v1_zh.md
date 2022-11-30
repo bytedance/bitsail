@@ -14,7 +14,7 @@
 ```text
 <dependency>
    <groupId>com.bytedance.bitsail</groupId>
-   <artifactId>bitsail-connector-ftp</artifactId>
+   <artifactId>connector-ftp</artifactId>
    <version>${revision}</version>
 </dependency>
 ```
@@ -22,41 +22,41 @@
 ## 支持的数据类型
 
 - 支持的基础数据类型如下:
-  - 整数类型:
-    - tinyint
-    - smallint
-    - int
-    - bigint
-  - 浮点类型:
-    - float
-    - double
-    - decimal
-  - 时间类型:
-    - timestamp
-    - date
-  - 字符类型:
-    - string
-    - varchar
-    - char
-  - 布尔类型:
-    - boolean
-  - 二进制类型:
-    - binary
+    - 整数类型:
+        - tinyint
+        - smallint
+        - int
+        - bigint
+    - 浮点类型:
+        - float
+        - double
+        - decimal
+    - 时间类型:
+        - timestamp
+        - date
+    - 字符类型:
+        - string
+        - varchar
+        - char
+    - 布尔类型:
+        - boolean
+    - 二进制类型:
+        - binary
 - 支持的复杂数据类型包括:
-  - map
-  - array
+    - map
+    - array
 
 ## 主要参数
 
 以下参数使用在 `job.reader`配置中
 
-配置示例文档 [FTP/SFTP连接器示例](./ftp-example_zh.md)
+配置示例文档 [FTP/SFTP连接器示例 V1](./ftp-v1-example_zh.md)
 
 ### 必需参数
 
 | 参数名称     | 参数是否必需 | 参数枚举值      | 参数含义                                                                                       |
 | :----------- | :----------- | :-------------- | :--------------------------------------------------------------------------------------------- |
-| class        | 是           |                 | 读连接器类名，只能为 `com.bytedance.bitsail.connector.legacy.ftp.source.FtpInputFormat` |
+| class        | 是           |                 | 读连接器类名，只能为 `com.bytedance.bitsail.connector.ftp.source.FtpSource` |
 | path_list    | 是           |                 | 指定读入文件的路径。可指定多个路径，使用 `','`分隔                                           |
 | content_type | 是           | JSON/CSV | 指定读入文件的格式，详情参考[支持的文件格式](#jump_format)                                        |
 | columns      | 是           |                 | 数据字段名称及类型                                                                             |

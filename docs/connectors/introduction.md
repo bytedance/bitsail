@@ -8,7 +8,7 @@
 
 - [Elasticsearch connector](./elasticsearch/elasticsearch.md)
 
-- [FTP/SFTP connector](./ftp/ftp.md)
+- FTP/SFTP connector [V0](./ftp/ftp.md) [V1](./ftp/ftp-v1.md)
 
 - [Hadoop connector](./hadoop/hadoop.md)
 

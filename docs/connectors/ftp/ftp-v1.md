@@ -14,7 +14,7 @@ This connector can be used to read files from FTP/SFTP servers in batch scenario
 ```text
 <dependency>
    <groupId>com.bytedance.bitsail</groupId>
-   <artifactId>bitsail-connector-ftp</artifactId>
+   <artifactId>connector-ftp</artifactId>
    <version>${revision}</version>
 </dependency>
 ```
@@ -22,39 +22,39 @@ This connector can be used to read files from FTP/SFTP servers in batch scenario
 ## Supported data types
 
 - Basic data types supported:
-  - Integer type:
-    - tinyint
-    - smallint
-    - int
-    - bigint
-  - Float type:
-    - float
-    - double
-    - decimal
-  - Time type:
-    - timestamp
-    - date
-  - String type:
-    - string
-    - varchar
-    - char
-  - Bool type:
-    - boolean
-  - Binary type:
-    - binary
+    - Integer type:
+        - tinyint
+        - smallint
+        - int
+        - bigint
+    - Float type:
+        - float
+        - double
+        - decimal
+    - Time type:
+        - timestamp
+        - date
+    - String type:
+        - string
+        - varchar
+        - char
+    - Bool type:
+        - boolean
+    - Binary type:
+        - binary
 - Composited data types supported:
-  - map
-  - array
+    - map
+    - array
 
 ## Parameters
 
-The following mentioned parameters should be added to `job.reader` block when using, for example: [ftp-connector-example](./ftp-example.md)
+The following mentioned parameters should be added to `job.reader` block when using, for example: [ftp-connector-example](./ftp-v1-example.md)
 
 ### Necessary parameters
 
 | Param name   | Required | Optional value   | Description                                                                                   |
 | :----------- | :------- | :--------------- | :-------------------------------------------------------------------------------------------- |
-| class        | Yes      |                  | Class name of connector,`com.bytedance.bitsail.connector.legacy.ftp.source.FtpInputFormat`             |
+| class        | Yes      |                  | Class name of connector,`com.bytedance.bitsail.connector.ftp.source.FtpSource`             |
 | path_list    | Yes      |                  | Specifies the path of the read in file. Multiple paths can be specified, separated by `','` |
 | content_type | Yes      | JSON/CSV | Specify the format of the read in file. For details, refer to  [Supported formats](#jump_format)      |
 | columns      | Yes      |                  | Describing fields' names and types                                                            |
