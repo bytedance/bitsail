@@ -77,7 +77,7 @@ public class FtpSourceReader implements SourceReader<Row, FtpSourceSplit> {
 
   @Override
   public void start() {
-
+    this.ftpHandler.loginFtpServer();
     checkPathsExist();
     if (this.ftpConfig.getEnableSuccessFileCheck()) {
       this.successFilePath = this.ftpConfig.getSuccessFilePath();

@@ -20,7 +20,6 @@
 package com.bytedance.bitsail.base.packages;
 
 import com.bytedance.bitsail.base.component.ComponentBuilder;
-import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
@@ -28,15 +27,15 @@ import java.io.Serializable;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.Collections;
+import java.util.Set;
 
 public interface PluginFinder extends Serializable, ComponentBuilder<Void> {
 
   /**
-   * Configure plugin explorer.
+   * Configure plugin finder.
    */
-  void configure(ExecutionEnviron execution,
-                 BitSailConfiguration commonConfiguration);
+  void configure(BitSailConfiguration commonConfiguration);
 
   /**
    * find plugin instance from plugin finder.
@@ -44,11 +43,19 @@ public interface PluginFinder extends Serializable, ComponentBuilder<Void> {
   <T> T findPluginInstance(String clazz, Object... parameters);
 
   /**
-   * upload plugin to execution.
+   * Load plugin jar to the plugin finder.
    */
-  default void uploadPlugins(ExecutionEnviron execution,
-                             List<URL> pluginUrls) {
+  void loadPlugin(String plugin);
 
+  /**
+   * Get all founded plugins
+   */
+  default Set<URL> getFoundedPlugins() {
+    return Collections.emptySet();
+  }
+
+  default ClassLoader getClassloader() {
+    return Thread.currentThread().getContextClassLoader();
   }
 
   /**

@@ -91,8 +91,11 @@ public class CsvRowDeserializerTest {
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
     jobConf.set(FtpReaderOptions.COLUMNS, getColumnInfo("c1", "date", "c2", "date"));
     CsvRowDeserializer parser = new CsvRowDeserializer(jobConf);
-    Row row = parser.convert("2022-01-01,2022-01-01 23:23:23");
-    Assert.assertEquals(((Date) row.getField(0)).getTime(), 1638288000000L);
-    Assert.assertEquals(((Date) row.getField(1)).getTime(), 1641050603000L);
+    Row row1 = parser.convert("2022-01-01,2022-01-02 23:23:23");
+    Assert.assertEquals(((Date) row1.getField(0)).getTime(), 1640966400000L);
+    Assert.assertEquals(((Date) row1.getField(1)).getTime(), 1641137003000L);
+    Row row2 = parser.convert("20220101,20220102232323");
+    Assert.assertEquals(((Date) row2.getField(0)).getTime(), 1640966400000L);
+    Assert.assertEquals(((Date) row2.getField(1)).getTime(), 1641137003000L);
   }
 }

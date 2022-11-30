@@ -31,7 +31,9 @@
     </properties>
 
     <modules>
-        <module>bitsail-core-flink</module>
+        <module>bitsail-core-api</module>
         <module>bitsail-core-entry</module>
+        <module>bitsail-core-flink-base</module>
+        <module>bitsail-core-flink-bridge</module>
     </modules>
 </project>
