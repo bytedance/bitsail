@@ -63,5 +63,9 @@ public interface WriteModeProxy extends Serializable {
      * Upsert records.
      */
     overwrite,
+    /**
+     * insert ignore records.
+     */
+    ignore,
   }
 }

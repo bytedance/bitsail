@@ -36,6 +36,8 @@ import com.bytedance.bitsail.connector.legacy.jdbc.options.JdbcWriterOptions;
 import com.bytedance.bitsail.connector.legacy.jdbc.utils.JDBCConnHolder;
 import com.bytedance.bitsail.connector.legacy.jdbc.utils.JdbcQueryHelper;
 import com.bytedance.bitsail.connector.legacy.jdbc.utils.MysqlUtil;
+import com.bytedance.bitsail.connector.legacy.jdbc.utils.ignore.JDBCInsertIgnoreUtil;
+import com.bytedance.bitsail.connector.legacy.jdbc.utils.ignore.MysqlInsertIgnoreUtil;
 import com.bytedance.bitsail.connector.legacy.jdbc.utils.upsert.JDBCUpsertUtil;
 import com.bytedance.bitsail.connector.legacy.jdbc.utils.upsert.MysqlUpsertUtil;
 import com.bytedance.bitsail.flink.core.constants.TypeSystem;
@@ -96,6 +98,7 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
   protected String[] shardKeys;
   protected Map<String, List<String>> upsertKeys;
   protected JDBCUpsertUtil jdbcUpsertUtil;
+  protected JDBCInsertIgnoreUtil jdbcInsertIgnoreUtil;
   /**
    * Writer batch size
    */
@@ -158,6 +161,9 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
     if (writeMode == WriteMode.overwrite) {
       upsertKeys = initUniqueIndexColumnsMap();
       jdbcUpsertUtil = initUpsertUtils();
+    }
+    if (writeMode == WriteMode.ignore) {
+      jdbcInsertIgnoreUtil = initInsertIgnoreUtils();
     }
 
     partitionName = outputSliceConfig.getUnNecessaryOption(JdbcWriterOptions.PARTITION_NAME, null);
@@ -234,6 +240,10 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
       case overwrite:
         insertQuery = genUpsertTemplate(table, columnNames);
         break;
+      case ignore:
+        columnNames = addPartitionColumns(columnNames, partitionName, extraPartitions);
+        insertQuery = genInsertIgnoreTemplate(table, columnNames);
+        break;
       default:
         throw BitSailException.asBitSailException(JDBCPluginErrorCode.INTERNAL_ERROR, "Unsupported write mode: " + writeMode);
 
@@ -260,12 +270,23 @@ public class JDBCOutputFormat extends OutputFormatPlugin<Row> implements ResultT
     return jdbcUpsertUtil.genUpsertTemplate(table, columnNames, "");
   }
 
+  /**
+   * Generate the update template for the insert ignore action.
+   */
+  protected String genInsertIgnoreTemplate(String table, List<String> columnNames) {
+    return jdbcInsertIgnoreUtil.genInsertIgnoreTemplate(table, columnNames);
+  }
+
   protected Map<String, List<String>> initUniqueIndexColumnsMap() throws IOException {
     return null;
   }
 
   protected JDBCUpsertUtil initUpsertUtils() {
     return new MysqlUpsertUtil(this, shardKeys, upsertKeys);
+  }
+
+  protected JDBCInsertIgnoreUtil initInsertIgnoreUtils() {
+    return new MysqlInsertIgnoreUtil(this, shardKeys);
   }
 
   protected List<String> addPartitionColumns(List<String> columnNames, String partitionName, JDBCOutputExtraPartitions extraPartitions) {

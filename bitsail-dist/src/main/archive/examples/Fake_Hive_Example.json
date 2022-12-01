@@ -3,15 +3,15 @@
     "common": {
       "job_id": 312,
       "instance_id": 3124,
-      "job_name": "BitSail_fake_to_print_test",
+      "job_name": "BitSail_fake_to_hive_test",
       "user_name": "test"
     },
     "writer": {
       "class": "com.bytedance.bitsail.connector.legacy.hive.sink.HiveOutputFormat",
       "db_name": "<test_db>",
       "table_name": "<test_table>",
-      "partition": "date=20180101",
-      "metastore_properties": "{\"hive.metastore.uris\":\"<Your-Hive-Metastore-Address>\"}",
+      "partition": "date=20221101",
+      "metastore_properties": "{\"hive.metastore.uris\":\"thrift://localhost:9083\"}",
       "columns": [
         {
           "name": "id",

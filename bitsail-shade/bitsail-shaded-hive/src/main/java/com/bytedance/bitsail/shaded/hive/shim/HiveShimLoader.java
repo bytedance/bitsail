@@ -39,6 +39,8 @@ public class HiveShimLoader {
     HiveShimV200 hiveShimV200 = new HiveShimV200();
     HiveShimV210 hiveShimV210 = new HiveShimV210();
     HiveShimV211 hiveShimV211 = new HiveShimV211();
+    HiveShimV230 hiveShimV230 = new HiveShimV230();
+    HiveShimV239 hiveShimV239 = new HiveShimV239();
     HiveShimV310 hiveShimV310 = new HiveShimV310();
     HiveShimV312 hiveShimV312 = new HiveShimV312();
     SHIMS.put(hiveShimV120.getVersion(), hiveShimV120);
@@ -47,6 +49,8 @@ public class HiveShimLoader {
     SHIMS.put(hiveShimV200.getVersion(), hiveShimV200);
     SHIMS.put(hiveShimV210.getVersion(), hiveShimV210);
     SHIMS.put(hiveShimV211.getVersion(), hiveShimV211);
+    SHIMS.put(hiveShimV230.getVersion(), hiveShimV230);
+    SHIMS.put(hiveShimV239.getVersion(), hiveShimV239);
     SHIMS.put(hiveShimV310.getVersion(), hiveShimV310);
     SHIMS.put(hiveShimV312.getVersion(), hiveShimV312);
   }
