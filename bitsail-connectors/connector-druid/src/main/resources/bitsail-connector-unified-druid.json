@@ -1,9 +1,0 @@
-{
-  "name": "bitsail-connector-unified-druid",
-  "classes": [
-    "com.bytedance.bitsail.connector.druid.sink.DruidSink"
-  ],
-  "libs": [
-    "bitsail-connector-druid-${version}.jar"
-  ]
-}

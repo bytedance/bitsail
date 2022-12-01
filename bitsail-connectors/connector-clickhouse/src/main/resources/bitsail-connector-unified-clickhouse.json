@@ -1,9 +1,0 @@
-{
-  "name": "bitsail-connector-unified-clickhouse",
-  "classes": [
-    "com.bytedance.bitsail.connector.clickhouse.source.ClickhouseSource"
-  ],
-  "libs": [
-    "connector-clickhouse-${version}.jar"
-  ]
-}
