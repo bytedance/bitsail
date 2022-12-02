@@ -1,8 +1,9 @@
 # Fake连接器
 
-Parent document: [fake-example_zh.md](fake-example_zh.md)
+上级文档: [fake-example_zh.md](fake-example_zh.md)
 
-The following shows how to generate random numbers by faking data sources
+如下展示了如何通过fake数据源生成随机数
+
 ```json
 
 {

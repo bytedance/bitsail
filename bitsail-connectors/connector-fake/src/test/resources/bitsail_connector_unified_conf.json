@@ -32,7 +32,7 @@
           "type": "map<string,string>"
         },
         {
-          "name": "localdatetime_value",
+          "name": "local_datetime_value",
           "type": "timestamp"
         },
         {

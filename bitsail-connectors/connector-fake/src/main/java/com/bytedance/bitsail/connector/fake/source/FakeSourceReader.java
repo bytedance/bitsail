@@ -44,13 +44,13 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
     this.totalCount = readerConfiguration.get(FakeReaderOptions.TOTAL_COUNT);
     this.fakeGenerateRate = RateLimiter.create(readerConfiguration.get(FakeReaderOptions.RATE));
     this.counter = new AtomicLong();
-    this.fakeRowGenerator = new FakeRowGenerator(readerConfiguration, context.getIndexOfSubtask());
+    this.fakeRowGenerator = new FakeRowGenerator(readerConfiguration, context.getIndexOfSubtask(), rowTypeInfo.getTypeInfos());
   }
 
   @Override
   public void pollNext(SourcePipeline<Row> pipeline) throws Exception {
     fakeGenerateRate.acquire();
-    pipeline.output(fakeRowGenerator.fakeOneRecord(rowTypeInfo.getTypeInfos()));
+    pipeline.output(fakeRowGenerator.fakeOneRecord());
   }
 
   @Override

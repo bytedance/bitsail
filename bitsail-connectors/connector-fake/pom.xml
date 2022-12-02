@@ -39,6 +39,10 @@
             <artifactId>datafaker</artifactId>
             <version>1.6.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>cn.ipokerface</groupId>
@@ -58,6 +62,10 @@
             <artifactId>bitsail-connector-test</artifactId>
             <scope>test</scope>
             <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-common</artifactId>
         </dependency>
     </dependencies>
 
