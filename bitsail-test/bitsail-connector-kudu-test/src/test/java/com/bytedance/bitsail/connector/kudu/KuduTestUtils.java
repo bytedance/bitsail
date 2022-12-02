@@ -86,7 +86,6 @@ public class KuduTestUtils {
    */
   @SuppressWarnings("checkstyle:MagicNumber")
   public static void insertRandomData(KuduClient client, String tableName, int totalCount) throws KuduException {
-    FakeRowGenerator fakeRowGenerator = new FakeRowGenerator(BitSailConfiguration.newDefault(), 1);
     TypeInfo<?>[] typeInfos = {
         TypeInfos.BOOLEAN_TYPE_INFO,
         TypeInfos.INT_TYPE_INFO,
@@ -95,13 +94,14 @@ public class KuduTestUtils {
         TypeInfos.STRING_TYPE_INFO,
         TypeInfos.STRING_TYPE_INFO      // getBytes()
     };
+    FakeRowGenerator fakeRowGenerator = new FakeRowGenerator(BitSailConfiguration.newDefault(),1, typeInfos);
 
     KuduTable kuduTable = client.openTable(tableName);
     KuduSession session = client.newSession();
     for (int i = 0; i < totalCount; ++i) {
       Insert insert = kuduTable.newInsert();
       PartialRow partialRow = insert.getRow();
-      Row randomRow = fakeRowGenerator.fakeOneRecord(typeInfos);
+      Row randomRow = fakeRowGenerator.fakeOneRecord();
 
       partialRow.addLong("key", i);
       partialRow.addBoolean("field_boolean", randomRow.getBoolean(0));

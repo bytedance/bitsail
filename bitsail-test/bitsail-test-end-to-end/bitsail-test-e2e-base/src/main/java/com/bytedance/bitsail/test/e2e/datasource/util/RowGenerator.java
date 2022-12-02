@@ -61,10 +61,10 @@ public class RowGenerator {
 
   public void init(@NonNull BitSailConfiguration conf) {
     conf.setIfAbsent(FakeReaderOptions.NULL_PERCENTAGE, 0);
-    this.fakeRowGenerator = new FakeRowGenerator(conf, 0);
+    this.fakeRowGenerator = new FakeRowGenerator(conf, 0, typeInfos);
   }
 
   public Row next() {
-    return fakeRowGenerator.fakeOneRecord(typeInfos);
+    return fakeRowGenerator.fakeOneRecord();
   }
 }
