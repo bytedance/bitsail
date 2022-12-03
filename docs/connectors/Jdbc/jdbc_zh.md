@@ -264,6 +264,7 @@ SQL 同步配置参数
 * 支持多种写入模式：清除式写入模式和覆盖式写入模式
   * 清除式写入: 需要有时间分区字段，写入时，若时间分区已存在，清除已有时间分区数据，再进行写入
   * 覆盖式写入: 不需要时间分区字段，写入时，不清除数据，按照唯一键upsert，用新的数据覆盖旧数据。当写入出现duplicate key的时候，会进行on duplicate key update操作，来更新字段。另外注意分库分表不支持更新分片建，需要配置job.writer.shard_key参数，value为分片建，多个分片建以逗号分隔
+  * 忽略式写入: 不需要时间分区字段，写入时，若数据行已存在，如果则忽略；目前只支持mysql
 
 ### 主要参数
 
@@ -294,6 +295,7 @@ SQL 同步配置参数
 |------------|--------|--------|--------|------------|--------------------------------------------------------------------------------------------------------------|
 | write_mode | insert | 否      | string | insert    | Insert 写入模式。为了保证重复执行结果的一致性。写入前会根据分区列清除数据。最终生成的写入语句类似INSERT INTO xx (xx) VALUES (xx)                          |
 | write_mode |        |        |        | overwrite  | Overwrite 写入模式。写入前不会清除数据。最终生成的写入语句类似 INSERT INTO xx (xx) VALUES (xx) ON DUPLICATE KEY UPDATE (xx) VALUES(xx) |
+| write_mode |        |        |        | ignore     | ignore 写入模式。如果写入时遇到重复数据，会提示warning，并不影响程序执行。最终生成的写入语句类似 INSERT IGNORE  INTO xx (xx) VALUES (xx)                                     |
 
 Insert 模式下会根据 partition 信息进行数据删除，下面的参数针对 insert 模式：
 
