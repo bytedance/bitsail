@@ -17,18 +17,25 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.connector.ftp.source.reader.deserializer;
+package com.bytedance.bitsail.component.format.json.option;
 
-import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.option.ConfigOption;
+import com.bytedance.bitsail.common.option.ReaderOptions;
 
-import java.io.IOException;
+import static com.bytedance.bitsail.common.option.ConfigOptions.key;
+import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
 
-public interface ITextRowDeserializer {
-  /**
-   * covert String to {@link Row}
-   *
-   * @param line
-   * @throws IOException convert error
-   */
-  Row convert(String line) throws IOException;
+/**
+ * Ftp Options
+ */
+public interface JsonReaderOptions extends ReaderOptions.BaseReaderOptions {
+
+  ConfigOption<Boolean> CONVERT_ERROR_COLUMN_AS_NULL =
+      key(READER_PREFIX + "convert_error_column_as_null")
+          .defaultValue(false);
+
+  ConfigOption<Boolean> CASE_INSENSITIVE =
+      key(READER_PREFIX + "case_insensitive")
+          .defaultValue(false);
+
 }

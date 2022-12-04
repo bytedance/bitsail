@@ -15,19 +15,29 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.ftp.source.reader.deserializer;
+package com.bytedance.bitsail.connector.ftp.source.reader;
 
+import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
+import com.bytedance.bitsail.base.format.DeserializationSchema;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.component.format.csv.CsvDeserializationSchema;
+import com.bytedance.bitsail.component.format.json.JsonDeserializationSchema;
 import com.bytedance.bitsail.connector.ftp.core.config.FtpConfig;
 
-public class TextRowDeserializerFactory {
-  public static ITextRowDeserializer createTextRowDeserializer(BitSailConfiguration jobConf, FtpConfig ftpConfig) {
-    ITextRowDeserializer textRowDeserializer;
+public class DeserializationSchemaFactory {
+  public static DeserializationSchema createDeserializationSchema(BitSailConfiguration jobConf, FtpConfig ftpConfig, SourceReader.Context context) {
+    DeserializationSchema deserializationSchema;
     if (ftpConfig.getContentType() == FtpConfig.ContentType.CSV) {
-      textRowDeserializer = new CsvRowDeserializer(jobConf);
+      deserializationSchema = new CsvDeserializationSchema(
+          jobConf,
+          context.getTypeInfos(),
+          context.getFieldNames());;
     } else {
-      textRowDeserializer = new JsonRowDeserializer(jobConf);
+      deserializationSchema = new JsonDeserializationSchema(
+          jobConf,
+          context.getTypeInfos(),
+          context.getFieldNames());
     }
-    return textRowDeserializer;
+    return deserializationSchema;
   }
 }

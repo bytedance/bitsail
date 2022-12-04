@@ -44,6 +44,16 @@
             <version>0.1.54</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-component-format-json</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-component-format-csv</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.mockftpserver</groupId>
@@ -65,5 +75,6 @@
             <version>${revision}</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 </project>

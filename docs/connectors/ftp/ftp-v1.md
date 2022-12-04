@@ -90,10 +90,9 @@ It supports parsing text files in json format. Each line is required to be a sta
 The following parameters are supported to adjust the json parsing stype:
 
 | Parameter name                              | Default value | Description                                                                                                                               |
-| ------------------------------------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `job.common.case_insensitive`             | true          | Whether to be sensitive to the case of the key in the json field                                                                          |
-| `job.common.json_serializer_features`     |               | Specify the mode when 'FastJsonUtil' is parsed. The format is `','` separated string, for example `"QuoteFieldNames,UseSingleQuotes"` |
-| `job.common.convert_error_column_as_null` | false         | Whether to set the field with parsing error to null                                                                                       |
+| ------------------------------------------- |---------------| ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `job.reader.case_insensitive`             | false         | Whether to be sensitive to the case of the key in the json field                                                                          |
+| `job.reader.convert_error_column_as_null` | false         | Whether to set the field with parsing error to null                                                                                       |
 
 ### <span id="jump_csv">CSV</span>
 
@@ -103,7 +102,7 @@ The following parameters are supported to adjust the csv parsing style:
 
 | Parameter name                      | Default value | Description                                                                |
 | ----------------------------------- | ------------- | -------------------------------------------------------------------------- |
-| `job.common.csv_delimiter`        | `','`       | csv delimiter                                                              |
-| `job.common.csv_escape`           |               | escape character                                                           |
-| `job.common.csv_quote`            |               | quote character                                                            |
-| `job.common.csv_with_null_string` |               | Specify the conversion value of null field. It is not converted by default |
+| `job.reader.csv_delimiter`        | `','`       | csv delimiter                                                              |
+| `job.reader.csv_escape`           |               | escape character                                                           |
+| `job.reader.csv_quote`            |               | quote character                                                            |
+| `job.reader.csv_with_null_string` |               | Specify the conversion value of null field. It is not converted by default |

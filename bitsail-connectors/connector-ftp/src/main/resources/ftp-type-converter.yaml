@@ -24,10 +24,10 @@ engine.type.to.bitsail.type.converter:
     target.type: bigdecimal
 
   - source.type: timestamp
-    target.type: date.datetime
+    target.type: timestamp
 
   - source.type: date
-    target.type: date.date
+    target.type: date
 
   - source.type: string
     target.type: string

@@ -57,7 +57,7 @@ public class FtpSource implements Source<Row, FtpSourceSplit, EmptyState>, Paral
 
   @Override
   public SourceReader<Row, FtpSourceSplit> createReader(SourceReader.Context readerContext) {
-    return new FtpSourceReader(jobConf, readerContext.getIndexOfSubtask());
+    return new FtpSourceReader(jobConf, readerContext, readerContext.getIndexOfSubtask());
   }
 
   @Override

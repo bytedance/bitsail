@@ -21,6 +21,7 @@ package com.bytedance.bitsail.connector.ftp.source.reader;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
+import com.bytedance.bitsail.base.format.DeserializationSchema;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
@@ -28,8 +29,6 @@ import com.bytedance.bitsail.connector.ftp.core.client.FtpHandlerFactory;
 import com.bytedance.bitsail.connector.ftp.core.client.IFtpHandler;
 import com.bytedance.bitsail.connector.ftp.core.config.FtpConfig;
 import com.bytedance.bitsail.connector.ftp.error.FtpErrorCode;
-import com.bytedance.bitsail.connector.ftp.source.reader.deserializer.ITextRowDeserializer;
-import com.bytedance.bitsail.connector.ftp.source.reader.deserializer.TextRowDeserializerFactory;
 import com.bytedance.bitsail.connector.ftp.source.split.FtpSourceSplit;
 
 import org.slf4j.Logger;
@@ -54,7 +53,7 @@ public class FtpSourceReader implements SourceReader<Row, FtpSourceSplit> {
   private boolean hasNoMoreSplits = false;
 
   private final Deque<FtpSourceSplit> splits;
-  private final transient ITextRowDeserializer rowDeserializer;
+  private final transient DeserializationSchema<byte[], Row> deserializationSchema;
 
   private FtpSourceSplit currentSplit;
   private long currentReadCount;
@@ -64,13 +63,15 @@ public class FtpSourceReader implements SourceReader<Row, FtpSourceSplit> {
 
   private boolean skipFirstLine = false;
   private String successFilePath;
+  private final transient Context context;
 
-  public FtpSourceReader(BitSailConfiguration jobConf, int subTaskId) {
+  public FtpSourceReader(BitSailConfiguration jobConf, Context context, int subTaskId) {
     this.subTaskId = subTaskId;
     this.ftpConfig = new FtpConfig(jobConf);
     this.ftpHandler = FtpHandlerFactory.createFtpHandler(ftpConfig);
-    this.rowDeserializer = TextRowDeserializerFactory.createTextRowDeserializer(jobConf, ftpConfig);
     this.splits = new LinkedList<>();
+    this.context = context;
+    this.deserializationSchema = DeserializationSchemaFactory.createDeserializationSchema(jobConf, ftpConfig, context);
     LOG.info("FtpReader is initialized.");
 
   }
@@ -107,7 +108,7 @@ public class FtpSourceReader implements SourceReader<Row, FtpSourceSplit> {
       line = br.readLine();
     }
     while (line != null) {
-      Row row = rowDeserializer.convert(line);
+      Row row = deserializationSchema.deserialize(line.getBytes());
       pipeline.output(row);
       line = br.readLine();
       currentReadCount++;

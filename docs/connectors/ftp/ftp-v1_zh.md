@@ -91,10 +91,9 @@
 支持以下参数对json解析方式进行调整:
 
 | 参数名称                                    | 参数默认值 | 参数说明                                                                                                      |
-| ------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------- |
-| `job.common.case_insensitive`             | true       | 是否对json字段中的key大小写敏感                                                                               |
-| `job.common.json_serializer_features`     |            | 指定 `FastJsonUtil`进行解析时的模式，格式为 `','`分隔的字符串，例如 `"QuoteFieldNames,UseSingleQuotes"` |
-| `job.common.convert_error_column_as_null` | false      | 是否将解析出错的字段置为null                                                                                  |
+| ------------------------------------------- |-------| ------------------------------------------------------------------------------------------------------------- |
+| `job.reader.case_insensitive`             | false | 是否对json字段中的key大小写敏感                                                                               |
+| `job.reader.convert_error_column_as_null` | false | 是否将解析出错的字段置为null                                                                                  |
 
 ### <span id="jump_csv">CSV</span>
 
@@ -103,7 +102,7 @@
 
 | 参数名称                            | 参数默认值 | 参数说明                         |
 | ----------------------------------- | ---------- | -------------------------------- |
-| `job.common.csv_delimiter`        | `','`    | csv分隔符                        |
-| `job.common.csv_escape`           |            | escape字符                       |
-| `job.common.csv_quote`            |            | quote字符                        |
-| `job.common.csv_with_null_string` |            | 指定null字段的转化值，默认不转化 |
+| `job.reader.csv_delimiter`        | `','`    | csv分隔符                        |
+| `job.reader.csv_escape`           |            | escape字符                       |
+| `job.reader.csv_quote`            |            | quote字符                        |
+| `job.reader.csv_with_null_string` |            | 指定null字段的转化值，默认不转化 |
