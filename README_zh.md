@@ -19,7 +19,7 @@
 
 -->
 
-![logo](docs/images/bitsail_logo.png)
+![logo](website/images/bitsail_logo.png)
 
 [English](README.md) | 简体中文
 
@@ -59,7 +59,7 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
 - 任务状态实时监控
 
 ## BitSail架构
-![](docs/images/bitsail_arch.png)
+![](website/images/bitsail_arch.png)
 
  ```
  Source[Input Sources] -> Framework[Data Transmission] -> Sink[Output Sinks]
@@ -205,19 +205,19 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
 ### 微信群
 欢迎加入BitSail微信群参与社区讨论与贡献
 
-<img src="docs/images/wechat_QR.png" alt="qr" width="100"/>
+<img src="website/images/wechat_QR.png" alt="qr" width="100"/>
 
 ## 环境配置
-跳转[环境配置](docs/env_setup_zh.md).
+跳转[环境配置](website/zh/documents/docs/start/env_setup.md).
 
 ## 如何部署
-跳转[部署指南](docs/deployment_zh.md).
+跳转[部署指南](website/zh/documents/docs/start/deployment.md).
 
 ## BitSail参数指引
-跳转[参数指引](docs/config_zh.md).
+跳转[参数指引](website/zh/documents/docs/start/config.md).
 
 ## 如何贡献
-跳转[贡献者指引](docs/contributing_zh.md).
+跳转[贡献者指引](website/zh/contribute/contribute.md).
 
 ## 开源协议
 [Apache 2.0 License](LICENSE).

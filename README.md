@@ -19,7 +19,7 @@
 
 -->
 
-![logo](docs/images/bitsail_logo.png)
+![logo](website/images/bitsail_logo.png)
 
 English | [简体中文](README_zh.md)
 
@@ -76,7 +76,7 @@ We have accumulated a lot of experience and made a number of optimizations to im
 - Real-time monitoring of task status
 
 ## Architecture of BitSail
- ![](docs/images/bitsail_arch.png)
+ ![](website/images/bitsail_arch.png)
  
  ```
  Source[Input Sources] -> Framework[Data Transmission] -> Sink[Output Sinks]
@@ -204,7 +204,7 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
   </tr>
 </table>
 
-Documentation for [Connectors](./docs/connectors/introduction.md).
+Documentation for [Connectors](website/en/documents/connectors.md).
 
 ## Community Support
 ### Slack
@@ -223,19 +223,19 @@ Unsubscribe: Email to this address `bitsail+unsubscribe@googlegroups.com`
 ### WeChat Group
 Welcome to scan this QR code and to join the WeChat group chat.
 
-<img src="docs/images/wechat_QR.png" alt="qr" width="100"/>
+<img src="website/images/wechat_QR.png" alt="qr" width="100"/>
 
 ## Environment Setup
-Link to [Environment Setup](docs/env_setup.md).
+Link to [Environment Setup](website/en/documents/docs/start/env_setup.md).
 
 ## Deployment Guide
-Link to [Deployment Guide](docs/deployment.md).
+Link to [Deployment Guide](website/en/documents/docs/start/deployment.md).
 
 ## BitSail Configuration
-Link to [Configuration Guide](docs/config.md).
+Link to [Configuration Guide](website/en/documents/docs/start/config.md).
 
 ## Contributing Guide
-Link to [Contributing Guide](docs/contributing.md).
+Link to [Contributing Guide](website/en/contribute/contribute.md).
 
 ## Contributors
 **Thanks all contributors**<br>

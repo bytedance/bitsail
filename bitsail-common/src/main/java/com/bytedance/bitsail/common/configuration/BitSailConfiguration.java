@@ -138,8 +138,13 @@ public class BitSailConfiguration implements Serializable {
   }
 
   public <T> boolean fieldExists(ConfigOption<T> option) {
-    String field = option.key();
-    return this.get(field) != null;
+    List<String> allKeys = option.allKeys();
+    for (String field : allKeys) {
+      if (this.get(field) != null) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public String getUnnecessaryValue(String key, String defaultValue) {
@@ -169,38 +174,44 @@ public class BitSailConfiguration implements Serializable {
     return (T) this.get(path);
   }
 
+  @SuppressWarnings({"checkstyle:EmptyCatchBlock"})
   public <T> T get(final ConfigOption<T> option) {
-    String path = option.key();
-    this.checkPath(path);
-    try {
-      return this.findObjectByConfig(path, option);
-    } catch (Exception e) {
-      if (!option.hasDefaultValue()) {
-        return null;
+    List<String> keys = option.allKeys();
+    for (String path : keys) {
+      this.checkPath(path);
+      try {
+        return this.findObjectByConfig(path, option);
+      } catch (Exception ignored) {
       }
-      return option.defaultValue();
     }
+    return option.hasDefaultValue() ? option.defaultValue() : null;
   }
 
+  @SuppressWarnings({"checkstyle:EmptyCatchBlock"})
   public <T> T getNecessaryOption(final ConfigOption<T> option, ErrorCode errorCode) {
-    String path = option.key();
-    this.checkPath(path);
-    try {
-      return (T) this.findObjectByConfig(path, option);
-    } catch (Exception e) {
-      throw BitSailException.asBitSailException(errorCode,
-          String.format("Invalid configuration, [%s] must be set.", path));
+    List<String> keys = option.allKeys();
+    for (String path : keys) {
+      this.checkPath(path);
+      try {
+        return this.findObjectByConfig(path, option);
+      } catch (Exception ignored) {
+      }
     }
+    throw BitSailException.asBitSailException(errorCode,
+        String.format("Invalid configuration, [%s] must be set.", keys.get(0)));
   }
 
+  @SuppressWarnings({"checkstyle:EmptyCatchBlock"})
   public <T> T getUnNecessaryOption(final ConfigOption<T> option, T defaultValue) {
-    String path = option.key();
-    this.checkPath(path);
-    try {
-      return this.findObjectByConfig(path, option);
-    } catch (Exception e) {
-      return defaultValue;
+    List<String> keys = option.allKeys();
+    for (String path : keys) {
+      this.checkPath(path);
+      try {
+        return this.findObjectByConfig(path, option);
+      } catch (Exception ignored) {
+      }
     }
+    return defaultValue;
   }
 
   public BitSailConfiguration getConfiguration(final String path) {
