@@ -12,10 +12,6 @@ actions:
     link: https://github.com/bytedance/bitsail
     type: primary
 
-# todo: 修改脚注
-footer: 记得修改脚注，加license！！！
-
-
 features:
   - title: Data Sync
     details: Support high-performance and reliable mass data synchronization between multiple heterogeneous data sources, and support conversion between different data source types.
