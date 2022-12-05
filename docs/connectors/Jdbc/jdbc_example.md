@@ -185,6 +185,47 @@ Parent document: [Jdbc-connector](./jdbc.md)
     }
 }
 ```
+
+#### MySQL insert ignore sync
+
+``` json
+{
+    "job":{
+        "writer":{
+            "class":"com.bytedance.bitsail.connector.legacy.jdbc.sink.JDBCOutputFormat",
+            "write_mode":"ignore",
+            "user_name":"test",
+            "columns":[
+                {
+                    "name":"name",
+                    "type":"varchar"
+                },
+                {
+                    "name":"int_info",
+                    "type":"int"
+                },
+                {
+                    "name":"double_info",
+                    "type":"double"
+                },
+                {
+                    "name":"bytes_info",
+                    "type":"binary"
+                }
+            ],
+            "table_name":"table name",
+            "password":"password",
+            "db_name":"test",
+            "connections":[
+                {
+                    "db_url":"jdbc:mysql://address=(protocol=tcp)(host=192.168.1.202)(port=3306)/test?permitMysqlScheme&rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false"
+                }
+            ]
+        }
+    }
+}
+```
+
 -----
 
 ## Oracle Example

@@ -269,6 +269,7 @@ Currently, supports reading and writing three kinds of data sources including My
  - Supports multiple write modes: <b>clear</b> write mode and <b>overwrite</b> write mode
     - Clear write: A time partition field is required. When writing, if the time partition already exists, clear the existing time partition data, and then write.
     - Overwrite write: No time partition field is required. When writing, the data is not cleared. According to the unique key upsert, the old data is overwritten with the new data. When a duplicate key appears in the write, the on duplicate key update operation will be performed to update the field. In addition, note that sharding and sharding do not support updating shards. You need to configure the `job.writer.shard_key` parameter. The value is sharding. Multiple shards are separated by `','`.
+    - ignore write: No time partition field is required. When writing, the data is will ignore if the data duplicated. Only supported Mysql
 
 ### Parameters
 
