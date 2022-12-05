@@ -19,13 +19,18 @@
 
 -->
 
-![logo](website/images/bitsail_logo.png)
-
-English | [简体中文](README_zh.md)
+# BitSail
 
 [![Build](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml/badge.svg)](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![Join Slack](https://img.shields.io/badge/slack-%23BitSail-72eff8?logo=slack&color=5DADE2&label=Join%20Slack)](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
+
+## Navigation
+
+- [Quick Start](start.md)
+- [BitSail Connectors](connectors.md)
+- [BitSail Components](components.md)
+- [FAQs](faq.md)
 
 ## Introduction
 BitSail is ByteDance's open source data integration engine which is based on distributed architecture and provides high performance. It supports data synchronization between multiple heterogeneous data sources, and provides global data integration solutions in batch, streaming, and incremental scenarios. At present, it serves almost all business lines in ByteDance, such as Douyin, Toutiao, etc., and synchronizes hundreds of trillions of data every day.
@@ -42,7 +47,7 @@ We have accumulated a lot of experience and made a number of optimizations to im
 - High maturity in terms of accuracy, stability and performance
 
 - Rich basic functions, such as type conversion, dirty data processing, flow control, data lake integration, automatic parallelism calculation
-, etc.
+  , etc.
 
 - Task running status monitoring, such as traffic, QPS, dirty data, latency, etc.
 
@@ -76,8 +81,8 @@ We have accumulated a lot of experience and made a number of optimizations to im
 - Real-time monitoring of task status
 
 ## Architecture of BitSail
- ![](website/images/bitsail_arch.png)
- 
+![](../../images/bitsail_arch.png)
+
  ```
  Source[Input Sources] -> Framework[Data Transmission] -> Sink[Output Sinks]
  ```
@@ -204,7 +209,7 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
   </tr>
 </table>
 
-Documentation for [Connectors](website/en/documents/connectors.md).
+Documentation for [Connectors](./connectors.md)
 
 ## Community Support
 ### Slack
@@ -223,19 +228,19 @@ Unsubscribe: Email to this address `bitsail+unsubscribe@googlegroups.com`
 ### WeChat Group
 Welcome to scan this QR code and to join the WeChat group chat.
 
-<img src="website/images/wechat_QR.png" alt="qr" width="100"/>
+<img src="../../images/wechat_QR.png" alt="qr" width="100"/>
 
 ## Environment Setup
-Link to [Environment Setup](website/en/documents/docs/start/env_setup.md).
+Link to [Environment Setup](docs/start/env_setup.md).
 
 ## Deployment Guide
-Link to [Deployment Guide](website/en/documents/docs/start/deployment.md).
+Link to [Deployment Guide](docs/start/deployment.md).
 
 ## BitSail Configuration
-Link to [Configuration Guide](website/en/documents/docs/start/config.md).
+Link to [Configuration Guide](docs/start/config.md).
 
 ## Contributing Guide
-Link to [Contributing Guide](website/en/contribute/contribute.md).
+Link to [Contributing Guide](../contribute/contribute.md).
 
 ## Contributors
 **Thanks all contributors**<br>
@@ -245,5 +250,5 @@ Link to [Contributing Guide](website/en/contribute/contribute.md).
 </a>
 
 ## License
-[Apache 2.0 License](LICENSE).
+[Apache 2.0 License](https://github.com/bytedance/bitsail/blob/master/LICENSE).
 

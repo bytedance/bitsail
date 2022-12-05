@@ -19,13 +19,19 @@
 
 -->
 
-![logo](website/images/bitsail_logo.png)
-
-[English](README.md) | 简体中文
+# BitSail
 
 [![Build](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml/badge.svg)](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![加入Slack](https://img.shields.io/badge/slack-%23BitSail-72eff8?logo=slack&color=5DADE2&label=加入%20Slack)](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
+
+## 快速导航
+
+ - [快速上手](start.md)：包含BitSail的环境部署和使用教程
+ - [BitSail连接器](connectors.md)：包含BitSail支持的连接器使用方法
+ - [BitSail组件](components.md)：包含BitSail支持的常用组件
+ - [常见问题](faq.md)：BitSail中遇到的常见问题
+
 
 ## 介绍
 BitSail是字节跳动开源的基于分布式架构的高性能数据集成引擎, 支持多种异构数据源间的数据同步，并提供离线、实时、全量、增量场景下的全域数据集成解决方案，目前服务于字节内部几乎所有业务线，包括抖音、今日头条等，每天同步数百万亿数据
@@ -59,7 +65,7 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
 - 任务状态实时监控
 
 ## BitSail架构
-![](website/images/bitsail_arch.png)
+![](../../images/bitsail_arch.png)
 
  ```
  Source[Input Sources] -> Framework[Data Transmission] -> Sink[Output Sinks]
@@ -205,20 +211,20 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
 ### 微信群
 欢迎加入BitSail微信群参与社区讨论与贡献
 
-<img src="website/images/wechat_QR.png" alt="qr" width="100"/>
+<img src="../../images/wechat_QR.png" alt="qr" width="100"/>
 
 ## 环境配置
-跳转[环境配置](website/zh/documents/docs/start/env_setup.md).
+跳转[环境配置](docs/start/env_setup.md).
 
 ## 如何部署
-跳转[部署指南](website/zh/documents/docs/start/deployment.md).
+跳转[部署指南](docs/start/deployment.md).
 
 ## BitSail参数指引
-跳转[参数指引](website/zh/documents/docs/start/config.md).
+跳转[参数指引](docs/start/config.md).
 
 ## 如何贡献
-跳转[贡献者指引](website/zh/contribute/contribute.md).
+跳转[贡献者指引](../contribute/contribute.md).
 
 ## 开源协议
-[Apache 2.0 License](LICENSE).
+[Apache 2.0 License](https://github.com/bytedance/bitsail/blob/master/LICENSE).
 
