@@ -8,23 +8,18 @@ export const zhNavbar = navbar([
     activeMatch: "^/zh/documents",
   },
   {
-    text: "如何贡献",
-    link: "/zh/contribute/contribute",
-    activeMatch: "^/zh/contribute",
+    text: "社区",
+    link: "/zh/community/community",
+    activeMatch: "^/zh/community",
   },
   {
-    text: "团队",
-    link: "/zh/team/team",
-    activeMatch: "^/zh/team",
-  },
-  {
-    text: "用户案例",
-    link: "/zh/usercases/case",
-    activeMatch: "^/zh/usercases",
+    text: "博客",
+    link: "/zh/blog/blog",
+    activeMatch: "^/zh/blog",
   },
   {
     text: "下载",
-    link: "/zh/release/release",
+    link: "https://github.com/bytedance/bitsail",
     activeMatch: "^/zh/release",
   },
   {

@@ -8,19 +8,14 @@ export const enNavbar = navbar([
     activeMatch: "^/en/documents",
   },
   {
-    text: "Contributing",
-    link: "/en/contribute/contribute",
-    activeMatch: "^/en/contribute",
+    text: "Community",
+    link: "/en/community/community",
+    activeMatch: "^/en/community",
   },
   {
-    text: "Team",
-    link: "/en/team/team",
-    activeMatch: "^/en/team",
-  },
-  {
-    text: "User cases",
-    link: "/en/usercases/case",
-    activeMatch: "^/en/usercases",
+    text: "Blog",
+    link: "/en/blog/blog",
+    activeMatch: "^/en/blog",
   },
   {
     text: "Download",
