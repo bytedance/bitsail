@@ -5,7 +5,11 @@ on:
   push:
     branches:
       # 确保这是你正在使用的分支名称
-      - bitsail-website
+      - master
+    paths:
+      - 'website/**'
+      - 'package.json'
+      - 'yarn.lock'
 
 jobs:
   deploy-gh-pages:
