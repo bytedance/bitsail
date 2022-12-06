@@ -11,9 +11,6 @@ actions:
   - text: 开源仓库
     link: https://github.com/bytedance/bitsail
     type: primary
-# todo: 修改脚注
-footer: 记得修改脚注，加license！！！
-
 
 features:
   - title: 异构数据源同步
