@@ -2,7 +2,7 @@
 home: true
 title: HomePage
 heroImage: /bitsail_logo.png
-heroText: BitSail
+heroText: false
 tagline: A high-performance data integration engine based on distributed architecture, supporting data synchronization between multiple heterogeneous data sources.
 actions:
   - text: Quick Start
