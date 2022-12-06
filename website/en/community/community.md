@@ -1,3 +1,6 @@
+---
+order: 1
+---
 # Community
 
  - [Contribute Guide](contribute.md)

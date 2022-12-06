@@ -1,3 +1,6 @@
+---
+order: 3
+---
 # Subscribe Mailing Lists
 
 Currently, BitSail community use Google Group as the mailing list provider.

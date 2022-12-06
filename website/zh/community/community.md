@@ -1,3 +1,6 @@
+---
+order: 1
+---
 # 社区
 
 - [贡献指南](contribute.md)

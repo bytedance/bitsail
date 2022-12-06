@@ -31,10 +31,10 @@ order: 1
 
 ## Navigation
 
-- [Quick Start](start.md)
-- [BitSail Connectors](connectors.md)
-- [BitSail Components](components.md)
-- [FAQs](faq.md)
+- [Quick Start](start/README.md)
+- [BitSail Connectors](connectors/README.md)
+- [BitSail Components](components/README.md)
+- [FAQs](faq/README.md)
 
 ## Introduction
 BitSail is ByteDance's open source data integration engine which is based on distributed architecture and provides high performance. It supports data synchronization between multiple heterogeneous data sources, and provides global data integration solutions in batch, streaming, and incremental scenarios. At present, it serves almost all business lines in ByteDance, such as Douyin, Toutiao, etc., and synchronizes hundreds of trillions of data every day.
@@ -213,7 +213,7 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
   </tr>
 </table>
 
-Documentation for [Connectors](./connectors.md)
+Documentation for [Connectors](./connectors/README.md)
 
 ## Community Support
 ### Slack
@@ -235,16 +235,16 @@ Welcome to scan this QR code and to join the WeChat group chat.
 <img src="../../images/wechat_QR.png" alt="qr" width="100"/>
 
 ## Environment Setup
-Link to [Environment Setup](docs/start/env_setup.md).
+Link to [Environment Setup](start/env_setup.md).
 
 ## Deployment Guide
-Link to [Deployment Guide](docs/start/deployment.md).
+Link to [Deployment Guide](start/deployment.md).
 
 ## BitSail Configuration
-Link to [Configuration Guide](docs/start/config.md).
+Link to [Configuration Guide](start/config.md).
 
 ## Contributing Guide
-Link to [Contributing Guide](../contribute/contribute.md).
+Link to [Contributing Guide](../community/contribute.md).
 
 ## Contributors
 **Thanks all contributors**<br>
