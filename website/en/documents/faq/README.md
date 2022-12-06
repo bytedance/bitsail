@@ -1,5 +1,6 @@
 ---
 index: false
+dir.order: 5
 ---
 
-# Components
+# FAQ
