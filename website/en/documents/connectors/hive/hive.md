@@ -1,6 +1,6 @@
 # Hive connector
 
-Parent document: [connectors](../../../connectors.md)
+Parent document: [connectors](../README.md)
 
 The ***BitSail*** hive connector supports reading and writing to hive tables. The main function points are as follows:
 

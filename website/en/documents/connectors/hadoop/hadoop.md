@@ -1,6 +1,6 @@
 # Hadoop connector
 
-Parent document: [connectors](../../../connectors.md)
+Parent document: [connectors](../README.md)
 
 
 ## Main function

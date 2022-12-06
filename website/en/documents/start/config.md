@@ -1,5 +1,5 @@
 # Job Configuration Guide
-English | [简体中文](/zh/documents/docs/start/config.md)
+English | [简体中文](/zh/documents/start/config.md)
 
 ***BitSail*** script configuration is managed by JSON structure, follow scripts show the complete structure:
 
@@ -163,4 +163,4 @@ Common Parameters：
 | class                  | TRUE     | -       | Connector's class name                                                                      | com.bytedance.bitsail.connector.legacy.hive.sink.HiveParquetOutputFormat |
 | writer_parallelism_num | FALSE    | -       | Specify Writer's parallelism, default bitsail will calculate write parallelism for the job. | 2                                                                        |
 
-Other parameters please check the [connector](../../connectors.md)
+Other parameters please check the [connector](../connectors/README.md)

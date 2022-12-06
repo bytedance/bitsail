@@ -1,6 +1,6 @@
 # Kudu connector
 
-Parent document: [connectors](../../../connectors.md)
+Parent document: [connectors](../README.md)
 
 ***BitSail*** Kudu connector supports reading and writing kudu tables.
 

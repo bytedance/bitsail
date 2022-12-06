@@ -1,5 +1,0 @@
----
-index: false
----
-
-# FAQ

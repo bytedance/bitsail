@@ -1,6 +1,6 @@
 # Doris connector
 
-Parent document: [connectors](../../../connectors.md)
+Parent document: [connectors](../README.md)
 
 ***BitSail*** Doris connector supports writing doris. The main function points are as follows:
 

@@ -1,6 +1,6 @@
 # RocketMQ connector
 
-Parent document: [connectors](../../../connectors.md)
+Parent document: [connectors](../README.md)
 
 ***BitSail*** RocketMQ connector supports writing in batch mode.
 

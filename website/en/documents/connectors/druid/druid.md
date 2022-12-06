@@ -1,6 +1,6 @@
 # Druid connector
 
-Parent document: [connectors](../../../connectors.md)
+Parent document: [connectors](../README.md)
 
 ***BitSail*** Druid connector supports writing druid data-sources.
 

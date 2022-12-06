@@ -1,5 +1,6 @@
 ---
-dir.order: 4
+dir:
+  order: 4
 ---
 
 
@@ -14,23 +15,23 @@ Currently, we support 5 functional components:
 
 - `bitsail-component-clients`:
     - Support conveniently creating some clients, such as KafkaProducer.
-    - Details can be seen: [bitsail_component_clients](docs/components/clients/introduction.md)
+    - Details can be seen: [bitsail_component_clients](clients/introduction.md)
 
 
 
 - `bitsail-component-formats-flink`:
     - Support converting different data types (such as hive `Writables`) into `bitsail rows`.
-    - Details can be seen: [bitsail_component_format](docs/components/format/introduction.md)
+    - Details can be seen: [bitsail_component_format](format/introduction.md)
 
 
 - `bitsail-conversion-flink`:
     - Support converting `bitsail` rows into different data types (such as hive `Writables`).
-    - Details can be seen: [bitsail_component_conversion](docs/components/conversion/introduction.md)
+    - Details can be seen: [bitsail_component_conversion](conversion/introduction.md)
 
 
 - `bitsail-flink-row-parser`:
     - Support converting `bytes` array into `bitsail` rows according to determined format.
-    - Details can be seen: [bitsail_component_parser](docs/components/parser/introduction.md)
+    - Details can be seen: [bitsail_component_parser](parser/introduction.md)
 
 -----
 

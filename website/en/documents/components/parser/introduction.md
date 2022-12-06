@@ -2,7 +2,7 @@
 
 ----- 
 
-Parent document: [bitsail-components](../../../components.md)
+Parent document: [bitsail-components](../README.md)
 
 ## Content
 

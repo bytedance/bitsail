@@ -2,7 +2,7 @@
 
 -----
 
-Parent document: [connectors](../../../connectors.md)
+Parent document: [connectors](../README.md)
 
 The Kafka connector supports the following functional points:
 

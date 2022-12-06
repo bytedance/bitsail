@@ -1,6 +1,6 @@
 # MongoDB connector
 
-Parent document: [connectors](../../../connectors.md)
+Parent document: [connectors](../README.md)
 
 ***BitSail*** MongoDB connector supports reading and writing MongoDB. The main function points are as follows:
 

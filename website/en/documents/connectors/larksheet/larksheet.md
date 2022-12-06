@@ -1,6 +1,6 @@
 # LarkSheet connector
 
-Parent document: [connectors](../../../connectors.md)
+Parent document: [connectors](../README.md)
 
 The ***Bitsail*** LarkSheet connector supports reading lark sheets.
 The main function points are as follows:

@@ -1,6 +1,6 @@
 # Hudi connector
 
-Parent document: [connectors](../../../connectors.md)
+Parent document: [connectors](../README.md)
 
 The ***BitSail*** hudi connector supports reading and writing to hudi tables. The main function points are as follows:
 

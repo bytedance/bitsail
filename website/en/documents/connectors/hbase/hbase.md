@@ -1,6 +1,6 @@
 # HBase connector
 
-Parent document: [connectors](../../../connectors.md)
+Parent document: [connectors](../README.md)
 
 ***Bitsail*** HBase can be used to read and write HBase tables.
 The main function points are as follows:

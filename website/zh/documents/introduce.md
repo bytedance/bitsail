@@ -31,10 +31,10 @@ order: 1
 
 ## 快速导航
 
- - [快速上手](start.md)：包含BitSail的环境部署和使用教程
- - [BitSail连接器](connectors.md)：包含BitSail支持的连接器使用方法
- - [BitSail组件](components.md)：包含BitSail支持的常用组件
- - [常见问题](faq.md)：BitSail中遇到的常见问题
+ - [快速上手](start/README.md)：包含BitSail的环境部署和使用教程
+ - [BitSail连接器](connectors/README.md)：包含BitSail支持的连接器使用方法
+ - [BitSail组件](components/README.md)：包含BitSail支持的常用组件
+ - [常见问题](faq/README.md)：BitSail中遇到的常见问题
 
 
 ## 介绍
@@ -218,16 +218,16 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
 <img src="../../images/wechat_QR.png" alt="qr" width="100"/>
 
 ## 环境配置
-跳转[环境配置](docs/start/env_setup.md).
+跳转[环境配置](start/env_setup.md).
 
 ## 如何部署
-跳转[部署指南](docs/start/deployment.md).
+跳转[部署指南](start/deployment.md).
 
 ## BitSail参数指引
-跳转[参数指引](docs/start/config.md).
+跳转[参数指引](start/config.md).
 
 ## 如何贡献
-跳转[贡献者指引](../contribute/contribute.md).
+跳转[贡献者指引](../community/contribute.md).
 
 ## 开源协议
 [Apache 2.0 License](https://github.com/bytedance/bitsail/blob/master/LICENSE).

@@ -1,6 +1,6 @@
 # Redis connector
 
-Parent document: [connectors](../../../connectors.md)
+Parent document: [connectors](../README.md)
 
 ***BitSail*** Redis connector supports writing Redis. The main function points are as follows:
 

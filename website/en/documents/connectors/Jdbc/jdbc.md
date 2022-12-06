@@ -1,6 +1,6 @@
 # Jdbc Connector
 
-Parent document: [connectors](../../../connectors.md)
+Parent document: [connectors](../README.md)
 
 The Jdbc Connector directly connects to the database through JDBC, and imports data into other storages or imports other stored data into the database in a batch manner. JDBC connectors internally read from slaves to minimize the impact on DB.
 
