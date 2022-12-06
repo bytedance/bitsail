@@ -166,7 +166,7 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
 ### 微信群
 欢迎加入BitSail微信群参与社区讨论与贡献
 
-<img src="docs/images/wechat_QR.png" alt="qr" width="100"/>
+<img src="docs/images/新二维码图片.png" alt="qr" width="100"/>
 
 ## 环境配置
 跳转[环境配置](docs/env_setup_zh.md).
