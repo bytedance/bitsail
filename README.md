@@ -204,7 +204,7 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
   </tr>
 </table>
 
-Documentation for [Connectors](website/en/documents/connectors.md).
+Documentation for [Connectors](website/en/documents/connectors/README.md).
 
 ## Community Support
 ### Slack
