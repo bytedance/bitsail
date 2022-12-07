@@ -187,6 +187,8 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
   </tr>
 </table>
 
+详情见：[Connectors详细文档](website/zh/documents/connectors/README.md).
+
 ## 社区支持
 ### Slack
 通过此链接可以直接下载并加入BitSail的Slack频道 [link](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
@@ -208,16 +210,16 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
 <img src="website/images/wechat_QR.png" alt="qr" width="100"/>
 
 ## 环境配置
-跳转[环境配置](website/zh/documents/docs/start/env_setup.md).
+跳转[环境配置](website/zh/documents/start/env_setup.md).
 
 ## 如何部署
-跳转[部署指南](website/zh/documents/docs/start/deployment.md).
+跳转[部署指南](website/zh/documents/start/deployment.md).
 
 ## BitSail参数指引
-跳转[参数指引](website/zh/documents/docs/start/config.md).
+跳转[参数指引](website/zh/documents/start/config.md).
 
 ## 如何贡献
-跳转[贡献者指引](website/zh/contribute/contribute.md).
+跳转[贡献者指引](website/zh/community/contribute.md).
 
 ## 开源协议
 [Apache 2.0 License](LICENSE).
