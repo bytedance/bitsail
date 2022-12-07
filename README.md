@@ -226,16 +226,16 @@ Welcome to scan this QR code and to join the WeChat group chat.
 <img src="website/images/wechat_QR.png" alt="qr" width="100"/>
 
 ## Environment Setup
-Link to [Environment Setup](website/en/documents/docs/start/env_setup.md).
+Link to [Environment Setup](website/en/documents/start/env_setup.md).
 
 ## Deployment Guide
-Link to [Deployment Guide](website/en/documents/docs/start/deployment.md).
+Link to [Deployment Guide](website/en/documents/start/deployment.md).
 
 ## BitSail Configuration
-Link to [Configuration Guide](website/en/documents/docs/start/config.md).
+Link to [Configuration Guide](website/en/documents/start/config.md).
 
 ## Contributing Guide
-Link to [Contributing Guide](website/en/contribute/contribute.md).
+Link to [Contributing Guide](website/en/community/contribute.md).
 
 ## Contributors
 **Thanks all contributors**<br>
