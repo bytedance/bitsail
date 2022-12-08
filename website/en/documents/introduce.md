@@ -213,6 +213,12 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <td>✅</td>
   </tr>
   <tr>
+    <td>LarkSheet</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
     <td>Clickhouse</td>
     <td>-</td>
     <td>✅</td>
