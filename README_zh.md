@@ -7,9 +7,9 @@
     to you under the Apache License, Version 2.0 (the
     "License"); you may not use this file except in compliance
     with the License.  You may obtain a copy of the License at
-
+    
       http://www.apache.org/licenses/LICENSE-2.0
-
+    
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on an
     "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -25,10 +25,13 @@
 
 [![Build](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml/badge.svg)](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
-[![加入Slack](https://img.shields.io/badge/slack-%23BitSail-72eff8?logo=slack&color=5DADE2&label=加入%20Slack)](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
+[![加入Slack](https://img.shields.io/badge/slack-%23BitSail-72eff8?logo=slack&color=5DADE2&label=加入%20Slack)](https://join.slack.com/t/bitsailworkspace/shared_invite/zt-1l1vgcnlj-gPSWqggOeRHrSO5l7na2WQ)
+[![Website](https://img.shields.io/badge/Website-%23BitSail-blue)](https://bytedance.github.io/bitsail/)
 
 ## 介绍
-BitSail是字节跳动开源的基于分布式架构的高性能数据集成引擎, 支持多种异构数据源间的数据同步，并提供离线、实时、全量、增量场景下的全域数据集成解决方案，目前服务于字节内部几乎所有业务线，包括抖音、今日头条等，每天同步数百万亿数据
+BitSail是字节跳动开源的基于分布式架构的高性能数据集成引擎, 支持多种异构数据源间的数据同步，并提供离线、实时、全量、增量场景下的全域数据集成解决方案，目前服务于字节内部几乎所有业务线，包括抖音、今日头条等，每天同步数百万亿数据。
+
+BitSail官方主页：https://bytedance.github.io/bitsail/
 
 ## 为什么我们要使用BitSail
 BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时在火山引擎云原生环境、客户私有云环境等多种场景下得到验证。
@@ -185,13 +188,25 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <td> </td>
     <td>✅</td>
   </tr>
+  <tr>
+    <td>LarkSheet</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
+    <td>Clickhouse</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
 </table>
 
 详情见：[Connectors详细文档](website/zh/documents/connectors/README.md).
 
 ## 社区支持
 ### Slack
-通过此链接可以直接下载并加入BitSail的Slack频道 [link](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
+通过此链接可以直接下载并加入BitSail的Slack频道 [link](https://join.slack.com/t/bitsailworkspace/shared_invite/zt-1l1vgcnlj-gPSWqggOeRHrSO5l7na2WQ)
 
 ### 邮件列表
 当前，BitSail社区通过谷歌群组作为邮件列表的提供者，邮件列表可以在绝大部分地区正常收发邮件。
