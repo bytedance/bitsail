@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+message ProtoTest {
+  int64 ID = 1;
+  string NAME = 2;
+  string DATE = 3;
+}

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+message ProtoTest {
+  double field1 = 1;
+  float field2 = 2;
+  int32 field3 = 3;
+  int64 field4 = 4;
+  uint32 field5 = 5;
+  uint64 field6 = 6;
+  sint32 field7 = 7;
+  sint64 field8 = 8;
+  fixed32 field9 = 9;
+  fixed64 field10 = 10;
+  sfixed32 field11 = 11;
+  sfixed64 field12 = 12;
+  bool field13 = 13;
+  string field14 = 14;
+  bytes field15 = 15;
+}

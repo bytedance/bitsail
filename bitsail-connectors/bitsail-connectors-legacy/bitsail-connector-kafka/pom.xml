@@ -98,6 +98,10 @@
             <version>${revision}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-flink-row-parser</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
