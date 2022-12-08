@@ -28,6 +28,7 @@ order: 1
 [![Build](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml/badge.svg)](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![Join Slack](https://img.shields.io/badge/slack-%23BitSail-72eff8?logo=slack&color=5DADE2&label=Join%20Slack)](https://join.slack.com/t/bitsailworkspace/shared_invite/zt-1l1vgcnlj-gPSWqggOeRHrSO5l7na2WQ)
+[![Website](https://img.shields.io/badge/Website-%23BitSail-blue)](https://bytedance.github.io/bitsail/)
 
 ## Navigation
 
@@ -210,6 +211,12 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <td>-</td>
     <td> </td>
     <td>✅</td>
+  </tr>
+  <tr>
+    <td>Clickhouse</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
   </tr>
 </table>
 
