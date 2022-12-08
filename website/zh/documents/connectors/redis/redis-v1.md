@@ -13,7 +13,7 @@
 ```xml
 <dependency>
    <groupId>com.bytedance.bitsail</groupId>
-   <artifactId>bitsail-connector-redis</artifactId>
+   <artifactId>connector-redis</artifactId>
    <version>${revision}</version>
 </dependency>
 ```

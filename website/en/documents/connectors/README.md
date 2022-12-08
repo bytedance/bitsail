@@ -26,6 +26,8 @@ dir:
 
 - [Redis connector](redis/redis.md)
 
+- [Redis V1 connector](redis/redis-v1.md)
+
 - [MongoDB connector](mongodb/mongodb.md)
 
 - [Doris connector](doris/doris.md)
@@ -34,7 +36,7 @@ dir:
 
 - [Jdbc connector](Jdbc/jdbc.md)
 
-- [LarkSheet_connector](larksheet/larksheet.md)
+- [LarkSheet connector](larksheet/larksheet.md)
 
 - [Kudu connector](kudu/kudu.md)
 
