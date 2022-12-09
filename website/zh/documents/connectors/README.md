@@ -15,7 +15,7 @@ dir:
 - [Hudi连接器](hudi/hudi.md)
 - [Kafka连接器](kafka/kafka.md)
 - [RocketMQ连接器](rocketmq/rocketmq.md)
-- [Redis连接器](redis/redis.md)
+- [Redis连接器](redis/redis-v1.md)
 - [MongoDB连接器](mongodb/mongodb.md)
 - [Doris连接器](doris/doris.md)
 - [StreamingFile连接器 (hdfs流式连接器)](StreamingFile/StreamingFile.md)
