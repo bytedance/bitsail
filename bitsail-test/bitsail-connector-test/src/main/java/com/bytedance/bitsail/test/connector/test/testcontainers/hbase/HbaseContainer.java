@@ -26,6 +26,8 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.Arrays;
 
@@ -39,18 +41,23 @@ public class HbaseContainer extends GenericContainer<HbaseContainer> {
   @Getter
   private Configuration configuration;
 
-  public HbaseContainer(DockerImageName dockerImageName) {
+  public HbaseContainer(DockerImageName dockerImageName) throws UnknownHostException {
     super(dockerImageName);
     configuration = HBaseConfiguration.create();
     addExposedPort(MASTER_PORT);
     addExposedPort(REGION_PORT);
     addExposedPort(ZOOKEEPER_PORT);
-    withCreateContainerCmdModifier(cmd -> cmd.withHostName("0.0.0.0"));
+    String hostname = InetAddress.getLocalHost().getHostName();
+
+    withCreateContainerCmdModifier(cmd -> cmd.withHostName(hostname));
     withLogConsumer(frame -> System.out.print(frame.getUtf8String()));
     waitingFor(Wait.forLogMessage(".*0 row.*", 1));
     withStartupTimeout(Duration.ofMinutes(STARTUP_TIMEOUT));
     withEnv("HBASE_MASTER_PORT", String.valueOf(MASTER_PORT));
     withEnv("HBASE_REGION_PORT", String.valueOf(REGION_PORT));
+    withEnv("HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT", String.valueOf(ZOOKEEPER_PORT));
+    withEnv("HBASE_ZOOKEEPER_QUORUM", DEFAULT_HOST);
+
     setPortBindings(Arrays.asList(String.format("%s:%s", MASTER_PORT, MASTER_PORT), String.format("%s:%s", REGION_PORT, REGION_PORT),
         String.format("%s:%s", ZOOKEEPER_PORT, ZOOKEEPER_PORT)));
 
