@@ -14,9 +14,9 @@ public class MapGenerator implements ColumnDataGenerator {
   }
 
   @Override
-  public Object generate(ColumnConfig columnConfig) {
+  public Object generate(GenerateConfig generateConfig) {
     Map<Object, Object> mapRawValue = Maps.newHashMap();
-    mapRawValue.put(keyGenerator.generate(columnConfig), valueGenerator.generate(columnConfig));
+    mapRawValue.put(keyGenerator.generate(generateConfig), valueGenerator.generate(generateConfig));
     return mapRawValue;
   }
 }

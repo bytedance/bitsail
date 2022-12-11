@@ -11,7 +11,7 @@ public class ListGenerator implements ColumnDataGenerator {
   }
 
   @Override
-  public Object generate(ColumnConfig columnConfig) {
-    return Lists.newArrayList(elementGenerator.generate(columnConfig));
+  public Object generate(GenerateConfig generateConfig) {
+    return Lists.newArrayList(elementGenerator.generate(generateConfig));
   }
 }

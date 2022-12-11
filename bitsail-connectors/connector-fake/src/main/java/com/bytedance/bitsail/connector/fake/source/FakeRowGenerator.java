@@ -24,7 +24,7 @@ import com.bytedance.bitsail.common.typeinfo.BasicTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.connector.fake.option.FakeReaderOptions;
 import com.bytedance.bitsail.connector.fake.source.generate.ColumnDataGenerator;
-import com.bytedance.bitsail.connector.fake.source.generate.ColumnConfig;
+import com.bytedance.bitsail.connector.fake.source.generate.GenerateConfig;
 import com.bytedance.bitsail.connector.fake.source.generate.GeneratorMatcher;
 
 import net.datafaker.Faker;
@@ -43,10 +43,10 @@ public class FakeRowGenerator {
   // column info
   private final TypeInfo<?>[] typeInfos;
   private final List<ColumnDataGenerator> columnDataGeneratorList = new ArrayList<>();
-  private final ColumnConfig columnConfig;
+  private final GenerateConfig generateConfig;
 
   public FakeRowGenerator(BitSailConfiguration jobConf, int taskId, TypeInfo<?>[] typeInfos) {
-    this.columnConfig = ColumnConfig.builder()
+    this.generateConfig = GenerateConfig.builder()
         .taskId(taskId)
         .lower(jobConf.get(FakeReaderOptions.UPPER_LIMIT))
         .upper(jobConf.get(FakeReaderOptions.LOWER_LIMIT))
@@ -57,7 +57,7 @@ public class FakeRowGenerator {
     this.nullPercentage = jobConf.get(FakeReaderOptions.NULL_PERCENTAGE);
     this.typeInfos = typeInfos;
     for (TypeInfo<?> typeInfo : typeInfos) {
-      columnDataGeneratorList.add(GeneratorMatcher.match(typeInfo));
+      columnDataGeneratorList.add(GeneratorMatcher.match(typeInfo, generateConfig));
     }
 
   }
@@ -69,7 +69,7 @@ public class FakeRowGenerator {
       if (isNullable(typeInfo) && isNull()) {
         row.setField(index, null);
       } else {
-        row.setField(index, columnDataGeneratorList.get(index).generate(columnConfig));
+        row.setField(index, columnDataGeneratorList.get(index).generate(generateConfig));
       }
     }
     return row;

@@ -11,72 +11,70 @@ import org.apache.commons.collections.CollectionUtils;
 
 public class GeneratorMatcher {
 
-  public static ColumnDataGenerator match(TypeInfo<?> typeInfo) {
-
-    if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.LongFaker;
-    }
-    if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      if (CollectionUtils.isNotEmpty(typeInfo.getTypeProperties()) && typeInfo.getTypeProperties().contains(TypeProperty.UNIQUE)) {
-        return new SnowflakeId();
-      } else {
-        return FakerGenerator.IntFaker;
+  public static ColumnDataGenerator match(TypeInfo<?> typeInfo, GenerateConfig generateConfig) {
+    if (CollectionUtils.isNotEmpty(typeInfo.getTypeProperties()) && typeInfo.getTypeProperties().contains(TypeProperty.UNIQUE)) {
+      if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+        return new SnowflakeId(generateConfig.getTaskId());
       }
-    } else if (TypeInfos.INT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.IntFaker;
+      return new AutoIncrementData(typeInfo);
+    }
 
+    if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return FakerData.LongFaker;
+    } else if (TypeInfos.INT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return FakerData.IntFaker;
     } else if (TypeInfos.SHORT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.ShortFaker;
+      return FakerData.ShortFaker;
 
     } else if (TypeInfos.STRING_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.StringFaker;
+      return FakerData.StringFaker;
 
     } else if (TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.BoolFaker;
+      return FakerData.BoolFaker;
 
     } else if (TypeInfos.DOUBLE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.DoubleFaker;
+      return FakerData.DoubleFaker;
 
     } else if (TypeInfos.FLOAT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.FloatFaker;
+      return FakerData.FloatFaker;
 
     } else if (TypeInfos.BIG_DECIMAL_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.BigDecimalFaker;
+      return FakerData.BigDecimalFaker;
 
     } else if (TypeInfos.BIG_INTEGER_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.BigIntegerFaker;
+      return FakerData.BigIntegerFaker;
 
     } else if (BasicArrayTypeInfo.BINARY_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.BinaryFaker;
+      return FakerData.BinaryFaker;
 
     } else if (TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.DateFaker;
+      return FakerData.DateFaker;
 
     } else if (TypeInfos.SQL_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.TimeFaker;
+      return FakerData.TimeFaker;
 
     } else if (TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.TimestampFaker;
+      return FakerData.TimestampFaker;
 
     } else if (TypeInfos.LOCAL_DATE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.LocalDateFaker;
+      return FakerData.LocalDateFaker;
 
     } else if (TypeInfos.LOCAL_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.LocalTimeFaker;
+      return FakerData.LocalTimeFaker;
 
     } else if (TypeInfos.LOCAL_DATE_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.LocalDateTimeFaker;
+      return FakerData.LocalDateTimeFaker;
 
     } else if (TypeInfos.VOID_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return FakerGenerator.VoidFaker;
+      return FakerData.VoidFaker;
     }
 
     if (typeInfo instanceof ListTypeInfo) {
-      return new ListGenerator(match(typeInfo));
+      return new ListGenerator(match(typeInfo, generateConfig));
     }
 
     if (typeInfo instanceof MapTypeInfo) {
-      return new MapGenerator(match(typeInfo), match(typeInfo));
+      return new MapGenerator(match(typeInfo, generateConfig), match(typeInfo, generateConfig));
     }
     throw new RuntimeException("Unsupported type " + typeInfo);
   }
