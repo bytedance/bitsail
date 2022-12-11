@@ -12,13 +12,15 @@ import org.apache.commons.collections.CollectionUtils;
 public class GeneratorMatcher {
 
   public static ColumnDataGenerator match(TypeInfo<?> typeInfo, GenerateConfig generateConfig) {
+    // Data generator by snowFlake
     if (CollectionUtils.isNotEmpty(typeInfo.getTypeProperties()) && typeInfo.getTypeProperties().contains(TypeProperty.UNIQUE)) {
       if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
         return new SnowflakeId(generateConfig.getTaskId());
       }
+      // Data Generator by AutoIncrementData
       return new AutoIncrementData(typeInfo);
     }
-
+    // Data Generator by FakeData
     if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
       return FakerData.LongFaker;
     } else if (TypeInfos.INT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
