@@ -1,6 +1,7 @@
 import { hopeTheme } from "vuepress-theme-hope";
 import { enNavbar, zhNavbar } from "./navbar/index.js";
 import { enSidebar, zhSidebar } from "./sidebar/index.js";
+import { cnFooter, enFooter } from './footer';
 
 export default hopeTheme({
   iconAssets: "iconfont",
@@ -15,6 +16,8 @@ export default hopeTheme({
 
   repo: 'https://github.com/bytedance/bitsail',
 
+  displayFooter: true,
+
   locales: {
     "/": {
       // navbar
@@ -22,6 +25,8 @@ export default hopeTheme({
 
       // sidebar
       sidebar: enSidebar,
+
+      footer: enFooter,
     },
 
     /**
@@ -33,6 +38,8 @@ export default hopeTheme({
 
       // sidebar
       sidebar: zhSidebar,
+
+      footer: cnFooter,
     },
   },
 

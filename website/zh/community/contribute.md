@@ -1,3 +1,6 @@
+---
+order: 2
+---
 # 贡献者指引
 
 [English](/en/contribute/contribute.md) | 简体中文

@@ -1,3 +1,7 @@
+---
+order: 1
+---
+
 <!--
 
     Licensed to the Apache Software Foundation (ASF) under one
@@ -23,14 +27,15 @@
 
 [![Build](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml/badge.svg)](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
-[![Join Slack](https://img.shields.io/badge/slack-%23BitSail-72eff8?logo=slack&color=5DADE2&label=Join%20Slack)](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
+[![Join Slack](https://img.shields.io/badge/slack-%23BitSail-72eff8?logo=slack&color=5DADE2&label=Join%20Slack)](https://join.slack.com/t/bitsailworkspace/shared_invite/zt-1l1vgcnlj-gPSWqggOeRHrSO5l7na2WQ)
+[![Website](https://img.shields.io/badge/Website-%23BitSail-blue)](https://bytedance.github.io/bitsail/)
 
 ## Navigation
 
-- [Quick Start](start.md)
-- [BitSail Connectors](connectors.md)
-- [BitSail Components](components.md)
-- [FAQs](faq.md)
+- [Quick Start](start/README.md)
+- [BitSail Connectors](connectors/README.md)
+- [BitSail Components](components/README.md)
+- [FAQs](faq/README.md)
 
 ## Introduction
 BitSail is ByteDance's open source data integration engine which is based on distributed architecture and provides high performance. It supports data synchronization between multiple heterogeneous data sources, and provides global data integration solutions in batch, streaming, and incremental scenarios. At present, it serves almost all business lines in ByteDance, such as Douyin, Toutiao, etc., and synchronizes hundreds of trillions of data every day.
@@ -207,13 +212,25 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <td> </td>
     <td>✅</td>
   </tr>
+  <tr>
+    <td>LarkSheet</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
+    <td>Clickhouse</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
 </table>
 
-Documentation for [Connectors](./connectors.md)
+Documentation for [Connectors](./connectors/README.md)
 
 ## Community Support
 ### Slack
-Join BitSail Slack channel via this [link](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
+Join BitSail Slack channel via this [link](https://join.slack.com/t/bitsailworkspace/shared_invite/zt-1l1vgcnlj-gPSWqggOeRHrSO5l7na2WQ)
 
 ### Mailing List
 Currently, BitSail community use Google Group as the mailing list provider.
@@ -231,16 +248,16 @@ Welcome to scan this QR code and to join the WeChat group chat.
 <img src="../../images/wechat_QR.png" alt="qr" width="100"/>
 
 ## Environment Setup
-Link to [Environment Setup](docs/start/env_setup.md).
+Link to [Environment Setup](start/env_setup.md).
 
 ## Deployment Guide
-Link to [Deployment Guide](docs/start/deployment.md).
+Link to [Deployment Guide](start/deployment.md).
 
 ## BitSail Configuration
-Link to [Configuration Guide](docs/start/config.md).
+Link to [Configuration Guide](start/config.md).
 
 ## Contributing Guide
-Link to [Contributing Guide](../contribute/contribute.md).
+Link to [Contributing Guide](../community/contribute.md).
 
 ## Contributors
 **Thanks all contributors**<br>

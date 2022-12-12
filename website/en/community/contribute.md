@@ -1,3 +1,6 @@
+---
+order: 2
+---
 # Contributor Guide
 English | [简体中文](/zh/contribute/contribute.md)
 

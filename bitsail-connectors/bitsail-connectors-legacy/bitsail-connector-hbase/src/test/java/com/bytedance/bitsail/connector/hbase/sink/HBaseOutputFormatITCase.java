@@ -19,24 +19,36 @@ package com.bytedance.bitsail.connector.hbase.sink;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
+import com.bytedance.bitsail.test.connector.test.testcontainers.hbase.HbaseCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 @Ignore
 public class HBaseOutputFormatITCase {
 
+  private HbaseCluster hbaseCluster;
+
+  @Before
+  public void initHbase() {
+    hbaseCluster = new HbaseCluster();
+    hbaseCluster.startService();
+    hbaseCluster.createTable("test_table", Arrays.asList("cf1", "cf2", "cf3"));
+  }
+
   @Test
   public void testFakeToHBase() throws Exception {
     BitSailConfiguration conf = JobConfUtils.fromClasspath("fake_to_hbase.json");
-    fillHBaseConfiguration();
     EmbeddedFlinkCluster.submitJob(conf);
   }
 
-  // Currently testing need start a local hbase docker.
-  // todo: add an available hbase container for test
-  private void fillHBaseConfiguration() {
-
+  @After
+  public void closeHbase() {
+    hbaseCluster.stopService();
   }
 }

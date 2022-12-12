@@ -1,3 +1,7 @@
+---
+order: 1
+---
+
 <!--
 
     Licensed to the Apache Software Foundation (ASF) under one
@@ -23,14 +27,15 @@
 
 [![Build](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml/badge.svg)](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
-[![加入Slack](https://img.shields.io/badge/slack-%23BitSail-72eff8?logo=slack&color=5DADE2&label=加入%20Slack)](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
+[![加入Slack](https://img.shields.io/badge/slack-%23BitSail-72eff8?logo=slack&color=5DADE2&label=加入%20Slack)](https://join.slack.com/t/bitsailworkspace/shared_invite/zt-1l1vgcnlj-gPSWqggOeRHrSO5l7na2WQ)
+[![Website](https://img.shields.io/badge/Website-%23BitSail-blue)](https://bytedance.github.io/bitsail/)
 
 ## 快速导航
 
- - [快速上手](start.md)：包含BitSail的环境部署和使用教程
- - [BitSail连接器](connectors.md)：包含BitSail支持的连接器使用方法
- - [BitSail组件](components.md)：包含BitSail支持的常用组件
- - [常见问题](faq.md)：BitSail中遇到的常见问题
+ - [快速上手](start/README.md)：包含BitSail的环境部署和使用教程
+ - [BitSail连接器](connectors/README.md)：包含BitSail支持的连接器使用方法
+ - [BitSail组件](components/README.md)：包含BitSail支持的常用组件
+ - [常见问题](faq/README.md)：BitSail中遇到的常见问题
 
 
 ## 介绍
@@ -191,11 +196,23 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <td> </td>
     <td>✅</td>
   </tr>
+  <tr>
+    <td>LarkSheet</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
+    <td>Clickhouse</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
 </table>
 
 ## 社区支持
 ### Slack
-通过此链接可以直接下载并加入BitSail的Slack频道 [link](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
+通过此链接可以直接下载并加入BitSail的Slack频道 [link](https://join.slack.com/t/bitsailworkspace/shared_invite/zt-1l1vgcnlj-gPSWqggOeRHrSO5l7na2WQ)
 
 ### 邮件列表
 当前，BitSail社区通过谷歌群组作为邮件列表的提供者，邮件列表可以在绝大部分地区正常收发邮件。
@@ -214,16 +231,16 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
 <img src="../../images/wechat_QR.png" alt="qr" width="100"/>
 
 ## 环境配置
-跳转[环境配置](docs/start/env_setup.md).
+跳转[环境配置](start/env_setup.md).
 
 ## 如何部署
-跳转[部署指南](docs/start/deployment.md).
+跳转[部署指南](start/deployment.md).
 
 ## BitSail参数指引
-跳转[参数指引](docs/start/config.md).
+跳转[参数指引](start/config.md).
 
 ## 如何贡献
-跳转[贡献者指引](../contribute/contribute.md).
+跳转[贡献者指引](../community/contribute.md).
 
 ## 开源协议
 [Apache 2.0 License](https://github.com/bytedance/bitsail/blob/master/LICENSE).

@@ -2,7 +2,7 @@
 home: true
 title: 首页
 heroImage: /bitsail_logo.png
-heroText: BitSail
+heroText: false
 tagline: 一款基于分布式架构的高性能数据集成引擎，支持多种异构数据源间的数据同步，目前服务于抖音、今日头条等业务线，每日同步百万级数据。
 actions:
   - text: 快速开始
@@ -11,9 +11,6 @@ actions:
   - text: 开源仓库
     link: https://github.com/bytedance/bitsail
     type: primary
-# todo: 修改脚注
-footer: 记得修改脚注，加license！！！
-
 
 features:
   - title: 异构数据源同步

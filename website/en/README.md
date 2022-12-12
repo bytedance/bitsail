@@ -2,7 +2,7 @@
 home: true
 title: HomePage
 heroImage: /bitsail_logo.png
-heroText: BitSail
+heroText: false
 tagline: A high-performance data integration engine based on distributed architecture, supporting data synchronization between multiple heterogeneous data sources.
 actions:
 - text: Quick Start
@@ -11,10 +11,6 @@ actions:
 - text: Github
   link: https://github.com/bytedance/bitsail
   type: primary
-
-# todo: 修改脚注
-footer: 记得修改脚注，加license！！！
-
 
 features:
 - title: Data Sync

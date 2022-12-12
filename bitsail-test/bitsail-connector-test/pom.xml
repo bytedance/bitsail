@@ -101,7 +101,12 @@
             <artifactId>mongo-java-driver</artifactId>
             <version>${mongo.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+            <version>${hbase.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>
