@@ -69,7 +69,7 @@ public class FtpHandlerITCase {
 
   @Test
   public void getFilesSizeTest() {
-    Assert.assertEquals(190L, ftpHandler.getFilesSize(CSV_UPLOAD1));
+    Assert.assertEquals(751L, ftpHandler.getFilesSize(CSV_UPLOAD1));
     Assert.assertEquals(0L, ftpHandler.getFilesSize(CSV_SUCCESS_TAG));
   }
 }

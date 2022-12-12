@@ -28,7 +28,9 @@ public enum FtpErrorCode implements ErrorCode {
   CONFIG_ERROR("Ftp-04", "Config parameter is error."),
   FILEPATH_NOT_EXIST("Ftp-05", "File paths isn't existed, please check filePath is correct."),
   SPLIT_ERROR("Ftp-06", "Something wrong with creating splits."),
-  UNSUPPORTED_TYPE("Ftp-07", "Type is not supported");
+  UNSUPPORTED_TYPE("Ftp-07", "Content Type is not supported"),
+  SUCCESS_FILEPATH_REQUIRED("Ftp-08", "when enable_success_file_check is set to true, the success_file_path is required."),
+  CONTENT_TYPE_NOT_SUPPORTED("Ftp-09", "Content type only supports JSON and CSV.");
 
   private final String code;
   private final String description;

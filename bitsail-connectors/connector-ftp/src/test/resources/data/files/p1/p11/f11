@@ -16,38 +16,3 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package com.bytedance.bitsail.connector.ftp.source.split;
-
-import com.bytedance.bitsail.base.connector.reader.v1.SourceSplit;
-
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-public class FtpSourceSplit implements SourceSplit {
-
-  public static final String FTP_SOURCE_SPLIT_PREFIX = "ftp_source_split_";
-
-  private final String splitId;
-
-  @Setter
-  private String path;
-  @Setter
-  private long fileSize;
-
-  public FtpSourceSplit(int splitId) {
-    this.splitId = FTP_SOURCE_SPLIT_PREFIX + splitId;
-  }
-
-  @Override
-  public String uniqSplitId() {
-    return splitId;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    return (obj instanceof FtpSourceSplit) && (splitId.equals(((FtpSourceSplit) obj).splitId));
-  }
-
-}

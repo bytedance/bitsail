@@ -51,7 +51,7 @@ public class FtpConfig implements Serializable {
 
   private int maxRetryTime;
 
-  private int retryIntervalMs;
+  private int successFileRetryIntervalMs;
 
   private Boolean enableSuccessFileCheck;
   private String successFilePath;
@@ -82,12 +82,14 @@ public class FtpConfig implements Serializable {
     this.password = jobConf.getNecessaryOption(FtpReaderOptions.PASSWORD, FtpErrorCode.REQUIRED_VALUE);
     this.timeout = jobConf.get(FtpReaderOptions.TIME_OUT);
     this.maxRetryTime = jobConf.get(FtpReaderOptions.MAX_RETRY_TIME);
-    this.retryIntervalMs = jobConf.get(FtpReaderOptions.RETRY_INTERVAL_MS);
+    this.successFileRetryIntervalMs = jobConf.get(FtpReaderOptions.RETRY_INTERVAL_MS);
     this.skipFirstLine = jobConf.get(FtpReaderOptions.SKIP_FIRST_LINE);
     this.protocol = FtpConfig.Protocol.valueOf(jobConf.getNecessaryOption(FtpReaderOptions.PROTOCOL, FtpErrorCode.REQUIRED_VALUE).toUpperCase());
-    this.contentType = FtpConfig.ContentType.valueOf(jobConf.getNecessaryOption(FtpReaderOptions.CONTENT_TYPE, FtpErrorCode.REQUIRED_VALUE).toUpperCase());
+    this.contentType = FtpConfig.ContentType.valueOf(jobConf.getNecessaryOption(FtpReaderOptions.CONTENT_TYPE, FtpErrorCode.UNSUPPORTED_TYPE).toUpperCase());
     this.connectPattern = FtpConfig.ConnectPattern.valueOf(jobConf.get(FtpReaderOptions.CONNECT_PATTERN).toUpperCase());
     this.enableSuccessFileCheck = jobConf.get(FtpReaderOptions.ENABLE_SUCCESS_FILE_CHECK);
-    this.successFilePath = jobConf.getNecessaryOption(FtpReaderOptions.SUCCESS_FILE_PATH, FtpErrorCode.SUCCESS_FILE_NOT_EXIST);
+    if (this.enableSuccessFileCheck) {
+      this.successFilePath = jobConf.getNecessaryOption(FtpReaderOptions.SUCCESS_FILE_PATH, FtpErrorCode.SUCCESS_FILEPATH_REQUIRED);
+    }
   }
 }

@@ -22,13 +22,11 @@ package com.bytedance.bitsail.connector.ftp.source.reader;
 import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.base.format.DeserializationSchema;
-import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.ftp.core.client.FtpHandlerFactory;
 import com.bytedance.bitsail.connector.ftp.core.client.IFtpHandler;
 import com.bytedance.bitsail.connector.ftp.core.config.FtpConfig;
-import com.bytedance.bitsail.connector.ftp.error.FtpErrorCode;
 import com.bytedance.bitsail.connector.ftp.source.split.FtpSourceSplit;
 
 import org.slf4j.Logger;
@@ -62,7 +60,6 @@ public class FtpSourceReader implements SourceReader<Row, FtpSourceSplit> {
   private FtpConfig ftpConfig;
 
   private boolean skipFirstLine = false;
-  private String successFilePath;
   private final transient Context context;
 
   public FtpSourceReader(BitSailConfiguration jobConf, Context context, int subTaskId) {
@@ -79,11 +76,6 @@ public class FtpSourceReader implements SourceReader<Row, FtpSourceSplit> {
   @Override
   public void start() {
     this.ftpHandler.loginFtpServer();
-    checkPathsExist();
-    if (this.ftpConfig.getEnableSuccessFileCheck()) {
-      this.successFilePath = this.ftpConfig.getSuccessFilePath();
-      checkSuccessFileExist();
-    }
     if (this.ftpHandler.getFtpConfig().getSkipFirstLine()) {
       this.skipFirstLine = true;
     }
@@ -91,14 +83,21 @@ public class FtpSourceReader implements SourceReader<Row, FtpSourceSplit> {
 
   @Override
   public void pollNext(SourcePipeline<Row> pipeline) throws Exception {
+    if (line == null && br != null) {
+      br.close();
+      br = null;
+      ftpHandler.logoutFtpServer();
+      LOG.info("Task {} finishes reading {} rows from split: {}", subTaskId, currentReadCount, currentSplit.uniqSplitId());
+    }
     if (line == null && splits.isEmpty()) {
       return;
     }
     if (line == null) {
       this.currentSplit = splits.poll();
-      LOG.info("Task {} begins to read split: {}={}", subTaskId, currentSplit.uniqSplitId(), currentSplit.getPath());
+      LOG.info("Task {} begins to read split: {}={},fileSize is {}", subTaskId, currentSplit.uniqSplitId(), currentSplit.getPath(), currentSplit.getFileSize());
       this.currentReadCount = 0;
       ftpHandler.loginFtpServer();
+
       InputStream in = ftpHandler.getInputStream(this.currentSplit.getPath());
       br = new BufferedReader(new InputStreamReader(in, "utf-8"));
       if (this.skipFirstLine) {
@@ -107,46 +106,11 @@ public class FtpSourceReader implements SourceReader<Row, FtpSourceSplit> {
       }
       line = br.readLine();
     }
-    while (line != null) {
+    if (line != null) {
       Row row = deserializationSchema.deserialize(line.getBytes());
       pipeline.output(row);
       line = br.readLine();
       currentReadCount++;
-    }
-
-    br.close();
-    br = null;
-    ftpHandler.logoutFtpServer();
-    LOG.info("Task {} finishes reading {} rows from split: {}", subTaskId, currentReadCount, currentSplit.uniqSplitId());
-  }
-
-  private void checkPathsExist() {
-    for (String path : ftpConfig.getPaths()) {
-      if (!ftpHandler.isPathExist(path)) {
-        throw BitSailException.asBitSailException(FtpErrorCode.FILEPATH_NOT_EXIST,
-                "Given filePath is not exist: " + path + " , please check paths is correct");
-      }
-    }
-  }
-
-  private void checkSuccessFileExist() {
-    boolean fileExistFlag = false;
-    int successFileRetryLeftTimes = ftpConfig.getMaxRetryTime();
-    while (!fileExistFlag && successFileRetryLeftTimes-- > 0) {
-      fileExistFlag = ftpHandler.isFileExist(this.successFilePath);
-      if (!fileExistFlag) {
-        LOG.info("SUCCESS tag file " + this.successFilePath + " is not exist, waiting for retry...");
-        // wait for retry if not SUCCESS tag file
-        try {
-          Thread.sleep(ftpConfig.getRetryIntervalMs());
-        } catch (InterruptedException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    }
-    if (!fileExistFlag) {
-      throw BitSailException.asBitSailException(FtpErrorCode.SUCCESS_FILE_NOT_EXIST,
-            "Success file is not ready after " + ftpConfig.getMaxRetryTime() + " retry, please wait upstream is ready");
     }
   }
 
@@ -164,7 +128,7 @@ public class FtpSourceReader implements SourceReader<Row, FtpSourceSplit> {
 
   @Override
   public boolean hasMoreElements() {
-    if (hasNoMoreSplits && splits.isEmpty() && line == null) {
+    if (hasNoMoreSplits && splits.isEmpty() && br == null) {
       LOG.info("Finish reading all {} splits.", totalSplitNum);
       return false;
     }

@@ -66,7 +66,7 @@ public class SftpHandlerITCase {
 
   @Test
   public void testGetFilesSize() {
-    Assert.assertEquals(190L, sftpHandler.getFilesSize(CSV_UPLOAD1));
+    Assert.assertEquals(751L, sftpHandler.getFilesSize(CSV_UPLOAD1));
     Assert.assertEquals(807L, sftpHandler.getFilesSize(CSV_SUCCESS_TAG));
   }
 }

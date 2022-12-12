@@ -19,25 +19,28 @@ package com.bytedance.bitsail.connector.ftp.source.reader;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.base.format.DeserializationSchema;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.component.format.csv.CsvDeserializationSchema;
 import com.bytedance.bitsail.component.format.json.JsonDeserializationSchema;
 import com.bytedance.bitsail.connector.ftp.core.config.FtpConfig;
+import com.bytedance.bitsail.connector.ftp.error.FtpErrorCode;
 
 public class DeserializationSchemaFactory {
   public static DeserializationSchema createDeserializationSchema(BitSailConfiguration jobConf, FtpConfig ftpConfig, SourceReader.Context context) {
-    DeserializationSchema deserializationSchema;
     if (ftpConfig.getContentType() == FtpConfig.ContentType.CSV) {
-      deserializationSchema = new CsvDeserializationSchema(
-          jobConf,
-          context.getTypeInfos(),
-          context.getFieldNames());;
-    } else {
-      deserializationSchema = new JsonDeserializationSchema(
+      return new CsvDeserializationSchema(
           jobConf,
           context.getTypeInfos(),
           context.getFieldNames());
+    } else if (ftpConfig.getContentType() == FtpConfig.ContentType.JSON) {
+      return new JsonDeserializationSchema(
+          jobConf,
+          context.getTypeInfos(),
+          context.getFieldNames());
+    } else {
+      throw BitSailException.asBitSailException(FtpErrorCode.CONTENT_TYPE_NOT_SUPPORTED,
+          "Content type only supports JSON and CSV");
     }
-    return deserializationSchema;
   }
 }

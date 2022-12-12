@@ -29,11 +29,12 @@ import com.bytedance.bitsail.connector.ftp.core.config.FtpConfig;
 import com.bytedance.bitsail.connector.ftp.error.FtpErrorCode;
 import com.bytedance.bitsail.connector.ftp.source.split.FtpSourceSplit;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,20 +56,24 @@ public class FtpSourceSplitCoordinator implements SourceSplitCoordinator<FtpSour
   private final BitSailConfiguration jobConf;
   private final Map<Integer, Set<FtpSourceSplit>> splitAssignmentPlan;
   protected long fileSize;
+  private FtpConfig ftpConfig;
+  private final IFtpHandler ftpHandler;
+  @Getter
+  private List<FtpSourceSplit> splitList;
 
   public FtpSourceSplitCoordinator(Context<FtpSourceSplit, EmptyState> context,
                                       BitSailConfiguration jobConf) {
     this.context = context;
     this.jobConf = jobConf;
     this.splitAssignmentPlan = Maps.newConcurrentMap();
+    this.ftpConfig = new FtpConfig(jobConf);
+    this.ftpHandler = FtpHandlerFactory.createFtpHandler(this.ftpConfig);
   }
 
   @Override
   public void start() {
-    List<FtpSourceSplit> splitList;
     try {
-      IFtpHandler ftpHandler = FtpHandlerFactory.createFtpHandler(new FtpConfig(jobConf));
-      splitList = construct(ftpHandler);
+      splitList = constructSplit();
     } catch (IOException e) {
       throw new BitSailException(FtpErrorCode.SPLIT_ERROR, "Failed to create splits.");
     }
@@ -125,21 +130,24 @@ public class FtpSourceSplitCoordinator implements SourceSplitCoordinator<FtpSour
     }
   }
 
-  private List<FtpSourceSplit> construct(IFtpHandler ftpHandler) throws IOException {
+  private List<FtpSourceSplit> constructSplit() throws IOException {
     List<FtpSourceSplit> splits = new ArrayList<>();
-    ftpHandler.loginFtpServer();
+    this.ftpHandler.loginFtpServer();
+    if (this.ftpConfig.getEnableSuccessFileCheck()) {
+      checkSuccessFileExist();
+    }
     String[] paths = ftpHandler.getFtpConfig().getPaths();
     int index = 0;
+    //todo support regex
     for (String path : paths) {
+      checkPathsExist(path);
       if (null != path && path.length() > 0) {
-        path = path.replace("\n", "").replace("\r", "");
-        String[] pathArray = StringUtils.split(path, ",");
-        for (String p : pathArray) {
-          for (String f : ftpHandler.getFiles(p.trim())) {
-            FtpSourceSplit split = new FtpSourceSplit(index++);
-            split.setPath(f);
-            splits.add(split);
-          }
+        path = path.replace("\n", "").replace("\r", "").trim();
+        for (String f : ftpHandler.getFiles(path)) {
+          FtpSourceSplit split = new FtpSourceSplit(index++);
+          split.setPath(f);
+          split.setFileSize(ftpHandler.getFilesSize(f));
+          splits.add(split);
         }
       }
       this.fileSize += ftpHandler.getFilesSize(path);
@@ -147,8 +155,37 @@ public class FtpSourceSplitCoordinator implements SourceSplitCoordinator<FtpSour
 
     int numSplits = splits.size();
     ftpHandler.logoutFtpServer();
-    LOG.info("FtpSourceSplitCoordinator Input splits size: {}", numSplits);
+    LOG.info("FtpSourceSplitCoordinator Input splits size: {}, total file size: {}", numSplits, this.fileSize);
     return splits;
+  }
+
+  private void checkPathsExist(String path) {
+    if (!ftpHandler.isPathExist(path)) {
+      throw BitSailException.asBitSailException(FtpErrorCode.FILEPATH_NOT_EXIST,
+          "Given filePath is not exist: " + path + " , please check paths is correct");
+    }
+  }
+
+  private void checkSuccessFileExist() {
+    boolean fileExistFlag = false;
+    int successFileRetryLeftTimes = ftpConfig.getMaxRetryTime();
+    String successFilePath = ftpConfig.getSuccessFilePath();
+    while (!fileExistFlag && successFileRetryLeftTimes-- > 0) {
+      fileExistFlag = ftpHandler.isFileExist(successFilePath);
+      if (!fileExistFlag) {
+        LOG.info("SUCCESS tag file " + successFilePath + " is not exist, waiting for retry...");
+        // wait for retry if not SUCCESS tag file
+        try {
+          Thread.sleep(ftpConfig.getSuccessFileRetryIntervalMs());
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+    if (!fileExistFlag) {
+      throw BitSailException.asBitSailException(FtpErrorCode.SUCCESS_FILE_NOT_EXIST,
+          "Success file is not ready after " + ftpConfig.getMaxRetryTime() + " retry, please wait upstream is ready");
+    }
   }
 
   @Override
@@ -172,5 +209,10 @@ public class FtpSourceSplitCoordinator implements SourceSplitCoordinator<FtpSour
     public static int getReaderIndex(int totalReaderNum) {
       return (int) readerIndex++ % totalReaderNum;
     }
+  }
+
+  @VisibleForTesting
+  public static int getReaderIndexForTest(int totalReaderNum) {
+    return ReaderSelector.getReaderIndex(totalReaderNum);
   }
 }

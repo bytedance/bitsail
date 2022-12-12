@@ -54,11 +54,6 @@ import java.util.Arrays;
 public class CsvDeserializationSchema implements DeserializationSchema<byte[], Row> {
 
   private final BitSailConfiguration deserializationConfiguration;
-
-  private final TypeInfo<?>[] typeInfos;
-
-  private final String[] fieldNames;
-
   private final String csvDelimiter;
   private final Character csvMultiDelimiterReplaceChar;
   private boolean convertErrorColumnAsNull;
@@ -75,8 +70,6 @@ public class CsvDeserializationSchema implements DeserializationSchema<byte[], R
                                   TypeInfo<?>[] typeInfos,
                                   String[] fieldNames) {
     this.deserializationConfiguration = deserializationConfiguration;
-    this.typeInfos = typeInfos;
-    this.fieldNames = fieldNames;
     this.csvDelimiter = deserializationConfiguration.get(CsvReaderOptions.CSV_DELIMITER);
     this.csvMultiDelimiterReplaceChar = deserializationConfiguration.get(CsvReaderOptions.CSV_MULTI_DELIMITER_REPLACER);
 

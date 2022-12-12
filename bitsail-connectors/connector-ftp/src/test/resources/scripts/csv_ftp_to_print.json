@@ -12,8 +12,8 @@
       "user": "user",
       "password": "password",
       "path_list": "/data/csv/upload1/,/data/csv/upload2/",
-      "success_file_path": "/data/csv/_SUCCESS",
       "content_type": "csv",
+      "enable_success_file_check": false,
       "skip_first_line": true,
       "columns": [
         {
