@@ -53,7 +53,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public class HiveRowBuilder implements RowBuilder {
+public class HiveRowBuilder implements RowBuilder<ArrayWritable> {
   private Map<String, Integer> columnMapping;
 
   public HiveRowBuilder(Map<String, Integer> columnMapping) {
@@ -66,10 +66,10 @@ public class HiveRowBuilder implements RowBuilder {
    * @param reuse
    */
   @Override
-  public void build(Object objectValue, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
+  public void build(ArrayWritable objectValue, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
     String columnName = "";
     try {
-      Writable[] vals = ((ArrayWritable) objectValue).get();
+      Writable[] vals = objectValue.get();
 
       for (int i = 0; i < reuse.getArity(); i++) {
         TypeInformation typeInfo = rowTypeInfo.getTypeAt(i);

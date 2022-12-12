@@ -27,7 +27,7 @@ import com.bytedance.bitsail.parser.error.ParserErrorCode;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 
-public class JsonRowBuilder implements RowBuilder {
+public class JsonRowBuilder<T> implements RowBuilder<T> {
 
   private BytesParser bytesParser;
 
@@ -37,7 +37,7 @@ public class JsonRowBuilder implements RowBuilder {
   }
 
   @Override
-  public void build(Object value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
+  public void build(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
     try {
       bytesParser.parse(reuse, value, rowTypeInfo);
     } catch (Exception e) {
