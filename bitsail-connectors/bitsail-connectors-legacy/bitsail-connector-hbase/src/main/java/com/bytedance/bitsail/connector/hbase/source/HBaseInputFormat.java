@@ -37,6 +37,7 @@ import com.bytedance.bitsail.connector.hbase.HBaseHelper;
 import com.bytedance.bitsail.connector.hbase.error.HBasePluginErrorCode;
 import com.bytedance.bitsail.connector.hbase.option.HBaseReaderOptions;
 import com.bytedance.bitsail.connector.hbase.source.split.RegionSplit;
+import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
 
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
@@ -177,6 +178,7 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
             (column.contains(":") && column.split(":").length == 2) || ROW_KEY.equalsIgnoreCase(column),
             "Invalid column names, it should be [ColumnFamily:Column] format"))
         .forEach(column -> columnFamilies.add(column.split(":")[0]));
+    rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(createTypeInfoConverter(), columnInfos);
   }
 
   /**
@@ -220,7 +222,11 @@ public class HBaseInputFormat extends HadoopInputFormatCommonBasePlugin<Row, Inp
         LOG.error("Cannot read data from {}, reason: \n", tableName, e);
       }
     }
-    reuse = deserializationSchema.deserialize(rawRow);
+    Row newRow = deserializationSchema.deserialize(rawRow);
+    for (int i = 0; i < newRow.getArity(); i++) {
+      reuse.setField(i, newRow.getField(i));
+    }
+
     return reuse;
   }
 
