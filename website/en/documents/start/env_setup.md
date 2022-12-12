@@ -7,7 +7,7 @@ English | [简体中文](/zh/documents/start/env_setup.md)
 
 **Bitsail** supports run integration tests on local IDE. To achieve that, you need:
 
-- JDK1.8
+- JDK1.8 or JDK11
 - maven 3.6+
 - [Docker desktop](https://www.docker.com/products/docker-desktop/)
 
