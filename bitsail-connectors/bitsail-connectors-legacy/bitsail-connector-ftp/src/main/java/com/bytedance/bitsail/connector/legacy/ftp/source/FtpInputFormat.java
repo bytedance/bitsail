@@ -71,7 +71,7 @@ public class FtpInputFormat extends InputFormatPlugin<Row, InputSplit> implement
       checkSuccessFileExist();
     }
 
-    this.rowBuilder = new TextRowBuilder(inputSliceConfig);
+    this.rowBuilder = new TextRowBuilder<String>(inputSliceConfig);
 
     List<ColumnInfo> columnInfos = inputSliceConfig.getNecessaryOption(FtpReaderOptions.COLUMNS, FtpInputFormatErrorCode.REQUIRED_VALUE);
     this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(createTypeInfoConverter(), columnInfos);

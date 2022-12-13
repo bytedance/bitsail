@@ -68,7 +68,7 @@ import java.util.Map;
 import java.util.Properties;
 
 @SuppressWarnings("checkstyle:MagicNumber")
-public class HiveGeneralRowBuilder implements RowBuilder {
+public class HiveGeneralRowBuilder implements RowBuilder<Writable> {
   private final Map<String, String> hiveProperties;
   private final String db;
   private final String table;
@@ -104,7 +104,7 @@ public class HiveGeneralRowBuilder implements RowBuilder {
   }
 
   @Override
-  public void build(Object objectValue, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
+  public void build(Writable objectValue, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
     if (deserializer == null) {
       synchronized (hiveShim) {
         if (deserializer == null) {

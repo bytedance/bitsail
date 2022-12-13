@@ -36,7 +36,7 @@ import java.util.stream.IntStream;
 
 import static com.bytedance.bitsail.common.option.ReaderOptions.BaseReaderOptions.CONTENT_TYPE;
 
-public class TextRowBuilder implements RowBuilder {
+public class TextRowBuilder<T> implements RowBuilder<T> {
 
   private ContentType contentType;
   private BytesParser bytesParser;
@@ -51,12 +51,12 @@ public class TextRowBuilder implements RowBuilder {
   }
 
   @Override
-  public void build(Object value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
+  public void build(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
     build(value, reuse, mandatoryEncoding, rowTypeInfo, IntStream.range(0, reuse.getArity()).toArray());
   }
 
   @Override
-  public void build(Object value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo, int[] fieldIndexes) throws BitSailException {
+  public void build(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo, int[] fieldIndexes) throws BitSailException {
     switch (contentType) {
       case JSON:
       case PROTOBUF:
@@ -77,7 +77,7 @@ public class TextRowBuilder implements RowBuilder {
   /**
    * text file is a json/protobuf file which needs a parser to parse
    */
-  private void buildRowWithParser(Object value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo, @NonNull BytesParser bytesParser) throws BitSailException {
+  private void buildRowWithParser(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo, @NonNull BytesParser bytesParser) throws BitSailException {
     try {
       bytesParser.parse(reuse, value, rowTypeInfo);
     } catch (Exception e) {
@@ -88,7 +88,7 @@ public class TextRowBuilder implements RowBuilder {
   /**
    * text file is a csv file which needs a parser to parse
    */
-  private void buildRowWithCsvParser(Object value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo, @NonNull BytesParser bytesParser,
+  private void buildRowWithCsvParser(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo, @NonNull BytesParser bytesParser,
                                      int[] fieldIndexes
   ) throws BitSailException {
     try {
