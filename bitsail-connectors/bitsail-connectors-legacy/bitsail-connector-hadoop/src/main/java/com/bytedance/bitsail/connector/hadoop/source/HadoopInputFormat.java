@@ -77,7 +77,7 @@ public class HadoopInputFormat<K, V> extends
   public void initPlugin() throws Exception {
     String[] paths = inputSliceConfig.getNecessaryOption(HadoopReaderOptions.PATH_LIST, TextInputFormatErrorCode.REQUIRED_VALUE).split(",");
 
-    this.rowBuilder = new TextRowBuilder(inputSliceConfig);
+    this.rowBuilder = new TextRowBuilder<V>(inputSliceConfig);
 
     //todo spi format api.
     String inputClassName = inputSliceConfig.get(HadoopReaderOptions.HADOOP_INPUT_FORMAT_CLASS);
