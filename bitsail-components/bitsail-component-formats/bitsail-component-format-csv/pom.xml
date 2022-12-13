@@ -22,25 +22,26 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>bitsail-components</artifactId>
+        <artifactId>bitsail-component-formats</artifactId>
         <groupId>com.bytedance.bitsail</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitsail-component-formats</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>bitsail-component-format-json</module>
-        <module>bitsail-component-format-csv</module>
-    </modules>
+    <artifactId>bitsail-component-format-csv</artifactId>
 
     <dependencies>
+
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-base</artifactId>
+            <artifactId>bitsail-common</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
         </dependency>
     </dependencies>
 
