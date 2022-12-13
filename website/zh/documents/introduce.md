@@ -4,7 +4,7 @@ order: 1
 
 <!--
 
-Copyright [2022] [ByteDance inc]
+Copyright 2022-present ByteDance.
          
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
