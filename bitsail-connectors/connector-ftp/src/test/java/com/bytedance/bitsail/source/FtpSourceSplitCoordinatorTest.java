@@ -28,7 +28,9 @@ import com.bytedance.bitsail.connector.ftp.source.split.FtpSourceSplit;
 import com.bytedance.bitsail.connector.ftp.source.split.coordinator.FtpSourceSplitCoordinator;
 import com.bytedance.bitsail.util.SetupUtil;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 
@@ -46,11 +48,20 @@ public class FtpSourceSplitCoordinatorTest {
   private FtpSourceSplitCoordinator ftpSourceSplitCoordinator;
   private GenericContainer sftpServer;
 
-  @Test
-  public void testConstructSplit() {
+  @Before
+  public void setup() {
     SetupUtil setupUtil = new SetupUtil();
     sftpServer = setupUtil.getSFTP();
     sftpServer.start();
+  }
+
+  @After
+  public void teardown() {
+    sftpServer.stop();
+  }
+
+  @Test
+  public void testConstructSplit() {
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
     jobConf.set(FtpReaderOptions.PROTOCOL, FtpConfig.Protocol.SFTP.name());
     jobConf.set(FtpReaderOptions.PORT, sftpServer.getFirstMappedPort());
