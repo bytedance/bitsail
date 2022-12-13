@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.bytedance.bitsail.source;
+package com.bytedance.bitsail.source.coordinator;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
@@ -28,7 +28,9 @@ import com.bytedance.bitsail.connector.ftp.source.split.FtpSourceSplit;
 import com.bytedance.bitsail.connector.ftp.source.split.coordinator.FtpSourceSplitCoordinator;
 import com.bytedance.bitsail.util.SetupUtil;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 
@@ -42,23 +44,38 @@ import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-public class FtpSourceSplitCoordinatorTest {
-  private FtpSourceSplitCoordinator ftpSourceSplitCoordinator;
-  private GenericContainer sftpServer;
+import static com.bytedance.bitsail.util.Constant.DEFAULT_TIMEOUT;
+import static com.bytedance.bitsail.util.Constant.LOCALHOST;
+import static com.bytedance.bitsail.util.Constant.PASSWORD;
+import static com.bytedance.bitsail.util.Constant.USER;
 
-  @Test
-  public void testConstructSplit() {
+public class FtpSourceSplitCoordinatorITCase {
+  private FtpSourceSplitCoordinator ftpSourceSplitCoordinator;
+  private static GenericContainer sftpServer;
+
+  @Before
+  public void setup() {
     SetupUtil setupUtil = new SetupUtil();
     sftpServer = setupUtil.getSFTP();
     sftpServer.start();
+  }
+
+  @After
+  public void teardown() {
+    sftpServer.stop();
+  }
+
+  @Test
+  public void testConstructSplit() {
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
     jobConf.set(FtpReaderOptions.PROTOCOL, FtpConfig.Protocol.SFTP.name());
     jobConf.set(FtpReaderOptions.PORT, sftpServer.getFirstMappedPort());
     jobConf.set(FtpReaderOptions.PATH_LIST, "/data/files/p1,/data/files/p2");
     jobConf.set(FtpReaderOptions.ENABLE_SUCCESS_FILE_CHECK, false);
-    jobConf.set(FtpReaderOptions.HOST, "localhost");
-    jobConf.set(FtpReaderOptions.PASSWORD, "password");
-    jobConf.set(FtpReaderOptions.USER, "user");
+    jobConf.set(FtpReaderOptions.HOST, LOCALHOST);
+    jobConf.set(FtpReaderOptions.PASSWORD, PASSWORD);
+    jobConf.set(FtpReaderOptions.USER, USER);
+    jobConf.set(FtpReaderOptions.TIME_OUT, DEFAULT_TIMEOUT);
     jobConf.set(FtpReaderOptions.CONTENT_TYPE, "csv");
     SourceSplitCoordinator.Context<FtpSourceSplit, EmptyState> context = new SourceSplitCoordinator.Context<FtpSourceSplit, EmptyState>() {
 
