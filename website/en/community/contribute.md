@@ -71,3 +71,32 @@ If it is the first time to submit a pull request, you can read this doc [About P
 ## Ask for a code review
 After you have your pull request ready, with all the items from the pull request checklist being completed.
 Tag a committer to review you pull request.
+
+## How to contribute documents
+
+BitSail's documents are saved in the `website` directory of the project, including Chinese and English versions.
+
+When any document update is merged into master branch, a GitHub action is triggered to generate [BitSail's homepage](https://bytedance.github.io/bitsail/). So one need to test the website in local before creating a PR.
+
+The BitSail homepage is built through the [VuePress](https://vuepress-theme-hope.github.io/v2/) framework. After the markdown document is modified, you can try generating a test homepage through the following steps:
+
+ 1. Install [yarn](https://yarnpkg.com/) (A JS package manager)
+
+```bash
+# install yarn
+npm install -g yarn
+
+# search version
+yarn --version
+```
+
+ 2. Generate test homepage locally
+```bash
+# install vuepress
+yarn add -D vuepress@next
+
+# generate homepage
+yarn docs:dev
+
+# visit http://localhost:8080/bitsail/
+```
