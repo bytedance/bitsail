@@ -48,7 +48,9 @@ import redis.clients.jedis.JedisPoolConfig;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -209,6 +211,10 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
         } else if (commandDescription.getJedisCommand() == JedisCommand.HSET) {
           // hash
           processor.addInitialCommand(new Command(commandDescription, key, scoreOrHashKey, value));
+        } else if (commandDescription.getJedisCommand() == JedisCommand.HMSET) {
+          //mhset
+          Map<byte[], byte[]> map = new HashMap<>();
+          processor.addInitialCommand(new Command(commandDescription, key, map));
         } else {
           // set and string
           processor.addInitialCommand(new Command(commandDescription, key, value));

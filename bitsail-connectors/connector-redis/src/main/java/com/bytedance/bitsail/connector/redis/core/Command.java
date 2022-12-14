@@ -23,6 +23,8 @@ import com.bytedance.bitsail.connector.redis.core.jedis.JedisCommandDescription;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Map;
+
 @Data
 public class Command {
   private JedisCommand jedisCommand;
@@ -30,11 +32,19 @@ public class Command {
   private byte[] hashField;
   private double score;
   private byte[] value;
+  private Map<byte[], byte[]> hash;
   private int ttlInSeconds;
 
   public Command(JedisCommandDescription commandDescription, byte[] key, byte[] hashField, byte[] value) {
     this(commandDescription, key, value);
     this.hashField = hashField;
+  }
+
+  public Command(JedisCommandDescription commandDescription, byte[] key, Map<byte[], byte[]> hash) {
+    this.jedisCommand = commandDescription.getJedisCommand();
+    this.key = key;
+    this.hash = hash;
+    this.ttlInSeconds = commandDescription.getAdditionalTTL() == null ? 0 : commandDescription.getAdditionalTTL();
   }
 
   public Command(JedisCommandDescription commandDescription, byte[] key, double score, byte[] value) {

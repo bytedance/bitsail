@@ -87,7 +87,12 @@ public enum JedisCommand {
    * Sets field in the hash stored at key to value. If key does not exist,
    * a new key holding a hash is created. If field already exists in the hash, it is overwritten.
    */
-  HSET(JedisDataType.HASH, 3);
+  HSET(JedisDataType.HASH, 3),
+
+  /**
+   * Support an upstream row contain one key and multiple pairs,and it unlimited number of fields.
+   */
+  HMSET(JedisDataType.SORTED_SET, Integer.MAX_VALUE);
 
   /**
    * The {@link JedisDataType} this command belongs to.
