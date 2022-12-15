@@ -36,6 +36,7 @@ header:
     - 'bitsail-connectors/bitsail-connectors-legacy/bitsail-connector-hudi/src/test/resources/'
     - 'bitsail-connectors/bitsail-connectors-legacy/bitsail-connector-ftp/src/test/resources/'
     - 'bitsail-base/src/test/resources/'
+    - 'bitsail-connectors/connector-ftp/src/test/resources/'
     - 'website/.vuepress/'
     - 'yarn.lock'
 
