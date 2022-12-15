@@ -19,6 +19,51 @@
 
 package com.bytedance.bitsail.connector.jdbc.source;
 
-public class JdbcSource {
+import com.bytedance.bitsail.base.connector.reader.v1.Boundedness;
+import com.bytedance.bitsail.base.connector.reader.v1.Source;
+import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
+import com.bytedance.bitsail.base.connector.reader.v1.SourceReader.Context;
+import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
+import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
+import com.bytedance.bitsail.base.execution.ExecutionEnviron;
+import com.bytedance.bitsail.base.extension.ParallelismComputable;
+import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.connector.jdbc.source.split.JdbcSourceSplit;
 
+import java.io.IOException;
+
+public class JdbcSource implements Source<Row, JdbcSourceSplit, EmptyState>, ParallelismComputable {
+
+  @Override
+  public void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration) throws IOException {
+
+  }
+
+  @Override
+  public Boundedness getSourceBoundedness() {
+    return null;
+  }
+
+  @Override
+  public SourceReader<Row, JdbcSourceSplit> createReader(Context readerContext) {
+    return null;
+  }
+
+  @Override
+  public SourceSplitCoordinator<JdbcSourceSplit, EmptyState> createSplitCoordinator(
+      SourceSplitCoordinator.Context<JdbcSourceSplit, EmptyState> coordinatorContext) {
+    return null;
+  }
+
+  @Override
+  public String getReaderName() {
+    return null;
+  }
+
+  @Override
+  public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConf, BitSailConfiguration selfConf, ParallelismAdvice upstreamAdvice) throws Exception {
+    return null;
+  }
 }
