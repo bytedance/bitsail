@@ -1,0 +1,18 @@
+{
+  "name": "bitsail-docs",
+  "version": "1.0.0",
+  "description": "docs of bitsail",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "docs:build": "vuepress build website",
+    "docs:clean-dev": "vuepress dev website --clean-cache",
+    "docs:dev": "vuepress dev website"
+  },
+  "devDependencies": {
+    "@vuepress/client": "2.0.0-beta.53",
+    "vue": "^3.2.45",
+    "vuepress": "2.0.0-beta.53",
+    "vuepress-theme-hope": "2.0.0-beta.131"
+  }
+}

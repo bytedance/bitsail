@@ -1,24 +1,17 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Original Files: apache/flink(https://github.com/apache/flink)
- * Copyright: Copyright 2014-2022 The Apache Software Foundation
- * SPDX-License-Identifier: Apache License 2.0
- *
- * This file may have been modified by ByteDance Ltd. and/or its affiliates.
  */
 
 package com.bytedance.bitsail.common.option;
@@ -28,8 +21,10 @@ import com.bytedance.bitsail.common.util.Preconditions;
 
 import com.alibaba.fastjson.TypeReference;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @param <T> The type of value associated with the configuration option.
@@ -67,6 +62,8 @@ public class ConfigOption<T> {
   private final Class typeClass;
 
   private TypeReference<T> typeReference;
+
+  private final List<String> alias;
   // ------------------------------------------------------------------------
 
   /**
@@ -80,6 +77,7 @@ public class ConfigOption<T> {
     this.defaultValue = defaultValue;
     this.deprecatedKeys = EMPTY;
     this.typeClass = clazz;
+    this.alias = new ArrayList<>();
   }
 
   ConfigOption(String key, T defaultValue, TypeReference<T> reference) {
@@ -88,6 +86,7 @@ public class ConfigOption<T> {
     this.deprecatedKeys = EMPTY;
     this.typeClass = null;
     this.typeReference = reference;
+    this.alias = new ArrayList<>();
   }
 
   /**
@@ -102,6 +101,12 @@ public class ConfigOption<T> {
     this.defaultValue = defaultValue;
     this.typeClass = clazz;
     this.deprecatedKeys = deprecatedKeys == null || deprecatedKeys.length == 0 ? EMPTY : deprecatedKeys;
+    this.alias = new ArrayList<>();
+  }
+
+  public ConfigOption<T> withAlias(String... aliasName) {
+    this.alias.addAll(Arrays.asList(aliasName));
+    return this;
   }
 
   // ------------------------------------------------------------------------
@@ -130,6 +135,30 @@ public class ConfigOption<T> {
    */
   public String key() {
     return key;
+  }
+
+  /**
+   * Return the config option alias.
+   */
+  public List<String> alias() {
+    return alias;
+  }
+
+  /**
+   * Check whether option has any alias.
+   */
+  public boolean hasAlias() {
+    return alias != null && !alias.isEmpty();
+  }
+
+  /**
+   * Return key and alias.
+   */
+  public List<String> allKeys() {
+    List<String> keys = new ArrayList<>();
+    keys.add(key);
+    keys.addAll(alias);
+    return keys;
   }
 
   /**

@@ -1,24 +1,17 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Original Files: alibaba/DataX (https://github.com/alibaba/DataX)
- * Copyright: Copyright 1999-2022 Alibaba Group Holding Ltd.
- * SPDX-License-Identifier: Apache License 2.0
- *
- * This file may have been modified by ByteDance Ltd. and/or its affiliates.
  */
 
 package com.bytedance.bitsail.common.configuration;
@@ -138,8 +131,13 @@ public class BitSailConfiguration implements Serializable {
   }
 
   public <T> boolean fieldExists(ConfigOption<T> option) {
-    String field = option.key();
-    return this.get(field) != null;
+    List<String> allKeys = option.allKeys();
+    for (String field : allKeys) {
+      if (this.get(field) != null) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public String getUnnecessaryValue(String key, String defaultValue) {
@@ -169,38 +167,44 @@ public class BitSailConfiguration implements Serializable {
     return (T) this.get(path);
   }
 
+  @SuppressWarnings({"checkstyle:EmptyCatchBlock"})
   public <T> T get(final ConfigOption<T> option) {
-    String path = option.key();
-    this.checkPath(path);
-    try {
-      return this.findObjectByConfig(path, option);
-    } catch (Exception e) {
-      if (!option.hasDefaultValue()) {
-        return null;
+    List<String> keys = option.allKeys();
+    for (String path : keys) {
+      this.checkPath(path);
+      try {
+        return this.findObjectByConfig(path, option);
+      } catch (Exception ignored) {
       }
-      return option.defaultValue();
     }
+    return option.hasDefaultValue() ? option.defaultValue() : null;
   }
 
+  @SuppressWarnings({"checkstyle:EmptyCatchBlock"})
   public <T> T getNecessaryOption(final ConfigOption<T> option, ErrorCode errorCode) {
-    String path = option.key();
-    this.checkPath(path);
-    try {
-      return (T) this.findObjectByConfig(path, option);
-    } catch (Exception e) {
-      throw BitSailException.asBitSailException(errorCode,
-          String.format("Invalid configuration, [%s] must be set.", path));
+    List<String> keys = option.allKeys();
+    for (String path : keys) {
+      this.checkPath(path);
+      try {
+        return this.findObjectByConfig(path, option);
+      } catch (Exception ignored) {
+      }
     }
+    throw BitSailException.asBitSailException(errorCode,
+        String.format("Invalid configuration, [%s] must be set.", keys.get(0)));
   }
 
+  @SuppressWarnings({"checkstyle:EmptyCatchBlock"})
   public <T> T getUnNecessaryOption(final ConfigOption<T> option, T defaultValue) {
-    String path = option.key();
-    this.checkPath(path);
-    try {
-      return this.findObjectByConfig(path, option);
-    } catch (Exception e) {
-      return defaultValue;
+    List<String> keys = option.allKeys();
+    for (String path : keys) {
+      this.checkPath(path);
+      try {
+        return this.findObjectByConfig(path, option);
+      } catch (Exception ignored) {
+      }
     }
+    return defaultValue;
   }
 
   public BitSailConfiguration getConfiguration(final String path) {

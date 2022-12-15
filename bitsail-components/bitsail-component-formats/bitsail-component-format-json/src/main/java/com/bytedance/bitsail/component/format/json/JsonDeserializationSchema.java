@@ -1,20 +1,17 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.bytedance.bitsail.component.format.json;
@@ -30,7 +27,13 @@ import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 import com.bytedance.bitsail.component.format.json.error.JsonFormatErrorCode;
+import com.bytedance.bitsail.component.format.json.option.JsonReaderOptions;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonTokenId;
+import com.fasterxml.jackson.core.io.IOContext;
+import com.fasterxml.jackson.core.util.JsonParserDelegate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -40,6 +43,8 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Lists;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -74,14 +79,18 @@ public class JsonDeserializationSchema implements DeserializationSchema<byte[], 
   private final transient DateTimeFormatter localDateFormatter;
   private final transient DateTimeFormatter localTimeFormatter;
   private final transient DeserializationConverter typeInfoConverter;
+  private final boolean isCaseInsensitive;
+  private final boolean convertErrorColumnAsNull;
 
   public JsonDeserializationSchema(BitSailConfiguration deserializationConfiguration,
                                    TypeInfo<?>[] typeInfos,
                                    String[] fieldNames) {
+    this.isCaseInsensitive = deserializationConfiguration.get(JsonReaderOptions.CASE_INSENSITIVE);
+    this.convertErrorColumnAsNull = deserializationConfiguration.get(JsonReaderOptions.CONVERT_ERROR_COLUMN_AS_NULL);
     this.deserializationConfiguration = deserializationConfiguration;
     this.typeInfos = typeInfos;
     this.fieldNames = fieldNames;
-    this.objectMapper = new ObjectMapper();
+    this.objectMapper = createObjectMapper(isCaseInsensitive);
     this.localDateTimeFormatter = DateTimeFormatter.ofPattern(
         deserializationConfiguration.get(CommonOptions.DateFormatOptions.DATE_TIME_PATTERN));
     this.localDateFormatter = DateTimeFormatter
@@ -125,7 +134,12 @@ public class JsonDeserializationSchema implements DeserializationSchema<byte[], 
       Row row = new Row(arity);
       for (int i = 0; i < arity; i++) {
         String fieldName = fieldNames[i];
-        JsonNode field = node.get(fieldName);
+        JsonNode field;
+        if (isCaseInsensitive) {
+          field = node.get(fieldName.toLowerCase());
+        } else {
+          field = node.get(fieldName);
+        }
         Object converted;
         try {
           converted = fieldConverters[i].convert(field);
@@ -159,7 +173,11 @@ public class JsonDeserializationSchema implements DeserializationSchema<byte[], 
       try {
         return typeInfoConverter.convert(jsonNode);
       } catch (Throwable t) {
-        throw t;
+        if (convertErrorColumnAsNull) {
+          return null;
+        } else {
+          throw t;
+        }
       }
     };
   }
@@ -396,5 +414,56 @@ public class JsonDeserializationSchema implements DeserializationSchema<byte[], 
       }
       return result;
     };
+  }
+
+  private ObjectMapper createObjectMapper(boolean isLowerCase) {
+    if (isLowerCase) {
+      return new ObjectMapper(new JsonFactory() {
+        @Override
+        protected JsonParser _createParser(byte[] data, int offset, int len, IOContext ctxt) throws IOException {
+          return new LowerCaseParser(super._createParser(data, offset, len, ctxt));
+        }
+
+        @Override
+        protected JsonParser _createParser(InputStream in, IOContext ctxt) throws IOException {
+          return new LowerCaseParser(super._createParser(in, ctxt));
+        }
+
+        @Override
+        protected JsonParser _createParser(Reader r, IOContext ctxt) throws IOException {
+          return new LowerCaseParser(super._createParser(r, ctxt));
+        }
+
+        @Override
+        protected JsonParser _createParser(char[] data, int offset, int len, IOContext ctxt, boolean recyclable)
+            throws IOException {
+          return new LowerCaseParser(super._createParser(data, offset, len, ctxt, recyclable));
+        }
+      });
+    } else {
+      return new ObjectMapper();
+    }
+  }
+
+  private static final class LowerCaseParser extends JsonParserDelegate {
+    private LowerCaseParser(JsonParser jsonParser) {
+      super(jsonParser);
+    }
+
+    @Override
+    public String getCurrentName() throws IOException {
+      if (hasTokenId(JsonTokenId.ID_FIELD_NAME)) {
+        return delegate.getCurrentName().toLowerCase();
+      }
+      return delegate.getCurrentName();
+    }
+
+    @Override
+    public String getText() throws IOException {
+      if (hasTokenId(JsonTokenId.ID_FIELD_NAME)) {
+        return delegate.getText().toLowerCase();
+      }
+      return delegate.getText();
+    }
   }
 }
