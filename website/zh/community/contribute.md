@@ -71,3 +71,30 @@ BitSail项目使用了[Google Java Style Guide](https://google.github.io/stylegu
 ## 请求代码审查
 准备好pull request后，请确保pull request模板清单中的所有项目都已完成。
 在pull request中@任意一个项目的committer进行代码审查。
+
+## 如何贡献文档
+BitSail的文档保存在项目的`website`目录下，包含中英两个版本。
+当文档更新合入项目master分支后，会触发github action生成 [BitSail主页](https://bytedance.github.io/bitsail/) ，所以在分支合并前需要在本地测试更新后的主页效果。
+
+BitSail主页通过 [VuePress](https://vuepress-theme-hope.github.io/v2/) 框架构建，在本地完成markdown文档修改后，可以通过如下步骤测试主页效果:
+
+ 1. 安装 [yarn](https://yarnpkg.com/) （yarn是一款JS包管理工具）
+ 
+```bash
+# 安装yarn
+npm install -g yarn
+
+# 查看版本
+yarn --version
+```
+
+ 2. 本地生成网页
+```bash
+# 安装vuepress
+yarn add -D vuepress@next
+
+# 本地起测试网页
+yarn docs:dev
+
+# 通过 http://localhost:8080/bitsail/ 访问测试主页
+```

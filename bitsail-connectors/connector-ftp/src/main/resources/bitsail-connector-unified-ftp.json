@@ -1,0 +1,9 @@
+{
+  "name": "bitsail-connector-unified-ftp",
+  "classes": [
+    "com.bytedance.bitsail.connector.ftp.source.FtpSource"
+  ],
+  "libs": [
+    "connector-ftp-${version}.jar"
+  ]
+}

@@ -31,7 +31,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 
-abstract class KVRowBuilder implements RowBuilder {
+abstract class KVRowBuilder<T> implements RowBuilder<T> {
 
   private ContentType contentType;
   private BytesParser bytesParser;
@@ -45,7 +45,7 @@ abstract class KVRowBuilder implements RowBuilder {
   }
 
   @Override
-  public void build(Object value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
+  public void build(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
     switch (contentType) {
       case JSON:
       case PROTOBUF:
@@ -64,7 +64,7 @@ abstract class KVRowBuilder implements RowBuilder {
    *
    * @param reuse
    */
-  private void buildTextRow(Object obj, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) {
+  private void buildTextRow(T obj, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) {
     try {
       byte[] key = getKey(obj);
       byte[] value;
@@ -93,7 +93,7 @@ abstract class KVRowBuilder implements RowBuilder {
    *
    * @param reuse
    */
-  private void buildRowWithParser(Object obj, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo, BytesParser bytesParser) {
+  private void buildRowWithParser(T obj, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo, BytesParser bytesParser) {
     try {
       byte[] key = getKey(obj);
       byte[] value = getValue(obj);
@@ -111,12 +111,12 @@ abstract class KVRowBuilder implements RowBuilder {
   /*
    * get key of object, need to be implemented
    */
-  protected abstract byte[] getKey(Object obj);
+  protected abstract byte[] getKey(T obj);
 
   /*
    * get value of object, need to be implemented
    */
-  protected abstract byte[] getValue(Object obj);
+  protected abstract byte[] getValue(T obj);
 
   /*
    * fail to parse key and value, throw Exception

@@ -29,6 +29,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>bitsail-component-format-json</module>
+        <module>bitsail-component-format-csv</module>
     </modules>
 
     <dependencies>

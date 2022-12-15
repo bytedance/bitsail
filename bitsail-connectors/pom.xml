@@ -42,6 +42,7 @@
         <module>connector-rocketmq</module>
         <module>connector-redis</module>
         <module>connector-clickhouse</module>
+        <module>connector-ftp</module>
         <module>connector-druid</module>
     </modules>
 
