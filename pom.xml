@@ -33,6 +33,7 @@
         <module>bitsail-test</module>
         <module>bitsail-shade</module>
         <module>bitsail-clients</module>
+        <module>bitsail-connectors/connector-jdbc</module>
     </modules>
 
     <properties>
