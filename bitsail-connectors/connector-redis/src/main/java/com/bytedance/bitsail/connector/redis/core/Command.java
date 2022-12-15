@@ -20,6 +20,7 @@ package com.bytedance.bitsail.connector.redis.core;
 import com.bytedance.bitsail.connector.redis.core.jedis.JedisCommand;
 import com.bytedance.bitsail.connector.redis.core.jedis.JedisCommandDescription;
 
+import com.alibaba.fastjson.JSON;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -69,6 +70,8 @@ public class Command {
         return new String(key) + ":" + new String(value);
       case HSET:
         return new String(key) + ":" + new String(hashField);
+      case HMSET:
+        return new String(key) + ":" + JSON.toJSONString(hash);
       default:
         return StringUtils.EMPTY;
     }

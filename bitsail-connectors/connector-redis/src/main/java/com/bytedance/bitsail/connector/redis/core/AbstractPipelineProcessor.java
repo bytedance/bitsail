@@ -52,7 +52,6 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
 
   /**
    * Incremental ID in a single split which is used to print data every other period of time.
-   *
    */
   protected long processorId;
 
@@ -249,7 +248,7 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
         LOG.warn("command failed! connection info: [{}], command is: {}, error is: {}",
             jedis.getClient(),
             command.print(), ((Throwable) response).getMessage(), (Throwable) response);
-        
+
         failureHandler.handle(command, (Throwable) response, this);
       } else if (ttlResponse instanceof Throwable) {
         LOG.warn("Set ttl error! " + ((Throwable) ttlResponse).getMessage(), (Throwable) ttlResponse);
@@ -345,6 +344,8 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
       case ZADD:
         this.pipeline.zadd(command.getKey(), command.getScore(), command.getValue());
         break;
+      case HMSET:
+        this.pipeline.hmset(command.getKey(), command.getHash());
       default:
         // cannot reach here
         break;

@@ -77,4 +77,31 @@ public class RedisSinkITCase {
     Assert.assertEquals(TOTAL_COUNT, redisContainer.getKeyCount());
   }
 
+  @Test
+  public void testhmashBatch() throws Exception {
+    BitSailConfiguration jobConfiguration = JobConfUtils.fromClasspath("fake_to_redis_mhash.json");
+    jobConfiguration.set(FakeReaderOptions.TOTAL_COUNT, TOTAL_COUNT);
+    jobConfiguration.set(CommonOptions.JOB_TYPE, "batch");
+    jobConfiguration.set(FakeReaderOptions.RATE, 1000);
+    jobConfiguration.set(RedisWriterOptions.HOST, redisHost);
+    jobConfiguration.set(RedisWriterOptions.PORT, redisPort);
+
+    EmbeddedFlinkCluster.submitJob(jobConfiguration);
+
+    Assert.assertEquals(TOTAL_COUNT, redisContainer.getKeyCount());
+  }
+
+  @Test
+  public void testHmashStreaming() throws Exception {
+    BitSailConfiguration jobConfiguration = JobConfUtils.fromClasspath("fake_to_redis_mhash.json");
+    jobConfiguration.set(FakeReaderOptions.TOTAL_COUNT, TOTAL_COUNT);
+    jobConfiguration.set(CommonOptions.JOB_TYPE, "streaming");
+    jobConfiguration.set(CommonOptions.CheckPointOptions.CHECKPOINT_ENABLE, true);
+    jobConfiguration.set(RedisWriterOptions.HOST, redisHost);
+    jobConfiguration.set(RedisWriterOptions.PORT, redisPort);
+
+    EmbeddedFlinkCluster.submitJob(jobConfiguration);
+
+    Assert.assertEquals(TOTAL_COUNT, redisContainer.getKeyCount());
+  }
 }

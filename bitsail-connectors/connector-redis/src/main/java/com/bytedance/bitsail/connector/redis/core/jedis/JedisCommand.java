@@ -17,10 +17,14 @@
 
 package com.bytedance.bitsail.connector.redis.core.jedis;
 
+import com.bytedance.bitsail.common.model.ColumnInfo;
+
 import lombok.Getter;
 import org.apache.flink.api.common.typeinfo.PrimitiveArrayTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
+
+import java.util.List;
 
 /**
  * All available commands for Redis. Each command belongs to a {@link JedisDataType} group.
@@ -101,26 +105,28 @@ public enum JedisCommand {
   private JedisDataType jedisDataType;
 
   @Getter
-  private final int columnSize;
+  private int columnSize;
   @Getter
   private final int keyIndex;
   @Getter
   private final int valueIndex;
   @Getter
   private final int defaultScoreOrHashKeyIndex;
-  @Getter
-  private final RowTypeInfo rowTypeInfo;
 
   JedisCommand(JedisDataType jedisDataType, int columnSize) {
     this.jedisDataType = jedisDataType;
-    this.columnSize = columnSize;
     this.keyIndex = 0;
     this.valueIndex = columnSize - 1;
     this.defaultScoreOrHashKeyIndex = 1;
-    TypeInformation[] typeInformations = new TypeInformation[columnSize];
-    for (int i = 0; i < columnSize; i++) {
+
+  }
+
+  public RowTypeInfo getRowTypeInfo(List<ColumnInfo> columnInfos) {
+    this.columnSize = columnInfos.size();
+    TypeInformation[] typeInformations = new TypeInformation[columnInfos.size()];
+    for (int i = 0; i < columnInfos.size(); i++) {
       typeInformations[i] = PrimitiveArrayTypeInfo.BYTE_PRIMITIVE_ARRAY_TYPE_INFO;
     }
-    this.rowTypeInfo = new RowTypeInfo(typeInformations);
+    return new RowTypeInfo(typeInformations);
   }
 }
