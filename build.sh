@@ -21,3 +21,10 @@ mvnProfile=flink-embedded
 
 echo "mvn profile = ${mvnProfile}"
 mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true -U -P${mvnProfile}
+
+# Copy bitsail files into `output` directory
+rm -rf output
+mkdir -p output
+
+revision="0.1.0-SNAPSHOT"   # modify ${revision} when version updated
+cp -r bitsail-dist/target/bitsail-dist-${revision}-bin/bitsail-archive-${revision}/* output/ || { echo 'cp bitsail-dist failed' ; exit 1; }
