@@ -1,0 +1,9 @@
+{
+  "name": "bitsail-connector-unified-hadoop",
+  "classes": [
+    "com.bytedance.bitsail.connector.hadoop.source.HadoopSource"
+  ],
+  "libs": [
+    "connector-hadoop-${version}.jar"
+  ]
+}
