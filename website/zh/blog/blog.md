@@ -15,5 +15,5 @@
 
 ## 2020
 - [字节跳动基于Flink的MQ-Hive实时数据集成](https://mp.weixin.qq.com/s/U04x9bzgWhjxQTXFgp-_GQ)
-- [Flink Forwrd Asia 2020峰会](https://developer.aliyun.com/topic/ffa2020/live)
+- [Flink Forward Asia 2020峰会](https://developer.aliyun.com/topic/ffa2020/live)
     - 12月14日下午，行业实践，字节跳动基于Flink的MQ-Hive实时数据集成
