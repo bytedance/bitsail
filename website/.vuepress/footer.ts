@@ -27,6 +27,7 @@ export const cnFooter = `
           <div style="text-align: center;">
             <h3>文档</h3>
             <a style="display: block; color: rgb(209, 213, 219); margin-bottom: 10px;" href="/bitsail/zh/documents/start/index.html">快速开始</a>
+            <a style="display: block; color: rgb(209, 213, 219); margin-bottom: 10px;" href="/bitsail/zh/documents/faq/index.html">FAQ</a>
           </div>
           <div style="text-align: center; margin-left: 40px;">
             <h3>社区</h3>
@@ -61,6 +62,7 @@ export const enFooter = `
           <div style="text-align: center;">
             <h3>Documents</h3>
             <a style="display: block; color: rgb(209, 213, 219); margin-bottom: 10px;" href="/bitsail/en/documents/start/index.html">Quick Start</a>
+            <a style="display: block; color: rgb(209, 213, 219); margin-bottom: 10px;" href="/bitsail/en/documents/faq/index.html">FAQ</a>
           </div>
           <div style="text-align: center; margin-left: 40px;">
             <h3>Community</h3>
