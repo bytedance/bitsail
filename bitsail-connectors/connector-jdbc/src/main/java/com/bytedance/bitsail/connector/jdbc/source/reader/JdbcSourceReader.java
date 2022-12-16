@@ -21,12 +21,17 @@ package com.bytedance.bitsail.connector.jdbc.source.reader;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.jdbc.source.split.JdbcSourceSplit;
 
 import java.util.List;
 
 public class JdbcSourceReader implements SourceReader<Row, JdbcSourceSplit> {
+
+  public JdbcSourceReader(BitSailConfiguration jobConf, SourceReader.Context readerContext) {
+
+  }
 
   @Override
   public void start() {

@@ -30,25 +30,32 @@ import com.bytedance.bitsail.base.extension.ParallelismComputable;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.connector.jdbc.JdbcConstants;
+import com.bytedance.bitsail.connector.jdbc.source.reader.JdbcSourceReader;
 import com.bytedance.bitsail.connector.jdbc.source.split.JdbcSourceSplit;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
+@Slf4j
 public class JdbcSource implements Source<Row, JdbcSourceSplit, EmptyState>, ParallelismComputable {
+
+  private BitSailConfiguration jobConf;
 
   @Override
   public void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration) throws IOException {
-
+    this.jobConf = readerConfiguration;
   }
 
   @Override
   public Boundedness getSourceBoundedness() {
-    return null;
+    return Boundedness.BOUNDEDNESS;
   }
 
   @Override
   public SourceReader<Row, JdbcSourceSplit> createReader(Context readerContext) {
-    return null;
+    return new JdbcSourceReader(jobConf, readerContext);
   }
 
   @Override
@@ -59,7 +66,7 @@ public class JdbcSource implements Source<Row, JdbcSourceSplit, EmptyState>, Par
 
   @Override
   public String getReaderName() {
-    return null;
+    return JdbcConstants.JDBC_CONNECTOR_NAME;
   }
 
   @Override
