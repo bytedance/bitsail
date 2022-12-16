@@ -345,6 +345,7 @@ public abstract class AbstractPipelineProcessor implements PipelineProcessor {
         break;
       case HMSET:
         this.pipeline.hmset(command.getKey(), command.getHash());
+        break;
       default:
         // cannot reach here
         break;
