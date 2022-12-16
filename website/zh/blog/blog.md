@@ -1,7 +1,7 @@
 # 博客
 
 ## 2022
-
+- [干货｜如何快速实现BitSail Connector？](https://mp.weixin.qq.com/s/ZkJgq-WVT5W9Xw4AOvgmgg)
 - [干货｜深度解析字节跳动开源数据集成引擎BitSail](https://mp.weixin.qq.com/s/FqVICUVsaJWNuDwIUe5ZnQ)
 - [InfoQ: 字节跳动开源BitSail：重构数据集成引擎，走向云原生化、实时化](https://mp.weixin.qq.com/s/nQdWOipYggBNGAB-LLcbCA)
 - [干货｜字节跳动流式数据集成基于Flink Checkpoint两阶段提交的实践和优化（1）](https://mp.weixin.qq.com/s?__biz=MzkwMzMwOTQwMg==&mid=2247490866&idx=1&sn=ff8e0bce2bce0eaea87cfafcaba4c6f6&chksm=c0996c07f7eee5114ded498b3c42bdec36f9eeb1220f1dcdc7e47d0b6cfb4487d78f74bfc834&token=785097190&lang=zh_CN#rd)
