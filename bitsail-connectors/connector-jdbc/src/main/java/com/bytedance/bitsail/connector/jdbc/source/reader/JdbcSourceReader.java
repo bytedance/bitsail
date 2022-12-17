@@ -30,7 +30,6 @@ import java.util.List;
 public class JdbcSourceReader implements SourceReader<Row, JdbcSourceSplit> {
 
   public JdbcSourceReader(BitSailConfiguration jobConf, SourceReader.Context readerContext) {
-
   }
 
   @Override

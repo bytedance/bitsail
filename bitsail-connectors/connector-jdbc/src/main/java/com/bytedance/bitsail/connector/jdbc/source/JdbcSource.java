@@ -31,8 +31,11 @@ import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.jdbc.JdbcConstants;
+import com.bytedance.bitsail.connector.jdbc.option.JdbcReaderOptions;
 import com.bytedance.bitsail.connector.jdbc.source.reader.JdbcSourceReader;
 import com.bytedance.bitsail.connector.jdbc.source.split.JdbcSourceSplit;
+import com.bytedance.bitsail.connector.jdbc.source.split.coordinator.JdbcSourceSplitCoordinator;
+import com.bytedance.bitsail.connector.jdbc.source.split.strategy.SimpleDivideSplitConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,7 +64,7 @@ public class JdbcSource implements Source<Row, JdbcSourceSplit, EmptyState>, Par
   @Override
   public SourceSplitCoordinator<JdbcSourceSplit, EmptyState> createSplitCoordinator(
       SourceSplitCoordinator.Context<JdbcSourceSplit, EmptyState> coordinatorContext) {
-    return null;
+    return new JdbcSourceSplitCoordinator(coordinatorContext, jobConf);
   }
 
   @Override
@@ -70,7 +73,19 @@ public class JdbcSource implements Source<Row, JdbcSourceSplit, EmptyState>, Par
   }
 
   @Override
-  public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConf, BitSailConfiguration selfConf, ParallelismAdvice upstreamAdvice) throws Exception {
-    return null;
+  public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConf, BitSailConfiguration selfConf, ParallelismAdvice upstreamAdvice) {
+    int parallelism;
+    if (selfConf.fieldExists(JdbcReaderOptions.READER_PARALLELISM_NUM)) {
+      parallelism = selfConf.get(JdbcReaderOptions.READER_PARALLELISM_NUM);
+    } else {
+      try {
+        SimpleDivideSplitConstructor constructor = new SimpleDivideSplitConstructor(jobConf);
+        parallelism = constructor.estimateSplitNum();
+      } catch (IOException e) {
+        parallelism = 1;
+        log.warn("Failed to compute splits for computing parallelism, will use default 1.");
+      }
+    }
+    return new ParallelismAdvice(false, parallelism);
   }
 }
