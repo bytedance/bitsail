@@ -88,7 +88,7 @@ npm install -g yarn
 yarn --version
 ```
 
- 2. 本地生成网页
+ 1. 本地生成网页
 ```bash
 # 安装vuepress
 yarn add -D vuepress@next

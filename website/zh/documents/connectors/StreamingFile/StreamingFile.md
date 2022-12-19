@@ -2,7 +2,7 @@
 
 上级文档: [connectors](../README.md)
 
-*StreamingFile*连接器的主要使用于流式场景中，提供保证`Exactly-Once`语义的写入HDFS、Hive的能力。
+***StreamingFile*** 连接器的主要使用于流式场景中，提供保证`Exactly-Once`语义的写入HDFS、Hive的能力。
 为各个厂商的实时数仓提供可靠的保障；
 
 ## 主要功能

@@ -2,7 +2,7 @@
 
 上级文档: [connectors](../README.md)
 
-***Bitsail***飞书表格连接器可用于支持读取飞书表格，主要功能如下:
+***BitSail***飞书表格连接器可用于支持读取飞书表格，主要功能如下:
 
  - 支持批式一次读取多张飞书表格
  - 支持token和 [application](https://open.feishu.cn/document/ukTMukTMukTM/uYTM5UjL2ETO14iNxkTN/terminology?lang=en-US) 两种鉴权方式
