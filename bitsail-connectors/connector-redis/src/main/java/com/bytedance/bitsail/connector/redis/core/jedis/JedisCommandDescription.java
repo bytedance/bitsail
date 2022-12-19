@@ -34,7 +34,7 @@ public class JedisCommandDescription implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Getter
-  private JedisCommand jedisCommand;
+  private final JedisCommand jedisCommand;
 
   /**
    * This additional key is needed for the group {@link JedisDataType#HASH} and {@link JedisDataType#SORTED_SET}.
@@ -46,7 +46,7 @@ public class JedisCommandDescription implements Serializable {
    * {@link #getAdditionalKey()} used as set name for {@link JedisDataType#SORTED_SET}
    */
   @Getter
-  private String additionalKey;
+  private final String additionalKey;
 
   /**
    * This additional key is optional for the group {@link JedisDataType#HASH}, required for {@link JedisCommand#SETEX}.
@@ -56,7 +56,7 @@ public class JedisCommandDescription implements Serializable {
    * <p>For {@link JedisCommand#SETEX}, we need key, value and time to live (TTL).
    */
   @Getter
-  private Integer additionalTTL;
+  private final Integer additionalTTL;
 
   /**
    * Default constructor for {@link JedisCommandDescription}.

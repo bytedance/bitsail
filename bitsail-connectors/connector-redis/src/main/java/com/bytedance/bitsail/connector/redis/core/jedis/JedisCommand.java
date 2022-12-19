@@ -16,18 +16,10 @@
 
 package com.bytedance.bitsail.connector.redis.core.jedis;
 
-import com.bytedance.bitsail.common.model.ColumnInfo;
-
 import lombok.Getter;
-import org.apache.flink.api.common.typeinfo.PrimitiveArrayTypeInfo;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.typeutils.RowTypeInfo;
-
-import java.util.List;
 
 /**
  * All available commands for Redis. Each command belongs to a {@link JedisDataType} group.
- * https://github.com/apache/bahir-flink/tree/master/flink-connector-redis
  */
 public enum JedisCommand {
 
@@ -36,96 +28,80 @@ public enum JedisCommand {
    * Insert the specified value at the head of the list stored at key.
    * If key does not exist, it is created as empty list before performing the push operations.
    */
-  LPUSH(JedisDataType.LIST, 2),
+  LPUSH(JedisDataType.LIST),
 
   /**
    * Unsupported because it's not idempotent.
    * Insert the specified value at the tail of the list stored at key.
    * If key does not exist, it is created as empty list before performing the push operation.
    */
-  RPUSH(JedisDataType.LIST, 2),
+  RPUSH(JedisDataType.LIST),
 
   /**
    * Add the specified member to the set stored at key.
    * Specified member that is already a member of this set is ignored.
    */
-  SADD(JedisDataType.SET, 2),
+  SADD(JedisDataType.SET),
 
   /**
    * Set key to hold the string value. If key already holds a value,
    * it is overwritten, regardless of its type.
    */
-  SET(JedisDataType.STRING, 2),
+  SET(JedisDataType.STRING),
 
   /**
    * Set key to hold the string value, with a time to live (TTL). If key already holds a value,
    * it is overwritten, regardless of its type.
    */
-  SETEX(JedisDataType.STRING, 2),
+  SETEX(JedisDataType.STRING),
 
   /**
    * todo: support this operation.
    * Adds the element to the HyperLogLog data structure stored at the variable name specified as first argument.
    */
-  PFADD(JedisDataType.HYPER_LOG_LOG, 2),
+  PFADD(JedisDataType.HYPER_LOG_LOG),
 
   /**
    * todo: support this operation.
    * Posts a message to the given channel.
    */
-  PUBLISH(JedisDataType.PUBSUB, 2),
+  PUBLISH(JedisDataType.PUBSUB),
 
   /**
    * Adds the specified members with the specified score to the sorted set stored at key.
    */
-  ZADD(JedisDataType.SORTED_SET, 3),
+  ZADD(JedisDataType.SORTED_SET),
 
   /**
    * todo: support this operation.
    * Removes the specified members from the sorted set stored at key.
    */
-  ZREM(JedisDataType.SORTED_SET, 3),
+  ZREM(JedisDataType.SORTED_SET),
 
   /**
    * Sets field in the hash stored at key to value. If key does not exist,
    * a new key holding a hash is created. If field already exists in the hash, it is overwritten.
    */
-  HSET(JedisDataType.HASH, 3),
+  HSET(JedisDataType.HASH),
 
   /**
    * Support an upstream row contain one key and multiple pairs,and it unlimited number of fields.
    */
-  HMSET(JedisDataType.SORTED_SET, Integer.MAX_VALUE);
+  HMSET(JedisDataType.SORTED_SET);
 
   /**
    * The {@link JedisDataType} this command belongs to.
    */
   @Getter
-  private JedisDataType jedisDataType;
-
-  @Getter
-  private int columnSize;
+  private final JedisDataType jedisDataType;
   @Getter
   private final int keyIndex;
   @Getter
-  private final int valueIndex;
-  @Getter
   private final int defaultScoreOrHashKeyIndex;
 
-  JedisCommand(JedisDataType jedisDataType, int columnSize) {
+  JedisCommand(JedisDataType jedisDataType) {
     this.jedisDataType = jedisDataType;
     this.keyIndex = 0;
-    this.valueIndex = columnSize - 1;
     this.defaultScoreOrHashKeyIndex = 1;
-
-  }
-
-  public RowTypeInfo getRowTypeInfo(List<ColumnInfo> columnInfos) {
-    this.columnSize = columnInfos.size();
-    TypeInformation[] typeInformations = new TypeInformation[columnInfos.size()];
-    for (int i = 0; i < columnInfos.size(); i++) {
-      typeInformations[i] = PrimitiveArrayTypeInfo.BYTE_PRIMITIVE_ARRAY_TYPE_INFO;
-    }
-    return new RowTypeInfo(typeInformations);
   }
 }

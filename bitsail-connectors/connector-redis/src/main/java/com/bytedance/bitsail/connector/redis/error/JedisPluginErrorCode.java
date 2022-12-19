@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.redis.core.jedis;
+package com.bytedance.bitsail.connector.redis.error;
 
 import com.bytedance.bitsail.common.exception.ErrorCode;
 

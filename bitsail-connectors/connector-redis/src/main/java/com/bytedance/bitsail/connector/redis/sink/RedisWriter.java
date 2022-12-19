@@ -19,24 +19,27 @@ package com.bytedance.bitsail.connector.redis.sink;
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.connector.redis.config.JedisPoolOptions;
-import com.bytedance.bitsail.connector.redis.config.RedisOptions;
 import com.bytedance.bitsail.connector.redis.core.Command;
+import com.bytedance.bitsail.connector.redis.core.TtlType;
 import com.bytedance.bitsail.connector.redis.core.api.PipelineProcessor;
 import com.bytedance.bitsail.connector.redis.core.jedis.JedisCommand;
 import com.bytedance.bitsail.connector.redis.core.jedis.JedisCommandDescription;
+import com.bytedance.bitsail.connector.redis.core.jedis.JedisDataType;
+import com.bytedance.bitsail.connector.redis.error.RedisPluginErrorCode;
 import com.bytedance.bitsail.connector.redis.error.RedisUnexpectedException;
+import com.bytedance.bitsail.connector.redis.option.RedisWriterOptions;
 
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Jedis;
@@ -64,16 +67,16 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   /**
    * Jedis connection pool.
    */
-  private final transient JedisPool jedisPool;
+  private final JedisPool jedisPool;
 
   /**
    * Retryer for obtaining jedis.
    */
-  private final transient Retryer.RetryerCallable<Jedis> jedisFetcher;
+  private final Retryer.RetryerCallable<Jedis> jedisFetcher;
 
-  private final transient Retryer<Boolean> retryer;
+  private final Retryer<Boolean> retryer;
 
-  private final transient CircularFifoQueue<Row> recordQueue;
+  private final CircularFifoQueue<Row> recordQueue;
 
   /**
    * pipeline id for logging.
@@ -93,7 +96,7 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   /**
    * Complex type command with ttl.
    */
-  private final boolean complexTypeWithTtl;
+  private boolean complexTypeWithTtl;
 
   /**
    * Log interval of pipelines.
@@ -106,30 +109,48 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   private final int maxAttemptCount;
 
   @SuppressWarnings("checkstyle:MagicNumber")
-  public RedisWriter(RedisOptions redisOptions, JedisPoolOptions jedisPoolOptions) {
-    this.recordQueue = new CircularFifoQueue<>(redisOptions.getBatchInterval());
-    this.columnSize = redisOptions.getColumnSize();
-    this.complexTypeWithTtl = redisOptions.isComplexTypeWithTtl();
-    this.commandDescription = redisOptions.getCommandDescription();
-    this.logSampleInterval = redisOptions.getLogSampleInterval();
-    this.maxAttemptCount = redisOptions.getMaxAttemptCount();
+  public RedisWriter(BitSailConfiguration writerConfiguration) {
+    // initialize ttl
+    int ttl = writerConfiguration.getUnNecessaryOption(RedisWriterOptions.TTL, -1);
+    TtlType ttlType;
+    try {
+      ttlType = TtlType.valueOf(StringUtils.upperCase(writerConfiguration.get(RedisWriterOptions.TTL_TYPE)));
+    } catch (IllegalArgumentException e) {
+      throw BitSailException.asBitSailException(RedisPluginErrorCode.ILLEGAL_VALUE,
+          String.format("unknown ttl type: %s", writerConfiguration.get(RedisWriterOptions.TTL_TYPE)));
+    }
+    int ttlInSeconds = ttl < 0 ? -1 : ttl * ttlType.getContainSeconds();
+    log.info("ttl is {}(s)", ttlInSeconds);
 
+    // initialize commandDescription
+    String redisDataType = StringUtils.upperCase(writerConfiguration.get(RedisWriterOptions.REDIS_DATA_TYPE));
+    String additionalKey = writerConfiguration.getUnNecessaryOption(RedisWriterOptions.ADDITIONAL_KEY, "default_redis_key");
+    this.commandDescription = initJedisCommandDescription(redisDataType, ttlInSeconds, additionalKey);
+    this.columnSize = writerConfiguration.get(RedisWriterOptions.COLUMNS).size();
+
+    // initialize jedis pool
     JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-    jedisPoolConfig.setMaxTotal(jedisPoolOptions.getMaxTotalConnection());
-    jedisPoolConfig.setMaxIdle(jedisPoolOptions.getMaxIdleConnection());
-    jedisPoolConfig.setMinIdle(jedisPoolOptions.getMinIdleConnection());
-    jedisPoolConfig.setMaxWait(Duration.ofMillis(jedisPoolOptions.getMaxWaitTimeInMillis()));
+    jedisPoolConfig.setMaxTotal(writerConfiguration.get(RedisWriterOptions.JEDIS_POOL_MAX_TOTAL_CONNECTIONS));
+    jedisPoolConfig.setMaxIdle(writerConfiguration.get(RedisWriterOptions.JEDIS_POOL_MAX_IDLE_CONNECTIONS));
+    jedisPoolConfig.setMinIdle(writerConfiguration.get(RedisWriterOptions.JEDIS_POOL_MIN_IDLE_CONNECTIONS));
+    jedisPoolConfig.setMaxWait(Duration.ofMillis(writerConfiguration.get(RedisWriterOptions.JEDIS_POOL_MAX_WAIT_TIME_IN_MILLIS)));
 
-    String redisPassword = redisOptions.getRedisPassword();
-    String redisHost = redisOptions.getRedisHost();
-    int redisPort = redisOptions.getRedisPort();
-    int timeout = redisOptions.getTimeout();
+    String redisHost = writerConfiguration.getNecessaryOption(RedisWriterOptions.HOST, RedisPluginErrorCode.REQUIRED_VALUE);
+    int redisPort = writerConfiguration.getNecessaryOption(RedisWriterOptions.PORT, RedisPluginErrorCode.REQUIRED_VALUE);
+    String redisPassword = writerConfiguration.get(RedisWriterOptions.PASSWORD);
+    int timeout = writerConfiguration.get(RedisWriterOptions.CLIENT_TIMEOUT_MS);
+
     if (StringUtils.isEmpty(redisPassword)) {
       this.jedisPool = new JedisPool(jedisPoolConfig, redisHost, redisPort, timeout);
     } else {
       this.jedisPool = new JedisPool(jedisPoolConfig, redisHost, redisPort, timeout, redisPassword);
     }
 
+    // initialize record queue
+    int batchSize = writerConfiguration.get(RedisWriterOptions.WRITE_BATCH_INTERVAL);
+    this.recordQueue = new CircularFifoQueue<>(batchSize);
+
+    this.logSampleInterval = writerConfiguration.get(RedisWriterOptions.LOG_SAMPLE_INTERVAL);
     this.jedisFetcher = RetryerBuilder.<Jedis>newBuilder()
         .retryIfResult(Objects::isNull)
         .retryIfRuntimeException()
@@ -137,12 +158,49 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
         .withWaitStrategy(WaitStrategies.exponentialWait(100, 5, TimeUnit.MINUTES))
         .build()
         .wrap(jedisPool::getResource);
+
+    this.maxAttemptCount = writerConfiguration.get(RedisWriterOptions.MAX_ATTEMPT_COUNT);
     this.retryer = RetryerBuilder.<Boolean>newBuilder()
         .retryIfResult(needRetry -> Objects.equals(needRetry, true))
         .retryIfException(e -> !(e instanceof BitSailException))
         .withWaitStrategy(WaitStrategies.fixedWait(3, TimeUnit.SECONDS))
         .withStopStrategy(StopStrategies.stopAfterAttempt(maxAttemptCount))
         .build();
+  }
+
+  @VisibleForTesting
+  public JedisCommandDescription initJedisCommandDescription(String redisDataType, int ttlSeconds, String additionalKey) {
+    JedisDataType dataType = JedisDataType.valueOf(redisDataType.toUpperCase());
+    JedisCommand jedisCommand;
+    this.complexTypeWithTtl = ttlSeconds > 0;
+    switch (dataType) {
+      case STRING:
+        jedisCommand = JedisCommand.SET;
+        if (ttlSeconds > 0) {
+          jedisCommand = JedisCommand.SETEX;
+          this.complexTypeWithTtl = false;
+        }
+        break;
+      case SET:
+        jedisCommand = JedisCommand.SADD;
+        break;
+      case HASH:
+        jedisCommand = JedisCommand.HSET;
+        break;
+      case MHASH:
+        jedisCommand = JedisCommand.HMSET;
+        break;
+      case SORTED_SET:
+        jedisCommand = JedisCommand.ZADD;
+        break;
+      default:
+        throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR, "The configure date type " + redisDataType +
+            " is not supported, only support string, set, hash, sorted set.");
+    }
+    if (ttlSeconds <= 0) {
+      return new JedisCommandDescription(jedisCommand, additionalKey);
+    }
+    return new JedisCommandDescription(jedisCommand, additionalKey, ttlSeconds);
   }
 
   @Override
@@ -164,21 +222,17 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
             String.format("record contains null element in index[%d]", i));
       }
     }
-    if (commandDescription.getJedisCommand() == JedisCommand.ZADD) {
-      parseScoreFromBytes((byte[]) record.getField(1));
-    }
   }
 
   /**
    * check if score field can be parsed to double.
    */
-  private double parseScoreFromBytes(byte[] scoreInBytes) throws BitSailException {
+  private double parseScoreFromString(String scoreString) throws BitSailException {
     try {
-      return Double.parseDouble(new String(scoreInBytes));
+      return Double.parseDouble(scoreString);
     } catch (NumberFormatException exception) {
-      throw new BitSailException(CONVERT_NOT_SUPPORT,
-          String.format("The score can't convert to double. And the score is %s.",
-              new String(scoreInBytes)));
+      throw new BitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
+          String.format("The score can't convert to double. And the score is %s.", scoreString));
     }
   }
 
@@ -190,23 +244,23 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
       Row record;
       while ((record = recordQueue.poll()) != null) {
 
-        byte[] key = ((String) record.getField(0)).getBytes();
-        byte[] value = ((String) record.getField(1)).getBytes();
-        byte[] scoreOrHashKey = value;
+        String key = (String) record.getField(0);
+        String value = (String) record.getField(1);
+        String scoreOrHashKey = value;
         if (columnSize == SORTED_SET_OR_HASH_COLUMN_SIZE) {
-          value = ((String) record.getField(2)).getBytes();
+          value = (String) record.getField(2);
           // Replace empty key with additionalKey in sorted set and hash.
-          if (key.length == 0) {
-            key = commandDescription.getAdditionalKey().getBytes();
+          if (key.length() == 0) {
+            key = commandDescription.getAdditionalKey();
           }
         }
 
         if (commandDescription.getJedisCommand() == JedisCommand.ZADD) {
-          // sortedSet
-          processor.addInitialCommand(new Command(commandDescription, key, parseScoreFromBytes(scoreOrHashKey), value));
+          // sorted set
+          processor.addInitialCommand(new Command(commandDescription, key.getBytes(), parseScoreFromString(scoreOrHashKey), value.getBytes()));
         } else if (commandDescription.getJedisCommand() == JedisCommand.HSET) {
           // hash
-          processor.addInitialCommand(new Command(commandDescription, key, scoreOrHashKey, value));
+          processor.addInitialCommand(new Command(commandDescription, key.getBytes(), scoreOrHashKey.getBytes(), value.getBytes()));
         } else if (commandDescription.getJedisCommand() == JedisCommand.HMSET) {
           //mhset
           if ((record.getArity() - 1) % 2 != 0) {
@@ -219,14 +273,13 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
           for (int index = 0; index < datas.size(); index = index + 2) {
             map.put(datas.get(index), datas.get(index + 1));
           }
-          processor.addInitialCommand(new Command(commandDescription, key, map));
+          processor.addInitialCommand(new Command(commandDescription, key.getBytes(), map));
         } else {
           // set and string
-          processor.addInitialCommand(new Command(commandDescription, key, value));
+          processor.addInitialCommand(new Command(commandDescription, key.getBytes(), value.getBytes()));
         }
       }
       retryer.call(processor::run);
-
     } catch (ExecutionException | RetryException e) {
       if (e.getCause() instanceof BitSailException) {
         throw (BitSailException) e.getCause();
@@ -255,16 +308,7 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
 
   @Override
   public void close() throws IOException {
-    try {
-      if (CollectionUtils.isNotEmpty(recordQueue)) {
-        flush(true);
-      }
-    } catch (IOException e) {
-      log.error("flush the last pipeline occurs error.", e);
-      throw e;
-    } finally {
-      Writer.super.close();
-      jedisPool.close();
-    }
+    Writer.super.close();
+    jedisPool.close();
   }
 }
