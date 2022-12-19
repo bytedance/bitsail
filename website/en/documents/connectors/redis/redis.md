@@ -35,6 +35,8 @@ Each data type has its own requirement for input data:
 | Hash | 3 | key of hash | key to insert to hash | value to insert to hash |
 | Sorted Set (Zset) | 3 | key of Sorted set | score | value to insert to set |
 
+Tips: If there are more than 3 columns, `Mhash` can be used.
+
 ### Parameters
 
 The following mentioned parameters should be added to `job.writer` block when using, for example:
@@ -71,7 +73,7 @@ The following mentioned parameters should be added to `job.writer` block when us
 | ttl | No | | Ttl of inserted data. Default -1 means not setting ttl |
 | ttl_type | No  | "DAY", "HOUR", "MINUTE", "SECOND" |  Time unit of ttl. Default "DAY" |
 | write_batch_interval | No | | Redis instruction write batch size. Default 50 | 
-| redis_data_type | No | "string"<br/>"set"<br/>"hash"<br/>"sorted_set" | Data type to insert. Default "string" | 
+| redis_data_type | No | "string"<br/>"set"<br/>"hash"<br/>"sorted_set"<br/>"mhash" | Data type to insert. Default "string" | 
 | password | No | | Password of redis | 
 
 

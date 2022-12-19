@@ -155,7 +155,7 @@ public class RedisSink<CommitT extends Serializable> implements Sink<Row, Commit
   }
 
   private RowTypeInfo getRowTypeInfo(List<ColumnInfo> columns) {
-    return commandDescription.getJedisCommand().getRowTypeInfo();
+    return commandDescription.getJedisCommand().getRowTypeInfo(columns);
   }
 
   public JedisCommandDescription initJedisCommandDescription(String redisDataType, int ttlSeconds, String additionalKey) {
@@ -175,6 +175,9 @@ public class RedisSink<CommitT extends Serializable> implements Sink<Row, Commit
         break;
       case HASH:
         jedisCommand = JedisCommand.HSET;
+        break;
+      case MHASH:
+        jedisCommand = JedisCommand.HMSET;
         break;
       case SORTED_SET:
         jedisCommand = JedisCommand.ZADD;

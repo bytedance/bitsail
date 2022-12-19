@@ -34,6 +34,12 @@ public enum JedisDataType {
   HASH,
 
   /**
+   * Set multiple field-value (domain-value) pairs to the hash table key at the same time.
+   *
+   */
+  MHASH,
+
+  /**
    * Redis Lists are simply lists of strings, sorted by insertion order.
    */
   LIST,
