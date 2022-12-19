@@ -19,8 +19,42 @@
 
 package com.bytedance.bitsail.connector.jdbc.option;
 
+import com.bytedance.bitsail.common.annotation.Essential;
+import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 
-public interface JdbcReaderOptions extends ReaderOptions.BaseReaderOptions {
+import com.alibaba.fastjson.TypeReference;
 
+import java.util.Map;
+
+import static com.bytedance.bitsail.common.option.ConfigOptions.key;
+import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
+
+public interface JdbcReaderOptions extends ReaderOptions.BaseReaderOptions {
+  @Essential
+  ConfigOption<String> JDBC_URL =
+      key(READER_PREFIX + "jdbc_url")
+          .noDefaultValue(String.class);
+
+  ConfigOption<String> SPLIT_FIELD =
+      key(READER_PREFIX + "split_field")
+          .noDefaultValue(String.class);
+
+  ConfigOption<String> SPLIT_CONFIGURATION =
+      key(READER_PREFIX + "split_config")
+          .noDefaultValue(String.class);
+
+  // Options for select data.
+  ConfigOption<String> SQL_FILTER =
+      key(READER_PREFIX + "sql_filter")
+          .noDefaultValue(String.class);
+
+  ConfigOption<Long> MAX_FETCH_COUNT =
+      key(READER_PREFIX + "max_fetch_count")
+          .noDefaultValue(Long.class);
+
+  // Connection properties.
+  ConfigOption<Map<String, String>> CUSTOMIZED_CONNECTION_PROPERTIES =
+      key(READER_PREFIX + "customized_connection_properties")
+          .onlyReference(new TypeReference<Map<String, String>>() {});
 }
