@@ -106,15 +106,15 @@ public class NativeFlinkTypeInfoUtil {
       org.apache.flink.api.java.typeutils.MapTypeInfo<?, ?> mapTypeInfo =
           (org.apache.flink.api.java.typeutils.MapTypeInfo<?, ?>) typeInformation;
       return new MapTypeInfo<>(
-          TypeInfoNativeBridge.bridgeTypeInfo(mapTypeInfo.getKeyTypeInfo()),
-          TypeInfoNativeBridge.bridgeTypeInfo(mapTypeInfo.getValueTypeInfo())
+          toTypeInfo(mapTypeInfo.getKeyTypeInfo()),
+          toTypeInfo(mapTypeInfo.getValueTypeInfo())
       );
 
     } else if (typeInformation instanceof org.apache.flink.api.java.typeutils.ListTypeInfo) {
       org.apache.flink.api.java.typeutils.ListTypeInfo<?> listTypeInfo =
           (org.apache.flink.api.java.typeutils.ListTypeInfo<?>) typeInformation;
       return new ListTypeInfo<>(
-          TypeInfoNativeBridge.bridgeTypeInfo(listTypeInfo.getElementTypeInfo())
+          toTypeInfo(listTypeInfo.getElementTypeInfo())
       );
 
     } else {
