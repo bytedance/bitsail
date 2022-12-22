@@ -49,7 +49,7 @@
       "db_name": "default",
       "table_name": "test_ch_table",
       "split_field": "id",
-      "split_config": "{\"name\": \"id\", \"lower_bound\": 0, \"upper_bound\": \"10000\", \"split_num\": 3}",
+      "split_config": "{\"lower_bound\": 0, \"upper_bound\": 10000, \"split_num\": 3}",
       "sql_filter": "( id % 2 == 0 )"
     }
   }
