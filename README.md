@@ -89,12 +89,19 @@ In data synchronization scenarios, it covers batch, streaming, and incremental d
 In the Runtime layer, it supports multiple execution modes, such as yarn, local, and k8s is under development
 
 ## Supported Connectors
+
 <table>
   <tr>
     <th>DataSource</th>
     <th>Sub Modules</th>
     <th>Reader</th>
     <th>Writer</th>
+  </tr>
+  <tr>
+    <td>ClickHouse</td>
+    <td>-</td>
+    <td>✅</td>
+    <td>-</td>
   </tr>
   <tr>
     <td>Doris</td>
@@ -109,7 +116,7 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <td>✅</td>
   </tr>
   <tr>
-    <td>ElasticSearch</td>
+    <td>Elasticsearch</td>
     <td>-</td>
     <td> </td>
     <td>✅</td>
@@ -127,19 +134,19 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <td> </td>
   </tr>
   <tr>
-    <td>Hive</td>
-    <td>-</td>
-    <td>✅</td>
-    <td>✅</td>
-  </tr>
-  <tr>
     <td>Hadoop</td>
     <td>-</td>
     <td>✅</td>
     <td>✅</td>
   </tr>
   <tr>
-    <td>Hbase</td>
+    <td>HBase</td>
+    <td>-</td>
+    <td>✅</td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Hive</td>
     <td>-</td>
     <td>✅</td>
     <td>✅</td>
@@ -178,6 +185,12 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <td>✅</td>
   </tr>
   <tr>
+    <td>LarkSheet</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
     <td>MongoDB</td>
     <td>-</td>
     <td>✅</td>
@@ -200,18 +213,6 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <td>-</td>
     <td> </td>
     <td>✅</td>
-  </tr>
-  <tr>
-    <td>LarkSheet</td>
-    <td>-</td>
-    <td>✅</td>
-    <td> </td>
-  </tr>
-  <tr>
-    <td>Clickhouse</td>
-    <td>-</td>
-    <td>✅</td>
-    <td> </td>
   </tr>
 </table>
 

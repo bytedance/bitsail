@@ -72,13 +72,20 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
 
 在Runtime层，支持多种执行模式，比如yarn、local，k8s在开发中
 
-## 支持连接器列表
+## 支持的连接器
+
 <table>
   <tr>
     <th>DataSource</th>
     <th>Sub Modules</th>
     <th>Reader</th>
     <th>Writer</th>
+  </tr>
+  <tr>
+    <td>ClickHouse</td>
+    <td>-</td>
+    <td>✅</td>
+    <td>-</td>
   </tr>
   <tr>
     <td>Doris</td>
@@ -93,7 +100,7 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <td>✅</td>
   </tr>
   <tr>
-    <td>ElasticSearch</td>
+    <td>Elasticsearch</td>
     <td>-</td>
     <td> </td>
     <td>✅</td>
@@ -111,19 +118,19 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <td> </td>
   </tr>
   <tr>
-    <td>Hive</td>
-    <td>-</td>
-    <td>✅</td>
-    <td>✅</td>
-  </tr>
-  <tr>
     <td>Hadoop</td>
     <td>-</td>
     <td>✅</td>
     <td>✅</td>
   </tr>
   <tr>
-    <td>Hbase</td>
+    <td>HBase</td>
+    <td>-</td>
+    <td>✅</td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Hive</td>
     <td>-</td>
     <td>✅</td>
     <td>✅</td>
@@ -162,6 +169,12 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <td>✅</td>
   </tr>
   <tr>
+    <td>LarkSheet</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
     <td>MongoDB</td>
     <td>-</td>
     <td>✅</td>
@@ -184,18 +197,6 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <td>-</td>
     <td> </td>
     <td>✅</td>
-  </tr>
-  <tr>
-    <td>LarkSheet</td>
-    <td>-</td>
-    <td>✅</td>
-    <td> </td>
-  </tr>
-  <tr>
-    <td>Clickhouse</td>
-    <td>-</td>
-    <td>✅</td>
-    <td> </td>
   </tr>
 </table>
 
