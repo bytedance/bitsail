@@ -23,6 +23,12 @@ engine.type.to.bitsail.type.converter:
   - source.type: int64
     target.type: long
 
+  - source.type: int128
+    target.type: biginteger
+
+  - source.type: int256
+    target.type: biginteger
+
   - source.type: long
     target.type: long
 

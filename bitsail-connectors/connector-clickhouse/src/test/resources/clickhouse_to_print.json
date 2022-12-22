@@ -34,6 +34,14 @@
         {
           "name": "p_date",
           "type": "date"
+        },
+        {
+          "name": "int_128",
+          "type": "int128"
+        },
+        {
+          "name": "int_256",
+          "type": "int256"
         }
       ]
     },
