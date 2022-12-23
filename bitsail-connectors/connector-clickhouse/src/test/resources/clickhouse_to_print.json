@@ -8,11 +8,11 @@
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.clickhouse.source.ClickhouseSource",
-      "jdbc_url": "jdbc:clickhouse://127.0.0.1:8123",
+      "jdbc_url": "jdbc:clickhouse://localhost:8123",
       "db_name": "default",
       "table_name": "test_ch_table",
       "split_field": "id",
-      "split_config": "{\"lower_bound\": 0, \"upper_bound\": 10000, \"split_num\": 3}",
+      "split_config": "{\"name\": \"id\", \"lower_bound\": 0, \"upper_bound\": \"10000\", \"split_num\": 3}",
       "sql_filter": "( id % 2 == 0 )",
       "columns": [
         {
