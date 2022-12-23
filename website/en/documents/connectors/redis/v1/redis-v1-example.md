@@ -1,7 +1,6 @@
-# Redis connector examples
+# Redis-v1 connector example
 
-Parent document: [redis-connector](./redis-v1.md)
-
+Parent document: [Redis-v1 connector](./redis-v1.md)
 
 ## Redis Writer example
 

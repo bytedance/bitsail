@@ -1,8 +1,8 @@
-# Kudu连接器
+# Kudu 连接器
 
-上级文档: [connectors](../README.md)
+上级文档：[连接器](../README.md)
 
-***BitSail*** Kudu连接器支持批式读写Kudu表。
+**BitSail** Kudu 连接器支持批式读写 Kudu 表。
 
 ## 依赖引入
 
@@ -172,9 +172,6 @@ SIMPLE_DIVIDE分片策略将lower_bound和upper_bound之间的范围均分成spl
 | kudu_session_external_consistency_mode | 否 | CLIENT_PROPAGATED<br/>COMMIT_WAIT | 默认CLIENT_PROPAGATED |
 | kudu_ignore_duplicate_rows | 否 | | 是否忽略因duplicate key造成的error, 默认false |
 
-
------
-
 ## 相关文档
 
-配置示例文档: [kudu-connector-example](./kudu-example.md)
+配置示例文档：[Kudu 连接器示例](./kudu-example.md)

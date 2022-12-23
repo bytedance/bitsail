@@ -1,6 +1,6 @@
-# Jdbc连接器示例
+# JDBC connector example
 
-上级文档: [Jdbc-connector](./jdbc.md)
+Parent document: [JDBC connector](./jdbc.md)
 
 ## MySQL Example
 
@@ -92,7 +92,7 @@
                 {
                     "slaves":[
                         {
-                            "db_url":"jdbc:mysql://address=(protocol=tcp)(host=192.168.1.202)(port=3306)/test?permitMysqlScheme&rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false"
+                            "db_url":"jdbc:mysql://address=(protocol=tcp)(host=192.168.1.202)(port=3306)/test?rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false"
                         }
                     ]
                 }
@@ -185,7 +185,6 @@
     }
 }
 ```
-
 -----
 
 ## Oracle Example

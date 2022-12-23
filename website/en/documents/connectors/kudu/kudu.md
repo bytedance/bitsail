@@ -1,8 +1,8 @@
 # Kudu connector
 
-Parent document: [connectors](../README.md)
+Parent document: [Connectors](../README.md)
 
-***BitSail*** Kudu connector supports reading and writing kudu tables.
+**BitSail** Kudu connector supports reading and writing kudu tables.
 
 ## Maven dependency
 
@@ -181,6 +181,6 @@ The following mentioned parameters should be added to `job.writer` block when us
 
 -----
 
-## Related document
+## Related documents
 
-Configuration example: [kudu-connector-example](./kudu-example.md)
+Configuration example: [Kudu connector example](./kudu-example.md)

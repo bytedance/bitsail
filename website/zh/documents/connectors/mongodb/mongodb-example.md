@@ -1,12 +1,10 @@
-# MongoDB连接器配置示例
+# MongoDB 连接器示例
 
-父目录: [mongodb-connector](./mongodb.md)
+父目录：[MongoDB 连接器](./mongodb.md)
 
------
+假设在本地启动了一个 MongoDB，连接地址为 mongodb://localhost:1234。在其中创建了名为 `test_db` 的database和名为 `test_collection` 的文档集合。
 
-假设在本地启动了一个mongoDB，连接地址为mongodb://localhost:1234。在其中创建了名为 `test_db` 的database和名为 `test_collection` 的文档集合。
-
-## MongoDB读连接器 
+## MongoDB 读连接器 
 
 假设想在文档包含 _id, string_field, int_field 三个字段，则可用如下配置读取。
 

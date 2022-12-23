@@ -1,11 +1,11 @@
 # ClickHouse connector
 
-Parent document: [connectors](../README.md)
+Parent document: [Connectors](../README.md)
 
 **BitSail** ClickHouse connector can be used to read data in ClickHouse, mainly supports the following functions:
 
 - Support batch reading of ClickHouse tables
-- JDBC Driver version used: 0.3.2-patch11
+- JDBC Driver version: 0.3.2-patch11
 
 ## Maven dependency
 
@@ -72,14 +72,6 @@ Read connector parameters are configured in `job.reader`, please pay attention t
 
 #### Optional parameters
 
-| user_name | No | | Username to access ClickHouse services |
-| password | No | | The password of the above user |
-| split_field | No | | Batch query fields, only support Int8 - Int64 and UInt8 - UInt32 integer types |
-| split_config | No | | The configuration for batch query according to `split_field` field, including initial value, maximum value and query times, <p/> For example: `{"lower_bound": 0, "upper_bound": 10000, "split_num": 3}` |
-| sql_filter | No | | The filter condition of the query, such as `( id % 2 == 0 )`, will be spliced into the WHERE clause of the query SQL |
-| reader_parallelism_num | No | | Concurrency for reading ClickHouse tables |
-
-
 | Parameter name     | Required | Optional value | Description                                        |
 |:-------------------|:---------|:---------------|:---------------------------------------------------|
 | user_name          | no       |                | Username to access ClickHouse services |
@@ -91,4 +83,4 @@ Read connector parameters are configured in `job.reader`, please pay attention t
 
 ## Related documents
 
-Configuration example: [clickhouse-connector-example](./clickhouse-example.md)
+Configuration example: [ClickHouse connector example](./clickhouse-example.md)

@@ -1,8 +1,8 @@
 # Druid connector
 
-Parent document: [connectors](../README.md)
+Parent document: [Connectors](../README.md)
 
-***BitSail*** Druid connector supports writing druid data-sources.
+**BitSail** Druid connector supports writing druid data-sources.
 
 ## Maven dependency
 
@@ -62,6 +62,6 @@ The following mentioned parameters should be added to `job.writer` block when us
 
 -----
 
-## Related document
+## Related documents
 
-Configuration example: [druid-connector-example](./druid-example.md)
+Configuration example: [Druid connector example](./druid-example.md)

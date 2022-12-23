@@ -1,6 +1,6 @@
 # ClickHouse 连接器
 
-上级文档: [connectors](../README.md)
+上级文档：[连接器](../README.md)
 
 **BitSail** ClickHouse 连接器可用于读取 ClickHouse 中的数据，主要支持如下功能：
 
@@ -83,4 +83,4 @@
 
 ## 相关文档
 
-配置示例文档: [clickhouse-connector-example](./clickhouse-example.md)
+配置示例文档：[ClickHouse 连接器示例](./clickhouse-example.md)

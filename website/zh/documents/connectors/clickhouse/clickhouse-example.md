@@ -1,6 +1,6 @@
-# ClickHouse 连接器配置示例
+# ClickHouse 连接器示例
 
-父目录: [clickhouse-connector](./clickhouse.md)
+父目录：[ClickHouse 连接器](./clickhouse.md)
 
 ## ClickHouse 配置
 

@@ -1,8 +1,6 @@
-# Kafka connector examples
+# Kafka connector example
 
------
-
-Parent document: [Kafka-connector](./kafka.md)
+Parent document: [Kafka connector](./kafka.md)
 
 ## Kafka configuration
 

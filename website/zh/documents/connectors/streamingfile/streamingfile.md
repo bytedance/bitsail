@@ -1,9 +1,8 @@
-# StreamingFile
+# StreamingFile(流式HDFS)连接器
 
-上级文档: [connectors](../README.md)
+上级文档：[连接器](../README.md)
 
-***StreamingFile*** 连接器的主要使用于流式场景中，提供保证`Exactly-Once`语义的写入HDFS、Hive的能力。
-为各个厂商的实时数仓提供可靠的保障；
+**StreamingFile** 连接器主要使用于流式场景中，提供以 `Exactly-Once` 语义的写入 HDFS、Hive 的能力，为实时数仓提供可靠的保障。
 
 ## 主要功能
 
@@ -83,4 +82,4 @@
 
 ## 相关文档
 
-配置示例文档[Example](./StreamingFile_Example.md)
+配置示例文档：[StreamingFile(流式HDFS)连接器](./streamingfile_example.md)

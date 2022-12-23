@@ -1,9 +1,8 @@
-# Redis连接器配置示例（todo检查修改）
+# Redis-v1 连接器示例
 
-Parent document: [redis-connector](./redis-v1.md)
+父目录：[Redis-v1 连接器](./redis-v1.md)
 
-
-## Redis写连接器
+## Redis 写连接器
 
 假设在本地起了一个端口为6379的Redis。用于写入该Redis的配置如下:
 

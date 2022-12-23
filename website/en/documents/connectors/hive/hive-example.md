@@ -1,6 +1,6 @@
-# Hive connector examples
+# Hive connector example
 
-Parent document: [hive-connector](./hive.md)
+Parent document: [Hive connector](./hive.md)
 
 The following shows test hive table with user parameters and how to read/write it with hive connectors.
 
