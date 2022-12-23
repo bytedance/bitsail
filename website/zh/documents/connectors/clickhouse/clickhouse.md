@@ -1,10 +1,11 @@
-# Doris连接器
+# ClickHouse 连接器
 
 上级文档: [connectors](../README.md)
 
 **BitSail** ClickHouse 连接器可用于读取 ClickHouse 中的数据，主要支持如下功能：
 
- - 支持流式批式读取 ClickHouse 表
+ - 支持批式读取 ClickHouse 表
+ - 使用的 JDBC Driver 版本：0.3.2-patch11
 
 ## 依赖引入
 
@@ -46,6 +47,8 @@
     "reader": {
       "class": "com.bytedance.bitsail.connector.clickhouse.source.ClickhouseSource",
       "jdbc_url": "jdbc:clickhouse://127.0.0.1:8123",
+      "user_name": "default",
+      "password": "1234567",
       "db_name": "default",
       "table_name": "test_ch_table",
       "split_field": "id",
@@ -71,8 +74,8 @@
 
 | 参数名称       | 是否必填 | 参数枚举值 | 参数含义                                              |
 |:-------------|:------|:-----------|:-----------------------------------------------------|
-| user_name    | 否    |       | 要读取的 ClickHouse 表 |
-| password     | 否    |       | 要读取的 ClickHouse 表 |
+| user_name    | 否    |       | 访问 ClickHouse 服务的用户名 |
+| password     | 否    |       | 上述用户的的密码 |
 | split_field  | 否    |  | 分批查询的字段，仅支持 Int8 - Int64 和 UInt8 - UInt 32 整数类型  |
 | split_config | 否    |  | 按照 `split_field` 字段进行批次查询时的配置，包括初始值、最大值和查询的次数，<p/> 如：`{"lower_bound": 0, "upper_bound": 10000, "split_num": 3}` |
 | sql_filter   | 否    |  | 查询的过滤条件，比如 `( id % 2 == 0 )`，会拼接到查询 SQL 的 WHERE 子句中 |
@@ -80,4 +83,4 @@
 
 ## 相关文档
 
-配置示例文档: [click_house-connector-example](./click_house-example.md)
+配置示例文档: [clickhouse-connector-example](./clickhouse-example.md)

@@ -1,6 +1,6 @@
 # ClickHouse 连接器配置示例
 
-父目录: [click_house-connector](./click_house.md)
+父目录: [clickhouse-connector](./clickhouse.md)
 
 ## ClickHouse 配置
 
@@ -50,6 +50,8 @@ VALUES
       "reader": {
         "class": "com.bytedance.bitsail.connector.clickhouse.source.ClickhouseSource",
         "jdbc_url": "jdbc:clickhouse://127.0.0.1:8123",
+        "user_name": "default",
+        "password": "1234567",
         "db_name": "default",
         "table_name": "test_ch_table",
         "split_field": "id",
