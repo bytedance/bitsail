@@ -6,7 +6,7 @@ Parent document: [bitsail-components](../README.md)
 
 ## Content
 
-When ***BitSail*** uses flink as the engine, it uses `flink rows` as intermediate format.
+When **BitSail** uses flink as the engine, it uses `flink rows` as intermediate format.
 So developers need to convert data from data source into `flink rows`.
 This module offers convenient methods to convert some kinds of data into `flink rows`.
 The specific supported formats are as follows:

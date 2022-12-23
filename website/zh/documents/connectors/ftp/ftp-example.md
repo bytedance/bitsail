@@ -1,6 +1,6 @@
-# FTP/SFTP 连接器使用示例
+# FTP/SFTP 连接器示例
 
-上级文档: [FTP/SFTP连接器](./ftp.md)
+上级文档：[FTP/SFTP 连接器](./ftp.md)
 
 下面展示了如何使用用户参数配置读取如下 CSV 格式文件。
 

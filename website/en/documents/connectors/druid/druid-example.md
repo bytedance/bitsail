@@ -1,6 +1,6 @@
-# Druid connector configuration examples
+# Druid connector example
 
-Parent document: [druid-connector](./druid.md)
+Parent document: [Druid connector](./druid.md)
 
 ## Druid writer example
 

@@ -1,8 +1,8 @@
-# Druid连接器
+# Druid 连接器
 
-上级文档: [connectors](../README.md)
+上级文档：[连接器](../README.md)
 
-***BitSail*** Druid连接器支持批式读写Druid资料源。
+**BitSail** Druid连接器支持批式读写Druid资料源。
 
 ## 依赖引入
 
@@ -62,4 +62,4 @@
 
 ## 相关文档
 
-配置示例文档: [druid-connector-example](./druid-example.md)
+配置示例文档：[Druid 连接器示例](./druid-example.md)

@@ -1,6 +1,6 @@
-# Kudu connector configration examples
+# Kudu connector example
 
-Parent document: [kudu-connector](./kudu.md)
+Parent document: [Kudu connector](./kudu.md)
 
 ## Kudu reader example
 

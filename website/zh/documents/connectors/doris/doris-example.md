@@ -1,7 +1,6 @@
-# Doris连接器配置示例
+# Doris 连接器示例
 
-父目录: [doris-connector](./doris.md)
-
+父目录：[Doris 连接器](./doris.md)
 
 ## 测试用Doris配置
 

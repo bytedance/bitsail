@@ -6,7 +6,7 @@
 
 ## 内容
 
-***BitSail*** 在使用flink作为引擎时，各个connector的数据传输过程中使用 `bitsail rows` 作为传输中间格式，因此在将数据从数据源读入后需要转化为 `bitsail rows` 。
+**BitSail** 在使用flink作为引擎时，各个connector的数据传输过程中使用 `bitsail rows` 作为传输中间格式，因此在将数据从数据源读入后需要转化为 `bitsail rows` 。
 本模块用于提供将常见格式数据转化为 `bitsail rows` 的便捷方法，具体支持的格式如下：
  - 文中`bitsail rows`指由`org.apache.flink.types.Row`包住的`com.bytedance.bitsail.common.column.Column`数据。
 

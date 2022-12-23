@@ -1,6 +1,6 @@
 # Doris connector
 
-Parent document: [connectors](../README.md)
+Parent document: [Connectors](../README.md)
 
 **BitSail** Doris connector supports writing doris. The main function points are as follows:
 
@@ -131,4 +131,4 @@ partitions example:
 
 ## Related documents
 
-Configuration examples: [doris-connector-example](./doris-example.md)
+Configuration examples: [Doris connector example](./doris-example.md)

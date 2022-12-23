@@ -1,6 +1,6 @@
-## HDFS's Example
+# StreamingFile(流式HDFS)连接器示例
 
-Parent document: [StreamingFile-connector](./StreamingFile.md)
+父目录：[StreamingFile(流式HDFS)连接器](./streamingfile.md)
 
 ```json
 {

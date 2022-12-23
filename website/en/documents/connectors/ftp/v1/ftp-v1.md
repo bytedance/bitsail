@@ -1,6 +1,6 @@
-# FTP/SFTP connector
+# FTP/SFTP-v1 connector
 
-Parent document: [connectors](../../README.md)
+Parent document: [Connectors](../../README.md)
 
 ## Main functionalities
 
@@ -109,4 +109,4 @@ The following parameters are supported to adjust the csv parsing style:
 
 ## Related documents
 
-Configuration examples: [ftp-connector-example](./ftp-v1-example.md)
+Configuration examples: [FTP/SFTP-v1 connector example](./ftp-v1-example.md)

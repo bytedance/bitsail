@@ -1,6 +1,6 @@
-# Elasticsearch connector examples
+# Elasticsearch connector example
 
-Parent document: [elasticsearch-connector](./elasticsearch.md)
+Parent document: [Elasticsearch connector](./elasticsearch.md)
 
 
 The following configuration shows how to organize parameter configuration to write the specified Elasticsearch index.

@@ -1,6 +1,6 @@
 # ClickHouse connector example
 
-Parent document: [clickhouse-connector](./clickhouse.md)
+Parent document: [ClickHouse connector](./clickhouse.md)
 
 ## ClickHouse configuration
 

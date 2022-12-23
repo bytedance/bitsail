@@ -1,6 +1,6 @@
-# Hadoop连接器使用示例
+# Hadoop 连接器示例
 
-上级文档: [hadoop连接器](./hadoop.md)
+上级文档：[Hadoop 连接器](./hadoop.md)
 
 下面展示了如何使用用户参数配置读取如下json格式hdfs文件。
 

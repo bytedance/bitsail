@@ -1,8 +1,8 @@
 # MongoDB connector
 
-Parent document: [connectors](../README.md)
+Parent document: [Connectors](../README.md)
 
-***BitSail*** MongoDB connector supports reading and writing MongoDB. The main function points are as follows:
+**BitSail** MongoDB connector supports reading and writing MongoDB. The main function points are as follows:
 
  - Support batch read documents from give collection. 
  - Support batch write to target collection.
@@ -183,7 +183,6 @@ The following mentioned parameters should be added to `job.writer` block when us
 | write_concern | no | 0, 1, 2, 3 | Data writing guarantee level, default 1 |
 
 
-## Related document
+## Related documents
 
-
-Configuration examples: [mongodb-connector-example](./mongodb-example.md)
+Configuration examples: [MongoDB connector example](./mongodb-example.md)

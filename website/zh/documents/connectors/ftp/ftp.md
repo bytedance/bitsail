@@ -1,6 +1,6 @@
-# FTP/SFTP连接器
+# FTP/SFTP 连接器
 
-上级文档: [connectors](../README.md)
+上级文档：[连接器](../README.md)
 
 ## 主要功能
 
@@ -48,7 +48,7 @@
 
 ## 主要参数
 
-以下参数在 `job.reader` 中配置，配置示例请参考 [FTP/SFTP连接器示例](./ftp-example.md)
+以下参数在 `job.reader` 中配置，配置示例请参考 [FTP/SFTP 连接器示例](./ftp-example.md)
 
 ### 必需参数
 
@@ -108,4 +108,4 @@
 
 ## 相关文档
 
-配置示例文档：[Example](./ftp-example.md)
+配置示例文档：[FTP/SFTP 连接器示例](./ftp-example.md)

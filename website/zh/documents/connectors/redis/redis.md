@@ -1,8 +1,8 @@
-# Redis连接器
+# Redis 连接器
 
-上级文档: [connectors](../README.md)
+上级文档：[连接器](../README.md)
 
-***BitSail*** Redis连接器支持写redis库，主要功能点如下:
+**BitSail** Redis 连接器支持写 Redis 库，主要功能点如下:
 
 - 支持批式写入Redis
 - 支持写入多种格式
@@ -75,4 +75,4 @@
 
 ## 相关文档
 
-配置示例文档: [redis-connector-example](./redis-example.md)
+配置示例文档：[Redis 连接器示例](./redis-example.md)

@@ -1,8 +1,6 @@
-# LarkSheet connector examples
+# LarkSheet connector example
 
------
-
-Parent document: [larksheet-connector](./larksheet.md)
+Parent document: [LarkSheet connector](./larksheet.md)
 
 ## Reader example
 

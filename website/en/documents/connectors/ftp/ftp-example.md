@@ -1,6 +1,6 @@
-# FTP/SFTP connector examples
+# FTP/SFTP connector example
 
-Parent document: [ftp-connector](./ftp.md)
+Parent document: [FTP connector](./ftp.md)
 
 The following configuration shows how to organize parameter configuration to read the following CSV format file.
 
