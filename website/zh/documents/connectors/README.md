@@ -8,7 +8,7 @@ dir:
 
 **BitSail** 支持以下连接器用于不同数据源：
 
-- [ClickHouse连接器](click_house/click_house.md)
+- [ClickHouse连接器](clickhouse/clickhouse.md)
 - [Doris连接器](doris/doris.md)
 - [Druid连接器](druid/druid.md)
 - [Elasticsearch连接器](elasticsearch/elasticsearch.md)
