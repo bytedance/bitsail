@@ -22,29 +22,29 @@ This connector can be used to read files from FTP/SFTP servers in batch scenario
 ## Supported data types
 
 - Basic data types supported:
-  - Integer type:
-    - tinyint
-    - smallint
-    - int
-    - bigint
-  - Float type:
-    - float
-    - double
-    - decimal
-  - Time type:
-    - timestamp
-    - date
-  - String type:
-    - string
-    - varchar
-    - char
-  - Bool type:
-    - boolean
-  - Binary type:
-    - binary
+    - Integer type:
+        - tinyint
+        - smallint
+        - int
+        - bigint
+    - Float type:
+        - float
+        - double
+        - decimal
+    - Time type:
+        - timestamp
+        - date
+    - String type:
+        - string
+        - varchar
+        - char
+    - Bool type:
+        - boolean
+    - Binary type:
+        - binary
 - Composited data types supported:
-  - map
-  - array
+    - map
+    - array
 
 ## Parameters
 
@@ -107,5 +107,7 @@ The following parameters are supported to adjust the csv parsing style:
 | `job.common.csv_escape`           |               | escape character                                                           |
 | `job.common.csv_quote`            |               | quote character                                                            |
 | `job.common.csv_with_null_string` |               | Specify the conversion value of null field. It is not converted by default |
+
+## Related documents
 
 Configuration examples: [ftp-connector-example](./ftp-example.md)

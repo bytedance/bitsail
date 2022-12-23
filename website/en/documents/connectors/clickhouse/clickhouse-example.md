@@ -11,7 +11,7 @@ Account information:
 - Username: default
 - Password: 1234567
 
-Library tables to write to:
+Target database and table:
 - Database name: default
 - Table name: test_ch_table
 

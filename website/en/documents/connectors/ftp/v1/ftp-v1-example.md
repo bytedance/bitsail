@@ -2,9 +2,9 @@
 
 Parent document: [ftp-connector](./ftp-v1.md)
 
-The following configuration shows how to organize parameter configuration to read the following csv format file.
+The following configuration shows how to organize parameter configuration to read the following CSV format file.
 
-- Example csv data
+- Example CSV data
 
 ```csv
 c1,c2
