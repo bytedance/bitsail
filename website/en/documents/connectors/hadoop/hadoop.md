@@ -1,7 +1,6 @@
 # Hadoop connector
 
-Parent document: [connectors](../README.md)
-
+Parent document: [Connectors](../README.md)
 
 ## Main function
 
@@ -123,9 +122,6 @@ The following parameters are supported to adjust the csv parsing style:
 |`job.common.proto.class_name`| 是 |指定protobuf描述文件中用于解析的类名|
 -->
 
-----
+## Related documents
 
-
-## Related document
-
-Configuration examples: [hadoop-connector-example](./hadoop-example.md)
+Configuration examples: [Hadoop connector example](./hadoop-example.md)

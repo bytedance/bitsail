@@ -1,6 +1,6 @@
-# FTP/SFTP connector
+# FTP/SFTP-v1 connector
 
-Parent document: [connectors](../../../connectors.md)
+Parent document: [Connectors](../../README.md)
 
 ## Main functionalities
 
@@ -11,7 +11,7 @@ This connector can be used to read files from FTP/SFTP servers in batch scenario
 
 ## Maven dependency
 
-```text
+```xml
 <dependency>
    <groupId>com.bytedance.bitsail</groupId>
    <artifactId>connector-ftp</artifactId>
@@ -89,10 +89,10 @@ It supports parsing text files in json format. Each line is required to be a sta
 
 The following parameters are supported to adjust the json parsing stype:
 
-| Parameter name                              | Default value | Description                                                                                                                               |
-| ------------------------------------------- |---------------| ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `job.reader.case_insensitive`             | false         | Whether to be sensitive to the case of the key in the json field                                                                          |
-| `job.reader.convert_error_column_as_null` | false         | Whether to set the field with parsing error to null                                                                                       |
+| Parameter name                            | Default value | Description                                                      |
+| ----------------------------------------- |---------------| -----------------------------------------------------------------|
+| `job.reader.case_insensitive`             | false         | Whether to be sensitive to the case of the key in the json field |
+| `job.reader.convert_error_column_as_null` | false         | Whether to set the field with parsing error to null              |
 
 ### <span id="jump_csv">CSV</span>
 
@@ -100,9 +100,13 @@ Support parsing of text files in csv format. Each line is required to be a stand
 
 The following parameters are supported to adjust the csv parsing style:
 
-| Parameter name                      | Default value | Description                                                                |
-| ----------------------------------- | ------------- | -------------------------------------------------------------------------- |
-| `job.reader.csv_delimiter`        | `','`       | csv delimiter                                                              |
+| Parameter name                    | Default value | Description                                                                |
+| --------------------------------- | ------------- | -------------------------------------------------------------------------- |
+| `job.reader.csv_delimiter`        | `','`         | csv delimiter                                                              |
 | `job.reader.csv_escape`           |               | escape character                                                           |
 | `job.reader.csv_quote`            |               | quote character                                                            |
 | `job.reader.csv_with_null_string` |               | Specify the conversion value of null field. It is not converted by default |
+
+## Related documents
+
+Configuration examples: [FTP/SFTP-v1 connector example](./ftp-v1-example.md)

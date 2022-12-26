@@ -1,7 +1,6 @@
-# Hadoop连接器
+# Hadoop 连接器
 
-上级文档: [connectors](../README.md)
-
+上级文档：[连接器](../README.md)
 
 ## 主要功能
 
@@ -128,5 +127,5 @@ Hadoop连接器可用于批式场景下的hdfs文件读取。其功能点主要�
 
 ## 相关文档
 
-配置示例文档 [hadoop连接器示例](./hadoop-example.md)
+配置示例文档：[Hadoop 连接器示例](./hadoop-example.md)
 

@@ -1,8 +1,8 @@
-# Kudu连接器配置示例
+# Kudu 连接器示例
 
-父目录: [kudu-connector](./kudu.md)
+父目录：[Kudu 连接器](./kudu.md)
 
-## Kudu读连接器示例配置
+## Kudu 读连接器
 
 假设当前有一个测试kudu集群，其master地址为"127.0.0.1:64086"，则可以通过如下配置读取test_kudu_table表。
 
@@ -60,8 +60,7 @@
 ```
 
 
-## Kudu写连接器示例配置
-
+## Kudu 写连接器
 
 假设当前有一个测试kudu集群，其master地址为"127.0.0.1:64086"，则可以通过如下配置写入test_kudu_table表。
 

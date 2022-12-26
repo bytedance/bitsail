@@ -1,14 +1,12 @@
-# RocketMQ连接器配置示例
+# RocketMQ 连接器示例
 
-Parent document: [rocketmq-connector](./rocketmq.md)
+父目录：[RocketMQ 连接器](./rocketmq.md)
 
-
-## RocketMQ Writer example
+## RocketMQ 写连接器
 
 假设我们在本地启动了一个RocketMQ服务，其name server地址为 "127.0.0.1:9876", 并且我们在其中创建了一个名为 "test_topic" 的topic。
 
 那么我们可以使用如下的配置文档写入上述topic：
-
 
 ```json
 {

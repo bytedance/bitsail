@@ -1,6 +1,6 @@
-# Elasticsearch连接器使用示例
+# Elasticsearch 连接器示例
 
-上级文档: [elasticsearch连接器](./elasticsearch.md) 
+上级文档：[Elasticsearch 连接器](./elasticsearch.md) 
 
 如下展示了如何使用用户参数配置写入指定的elasticsearch索引。
 

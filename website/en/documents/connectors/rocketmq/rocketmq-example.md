@@ -1,7 +1,6 @@
-# RocketMQ connector examples
+# RocketMQ connector example
 
-Parent document: [rocketmq-connector](./rocketmq.md)
-
+Parent document: [RocketMQ connector](./rocketmq.md)
 
 ## RocketMQ Writer example
 

@@ -1,8 +1,8 @@
-# Hudi连接器
+# Hudi 连接器
 
-上级文档: [connectors](../README.md)
+上级文档：[连接器](../README.md)
 
-***BitSail*** hudi连接器支持读写hudi表，主要功能如下
+**BitSail** Hudi 连接器支持读写 Hudi 表，主要功能如下
 
  - 支持流式写入Hudi表。
  - 支持批式写入Hudi表。
@@ -233,4 +233,4 @@ Compaction参数包含了reader和writer部分。
 
 ## 相关文档
 
-配置示例文档: [hudi-connector-example](./hudi-example.md)
+配置示例文档：[Hudi 连接器示例](./hudi-example.md)

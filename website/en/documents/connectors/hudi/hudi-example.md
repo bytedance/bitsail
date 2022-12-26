@@ -1,6 +1,6 @@
-# Hudi connector examples
+# Hudi connector example
 
-Parent document: [hudi-connector](./hudi.md)
+Parent document: [Hudi connector](./hudi.md)
 
 ## Hudi reader example
 

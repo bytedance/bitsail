@@ -1,12 +1,9 @@
-# MongoDB connector examples
+# MongoDB connector example
 
-Parent document: [mongodb-connector](./mongodb.md)
-
------
+Parent document: [MongoDB connector](./mongodb.md)
 
 Suppose starting a local MongoDB with connection url `mongodb://localhost:1234`.
 We create a database `test_db` and a collection `test_collection` on it.
-
 
 ## MongoDB Reader
 

@@ -1,12 +1,11 @@
-# Redis连接器（todo检查修改）
+# Redis-v1 连接器
 
-上级文档: [connectors](../README.md)
+上级文档: [Connectors](../../README.md)
 
-***BitSail*** Redis连接器支持写redis库，主要功能点如下:
+**BitSail** Redis连接器支持写 Redis 库，主要功能点如下:
 
 - 支持批式写入Redis
 - 支持写入多种格式
-
 
 ## 依赖引入
 
@@ -87,7 +86,6 @@
 | connection_pool_max_wait_time_ms | 否       |                                                | 连接池最大等待时间                |
 | max_attempt_count                | 否       |                                                | 重试器最大重试次数                |
 
-
 ## 相关文档
 
-配置示例文档: [redis-connector-example](./redis-v1-example.md)
+配置示例文档：[Redis-v1 连接器示例](./redis-v1-example.md)

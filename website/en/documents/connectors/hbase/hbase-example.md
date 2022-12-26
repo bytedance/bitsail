@@ -1,6 +1,4 @@
-# Hbase connector examples
-
------
+# Hbase connector example
 
 Parent document: [HBase connector](./hbase.md)
 
