@@ -21,8 +21,6 @@ import com.bytedance.bitsail.common.column.StringColumn;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DateUtilTest {
@@ -35,24 +33,10 @@ public class DateUtilTest {
   }
 
   @Test
-  public void testGetDatesBetweenTwoDate(){
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    try {
-      Date dStart = sdf.parse("2022-12-26");
-      Date dEnd = sdf.parse("2022-12-26");
-      Assert.assertEquals(1, DateUtil.getDatesBetweenTwoDate(dStart, dEnd).size());
-    } catch (ParseException e) {
-      e.printStackTrace();
-    }
+  public void testGetDatesBetweenTwoDate() {
+    Date start = new Date();
+    Date end = new Date();
+    Assert.assertEquals(1, DateUtil.getDatesBetweenTwoDate(start, end).size());
   }
-  @Test
-  public void testGetNDaysAfterDate(){
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    try {
-      Date date = sdf.parse("2022-12-31");
-      Assert.assertEquals("2023-01-01", sdf.format(DateUtil.getNDaysAfterDate(date, 1)));
-    } catch (ParseException e) {
-      e.printStackTrace();
-    }
-  }
+
 }

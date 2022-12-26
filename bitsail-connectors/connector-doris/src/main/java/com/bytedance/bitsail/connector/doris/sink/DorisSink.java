@@ -49,8 +49,14 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 
 public class DorisSink<InputT> implements Sink<InputT, DorisCommittable, DorisWriterState> {
   private static final Logger LOG = LoggerFactory.getLogger(DorisSink.class);
@@ -145,7 +151,7 @@ public class DorisSink<InputT> implements Sink<InputT, DorisCommittable, DorisWr
     dorisOptions = builder.build();
   }
 
-  private List<DorisPartition> parseTemplateToDorisPartitions(DorisPartitionTemplate dorisPartitionTemplate){
+  private List<DorisPartition> parseTemplateToDorisPartitions(DorisPartitionTemplate dorisPartitionTemplate) {
     String pattern = dorisPartitionTemplate.getPattern();
     String prefix = dorisPartitionTemplate.getPrefix();
     String start = dorisPartitionTemplate.getStartRange();
@@ -153,11 +159,11 @@ public class DorisSink<InputT> implements Sink<InputT, DorisCommittable, DorisWr
 
     SimpleDateFormat sdf = new SimpleDateFormat(pattern);
     try {
-      Date dStart = sdf.parse(start);
-      Date dEnd = sdf.parse(end);
+      Date dateStart = sdf.parse(start);
+      Date dateEnd = sdf.parse(end);
       List<DorisPartition> dorisPartitions = new ArrayList<>();
-      List<Date> listDate = DateUtil.getDatesBetweenTwoDate(dStart, dEnd);
-      listDate.forEach(date->{
+      List<Date> listDate = DateUtil.getDatesBetweenTwoDate(dateStart, dateEnd);
+      listDate.forEach(date -> {
         DorisPartition dorisPartition = new DorisPartition();
         dorisPartition.setName(prefix + sdf.format(date));
         dorisPartition.setStartRange(Collections.singletonList(sdf.format(date)));
