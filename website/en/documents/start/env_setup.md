@@ -1,5 +1,5 @@
 # Develop Environment Setup
-English | [简体中文](/zh/documents/start/env_setup.md)
+English | [简体中文](../../../zh/documents/start/env_setup.md)
 
 -----
 

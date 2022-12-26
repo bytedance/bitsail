@@ -1,6 +1,6 @@
 # 任务配置说明
 
-[English](/en/documents/start/config.md) | 简体中文
+[English](../../../en/documents/start/config.md) | 简体中文
 
 ***BitSail*** 完整配置脚本是由一个 JSON 组成的，完整示意结构如下所示：
 

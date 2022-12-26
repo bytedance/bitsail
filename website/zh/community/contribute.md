@@ -3,7 +3,7 @@ order: 2
 ---
 # 贡献者指引
 
-[English](/en/contribute/contribute.md) | 简体中文
+[English](../../en/community/contribute.md) | 简体中文
 
 BitSail社区欢迎大家的贡献！
 
@@ -22,7 +22,7 @@ BitSail社区欢迎大家的贡献！
 - 如果不是，根据文档自己创建一个新问题[创建Issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/creating-an-issue)
 
 ## 开发环境配置
-跳转到[环境配置](/zh/documents/docs/start/env_setup.md)
+跳转到[环境配置](../documents/start/env_setup.md)
 
 ## 代码风格
 
