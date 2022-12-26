@@ -1,6 +1,6 @@
-# Jdbc Connector 介绍
+# JDBC 连接器
 
-上级文档: [connectors](../README.md)
+上级文档：[连接器](../README.md)
 
 Jdbc Connector 通过 JDBC 直连数据库，通过批式的方式，将数据导入到其他存储或者将其他存储的数据导入到数据库中。JDBC connectors 读取 slaves 以最小化对数据库的影响。
 
@@ -341,4 +341,4 @@ Oracle 写入的定制参数
 
 ## 相关文档
 
-配置示例文档 [Example](./jdbc-example.md).
+配置示例文档：[JDBC 连接器示例](./jdbc-example.md).

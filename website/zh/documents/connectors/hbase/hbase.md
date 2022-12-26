@@ -1,8 +1,8 @@
-# HBase连接器
+# HBase 连接器
 
-上级文档: [connectors](../README.md)
+上级文档：[连接器](../README.md)
 
-***Bitsail*** HBase连接器可用于支持读写HBase，支持的主要功能如下:
+**BitSail** HBase连接器可用于支持读写HBase，支持的主要功能如下:
 
 - 支持scan方式读取 HBase table 中的数据
 - 支持在写 HBase table 时根据列数据设置 RowKey
@@ -185,9 +185,6 @@ version_column的使用说明如下:
     }
   ```
 
-
-
-
 ## 相关文档
 
-配置示例文档: [hbase-connector-example](./hbase-example.md)
+配置示例文档：[HBase 连接器示例](./hbase-example.md)

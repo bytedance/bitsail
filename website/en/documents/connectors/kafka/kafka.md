@@ -1,8 +1,6 @@
 # Kafka connector
 
------
-
-Parent document: [connectors](../README.md)
+Parent document: [Connectors](../README.md)
 
 The Kafka connector supports the following functional points:
 
@@ -109,13 +107,13 @@ If the user wants to debug by consuming only a limited amount of data, the follo
 
 ### Supported message parsing modes
 
-Messages can be pulled from KafkaConsumer in format of ConsumerRecord. ***BitSail*** supports two ways to handle ConsumerRecordof. The user can use `job.reader.format` to decide which method to use.
+Messages can be pulled from KafkaConsumer in format of ConsumerRecord. **BitSail** supports two ways to handle ConsumerRecordof. The user can use `job.reader.format` to decide which method to use.
 
 - `job.reader.format_type="json"`: Parse according to json format
-    - In this mode, ***BitSail*** parses the json format string represented by value in ConsumerRecord according to the parameters `job.reader.columns`  set by the user.
+    - In this mode, **BitSail** parses the json format string represented by value in ConsumerRecord according to the parameters `job.reader.columns`  set by the user.
     - Therefore, the parameters `job.reader.columns` is required in this mode
 - `job.reader.format_type="streaming_file"`: Use raw byte value
-    - In this mode, ***BitSail*** directly deliver the raw bytes value in ConsumerRecord. The specific structure is as follows:
+    - In this mode, **BitSail** directly deliver the raw bytes value in ConsumerRecord. The specific structure is as follows:
 
 ```json
    [
@@ -170,15 +168,6 @@ When initializing the KafkaProducer, the user can use `job.common.optional` to p
 }
 ```
 
-----
+## Related documents
 
-
-## Related document
-
-Configuration examples: [kafka-connector-example](./kafka-example.md)
-
-
-
-
-
-
+Configuration examples: [Kafka connector example](./kafka-example.md)

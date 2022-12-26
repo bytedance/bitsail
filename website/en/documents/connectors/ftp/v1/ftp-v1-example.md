@@ -1,17 +1,17 @@
-# FTP/SFTP连接器使用示例
+# FTP/SFTP-v1 connector example
 
-上级文档: [FTP/SFTP连接器](./ftp-v1.md)
+Parent document: [FTP-v1 connector](./ftp-v1.md)
 
-下面展示了如何使用用户参数配置读取如下csv格式文件。
+The following configuration shows how to organize parameter configuration to read the following CSV format file.
 
-- 示例csv数据
+- Example CSV data
 
 ```csv
 c1,c2
 aaa,bbb
 ```
 
-- 用于读取上述格式文件的配置
+- Configuration file used to read the above file:
 
 ```json
 {

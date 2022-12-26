@@ -1,10 +1,8 @@
-# Kafka连接器
+# Kafka 连接器
 
------
+上级文档：[连接器](../README.md)
 
-上级文档: [connectors](../README.md)
-
-Kafka连接器支持如下功能点:
+Kafka 连接器支持如下功能点:
 
  - 批式场景下支持 `At Least Once` 的写入
  - 流式场景下支持 `Exactly Once` 的读取
@@ -105,10 +103,10 @@ Kafka读连接器用于流式场景，正常情况下会一直消费。若用户
 
 ### 支持的消息解析模式
 
-从KafkaConsumer可以拉取到消息`ConsumerRecord`。 ***BitSail*** 支持两种对`ConsumerRecord`的处理方式。
+从KafkaConsumer可以拉取到消息`ConsumerRecord`。 **BitSail** 支持两种对`ConsumerRecord`的处理方式。
 用户可通过参数`job.reader.format_type`决定使用哪种方式:
  - `job.reader.format_type="json"`: 按照json格式解析
-    - 在此模式下，***BitSail*** 按照用户设置的参数 `job.reader.columns` ，对ConsumerRecord中value代表的json格式字符串进行解析。
+    - 在此模式下，**BitSail** 按照用户设置的参数 `job.reader.columns` ，对ConsumerRecord中value代表的json格式字符串进行解析。
     - 因此此模式下必需`job.reader.columns`参数
  - `job.reader.format_type="streaming_file"`: 不解析
     - 在此模式下，会直接将ConsumerRecord中的信息传出，具体结构如下:
@@ -166,13 +164,6 @@ Kafka读连接器用于流式场景，正常情况下会一直消费。若用户
 }
 ```
 
-----
-
 ## 相关文档
 
-配置示例文档 [kafka连接器示例](./kafka-example.md)
-
-
-
-
-
+配置示例文档：[Kafka 连接器示例](./kafka-example.md)

@@ -1,8 +1,8 @@
 # Hudi connector
 
-Parent document: [connectors](../README.md)
+Parent document: [Connectors](../README.md)
 
-The ***BitSail*** hudi connector supports reading and writing to hudi tables. The main function points are as follows:
+The **BitSail** hudi connector supports reading and writing to hudi tables. The main function points are as follows:
 
  - Support streaming write to Hudi table.
  - Support batch write to Hudi table.
@@ -230,6 +230,6 @@ Compaction has well-defined reader and writer parameters
 |:-----------------------|:---------|:---------------|:--------------------------------------|
 | writer_parallelism_num | No       |                | parallelism to process the compaction |
 
-## Related document
+## Related documents
 
-Configuration examples: [hudi-connector-example](./hudi-example.md)
+Configuration examples: [Hudi connector example](./hudi-example.md)

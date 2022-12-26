@@ -1,8 +1,8 @@
-# 飞书表格连接器
+# LarkSheet(飞书表格)连接器
 
-上级文档: [connectors](../README.md)
+上级文档：[连接器](../README.md)
 
-***BitSail***飞书表格连接器可用于支持读取飞书表格，主要功能如下:
+**BitSail** 飞书表格连接器可用于支持读取飞书表格，主要功能如下:
 
  - 支持批式一次读取多张飞书表格
  - 支持token和 [application](https://open.feishu.cn/document/ukTMukTMukTM/uYTM5UjL2ETO14iNxkTN/terminology?lang=en-US) 两种鉴权方式
@@ -100,4 +100,4 @@
 
 ## 相关文档
 
-配置示例文档: [larksheet-connector-example](./larksheet-example.md)
+配置示例文档：[LarkSheet(飞书表格)连接器示例](./larksheet-example.md)

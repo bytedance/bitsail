@@ -1,10 +1,8 @@
-# LarkSheet connector examples
+# LarkSheet(飞书表格)连接器示例
 
------
+父目录：[LarkSheet(飞书表格)连接器](./larksheet.md)
 
-父目录: [飞书表格连接器](./larksheet.md)
-
-## 读连接器示例
+## 飞书表格读连接器
 
 要读的表格如下
 

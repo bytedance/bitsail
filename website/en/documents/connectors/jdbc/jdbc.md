@@ -1,8 +1,8 @@
-# Jdbc Connector
+# JDBC Connector
 
-Parent document: [connectors](../README.md)
+Parent document: [Connectors](../README.md)
 
-The Jdbc Connector directly connects to the database through JDBC, and imports data into other storages or imports other stored data into the database in a batch manner. JDBC connectors internally read from slaves to minimize the impact on DB.
+The JDBC Connector directly connects to the database through JDBC, and imports data into other storages or imports other stored data into the database in a batch manner. JDBC connectors internally read from slaves to minimize the impact on DB.
 
 Currently, supports reading and writing three kinds of data sources including MySQL, Oracle, PgSQL, SqlServer.
 
@@ -197,7 +197,7 @@ Currently, supports reading and writing three kinds of data sources including My
 * uniqueidentifier
 * xml
 
-## Jdbc Source
+## JDBC Source
 
 > Please add property `permitMysqlScheme in connection url when use MySQL.
 
@@ -224,19 +224,19 @@ Currently, supports reading and writing three kinds of data sources including My
 
 | Param name            | Default value | Required | Parameter type | Recommended value / Example value                                                                                                                                                                                                                                                        | Description                    |
 |-----------------------|---------------|----------|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------|
-| user_name             | -             | Yes      | string         | abc                                                                                                                                                                                                                                                                                      | Jdbc username                  |
-| password              | -             | Yes      | string         | password                                                                                                                                                                                                                                                                                 | Jdbc password                  |
-| query_timeout_seconds | 300           | No       | int            | 300                                                                                                                                                                                                                                                                                      | Jdbc connection timeout (s)    |
-| query_retry_times     | 3             | No       | int            | 3                                                                                                                                                                                                                                                                                        | Max retry times for Jdbc query |
-| connections           | -             | Yes      |                | [ { "slaves": [ {"db_url": "jdbc:mysql://address=(protocol=tcp)(host=192.168.1.202)(port=3306)/test?permitMysqlScheme&rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false"} ]} ] | Jdbc connection urls           |
+| user_name             | -             | Yes      | string         | abc                                                                                                                                                                                                                                                                                      | JDBC username                  |
+| password              | -             | Yes      | string         | password                                                                                                                                                                                                                                                                                 | JDBC password                  |
+| query_timeout_seconds | 300           | No       | int            | 300                                                                                                                                                                                                                                                                                      | JDBC connection timeout (s)    |
+| query_retry_times     | 3             | No       | int            | 3                                                                                                                                                                                                                                                                                        | Max retry times for JDBC query |
+| connections           | -             | Yes      |                | [ { "slaves": [ {"db_url": "jdbc:mysql://address=(protocol=tcp)(host=192.168.1.202)(port=3306)/test?permitMysqlScheme&rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false"} ]} ] | JDBC connection urls           |
 
 #### Table synchronization configuration parameters
 
 
 | Param name         | Default value | Required                             | Parameter type | Recommended value / Example value | Description                                                                                                                                                                                                                           |
 |--------------------|---------------|------------------------------------------|----------------|-----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| db_name            | -             | Yes                                      | string         | db                                | Jdbc connection database name                                                                                                                                                                                                         |
-| table_schema       | -             | No                                       | string         | schema                            | Jdbc connection schema name, usually only used for PgSql                                                                                                                                                                              |
+| db_name            | -             | Yes                                      | string         | db                                | JDBC connection database name                                                                                                                                                                                                         |
+| table_schema       | -             | No                                       | string         | schema                            | JDBC connection schema name, usually only used for PgSql                                                                                                                                                                              |
 | table_name         | -             | Necessary if using table synchronization | string         | table                             | Table to read                                                                                                                                                                                                                         |
 | split_pk           | -             | Necessary if using table synchronization | string         | id                                | The primary key used by the shard                                                                                                                                                                                                     |
 | split_pk_jdbc_type | int           | No                                       | string         | Int/String                        | Shard key field type, supports numeric and string types                                                                                                                                                                               |
@@ -257,7 +257,7 @@ Currently, supports reading and writing three kinds of data sources including My
 
 ----
 
-## Jdbc Sink
+## JDBC Sink
 
 > Please add property `permitMysqlScheme in connection url when use MySQL.
 
@@ -286,9 +286,9 @@ Currently, supports reading and writing three kinds of data sources including My
 
 | Param name   | Default value                             | Is necessary | Parameter type | Recommended value / Example value                                                                                                                                                                                                                     | Description                                  |
 |--------------|-------------------------------------------|--------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|
-| user_name    | -                                         | Yes          | string         | abc                                                                                                                                                                                                                                                   | Jdbc username                                |
-| password     | -                                         | Yes          | string         | password                                                                                                                                                                                                                                              | Jdbc password                                |
-| connections  | -                                         | Yes          |                | [ { "db_url": "jdbc:mysql://address=(protocol=tcp)(host=192.168.1.202)(port=3306)/test?rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false" } ] | Jdbc connection urls                         |
+| user_name    | -                                         | Yes          | string         | abc                                                                                                                                                                                                                                                   | JDBC username                                |
+| password     | -                                         | Yes          | string         | password                                                                                                                                                                                                                                              | JDBC password                                |
+| connections  | -                                         | Yes          |                | [ { "db_url": "jdbc:mysql://address=(protocol=tcp)(host=192.168.1.202)(port=3306)/test?rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false" } ] | JDBC connection urls                         |
 | db_name      | -                                         | Yes          | string         | db                                                                                                                                                                                                                                                    | Database to connect                          |
 | table_schema | "public" for PgSql<br>"dbo" for Sqlserver | No           | string         | schema                                                                                                                                                                                                                                                | Schema to connect，usually used only in PgSql |
 | table_name   | -                                         | Yes          | string         | table                                                                                                                                                                                                                                                 | Table to write                               |
@@ -343,6 +343,7 @@ In insert mode, data will be deleted according to partition information. The fol
 | partition_name           | -             | Yes          | string (case sensitive)        | DATETIME                | Same as general parameters except value is case sensitive. |
 | db_name                  | -             | Yes          | string (case sensitive)        | DB                | Same as general parameters except value is case sensitive. |
 | columns.name             | -             | No           | string (case sensitive)        | COLUMN            | Same as general parameters except value is case sensitive. |
-## Related document
 
-Configuration examples: [jdbc-connector-example](./jdbc_example.md)
+## Related documents
+
+Configuration examples: [JDBC connector example](./jdbc_example.md)
