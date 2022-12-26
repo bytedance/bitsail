@@ -21,6 +21,10 @@ import com.bytedance.bitsail.common.column.StringColumn;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class DateUtilTest {
   @Test
   public void testConvertStringToSeconds() {
@@ -28,5 +32,27 @@ public class DateUtilTest {
     Assert.assertEquals(1575734400L, DateUtil.convertStringToSeconds(new StringColumn("1575734400000")));
     Assert.assertEquals(1575734400L, DateUtil.convertStringToSeconds(new StringColumn("2020-08-01")));
     Assert.assertEquals(1596214923L, DateUtil.convertStringToSeconds(new StringColumn("2020-08-01 01:02:03")));
+  }
+
+  @Test
+  public void testGetDatesBetweenTwoDate(){
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    try {
+      Date dStart = sdf.parse("2022-12-26");
+      Date dEnd = sdf.parse("2022-12-26");
+      Assert.assertEquals(1, DateUtil.getDatesBetweenTwoDate(dStart, dEnd).size());
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
+  }
+  @Test
+  public void testGetNDaysAfterDate(){
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    try {
+      Date date = sdf.parse("2022-12-31");
+      Assert.assertEquals("2023-01-01", sdf.format(DateUtil.getNDaysAfterDate(date, 1)));
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
   }
 }

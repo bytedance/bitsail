@@ -26,11 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 public class DateUtil {
   public static final int LENGTH_SECOND = 10;
@@ -249,4 +245,25 @@ public class DateUtil {
       return stringToDate(column.asString(), null, null).toInstant().getEpochSecond();
     }
   }
+
+  public static List<Date> getDatesBetweenTwoDate(Date beginDate, Date endDate) {
+    List<Date> dataRange = new ArrayList<>();
+    dataRange.add(beginDate);
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(beginDate);
+    while (endDate.after(cal.getTime())) {
+      cal.add(Calendar.DAY_OF_MONTH, 1);
+      dataRange.add(cal.getTime());
+    }
+    return dataRange;
+  }
+
+  public static Date getNDaysAfterDate(Date date, int n){
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(date);
+    cal.add(Calendar.DAY_OF_MONTH, n);
+    return cal.getTime();
+  }
+
+
 }

@@ -21,11 +21,13 @@ import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.base.connector.writer.v1.WriterCommitter;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
+import com.bytedance.bitsail.common.util.DateUtil;
 import com.bytedance.bitsail.connector.doris.DorisConnectionHolder;
 import com.bytedance.bitsail.connector.doris.committer.DorisCommittable;
 import com.bytedance.bitsail.connector.doris.committer.DorisCommittableSerializer;
@@ -36,6 +38,7 @@ import com.bytedance.bitsail.connector.doris.error.DorisErrorCode;
 import com.bytedance.bitsail.connector.doris.option.DorisWriterOptions;
 import com.bytedance.bitsail.connector.doris.partition.DorisPartition;
 import com.bytedance.bitsail.connector.doris.partition.DorisPartitionManager;
+import com.bytedance.bitsail.connector.doris.partition.DorisPartitionTemplate;
 import com.bytedance.bitsail.connector.doris.sink.ddl.DorisSchemaManagerGenerator;
 
 import com.alibaba.fastjson.JSON;
@@ -44,11 +47,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DorisSink<InputT> implements Sink<InputT, DorisCommittable, DorisWriterState> {
@@ -137,14 +138,36 @@ public class DorisSink<InputT> implements Sink<InputT, DorisCommittable, DorisWr
     // Need partition info in batch replace modes.
     if (isHasPartition && this.writeMode.equals(DorisExecutionOptions.WRITE_MODE.BATCH_REPLACE)) {
       //BATCH and REPLACE mode need the partition infos
-      List<Map<String, Object>> partitionList = writerConfiguration.getNecessaryOption(DorisWriterOptions.PARTITIONS, CommonErrorCode.CONFIG_ERROR);
-      builder.partitions(
-          partitionList.stream()
-              .map(partition -> JSON.parseObject(JSON.toJSONString(partition), DorisPartition.class))
-              .collect(Collectors.toList())
-      );
+      DorisPartitionTemplate dorisPartitionTemplate = writerConfiguration.getNecessaryOption(DorisWriterOptions.PARTITIONS, CommonErrorCode.CONFIG_ERROR);
+      List<DorisPartition> dorisPartitions = parseTemplateToDorisPartitions(dorisPartitionTemplate);
+      builder.partitions(dorisPartitions);
     }
     dorisOptions = builder.build();
+  }
+
+  private List<DorisPartition> parseTemplateToDorisPartitions(DorisPartitionTemplate dorisPartitionTemplate){
+    String pattern = dorisPartitionTemplate.getPattern();
+    String prefix = dorisPartitionTemplate.getPrefix();
+    String start = dorisPartitionTemplate.getStartRange();
+    String end = dorisPartitionTemplate.getEndRange();
+
+    SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+    try {
+      Date dStart = sdf.parse(start);
+      Date dEnd = sdf.parse(end);
+      List<DorisPartition> dorisPartitions = new ArrayList<>();
+      List<Date> listDate = DateUtil.getDatesBetweenTwoDate(dStart, dEnd);
+      listDate.forEach(date->{
+        DorisPartition dorisPartition = new DorisPartition();
+        dorisPartition.setName(prefix + sdf.format(date));
+        dorisPartition.setStartRange(Collections.singletonList(sdf.format(date)));
+        dorisPartition.setEndRange(Collections.singletonList(sdf.format(DateUtil.getNDaysAfterDate(date, 1))));
+        dorisPartitions.add(dorisPartition);
+      });
+      return dorisPartitions;
+    } catch (ParseException e) {
+      throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR, "Can't parse configuration info: " + dorisPartitionTemplate, e);
+    }
   }
 
   private void initDorisExecutionOptions(BitSailConfiguration writerConfiguration) {
