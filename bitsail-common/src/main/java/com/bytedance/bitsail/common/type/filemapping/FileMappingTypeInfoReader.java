@@ -84,7 +84,7 @@ public class FileMappingTypeInfoReader implements Serializable {
   }
 
   private void read() throws IOException {
-    URL resource = FileMappingTypeInfoReader.class.getResource("/" + converterFileName);
+    URL resource = Thread.currentThread().getContextClassLoader().getResource(converterFileName);
     if (Objects.isNull(resource)) {
       throw new IllegalArgumentException(String.format("Resource for the column converter %s not found in classpath.", converterFileName));
     }

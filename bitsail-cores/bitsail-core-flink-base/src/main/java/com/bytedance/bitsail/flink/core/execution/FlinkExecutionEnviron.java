@@ -41,6 +41,7 @@ import com.bytedance.bitsail.flink.core.writer.FlinkDataWriterDAGBuilder;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.dag.Transformation;
 import org.apache.flink.configuration.ConfigUtils;
@@ -91,6 +92,10 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
   }
 
   public void addPluginToExecution(Set<URL> libraries) {
+    if (CollectionUtils.isEmpty(libraries)) {
+      LOG.info("No plugins will add to execution environ.");
+      return;
+    }
     Configuration configuration = getFlinkConfiguration();
     List<URI> classpath = ConfigUtils
         .decodeListFromConfig(configuration, PipelineOptions.JARS, URI::create);

@@ -41,11 +41,9 @@ public class LocalFSPluginFinder implements PluginFinder {
   private static final String DEFAULT_PLUGIN_FINDER_NAME = "localFS";
   private List<PluginStore> pluginStores;
   private URLClassLoader pluginClassloader;
-  private Set<URL> foundedPlugins;
 
   @Override
   public void configure(BitSailConfiguration commonConfiguration) {
-    this.foundedPlugins = Sets.newHashSet();
 
     String frameworkBaseDir = commonConfiguration
         .getUnNecessaryOption(CommonOptions.JOB_PLUGIN_ROOT_PATH, getFrameworkEntryDir().toString());
@@ -69,8 +67,8 @@ public class LocalFSPluginFinder implements PluginFinder {
         .pluginMappingBaseDirPath(frameworkBaseDirPath.resolve(engineMappingDirName))
         .build());
 
-    this.pluginClassloader = (URLClassLoader) Thread.currentThread()
-        .getContextClassLoader();
+    this.pluginClassloader = URLClassLoader.newInstance(new URL[] {}, Thread.currentThread()
+        .getContextClassLoader());
   }
 
   @Override
@@ -113,12 +111,11 @@ public class LocalFSPluginFinder implements PluginFinder {
     }
 
     tryAddPluginToClassloader(pluginClassloader, pluginUrls);
-    foundedPlugins.addAll(pluginUrls);
   }
 
   @Override
   public Set<URL> getFoundedPlugins() {
-    return foundedPlugins;
+    return Sets.newHashSet(pluginClassloader.getURLs());
   }
 
   @Override
@@ -134,9 +131,9 @@ public class LocalFSPluginFinder implements PluginFinder {
 
       for (URL pluginUrl : pluginUrls) {
         addUrlMethod.invoke(classloader, pluginUrl);
+        LOG.info("Plugin class loader add plugin url: {}.", pluginUrl);
       }
 
-      LOG.debug("Plugin class loader's url: {}.", classloader.getURLs());
     } catch (Exception e) {
       //ignore
     }

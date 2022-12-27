@@ -31,7 +31,7 @@ public class ProgramFactory {
     pluginFinder.loadPlugin(engineName);
 
     DefaultComponentBuilderLoader<Program> loader =
-        new DefaultComponentBuilderLoader<>(Program.class, pluginFinder.getClassloader());
+        new DefaultComponentBuilderLoader<>(Program.class);
 
     return loader.loadComponent(engineName, true);
   }
