@@ -85,15 +85,21 @@ public class Engine {
   }
 
   private <T> void run() throws Exception {
+    //plugin load from original class loader.
     PluginFinder pluginFinder = PluginFinderFactory
         .getPluginFinder(configuration.get(CommonOptions.PLUGIN_FINDER_NAME));
     pluginFinder.configure(configuration);
-    Program entryProgram = ProgramFactory.createEntryProgram(pluginFinder, coreCommandArgs, configuration);
 
-    LOG.info("Final program: {}.", entryProgram.getComponentName());
-    entryProgram.configure(pluginFinder, configuration, coreCommandArgs);
+    ClassLoader original = Thread.currentThread().getContextClassLoader();
 
     try {
+      //set context class loader to plugin's class loader.
+      Thread.currentThread().setContextClassLoader(pluginFinder.getClassloader());
+
+      Program entryProgram = ProgramFactory.createEntryProgram(pluginFinder, coreCommandArgs, configuration);
+      LOG.info("Final program: {}.", entryProgram.getComponentName());
+      entryProgram.configure(pluginFinder, configuration, coreCommandArgs);
+
       if (entryProgram.validate()) {
         entryProgram.submit();
       }
@@ -101,6 +107,8 @@ public class Engine {
       if (configuration.fieldExists(CommonOptions.SLEEP_TIME)) {
         Thread.sleep(configuration.get(CommonOptions.SLEEP_TIME));
       }
+      //reset context classloader to original.
+      Thread.currentThread().setContextClassLoader(original);
     }
   }
 }
