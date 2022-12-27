@@ -154,6 +154,8 @@ public class DorisSink<InputT> implements Sink<InputT, DorisCommittable, DorisWr
         .maxRetries(writerConfiguration.get(DorisWriterOptions.SINK_MAX_RETRIES))
         .bufferCount(writerConfiguration.get(DorisWriterOptions.SINK_BUFFER_COUNT))
         .bufferSize(writerConfiguration.get(DorisWriterOptions.SINK_BUFFER_SIZE))
+        .upsertBufferCount(writerConfiguration.get(DorisWriterOptions.SINK_UPSERT_BUFFER_COUNT))
+        .upsertBufferSize(writerConfiguration.get(DorisWriterOptions.SINK_UPSERT_BUFFER_SIZE))
         .labelPrefix(writerConfiguration.get(DorisWriterOptions.SINK_LABEL_PREFIX))
         .enableDelete(writerConfiguration.get(DorisWriterOptions.SINK_ENABLE_DELETE))
         .enable2PC(writerConfiguration.get(DorisWriterOptions.SINK_ENABLE_2PC))

@@ -84,21 +84,21 @@ public class RecordBuffer {
   }
 
   public void write(byte[] buf) throws InterruptedException {
-    int wPos = 0;
+    int writePos = 0;
     do {
       if (currentWriteBuffer == null) {
         currentWriteBuffer = writeQueue.take();
       }
       int available = currentWriteBuffer.remaining();
-      int nWrite = Math.min(available, buf.length - wPos);
-      currentWriteBuffer.put(buf, wPos, nWrite);
-      wPos += nWrite;
+      int minWrite = Math.min(available, buf.length - writePos);
+      currentWriteBuffer.put(buf, writePos, minWrite);
+      writePos += minWrite;
       if (currentWriteBuffer.remaining() == 0) {
         currentWriteBuffer.flip();
         readQueue.put(currentWriteBuffer);
         currentWriteBuffer = null;
       }
-    } while (wPos != buf.length);
+    } while (writePos != buf.length);
   }
 
   public int read(byte[] buf) throws InterruptedException {
@@ -113,13 +113,13 @@ public class RecordBuffer {
       return -1;
     }
     int available = currentReadBuffer.remaining();
-    int nRead = Math.min(available, buf.length);
-    currentReadBuffer.get(buf, 0, nRead);
+    int minRead = Math.min(available, buf.length);
+    currentReadBuffer.get(buf, 0, minRead);
     if (currentReadBuffer.remaining() == 0) {
       recycleBuffer(currentReadBuffer);
       currentReadBuffer = null;
     }
-    return nRead;
+    return minRead;
   }
 
   private void recycleBuffer(ByteBuffer buffer) throws InterruptedException {

@@ -33,14 +33,14 @@ import com.bytedance.bitsail.connector.doris.sink.ddl.DorisSchemaManagerGenerato
 
 import static com.bytedance.bitsail.connector.doris.sink.streamload.LoadStatus.FAIL;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.NoArgsConstructor;
 
 import static org.apache.http.HttpStatus.SC_OK;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +74,7 @@ public class DorisCommitter implements WriterCommitter<DorisCommittable> {
 
   @Override
   public List<DorisCommittable> commit(List<DorisCommittable> committables) throws IOException {
-    if (this.writeMode.equals(WRITE_MODE.BATCH_UPSERT)) {
+    if (this.writeMode.equals(WRITE_MODE.BATCH_UPSERT) && executionOptions.isEnable2PC()) {
       for (DorisCommittable committable : committables) {
         try {
           // TODO add a open method init it
@@ -129,7 +129,6 @@ public class DorisCommitter implements WriterCommitter<DorisCommittable> {
   }
 
   private void commitTransaction(DorisCommittable committable) throws IOException {
-    String reasonPhrase = null;
     int retry = 0;
     String hostPort = committable.getHostPort();
     CloseableHttpResponse response = null;
@@ -158,8 +157,10 @@ public class DorisCommitter implements WriterCommitter<DorisCommittable> {
 
     assert response != null;
     if (response.getStatusLine().getStatusCode() != SC_OK) {
-      throw new BitSailException(DorisErrorCode.LOAD_FAILED, "stream load error: " + reasonPhrase);
+      LOG.warn("stream load error, reason={}", response.getStatusLine().getReasonPhrase());
+      throw new BitSailException(DorisErrorCode.LOAD_FAILED, "stream load error: " + response.getStatusLine().getReasonPhrase());
     }
+
     ObjectMapper mapper = new ObjectMapper();
     if (response.getEntity() != null) {
       String loadResult = EntityUtils.toString(response.getEntity());

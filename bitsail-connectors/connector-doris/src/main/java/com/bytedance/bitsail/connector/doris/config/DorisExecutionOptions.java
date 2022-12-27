@@ -37,6 +37,8 @@ public class DorisExecutionOptions implements Serializable {
   private final int maxRetries;
   private final int bufferSize;
   private final int bufferCount;
+  private final int upsertBufferCount;
+  private final int upsertBufferSize;
   private final String labelPrefix;
   private final boolean isBatch;
   private final boolean enable2PC;

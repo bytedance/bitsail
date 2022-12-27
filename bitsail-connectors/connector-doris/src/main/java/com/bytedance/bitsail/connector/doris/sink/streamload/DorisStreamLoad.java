@@ -24,10 +24,9 @@ import com.bytedance.bitsail.connector.doris.error.DorisErrorCode;
 import com.bytedance.bitsail.connector.doris.http.HttpPutBuilder;
 import com.bytedance.bitsail.connector.doris.http.HttpUtil;
 import com.bytedance.bitsail.connector.doris.http.ResponseUtil;
-import com.bytedance.bitsail.connector.doris.rest.RestService;
 import com.bytedance.bitsail.connector.doris.http.model.RespContent;
 import com.bytedance.bitsail.connector.doris.partition.DorisPartition;
-
+import com.bytedance.bitsail.connector.doris.rest.RestService;
 import com.bytedance.bitsail.connector.doris.sink.label.LabelGenerator;
 import com.bytedance.bitsail.connector.doris.sink.record.RecordStream;
 
@@ -96,7 +95,7 @@ public class DorisStreamLoad {
   private Future<CloseableHttpResponse> pendingLoadFuture;
   private ExecutorService executorService;
 
-  public DorisStreamLoad(DorisExecutionOptions executionOptions, DorisOptions dorisOptions, LabelGenerator labelGenerator) {
+  public DorisStreamLoad(DorisExecutionOptions executionOptions, DorisOptions dorisOptions, LabelGenerator labelGenerator, RecordStream recordStream) {
     this.hostPort = RestService.getBackend(dorisOptions, executionOptions, LOG);
     this.executionOptions = executionOptions;
     this.userName = dorisOptions.getUsername();
@@ -106,7 +105,7 @@ public class DorisStreamLoad {
     this.authEncoding = basicAuthHeader(dorisOptions.getUsername(), dorisOptions.getPassword());
     this.lineDelimiter = dorisOptions.getLineDelimiter().getBytes(StandardCharsets.UTF_8);
     this.httpClient = new HttpUtil().getHttpClient();
-    this.recordStream = new RecordStream(executionOptions.getBufferSize(), executionOptions.getBufferCount());
+    this.recordStream = recordStream;
     this.enable2PC = executionOptions.isEnable2PC();
     this.loadUrlStr = String.format(STREAM_LOAD_URL_FORMAT, hostPort, dorisOptions.getDatabaseName(), dorisOptions.getTableName());
     this.abortUrlStr = String.format(ABORT_URL_PATTERN, hostPort, dorisOptions.getDatabaseName());
@@ -243,7 +242,7 @@ public class DorisStreamLoad {
 
   public RespContent handlePreCommitResponse(CloseableHttpResponse response) throws Exception {
     final int statusCode = response.getStatusLine().getStatusCode();
-    if (statusCode == 200 && response.getEntity() != null) {
+    if (statusCode == SC_OK && response.getEntity() != null) {
       String loadResult = EntityUtils.toString(response.getEntity());
       LOG.info("load Result {}", loadResult);
       return OBJECT_MAPPER.readValue(loadResult, RespContent.class);

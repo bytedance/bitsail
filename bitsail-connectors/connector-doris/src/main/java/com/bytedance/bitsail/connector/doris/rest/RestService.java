@@ -18,7 +18,6 @@ package com.bytedance.bitsail.connector.doris.rest;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.connector.doris.config.DorisExecutionOptions;
-
 import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 import com.bytedance.bitsail.connector.doris.error.DorisErrorCode;
 import com.bytedance.bitsail.connector.doris.rest.model.Backend;

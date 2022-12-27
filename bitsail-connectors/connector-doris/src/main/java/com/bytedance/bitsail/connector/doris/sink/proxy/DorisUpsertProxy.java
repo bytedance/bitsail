@@ -21,20 +21,23 @@ import com.bytedance.bitsail.connector.doris.committer.DorisCommittable;
 import com.bytedance.bitsail.connector.doris.config.DorisExecutionOptions;
 import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 import com.bytedance.bitsail.connector.doris.error.DorisErrorCode;
-import com.bytedance.bitsail.connector.doris.rest.RestService;
 import com.bytedance.bitsail.connector.doris.http.model.RespContent;
+import com.bytedance.bitsail.connector.doris.rest.RestService;
 import com.bytedance.bitsail.connector.doris.sink.DorisWriterState;
 import com.bytedance.bitsail.connector.doris.sink.label.LabelGenerator;
+import com.bytedance.bitsail.connector.doris.sink.record.RecordStream;
 import com.bytedance.bitsail.connector.doris.sink.streamload.DorisStreamLoad;
+
+import com.google.common.collect.ImmutableList;
 
 import static com.bytedance.bitsail.connector.doris.sink.streamload.LoadStatus.PUBLISH_TIMEOUT;
 import static com.bytedance.bitsail.connector.doris.sink.streamload.LoadStatus.SUCCESS;
 
-import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +53,7 @@ public class DorisUpsertProxy extends AbstractDorisWriteModeProxy {
   private final String labelPrefix;
   private final LabelGenerator labelGenerator;
   private final DorisWriterState dorisWriterState;
+  private final RecordStream recordStream;
 
   public DorisUpsertProxy(DorisExecutionOptions dorisExecutionOptions, DorisOptions dorisOptions) {
     this.executionOptions = dorisExecutionOptions;
@@ -57,11 +61,12 @@ public class DorisUpsertProxy extends AbstractDorisWriteModeProxy {
     this.dorisWriterState = new DorisWriterState(executionOptions.getLabelPrefix());
     this.labelPrefix = executionOptions.getLabelPrefix();
     this.labelGenerator = new LabelGenerator(labelPrefix, dorisExecutionOptions.isEnable2PC());
+    this.recordStream = new RecordStream(executionOptions.getUpsertBufferSize(), executionOptions.getUpsertBufferCount());
     init();
   }
 
   public void init() {
-    this.dorisStreamLoad = new DorisStreamLoad(executionOptions, dorisOptions, labelGenerator);
+    this.dorisStreamLoad = new DorisStreamLoad(executionOptions, dorisOptions, labelGenerator, recordStream);
     try {
       if (executionOptions.isEnable2PC()) {
         dorisStreamLoad.abortPreCommit(labelPrefix, lastCheckpointId);

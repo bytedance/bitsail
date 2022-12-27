@@ -30,6 +30,15 @@ public class RecordStream extends InputStream {
     return 0;
   }
 
+  @Override
+  public int read(byte[] buff) throws IOException {
+    try {
+      return recordBuffer.read(buff);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   public RecordStream(int bufferSize, int bufferCount) {
     this.recordBuffer = new RecordBuffer(bufferSize, bufferCount);
   }
@@ -40,15 +49,6 @@ public class RecordStream extends InputStream {
 
   public void endInput() throws IOException {
     recordBuffer.stopBufferData();
-  }
-
-  @Override
-  public int read(byte[] buff) throws IOException {
-    try {
-      return recordBuffer.read(buff);
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   public void write(byte[] buff) throws IOException {
