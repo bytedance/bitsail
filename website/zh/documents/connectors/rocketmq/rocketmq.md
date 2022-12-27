@@ -1,9 +1,8 @@
-# RocketMQ连接器
+# RocketMQ 连接器
 
-上级文档: [connectors](../README.md)
+上级文档：[连接器](../README.md)
 
-***BitSail*** RocketMQ连接器支持写指定的RocketMQ topic。
-
+**BitSail** RocketMQ 连接器支持写指定的 RocketMQ topic。
 
 ## 依赖引入
 
@@ -73,10 +72,6 @@
 | key | 否 | | 指定column中的一个或几个字段作为消息的key |
 | partition_fields | 否 | | 指定column中的一个或几个字段用于选择消息发送到的queue  |
 
+## 相关文档
 
-
-
-## Related document
-
-
-配置示例文档: [rocketmq-connector-example](./rocketmq-example.md)
+配置示例文档：[RocketMQ 连接器示例](./rocketmq-example.md)

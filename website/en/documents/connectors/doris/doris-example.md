@@ -1,7 +1,6 @@
-# Doris connector examples
+# Doris connector example
 
-Parent documents: [doris-connector](./doris.md)
-
+Parent documents: [Doris connector](./doris.md)
 
 ## Doris cluster info
 

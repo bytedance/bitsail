@@ -1,8 +1,8 @@
-# hive连接器
+# Hive 连接器
 
-上级文档: [connectors](../README.md)
+上级文档：[连接器](../README.md)
 
-***BitSail*** hive连接器支持对hive表进行读写。主要功能点如下:
+**BitSail** hive连接器支持对hive表进行读写。主要功能点如下:
 
    - 支持读取分区表和非分区表
    - 支持写入分区表
@@ -161,4 +161,4 @@ hive写连接器参数在`job.writer`中配置，实际使用时请注意路径�
 
 ## 相关文档
 
-配置示例文档 [Hive example](hive-example.md)
+配置示例文档：[Hive 连接器示例](hive-example.md)

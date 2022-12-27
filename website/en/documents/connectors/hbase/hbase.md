@@ -1,8 +1,8 @@
 # HBase connector
 
-Parent document: [connectors](../README.md)
+Parent document: [Connectors](../README.md)
 
-***Bitsail*** HBase can be used to read and write HBase tables.
+**BitSail** HBase can be used to read and write HBase tables.
 The main function points are as follows:
 
  - Support scanning HBase tables.
@@ -191,6 +191,6 @@ The usage of version_column is as follow:
 
 
 
-## Related document
+## Related documents
 
-Configuration examples: [hbase-connector-example](./hbase-example.md)
+Configuration examples: [HBase connector example](./hbase-example.md)

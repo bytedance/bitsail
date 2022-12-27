@@ -1,12 +1,11 @@
 # Doris connector
 
-Parent document: [connectors](../README.md)
+Parent document: [Connectors](../README.md)
 
-***BitSail*** Doris connector supports writing doris. The main function points are as follows:
+**BitSail** Doris connector supports writing doris. The main function points are as follows:
 
 - Use StreamLoad to write doris.
 - Support firstly create and then write partition
-
 
 ## Maven dependency
 
@@ -48,7 +47,6 @@ It supports common data type in doris:
 
 ### Parameters
 
-
 The following mentioned parameters should be added to `job.writer` block when using, for example:
 
 ```json
@@ -65,22 +63,22 @@ The following mentioned parameters should be added to `job.writer` block when us
 
 #### Necessary parameters
 
-| Param name                   | Required | Optional value | Description                                                                                                    |
-|:-----------------------------|:---------|:---------------|:---------------------------------------------------------------------------------------------------------------|
-| class             | yes  |       | Doris writer class name, `com.bytedance.bitsail.connector.doris.sink.DorisSink` |
-| fe_hosts   | yes  |       | Doris FE address, multi addresses separated by comma |
-| mysql_hosts        | yes  |       | Doris jdbc query address , multi addresses separated by comma |
-| user| yes | | Doris account user |
-| password| yes | | Doris account password, can be empty  |
-| db_name| yes | | database to write |
-| table_name| yes | | table to write |
-| partitions | Yes if target table has partition | | target partition to write |
+| Param name          | Required | Optional value | Description                                                        |
+|:--------------------|:---------|:---------------|:-------------------------------------------------------------------|
+| class               | yes  |       | Doris writer class name, `com.bytedance.bitsail.connector.doris.sink.DorisSink` |
+| fe_hosts            | yes  |       | Doris FE address, multi addresses separated by comma |
+| mysql_hosts         | yes  |       | Doris jdbc query address , multi addresses separated by comma |
+| user                | yes  |  | Doris account user |
+| password            | yes  |  | Doris account password, can be empty  |
+| db_name             | yes  |  | database to write |
+| table_name          | yes  |  | table to write |
+| partitions          | Yes if target table has partition | | target partition to write |
 | table_has_partition | Yes if target table does not have partition | | True if target table does not have partition  |
-| table_model | yes | UNIQUE | Table model of target table. Currently only support unique table. | 
+| table_model         | yes  | UNIQUE | Table model of target table. Currently only support unique table. | 
 
 <!--AGGREGATE<br/>DUPLICATE-->
 
-Notice, `partitions` has following requirements:
+Notice, `partitions` has the following requirements:
  1. You can determine multi partitions
  2. Each partition should contain:
     1. `name`: name of the partition
@@ -116,9 +114,6 @@ partitions example:
 }
 ```
 
-
-
-
 #### Optional parameters
 
 | Param name             | Required | Optional value | Description                                                           |
@@ -134,8 +129,6 @@ partitions example:
 | csv_field_delimiter | no | | field delimiter used in csv, default "," |
 | csv_line_delimiter | no | | line delimiter used in csv, default "\n" |
 
+## Related documents
 
-## Related document
-
-
-Configuration examples: [doris-connector-example](./doris-example.md)
+Configuration examples: [Doris connector example](./doris-example.md)

@@ -1,7 +1,6 @@
 # Elasticsearch connector
 
-Parent document: [connectors](../README.md)
-
+Parent document: [Connectors](../README.md)
 
 ## Main function
 
@@ -102,7 +101,6 @@ Users can add parameters to `job.writer` block in task configuration files.
 | json_serializer_features | -             |                                                         | Json features used when building json strings. The format is `','` separated string, for example: `"QuoteFieldNames,UseSingleQuotes"` |
 
 
-## Related document
+## Related documents
 
-Configuration examples: [elasticsearch-connector-example](./elasticsearch-example.md)
-
+Configuration examples: [Elasticsearch connector example](./elasticsearch-example.md)

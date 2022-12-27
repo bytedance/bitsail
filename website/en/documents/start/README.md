@@ -7,6 +7,6 @@ dir:
 
 # Quick Start
 
-- [Develop Environment Setup](docs/start/env_setup.md)
-- [Deployment Guide](docs/start/deployment.md)
-- [Job Configuration Guide](docs/start/config.md)
+- [Develop Environment Setup](env_setup.md)
+- [Deployment Guide](deployment.md)
+- [Job Configuration Guide](config.md)

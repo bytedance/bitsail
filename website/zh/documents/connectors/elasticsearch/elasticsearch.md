@@ -1,7 +1,6 @@
-# Elasticsearch连接器
+# Elasticsearch 连接器
 
-上级文档: [connectors](../README.md)
-
+上级文档：[连接器](../README.md)
 
 ## 主要功能
 
@@ -103,5 +102,4 @@ Elasticsearch连接器支持基本的字段类型:
 
 ## 相关文档
 
-配置示例文档[Example](./elasticsearch-example.md)
-
+配置示例文档：[Elasticsearch 连接器示例](./elasticsearch-example.md)

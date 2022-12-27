@@ -1,6 +1,6 @@
-## HDFS's Example
+# StreamingFile connector example
 
-Parent document: [StreamingFile-connector](./StreamingFile.md)
+Parent document: [StreamingFile connector](./streamingfile.md)
 
 ```json
 {

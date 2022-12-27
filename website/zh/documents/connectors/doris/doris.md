@@ -1,8 +1,8 @@
-# Doris连接器
+# Doris 连接器
 
-上级文档: [connectors](../README.md)
+上级文档：[连接器](../README.md)
 
-***BitSail*** Doris连接器支持批式和流式写doris，其支持的主要功能点如下
+**BitSail** Doris连接器支持批式和流式写doris，其支持的主要功能点如下
  
  - 使用StreamLoad方式写Doris表
  - 支持分区创建再写入
@@ -23,7 +23,7 @@
 
 ### 支持的数据类型
 
-写连接器使用json或者csv格式传输数据，支持常见的doris数据类型: 
+写连接器使用 JSON 或者 CSV 格式传输数据，支持常见的 Doris 数据类型：
 
 - CHAR
 - VARCHAR
@@ -116,9 +116,6 @@ partitions示例:
 }
 ```
 
-
-
-
 #### 可选参数
 
 | 参数名称                                    | 是否必填  | 参数枚举值 | 参数含义                                                 |
@@ -136,15 +133,11 @@ partitions示例:
 | csv_line_delimiter | 否 | | csv格式的行间分隔符, 默认 "\n" |
 
 
-sink_write_mode的说明如下:
+sink_write_mode 参数可选值：
  - STREAMING_UPSERT: 流式upsert写入
  - BATCH_UPSERT: 批式upsert写入
  - BATCH_REPLACE: 批式replace写入
 
-
-
-
-
 ## 相关文档
 
-配置示例文档: [doris-connector-example](./doris-example.md)
+配置示例文档：[Doris 连接器示例](./doris-example.md)

@@ -1,8 +1,8 @@
 # LarkSheet connector
 
-Parent document: [connectors](../README.md)
+Parent document: [Connectors](../README.md)
 
-The ***Bitsail*** LarkSheet connector supports reading lark sheets.
+The **BitSail** LarkSheet connector supports reading lark sheets.
 The main function points are as follows:
 
  - Support batch read from single or multiple lark sheets at once.
@@ -24,7 +24,7 @@ The main function points are as follows:
 
 ### Supported data types
 
-Bitsail LarkSheet reader processes all data as string.
+BitSail LarkSheet reader processes all data as string.
 
 ### Parameters
 
@@ -96,6 +96,6 @@ If you use `app_id` and `app_secret`, the token will be refreshed if it expires.
 | batch_size | No | | Number of lines extracted once.|
 |skip_nums| no | | A list of numbers indicating how many lines should be skipped in each sheet. |
 
-## Related document
+## Related documents
 
-Configuration examples: [larksheet-connector-example](./larksheet-example.md)
+Configuration examples: [LarkSheet connector example](./larksheet-example.md)

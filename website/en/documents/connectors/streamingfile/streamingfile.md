@@ -1,6 +1,6 @@
-# StreamingFile
+# StreamingFile connector
 
-Parent document: [connectors](../README.md)
+Parent document: [Connectors](../README.md)
 
 *StreamingFile* Connector mainly used in streaming, and it supports write both hdfs and use hive `Exactly-Once` semantics.
 Provide reliable guarantee for real-time data warehouses.
@@ -82,4 +82,4 @@ Provide reliable guarantee for real-time data warehouses.
 
 ## Reference docs
 
-Example for the StreamingFile: [Example](./StreamingFile_Example.md)
+Configuration examples: [StreamingFile connector example](./streamingfile_example.md)

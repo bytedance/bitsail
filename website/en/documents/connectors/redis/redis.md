@@ -1,8 +1,8 @@
 # Redis connector
 
-Parent document: [connectors](../README.md)
+Parent document: [Connectors](../README.md)
 
-***BitSail*** Redis connector supports writing Redis. The main function points are as follows:
+**BitSail** Redis connector supports writing Redis. The main function points are as follows:
 
  - Support batch write to Redis.
  - Support 4 kinds of data type in Redis.
@@ -77,7 +77,6 @@ The following mentioned parameters should be added to `job.writer` block when us
 | password | No | | Password of redis | 
 
 
-## Related document
+## Related documents
 
-
-Configuration examples: [redis-connector-example](./redis-example.md)
+Configuration examples: [Redis connector example](./redis-example.md)

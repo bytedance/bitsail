@@ -1,8 +1,8 @@
 # RocketMQ connector
 
-Parent document: [connectors](../README.md)
+Parent document: [Connectors](../README.md)
 
-***BitSail*** RocketMQ connector supports writing in batch mode.
+**BitSail** RocketMQ connector supports writing in batch mode.
 
 
 ## Maven dependency
@@ -76,7 +76,6 @@ The following mentioned parameters should be added to `job.writer` block when us
 
 
 
-## Related document
+## Related documents
 
-
-Configuration examples: [rocketmq-connector-example](./rocketmq-example.md)
+Configuration examples: [RocketMQ connector example](./rocketmq-example.md)

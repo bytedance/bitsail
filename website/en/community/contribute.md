@@ -2,7 +2,7 @@
 order: 2
 ---
 # Contributor Guide
-English | [简体中文](/zh/contribute/contribute.md)
+English | [简体中文](../../zh/community/contribute.md)
 
 BitSail community welcomes contributions from anyone!
 
@@ -21,7 +21,7 @@ BitSail community welcomes contributions from anyone!
 - If Not, create a new issue by yourself according to the doc [Create a New Issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/creating-an-issue)
 
 ## Environment Setup
-Link to [environment setup](/en/documents/docs/start/env_setup.md)
+Link to [environment setup](../documents/start/env_setup.md)
 
 ## Code Style
 

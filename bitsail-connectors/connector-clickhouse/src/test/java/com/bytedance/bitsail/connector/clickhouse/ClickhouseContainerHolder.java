@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.ClickHouseContainer;
 import org.testcontainers.utility.DockerImageName;
 
+import java.math.BigInteger;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -53,20 +54,22 @@ public class ClickhouseContainerHolder {
 
   private static final String DROP_TABLE_SQL = "DROP TABLE IF EXISTS " + TABLE;
   private static final String CREATE_TABLE_SQL =
-      "CREATE TABLE " + TABLE + "\n" +
-      "(\n" +
-      "    `id`            `Int64`,\n" +
-      "    `int_type`      `Int32`,\n" +
-      "    `double_type`   `Float64`,\n" +
-      "    `string_type`   `String`,\n" +
-      "    `p_date`        `Date`\n" +
-      ") ENGINE = MergeTree()\n" +
-      "PARTITION BY toYYYYMM(p_date)\n" +
-      "PRIMARY KEY (id);";
+          "CREATE TABLE " + TABLE + "\n" +
+                  "(\n" +
+                  "    `id`            `Int64`,\n" +
+                  "    `int_type`      `Int32`,\n" +
+                  "    `double_type`   `Float64`,\n" +
+                  "    `string_type`   `String`,\n" +
+                  "    `p_date`        `Date`,\n" +
+                  "    `int_128`       `Int128`,\n" +
+                  "    `int_256`       `Int256`\n" +
+                  ") ENGINE = MergeTree()\n" +
+                  "PARTITION BY toYYYYMM(p_date)\n" +
+                  "PRIMARY KEY (id);";
   private static final String INSERT_SQL_HEADER = "INSERT INTO " + TABLE
-      + " (id, int_type, double_type, string_type, p_date) VALUES ";
+          + " (id, int_type, double_type, string_type, p_date, int_128, int_256) VALUES ";
   private static final String COUNT_SQL = "SELECT count(id) FROM " + TABLE;
-  private static final String SCAN_SQL = "SELECT id, int_type, double_type, string_type, p_date from " + TABLE + " ORDER BY id";
+  private static final String SCAN_SQL = "SELECT id, int_type, double_type, string_type, p_date, int_128, int_256 from " + TABLE + " ORDER BY id";
   private static final int INSERT_BATCH_SIZE = 10;
 
   private ClickHouseContainer container;
@@ -166,7 +169,9 @@ public class ClickhouseContainerHolder {
         Integer.valueOf(100000 + index).toString(),             // int_type
         Double.valueOf((100000.0 + index) / 1000).toString(),  // double_type
         "'text_" + index + "'",            // string_type
-        "'" + sdf.format(calendar.getTime()) + "'"      // date_type
+        "'" + sdf.format(calendar.getTime()) + "'",      // date_type
+        new BigInteger("17014118346046923173168730371588").toString(),  // int128
+        new BigInteger("578960446186580977117854925043439539266349923328202820").toString()  // int256
     );
     return data.stream().collect(Collectors.joining(", ", "(", ")"));
   }
