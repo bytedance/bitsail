@@ -39,7 +39,7 @@ dir:
 ```xml
 <dependency>
     <groupId>com.bytedance.bitsail</groupId>
-    <artifactId>bitsail-xxxxx</artifactId>
+    <artifactId>bitsail-xxx</artifactId>
     <version>${revision}</version>
     <scope>compile</scope>
 </dependency>

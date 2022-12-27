@@ -1,5 +1,5 @@
 # Job Configuration Guide
-English | [简体中文](/zh/documents/start/config.md)
+English | [简体中文](../../../zh/documents/start/config.md)
 
 ***BitSail*** script configuration is managed by JSON structure, follow scripts show the complete structure:
 
