@@ -119,7 +119,7 @@ public class HttpPutBuilder {
   }
 
   public HttpPutBuilder addHiddenColumns(boolean enableDelete) {
-    if(enableDelete){
+    if (enableDelete) {
       header.put("hidden_columns", DorisConstants.DORIS_DELETE_SIGN);
     }
     return this;

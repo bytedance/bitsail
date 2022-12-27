@@ -29,7 +29,7 @@ public class DorisCommittableSerializer implements BinarySerializer<DorisCommitt
   @Override
   public byte[] serialize(DorisCommittable dorisCommittable) throws IOException {
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final DataOutputStream out = new DataOutputStream(baos)) {
+         final DataOutputStream out = new DataOutputStream(baos)) {
       out.writeUTF(dorisCommittable.getHostPort());
       out.writeUTF(dorisCommittable.getDb());
       out.writeLong(dorisCommittable.getTxnID());
@@ -41,7 +41,7 @@ public class DorisCommittableSerializer implements BinarySerializer<DorisCommitt
   @Override
   public DorisCommittable deserialize(byte[] bytes) throws IOException {
     try (final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        final DataInputStream in = new DataInputStream(bais)) {
+         final DataInputStream in = new DataInputStream(bais)) {
       final String hostPort = in.readUTF();
       final String db = in.readUTF();
       final long txnId = in.readLong();
