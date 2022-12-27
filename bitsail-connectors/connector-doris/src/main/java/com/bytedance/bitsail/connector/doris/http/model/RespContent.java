@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.doris.http;
+package com.bytedance.bitsail.connector.doris.http.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -93,6 +93,10 @@ public class RespContent {
 
   public String getMessage() {
     return Message;
+  }
+
+  public String getLabel() {
+    return Label;
   }
 
   public String getExistingJobStatus() {
