@@ -77,20 +77,20 @@ public interface DorisWriterOptions extends WriterOptions.BaseWriterOptions {
       key(WRITER_PREFIX + "sink_max_retries")
           .defaultValue(3);
 
+  ConfigOption<Integer> SINK_RECORD_SIZE =
+      key(WRITER_PREFIX + "sink_record_size")
+          .defaultValue(20 * 1024 * 1024);
+
+  ConfigOption<Integer> SINK_RECORD_COUNT =
+      key(WRITER_PREFIX + "sink_record_count")
+          .defaultValue(100000);
+
   ConfigOption<Integer> SINK_BUFFER_SIZE =
       key(WRITER_PREFIX + "sink_buffer_size")
-          .defaultValue(20 * 1024 * 1024);
+          .defaultValue(1024 * 1024);
 
   ConfigOption<Integer> SINK_BUFFER_COUNT =
       key(WRITER_PREFIX + "sink_buffer_count")
-          .defaultValue(100000);
-
-  ConfigOption<Integer> SINK_UPSERT_BUFFER_SIZE =
-      key(WRITER_PREFIX + "sink_upsert_buffer_size")
-          .defaultValue(1024 * 1024);
-
-  ConfigOption<Integer> SINK_UPSERT_BUFFER_COUNT =
-      key(WRITER_PREFIX + "sink_upsert_buffer_count")
           .defaultValue(3);
 
   ConfigOption<String> SINK_LABEL_PREFIX =

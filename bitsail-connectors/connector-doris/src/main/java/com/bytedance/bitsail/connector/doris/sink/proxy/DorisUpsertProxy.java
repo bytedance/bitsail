@@ -59,7 +59,7 @@ public class DorisUpsertProxy extends AbstractDorisWriteModeProxy {
     this.dorisWriterState = new DorisWriterState(executionOptions.getLabelPrefix());
     this.labelPrefix = executionOptions.getLabelPrefix();
     this.labelGenerator = new LabelGenerator(labelPrefix, dorisExecutionOptions.isEnable2PC());
-    this.recordStream = new RecordStream(executionOptions.getUpsertBufferSize(), executionOptions.getUpsertBufferCount());
+    this.recordStream = new RecordStream(executionOptions.getBufferSize(), executionOptions.getBufferCount());
     init();
   }
 

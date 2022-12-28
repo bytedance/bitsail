@@ -62,8 +62,8 @@ public class DorisReplaceProxy extends AbstractDorisWriteModeProxy {
   private void addBatchBuffers(String record) throws IOException {
     this.dorisBatchBuffers.add(record);
     this.dorisBatchBuffersSize += record.getBytes().length;
-    if (dorisBatchBuffers.size() >= dorisExecutionOptions.getBufferCount()
-        || this.dorisBatchBuffersSize >= dorisExecutionOptions.getBufferSize()) {
+    if (dorisBatchBuffers.size() >= dorisExecutionOptions.getRecordSize()
+        || this.dorisBatchBuffersSize >= dorisExecutionOptions.getRecordCount()) {
       flush(false);
     }
   }
