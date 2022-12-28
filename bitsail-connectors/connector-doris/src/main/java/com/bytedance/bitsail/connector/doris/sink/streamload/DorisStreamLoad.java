@@ -78,7 +78,7 @@ public class DorisStreamLoad {
   private static final String ABORT_URL_PATTERN = "http://%s/api/%s/_stream_load_2pc";
   private static final int SUCCESS_STATUS_CODE = 200;
   private LabelGenerator labelGenerator;
-  private String JOB_EXIST_FINISHED = "FINISHED";
+  private final String jobExistFinished = "FINISHED";
   private String userName;
   private String password;
   private String abortUrlStr;
@@ -139,7 +139,7 @@ public class DorisStreamLoad {
         Preconditions.checkState("true".equals(respContent.getTwoPhaseCommit()));
         if (LABEL_ALREADY_EXIST.equals(respContent.getStatus())) {
           // label already exist and job finished
-          if (JOB_EXIST_FINISHED.equals(respContent.getExistingJobStatus())) {
+          if (jobExistFinished.equals(respContent.getExistingJobStatus())) {
             throw new BitSailException(DorisErrorCode.LABEL_ALREADY_EXIST,
                 "Label already exist and load job finished, change you label prefix or restore from latest savepoint!");
           }

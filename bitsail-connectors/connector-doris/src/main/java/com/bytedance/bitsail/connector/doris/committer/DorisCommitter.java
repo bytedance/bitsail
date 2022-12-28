@@ -26,21 +26,16 @@ import com.bytedance.bitsail.connector.doris.error.DorisErrorCode;
 import com.bytedance.bitsail.connector.doris.http.HttpPutBuilder;
 import com.bytedance.bitsail.connector.doris.http.HttpUtil;
 import com.bytedance.bitsail.connector.doris.http.ResponseUtil;
-import com.bytedance.bitsail.connector.doris.rest.RestService;
 import com.bytedance.bitsail.connector.doris.partition.DorisPartition;
 import com.bytedance.bitsail.connector.doris.partition.DorisPartitionManager;
+import com.bytedance.bitsail.connector.doris.rest.RestService;
 import com.bytedance.bitsail.connector.doris.sink.ddl.DorisSchemaManagerGenerator;
 
-import static com.bytedance.bitsail.connector.doris.sink.streamload.LoadStatus.FAIL;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NoArgsConstructor;
-
-import static org.apache.http.HttpStatus.SC_OK;
-
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,10 +48,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.bytedance.bitsail.connector.doris.sink.streamload.LoadStatus.FAIL;
+import static org.apache.http.HttpStatus.SC_OK;
+
 @NoArgsConstructor
 public class DorisCommitter implements WriterCommitter<DorisCommittable> {
   private static final Logger LOG = LoggerFactory.getLogger(DorisCommitter.class);
-  private static final String commitPattern = "http://%s/api/%s/_stream_load_2pc";
+  private static final String COMMIT_PATTERN = "http://%s/api/%s/_stream_load_2pc";
   protected DorisPartitionManager dorisPartitionManager;
   protected DorisConnectionHolder dorisConnectionHolder;
   protected DorisOptions dorisOptions;
@@ -134,7 +132,7 @@ public class DorisCommitter implements WriterCommitter<DorisCommittable> {
     CloseableHttpResponse response = null;
     while (retry++ <= maxRetry) {
       HttpPutBuilder putBuilder = new HttpPutBuilder();
-      putBuilder.setUrl(String.format(commitPattern, hostPort, committable.getDb()))
+      putBuilder.setUrl(String.format(COMMIT_PATTERN, hostPort, committable.getDb()))
           .baseAuth(dorisOptions.getUsername(), dorisOptions.getPassword())
           .addCommonHeader()
           .addTxnId(committable.getTxnID())

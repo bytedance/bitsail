@@ -29,20 +29,18 @@ import com.bytedance.bitsail.connector.doris.sink.record.RecordStream;
 import com.bytedance.bitsail.connector.doris.sink.streamload.DorisStreamLoad;
 
 import com.google.common.collect.ImmutableList;
-
-import static com.bytedance.bitsail.connector.doris.sink.streamload.LoadStatus.PUBLISH_TIMEOUT;
-import static com.bytedance.bitsail.connector.doris.sink.streamload.LoadStatus.SUCCESS;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static com.bytedance.bitsail.connector.doris.sink.streamload.LoadStatus.PUBLISH_TIMEOUT;
+import static com.bytedance.bitsail.connector.doris.sink.streamload.LoadStatus.SUCCESS;
 
 public class DorisUpsertProxy extends AbstractDorisWriteModeProxy {
   private static final Logger LOG = LoggerFactory.getLogger(DorisUpsertProxy.class);
