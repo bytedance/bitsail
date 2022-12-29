@@ -50,13 +50,13 @@ public class AssertRuleExecutor {
       return false;
     }
 
-    boolean valueChecked = checkValue(value, columnRule.getColumnRules());
-    if (!valueChecked) {
+    boolean typeChecked = checkType(value, columnRule.getColumnType());
+    if (!typeChecked) {
       return false;
     }
 
-    boolean typeChecked = checkType(value, columnRule.getColumnType());
-    if (!typeChecked) {
+    boolean valueChecked = checkValue(value, columnRule.getColumnRules());
+    if (!valueChecked) {
       return false;
     }
 
