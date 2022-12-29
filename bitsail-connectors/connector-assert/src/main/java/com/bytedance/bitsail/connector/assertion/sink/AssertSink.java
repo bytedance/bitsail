@@ -18,6 +18,8 @@ package com.bytedance.bitsail.connector.assertion.sink;
 
 import com.bytedance.bitsail.base.connector.writer.v1.Sink;
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
+import com.bytedance.bitsail.base.extension.ParallelismComputable;
+import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.WriterOptions;
@@ -35,7 +37,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class AssertSink implements Sink<Row, String, Integer> {
+import static com.bytedance.bitsail.connector.assertion.sink.constants.AssertConstants.DEFAULT_PARALLELISM;
+
+public class AssertSink implements Sink<Row, String, Integer>, ParallelismComputable {
   private static final Logger LOG = LoggerFactory.getLogger(AssertSink.class);
 
   private List<AssertSimpleRule> rowRules;
@@ -70,5 +74,19 @@ public class AssertSink implements Sink<Row, String, Integer> {
   public Writer<Row, String, Integer> createWriter(Writer.Context<Integer> context) throws IOException {
     List<String> columnNames = this.columnInfos.stream().map(ColumnInfo::getName).collect(Collectors.toList());
     return new AssertWriter(rowRules, columnRules, columnNames);
+  }
+
+  @Override
+  public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConf, BitSailConfiguration selfConf, ParallelismAdvice upstreamAdvice) throws Exception {
+    int parallelism = upstreamAdvice.getAdviceParallelism();
+    if (selfConf.fieldExists(AssertWriterOptions.ROW_RULES)) {
+      parallelism = DEFAULT_PARALLELISM;
+    } else if (selfConf.fieldExists(WriterOptions.BaseWriterOptions.WRITER_PARALLELISM_NUM) && !upstreamAdvice.isEnforceDownStreamChain()) {
+      parallelism = selfConf.get(WriterOptions.BaseWriterOptions.WRITER_PARALLELISM_NUM);
+    }
+    return ParallelismAdvice.builder()
+        .adviceParallelism(parallelism)
+        .enforceDownStreamChain(false)
+        .build();
   }
 }
