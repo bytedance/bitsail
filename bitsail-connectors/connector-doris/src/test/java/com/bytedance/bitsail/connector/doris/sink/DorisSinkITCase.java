@@ -53,6 +53,6 @@ public class DorisSinkITCase {
     jobConf.set(CommonOptions.CheckPointOptions.CHECKPOINT_ENABLE, true);
     jobConf.set(CommonOptions.CheckPointOptions.CHECKPOINT_INTERVAL, 5000L);
     jobConf.set(DorisWriterOptions.SINK_ENABLE_2PC, false);
-    jobConf.set(DorisWriterOptions.SINK_LABEL_PREFIX, "bitsail_doris-test");
+    jobConf.set(DorisWriterOptions.SINK_LABEL_PREFIX, "bitsail-doris");
   }
 }
