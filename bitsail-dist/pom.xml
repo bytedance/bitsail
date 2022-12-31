@@ -271,7 +271,7 @@
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>connector-local-csv</artifactId>
