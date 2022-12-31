@@ -44,6 +44,8 @@
         <module>connector-clickhouse</module>
         <module>connector-ftp</module>
         <module>connector-druid</module>
+        <module>connector-assert</module>
+        <module>connector-local-csv</module>
     </modules>
 
     <dependencies>

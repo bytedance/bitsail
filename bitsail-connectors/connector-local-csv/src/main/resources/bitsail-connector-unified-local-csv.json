@@ -1,0 +1,9 @@
+{
+  "name": "bitsail-connector-unified-local-csv",
+  "classes": [
+    "com.bytedance.bitsail.connector.local.csv.source.LocalCsvSource"
+  ],
+  "libs": [
+    "connector-local-csv-${version}.jar"
+  ]
+}
