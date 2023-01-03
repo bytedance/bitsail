@@ -18,149 +18,187 @@
 
 package com.bytedance.bitsail.connector.fake.source.generate;
 
+import java.math.BigDecimal;
 import java.sql.Date;
+
+import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfos;
+
 import net.datafaker.Faker;
 
 import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Arrays;
 
 /**
  * generate data by net.datafaker:datafaker
  */
-public enum FakerData implements ColumnDataGenerator {
+public class FakerData implements ColumnDataGenerator {
 
-  LongFaker {
-    @Override
-    public Object generate(GenerateConfig generateConfig) {
-      return faker.number().randomNumber();
-    }
-  },
-  IntFaker {
-    @Override
-    public Object generate(GenerateConfig generateConfig) {
-      return Long.valueOf(faker.number().randomNumber())
-          .intValue();
-    }
-  },
-  ShortFaker {
-    @Override
-    public Object generate(GenerateConfig generateConfig) {
-      return Long.valueOf(faker.number().randomNumber())
-          .shortValue();
-    }
-  },
-  StringFaker {
-    @Override
-    public Object generate(GenerateConfig generateConfig) {
-      return faker.name().fullName();
-    }
-  },
-  BoolFaker {
-    @Override
-    public Object generate(GenerateConfig generateConfig) {
-      return faker.bool().bool();
-    }
-  },
-  DoubleFaker {
-    @Override
-    public Object generate(GenerateConfig config) {
-      return faker.number().randomDouble(5, config.getLower(), config.getUpper());
-    }
-  },
-  FloatFaker {
-    @Override
-    public Object generate(GenerateConfig config) {
-      return Double.valueOf(faker.number().randomDouble(5, config.getLower(), config.getUpper()))
-          .floatValue();
-    }
-  },
-  BigDecimalFaker {
-    @Override
-    public Object generate(GenerateConfig config) {
-      return java.math.BigDecimal.valueOf(faker.number().randomDouble(5, config.getLower(), config.getUpper()));
-    }
-  },
-  BigIntegerFaker {
-    @Override
-    public Object generate(GenerateConfig generateConfig) {
-      return new BigInteger(String.valueOf(faker.number().randomNumber()));
-    }
-  },
-  BinaryFaker {
-    @Override
-    public Object generate(GenerateConfig generateConfig) {
-      return faker.name().fullName().getBytes();
-    }
-  },
-  DateFaker {
-    @Override
-    public Object generate(GenerateConfig config) {
-      return new Date(
-          faker.date()
-              .between(config.getFromTimestamp(), config.getToTimestamp())
-              .getTime());
-    }
-  },
-  TimeFaker {
-    @Override
-    public Object generate(GenerateConfig config) {
-      return new Time(
-          faker.date()
-              .between(config.getFromTimestamp(), config.getToTimestamp())
-              .getTime());
-    }
-  },
-  TimestampFaker {
-    @Override
-    public Object generate(GenerateConfig config) {
-      return new Timestamp(
-          faker.date()
-              .between(config.getFromTimestamp(), config.getToTimestamp())
-              .getTime());
-    }
-  },
-  LocalDateFaker {
-    @Override
-    public Object generate(GenerateConfig generateConfig) {
-      return faker.date()
-          .between(generateConfig.getFromTimestamp(), generateConfig.getToTimestamp())
-          .toLocalDateTime()
-          .toLocalDate();
-    }
-  },
-  LocalTimeFaker {
-    @Override
-    public Object generate(GenerateConfig generateConfig) {
-      return faker.date()
-          .between(generateConfig.getFromTimestamp(), generateConfig.getToTimestamp())
-          .toLocalDateTime()
-          .toLocalTime();
-    }
-  },
-  LocalDateTimeFaker {
-    @Override
-    public Object generate(GenerateConfig generateConfig) {
-      return faker.date()
-          .between(generateConfig.getFromTimestamp(), generateConfig.getToTimestamp())
-          .toLocalDateTime();
-    }
-  },
-  VoidFaker{
-    @Override
-    public Object generate(GenerateConfig generateConfig) {
-      return null;
-    }
-  }
-  ;
-  protected final transient Faker faker;
-
-  FakerData() {
-    this.faker = new Faker();
+  public static boolean supported(TypeInfo<?> typeInfo) {
+    return Arrays.stream(FakeInstance.values())
+        .anyMatch(fakeInstance -> typeInfo == fakeInstance.typeInfo);
   }
 
+  private FakeData fakeData;
+
+  public FakerData(TypeInfo<?> typeInfo) {
+    for (FakeInstance fakeInstance : FakeInstance.values()) {
+      if (typeInfo == fakeInstance.typeInfo) {
+        this.fakeData = fakeInstance;
+      }
+    }
+
+    if (fakeData == null) {
+      throw new IllegalArgumentException("not supported the type:" + typeInfo);
+    }
+  }
 
   @Override
-  public abstract Object generate(GenerateConfig generateConfig);
+  public Object generate(GenerateConfig generateConfig) {
+    return fakeData.fake(generateConfig);
+  }
+
+  private interface FakeData {
+    Object fake(GenerateConfig generateConfig);
+  }
+
+  private enum FakeInstance implements FakeData {
+    LongFaker(TypeInfos.LONG_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig generateConfig) {
+        return faker.number().randomNumber();
+      }
+    },
+    IntFaker(TypeInfos.INT_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig generateConfig) {
+        return Long.valueOf(faker.number().randomNumber())
+            .intValue();
+      }
+    },
+    ShortFaker(TypeInfos.SHORT_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig generateConfig) {
+        return Long.valueOf(faker.number().randomNumber())
+            .shortValue();
+      }
+    },
+    StringFaker(TypeInfos.STRING_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig generateConfig) {
+        return faker.name().fullName();
+      }
+    },
+    BoolFaker(TypeInfos.BOOLEAN_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig generateConfig) {
+        return faker.bool().bool();
+      }
+    },
+    DoubleFaker(TypeInfos.DOUBLE_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig config) {
+        return faker.number().randomDouble(5, config.getLower(), config.getUpper());
+      }
+    },
+    FloatFaker(TypeInfos.FLOAT_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig config) {
+        return Double.valueOf(faker.number().randomDouble(5, config.getLower(), config.getUpper()))
+            .floatValue();
+      }
+    },
+    BigDecimalFaker(TypeInfos.BIG_DECIMAL_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig config) {
+        return BigDecimal.valueOf(faker.number().randomDouble(5, config.getLower(), config.getUpper()));
+      }
+    },
+    BigIntegerFaker(TypeInfos.BIG_INTEGER_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig generateConfig) {
+        return new BigInteger(String.valueOf(faker.number().randomNumber()));
+      }
+    },
+    BinaryFaker(BasicArrayTypeInfo.BINARY_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig generateConfig) {
+        return faker.name().fullName().getBytes();
+      }
+    },
+    DateFaker(TypeInfos.SQL_DATE_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig config) {
+        return new Date(faker.date()
+            .between(config.getFromTimestamp(), config.getToTimestamp())
+            .getTime());
+      }
+    },
+    TimeFaker(TypeInfos.SQL_TIME_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig config) {
+        return new Time(faker.date()
+            .between(config.getFromTimestamp(), config.getToTimestamp())
+            .getTime());
+      }
+    },
+    TimestampFaker(TypeInfos.SQL_TIMESTAMP_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig config) {
+        return new Timestamp(faker.date()
+            .between(config.getFromTimestamp(), config.getToTimestamp())
+            .getTime());
+      }
+    },
+    LocalDateFaker(TypeInfos.LOCAL_DATE_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig generateConfig) {
+        return faker.date()
+            .between(generateConfig.getFromTimestamp(), generateConfig.getToTimestamp())
+            .toLocalDateTime()
+            .toLocalDate();
+      }
+    },
+    LocalTimeFaker(TypeInfos.LOCAL_TIME_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig generateConfig) {
+        return faker.date()
+            .between(generateConfig.getFromTimestamp(), generateConfig.getToTimestamp())
+            .toLocalDateTime()
+            .toLocalTime();
+      }
+    },
+    LocalDateTimeFaker(TypeInfos.LOCAL_DATE_TIME_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig generateConfig) {
+        return faker.date()
+            .between(generateConfig.getFromTimestamp(), generateConfig.getToTimestamp())
+            .toLocalDateTime();
+      }
+    },
+    VoidFaker(TypeInfos.VOID_TYPE_INFO) {
+      @Override
+      public Object fake(GenerateConfig generateConfig) {
+        return null;
+      }
+    };
+
+    protected final transient Faker faker;
+
+    protected final TypeInfo<?> typeInfo;
+
+    FakeInstance(TypeInfo<?> typeInfo) {
+      this.typeInfo = typeInfo;
+      this.faker = new Faker();
+    }
+
+
+    @Override
+    public abstract Object fake(GenerateConfig generateConfig);
+
+  }
 
 }
