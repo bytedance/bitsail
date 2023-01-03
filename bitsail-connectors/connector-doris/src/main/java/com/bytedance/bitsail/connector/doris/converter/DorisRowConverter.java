@@ -46,7 +46,8 @@ public class DorisRowConverter implements Serializable {
 
   /**
    * Convert data from {@link Row}
-   * @param row record from bitsail row
+   *
+   * @param row   record from bitsail row
    * @param index the field index
    * @return java type value.
    */

@@ -30,6 +30,7 @@ import com.bytedance.bitsail.connector.doris.sink.proxy.DorisReplaceProxy;
 import com.bytedance.bitsail.connector.doris.sink.proxy.DorisUpsertProxy;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,9 +64,6 @@ public class DorisWriter<InputT extends Row> implements Writer<InputT, DorisComm
         }
         writeModeProxy = new DorisReplaceProxy(dorisExecutionOptions, dorisOptions);
         break;
-      case STREAMING_TWO_PC:
-        //TODO implement 2PC write mode
-        throw new BitSailException(DorisErrorCode.PROXY_INIT_FAILED, "2PC commit is not supported currently");
       default:
         throw new BitSailException(DorisErrorCode.PROXY_INIT_FAILED, "Write mode is not valid");
     }
@@ -81,6 +79,9 @@ public class DorisWriter<InputT extends Row> implements Writer<InputT, DorisComm
   public void write(InputT in) throws IOException {
     String dorisRecord;
     dorisRecord = this.serializer.serialize(in);
+    if (StringUtils.isEmpty(dorisRecord)) {
+      return;
+    }
     writeModeProxy.write(dorisRecord);
   }
 

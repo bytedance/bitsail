@@ -46,7 +46,7 @@ public class DorisOptions implements Serializable {
 
   /**
    * Doris supports AGGREGATE, DUPLICATE and UNIQUE model.<br/>
-   *
+   * <p>
    * Currently, we only support UNIQUE table writer.
    */
   private TableModel tableModel;

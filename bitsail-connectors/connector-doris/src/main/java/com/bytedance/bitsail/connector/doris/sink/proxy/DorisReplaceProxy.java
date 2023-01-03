@@ -21,6 +21,8 @@ import com.bytedance.bitsail.connector.doris.committer.DorisCommittable;
 import com.bytedance.bitsail.connector.doris.config.DorisExecutionOptions;
 import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 import com.bytedance.bitsail.connector.doris.sink.DorisWriterState;
+import com.bytedance.bitsail.connector.doris.sink.label.LabelGenerator;
+import com.bytedance.bitsail.connector.doris.sink.record.RecordStream;
 import com.bytedance.bitsail.connector.doris.sink.streamload.DorisStreamLoad;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -36,17 +38,21 @@ public class DorisReplaceProxy extends AbstractDorisWriteModeProxy {
   private static final Logger LOG = LoggerFactory.getLogger(DorisReplaceProxy.class);
   protected List dorisBatchBuffers;
   protected long dorisBatchBuffersSize;
+  private RecordStream recordStream;
 
   public DorisReplaceProxy(DorisExecutionOptions dorisExecutionOptions, DorisOptions dorisOptions) {
     this.dorisExecutionOptions = dorisExecutionOptions;
     this.dorisBatchBuffers = new ArrayList(dorisExecutionOptions.getBufferCount());
     this.dorisOptions = dorisOptions;
-    this.dorisStreamLoad = new DorisStreamLoad(dorisExecutionOptions, dorisOptions);
+    this.recordStream = new RecordStream(dorisExecutionOptions.getBufferSize(), dorisExecutionOptions.getBufferCount());
+    this.dorisStreamLoad = new DorisStreamLoad(dorisExecutionOptions, dorisOptions,
+        new LabelGenerator(dorisExecutionOptions.getLabelPrefix(), dorisExecutionOptions.isEnable2PC()), recordStream);
     this.dorisBatchBuffersSize = 0;
   }
 
   @VisibleForTesting
-  public DorisReplaceProxy() {}
+  public DorisReplaceProxy() {
+  }
 
   @Override
   public void write(String record) throws IOException {
@@ -56,8 +62,8 @@ public class DorisReplaceProxy extends AbstractDorisWriteModeProxy {
   private void addBatchBuffers(String record) throws IOException {
     this.dorisBatchBuffers.add(record);
     this.dorisBatchBuffersSize += record.getBytes().length;
-    if (dorisBatchBuffers.size() >= dorisExecutionOptions.getBufferCount()
-        || this.dorisBatchBuffersSize >= dorisExecutionOptions.getBufferSize()) {
+    if (dorisBatchBuffers.size() >= dorisExecutionOptions.getRecordSize()
+        || this.dorisBatchBuffersSize >= dorisExecutionOptions.getRecordCount()) {
       flush(false);
     }
   }

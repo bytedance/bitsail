@@ -98,7 +98,7 @@ public class DorisSink<InputT> implements Sink<InputT, DorisCommittable, DorisWr
 
   @Override
   public Optional<WriterCommitter<DorisCommittable>> createCommitter() {
-    return Optional.of(new DorisCommitter(dorisOptions, dorisExecutionOptions.getWriterMode()));
+    return Optional.of(new DorisCommitter(dorisOptions, dorisExecutionOptions));
   }
 
   @Override
@@ -154,8 +154,14 @@ public class DorisSink<InputT> implements Sink<InputT, DorisCommittable, DorisWr
         .maxRetries(writerConfiguration.get(DorisWriterOptions.SINK_MAX_RETRIES))
         .bufferCount(writerConfiguration.get(DorisWriterOptions.SINK_BUFFER_COUNT))
         .bufferSize(writerConfiguration.get(DorisWriterOptions.SINK_BUFFER_SIZE))
+        .recordCount(writerConfiguration.get(DorisWriterOptions.SINK_RECORD_COUNT))
+        .recordSize(writerConfiguration.get(DorisWriterOptions.SINK_RECORD_SIZE))
         .labelPrefix(writerConfiguration.get(DorisWriterOptions.SINK_LABEL_PREFIX))
         .enableDelete(writerConfiguration.get(DorisWriterOptions.SINK_ENABLE_DELETE))
+        .enable2PC(writerConfiguration.get(DorisWriterOptions.SINK_ENABLE_2PC))
+        .requestConnectTimeoutMs(writerConfiguration.get(DorisWriterOptions.REQUEST_CONNECT_TIMEOUTS))
+        .requestRetries(writerConfiguration.get(DorisWriterOptions.REQUEST_RETRIES))
+        .requestReadTimeoutMs(writerConfiguration.get(DorisWriterOptions.REQUEST_READ_TIMEOUTS))
         .writerMode(this.writeMode)
         .isBatch(this.writeMode.name().startsWith("BATCH"));
     Map<String, String> streamProperties =
