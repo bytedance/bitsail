@@ -1,34 +1,33 @@
 <!--
 
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
+Copyright 2022 Bytedance Ltd. and/or its affiliates.
+         
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 -->
 
-![logo](docs/images/bitsail_logo.png)
+![logo](website/images/bitsail_logo.png)
 
 English | [简体中文](README_zh.md)
 
 [![Build](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml/badge.svg)](https://github.com/bytedance/bitsail/actions/workflows/cicd.yml)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
-[![Join Slack](https://img.shields.io/badge/slack-%23BitSail-72eff8?logo=slack&color=5DADE2&label=Join%20Slack)](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
-
+[![Join Slack](https://img.shields.io/badge/slack-%23BitSail-72eff8?logo=slack&color=5DADE2&label=Join%20Slack)](https://join.slack.com/t/bitsailworkspace/shared_invite/zt-1l1vgcnlj-gPSWqggOeRHrSO5l7na2WQ)
+[![Website](https://img.shields.io/badge/Website-%23BitSail-blue)](https://bytedance.github.io/bitsail/)
 ## Introduction
 BitSail is ByteDance's open source data integration engine which is based on distributed architecture and provides high performance. It supports data synchronization between multiple heterogeneous data sources, and provides global data integration solutions in batch, streaming, and incremental scenarios. At present, it serves almost all business lines in ByteDance, such as Douyin, Toutiao, etc., and synchronizes hundreds of trillions of data every day.
+
+Official website of BitSail:  https://bytedance.github.io/bitsail/
 
 ## Why Do We Use BitSail
 BitSail has been widely used and supports hundreds of trillions of large traffic. At the same time, it has been verified in various scenarios such as the cloud native environment of the volcano engine and the on-premises private cloud environment.
@@ -76,8 +75,8 @@ We have accumulated a lot of experience and made a number of optimizations to im
 - Real-time monitoring of task status
 
 ## Architecture of BitSail
- ![](docs/images/bitsail_arch.png)
- 
+ ![](website/images/bitsail_arch.png)
+
  ```
  Source[Input Sources] -> Framework[Data Transmission] -> Sink[Output Sinks]
  ```
@@ -90,6 +89,7 @@ In data synchronization scenarios, it covers batch, streaming, and incremental d
 In the Runtime layer, it supports multiple execution modes, such as yarn, local, and k8s is under development
 
 ## Supported Connectors
+
 <table>
   <tr>
     <th>DataSource</th>
@@ -98,13 +98,25 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <th>Writer</th>
   </tr>
   <tr>
+    <td>ClickHouse</td>
+    <td>-</td>
+    <td>✅</td>
+    <td>-</td>
+  </tr>
+  <tr>
     <td>Doris</td>
     <td>-</td>
     <td> </td>
     <td>✅</td>
   </tr>
   <tr>
-    <td>ElasticSearch</td>
+    <td>Druid</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Elasticsearch</td>
     <td>-</td>
     <td> </td>
     <td>✅</td>
@@ -122,19 +134,19 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <td> </td>
   </tr>
   <tr>
-    <td>Hive</td>
-    <td>-</td>
-    <td>✅</td>
-    <td>✅</td>
-  </tr>
-  <tr>
     <td>Hadoop</td>
     <td>-</td>
     <td>✅</td>
     <td>✅</td>
   </tr>
   <tr>
-    <td>Hbase</td>
+    <td>HBase</td>
+    <td>-</td>
+    <td>✅</td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Hive</td>
     <td>-</td>
     <td>✅</td>
     <td>✅</td>
@@ -173,6 +185,12 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <td>✅</td>
   </tr>
   <tr>
+    <td>LarkSheet</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
     <td>MongoDB</td>
     <td>-</td>
     <td>✅</td>
@@ -198,11 +216,11 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
   </tr>
 </table>
 
-Documentation for [Connectors](./docs/connectors/introduction.md).
+Documentation for [Connectors](website/en/documents/connectors/README.md).
 
 ## Community Support
 ### Slack
-Join BitSail Slack channel via this [link](https://join.slack.com/t/slack-ted3816/shared_invite/zt-1inff2sip-u7Ej_o73sUgdpJAvqwlEwQ)
+Join BitSail Slack channel via this [link](https://join.slack.com/t/bitsailworkspace/shared_invite/zt-1l1vgcnlj-gPSWqggOeRHrSO5l7na2WQ)
 
 ### Mailing List
 Currently, BitSail community use Google Group as the mailing list provider.
@@ -217,19 +235,19 @@ Unsubscribe: Email to this address `bitsail+unsubscribe@googlegroups.com`
 ### WeChat Group
 Welcome to scan this QR code and to join the WeChat group chat.
 
-<img src="docs/images/wechat_QR.png" alt="qr" width="100"/>
+<img src="website/images/wechat_QR.png" alt="qr" width="100"/>
 
 ## Environment Setup
-Link to [Environment Setup](docs/env_setup.md).
+Link to [Environment Setup](website/en/documents/start/env_setup.md).
 
 ## Deployment Guide
-Link to [Deployment Guide](docs/deployment.md).
+Link to [Deployment Guide](website/en/documents/start/deployment.md).
 
 ## BitSail Configuration
-Link to [Configuration Guide](docs/config.md).
+Link to [Configuration Guide](website/en/documents/start/config.md).
 
 ## Contributing Guide
-Link to [Contributing Guide](docs/contributing.md).
+Link to [Contributing Guide](website/en/community/contribute.md).
 
 ## Contributors
 **Thanks all contributors**<br>

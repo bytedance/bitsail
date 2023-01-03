@@ -1,12 +1,11 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,13 +17,17 @@
 package com.bytedance.bitsail.core;
 
 import com.bytedance.bitsail.base.execution.Mode;
+import com.bytedance.bitsail.base.packages.PluginFinder;
+import com.bytedance.bitsail.base.packages.PluginFinderFactory;
 import com.bytedance.bitsail.base.statistics.VMInfo;
 import com.bytedance.bitsail.client.api.command.CommandArgsParser;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.configuration.ConfigParser;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.core.command.CoreCommandArgs;
-import com.bytedance.bitsail.core.job.UnificationJob;
+import com.bytedance.bitsail.core.api.command.CoreCommandArgs;
+import com.bytedance.bitsail.core.api.interceptor.ConfigInterceptorHelper;
+import com.bytedance.bitsail.core.api.program.Program;
+import com.bytedance.bitsail.core.program.ProgramFactory;
 import com.bytedance.bitsail.core.util.ExceptionTracker;
 
 import lombok.Getter;
@@ -38,20 +41,22 @@ public class Engine {
   private static final Logger LOG = LoggerFactory.getLogger(Engine.class);
   private final Mode mode;
   @Getter
-  private final BitSailConfiguration bitSailConfiguration;
+  private final BitSailConfiguration configuration;
   private final CoreCommandArgs coreCommandArgs;
 
   public Engine(String[] args) {
     coreCommandArgs = new CoreCommandArgs();
     CommandArgsParser.parseArguments(args, coreCommandArgs);
     if (StringUtils.isNotEmpty(coreCommandArgs.getJobConfPath())) {
-      bitSailConfiguration = ConfigParser.fromRawConfPath(coreCommandArgs.getJobConfPath());
+      configuration = ConfigParser.fromRawConfPath(coreCommandArgs.getJobConfPath());
     } else {
-      bitSailConfiguration = BitSailConfiguration.from(
+      configuration = BitSailConfiguration.from(
           new String(Base64.getDecoder().decode(coreCommandArgs.getJobConfBase64())));
     }
-    LOG.info("BitSail configuration: {}", bitSailConfiguration.desensitizedBeautify());
-    mode = Mode.getJobRunMode(bitSailConfiguration.get(CommonOptions.JOB_TYPE));
+
+    ConfigInterceptorHelper.intercept(configuration);
+    LOG.info("BitSail configuration: {}", configuration.desensitizedBeautify());
+    mode = Mode.getJobRunMode(configuration.get(CommonOptions.JOB_TYPE));
   }
 
   public static void main(String[] args) throws Throwable {
@@ -80,13 +85,30 @@ public class Engine {
   }
 
   private <T> void run() throws Exception {
-    UnificationJob<T> job = new UnificationJob<>(bitSailConfiguration, coreCommandArgs);
+    //plugin load from original class loader.
+    PluginFinder pluginFinder = PluginFinderFactory
+        .getPluginFinder(configuration.get(CommonOptions.PLUGIN_FINDER_NAME));
+    pluginFinder.configure(configuration);
+
+    ClassLoader original = Thread.currentThread().getContextClassLoader();
+
     try {
-      job.start();
-    } finally {
-      if (bitSailConfiguration.fieldExists(CommonOptions.SLEEP_TIME)) {
-        Thread.sleep(bitSailConfiguration.get(CommonOptions.SLEEP_TIME));
+      //set context class loader to plugin's class loader.
+      Thread.currentThread().setContextClassLoader(pluginFinder.getClassloader());
+
+      Program entryProgram = ProgramFactory.createEntryProgram(pluginFinder, coreCommandArgs, configuration);
+      LOG.info("Final program: {}.", entryProgram.getComponentName());
+      entryProgram.configure(pluginFinder, configuration, coreCommandArgs);
+
+      if (entryProgram.validate()) {
+        entryProgram.submit();
       }
+    } finally {
+      if (configuration.fieldExists(CommonOptions.SLEEP_TIME)) {
+        Thread.sleep(configuration.get(CommonOptions.SLEEP_TIME));
+      }
+      //reset context classloader to original.
+      Thread.currentThread().setContextClassLoader(original);
     }
   }
 }

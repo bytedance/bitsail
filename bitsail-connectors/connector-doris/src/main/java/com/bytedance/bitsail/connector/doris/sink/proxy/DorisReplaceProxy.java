@@ -1,12 +1,11 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +21,8 @@ import com.bytedance.bitsail.connector.doris.committer.DorisCommittable;
 import com.bytedance.bitsail.connector.doris.config.DorisExecutionOptions;
 import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 import com.bytedance.bitsail.connector.doris.sink.DorisWriterState;
+import com.bytedance.bitsail.connector.doris.sink.label.LabelGenerator;
+import com.bytedance.bitsail.connector.doris.sink.record.RecordStream;
 import com.bytedance.bitsail.connector.doris.sink.streamload.DorisStreamLoad;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -37,17 +38,21 @@ public class DorisReplaceProxy extends AbstractDorisWriteModeProxy {
   private static final Logger LOG = LoggerFactory.getLogger(DorisReplaceProxy.class);
   protected List dorisBatchBuffers;
   protected long dorisBatchBuffersSize;
+  private RecordStream recordStream;
 
   public DorisReplaceProxy(DorisExecutionOptions dorisExecutionOptions, DorisOptions dorisOptions) {
     this.dorisExecutionOptions = dorisExecutionOptions;
     this.dorisBatchBuffers = new ArrayList(dorisExecutionOptions.getBufferCount());
     this.dorisOptions = dorisOptions;
-    this.dorisStreamLoad = new DorisStreamLoad(dorisExecutionOptions, dorisOptions);
+    this.recordStream = new RecordStream(dorisExecutionOptions.getBufferSize(), dorisExecutionOptions.getBufferCount());
+    this.dorisStreamLoad = new DorisStreamLoad(dorisExecutionOptions, dorisOptions,
+        new LabelGenerator(dorisExecutionOptions.getLabelPrefix(), dorisExecutionOptions.isEnable2PC()), recordStream);
     this.dorisBatchBuffersSize = 0;
   }
 
   @VisibleForTesting
-  public DorisReplaceProxy() {}
+  public DorisReplaceProxy() {
+  }
 
   @Override
   public void write(String record) throws IOException {
@@ -57,8 +62,8 @@ public class DorisReplaceProxy extends AbstractDorisWriteModeProxy {
   private void addBatchBuffers(String record) throws IOException {
     this.dorisBatchBuffers.add(record);
     this.dorisBatchBuffersSize += record.getBytes().length;
-    if (dorisBatchBuffers.size() >= dorisExecutionOptions.getBufferCount()
-        || this.dorisBatchBuffersSize >= dorisExecutionOptions.getBufferSize()) {
+    if (dorisBatchBuffers.size() >= dorisExecutionOptions.getRecordSize()
+        || this.dorisBatchBuffersSize >= dorisExecutionOptions.getRecordCount()) {
       flush(false);
     }
   }

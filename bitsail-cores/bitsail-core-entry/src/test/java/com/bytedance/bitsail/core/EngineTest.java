@@ -1,12 +1,9 @@
 /*
- * Copyright 2022 ByteDance and/or its affiliates
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -38,8 +35,8 @@ public class EngineTest {
         new String[] {
             "-xjob_conf_in_base64", Base64.getEncoder().encodeToString(jobConf.getBytes())
         });
-    assertTrue(engine.getBitSailConfiguration().fieldExists("key"));
-    assertFalse(engine.getBitSailConfiguration().fieldExists("key1"));
+    assertTrue(engine.getConfiguration().fieldExists("key"));
+    assertFalse(engine.getConfiguration().fieldExists("key1"));
   }
 
   @Test
@@ -49,7 +46,7 @@ public class EngineTest {
         new String[] {
             "-xjob_conf", confPath
         });
-    assertTrue(engine.getBitSailConfiguration().fieldExists("key"));
-    assertFalse(engine.getBitSailConfiguration().fieldExists("key1"));
+    assertTrue(engine.getConfiguration().fieldExists("key"));
+    assertFalse(engine.getConfiguration().fieldExists("key1"));
   }
 }

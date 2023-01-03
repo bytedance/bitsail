@@ -1,12 +1,11 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,8 +37,8 @@ public interface CommonOptions {
       key(COMMON_PREFIX + "static_lib_conf_file")
           .defaultValue("static_libs/static_lib_conf.json");
 
-  ConfigOption<String> PLUGIN_EXPLORER_NAME =
-      key(COMMON_PREFIX + "plugin_explorer_name")
+  ConfigOption<String> PLUGIN_FINDER_NAME =
+      key(COMMON_PREFIX + "plugin_finder_name")
           .defaultValue("localFS");
 
   ConfigOption<String> STATIC_LIB_DIR =
@@ -57,6 +56,14 @@ public interface CommonOptions {
   ConfigOption<String> JOB_PLUGIN_ROOT_PATH =
       key(COMMON_PREFIX + "job_plugin_root_path")
           .noDefaultValue(String.class);
+
+  ConfigOption<String> JOB_ENGINE_MAPPING_DIR_NAME =
+      key(COMMON_PREFIX + "job_engine_conf_dir")
+          .defaultValue("engines/mapping");
+
+  ConfigOption<String> JOB_ENGINE_DIR_NAME =
+      key(COMMON_PREFIX + "job_engine_lib_dir")
+          .defaultValue("engines");
 
   ConfigOption<Integer> GLOBAL_PARALLELISM_NUM =
       key(COMMON_PREFIX + "global_parallelism_num")

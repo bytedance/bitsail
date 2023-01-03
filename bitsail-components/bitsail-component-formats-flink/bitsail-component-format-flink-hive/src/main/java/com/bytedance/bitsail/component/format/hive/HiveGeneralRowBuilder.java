@@ -1,12 +1,11 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -68,7 +67,7 @@ import java.util.Map;
 import java.util.Properties;
 
 @SuppressWarnings("checkstyle:MagicNumber")
-public class HiveGeneralRowBuilder implements RowBuilder {
+public class HiveGeneralRowBuilder implements RowBuilder<Writable> {
   private final Map<String, String> hiveProperties;
   private final String db;
   private final String table;
@@ -104,7 +103,7 @@ public class HiveGeneralRowBuilder implements RowBuilder {
   }
 
   @Override
-  public void build(Object objectValue, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
+  public void build(Writable objectValue, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
     if (deserializer == null) {
       synchronized (hiveShim) {
         if (deserializer == null) {

@@ -1,12 +1,11 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +24,13 @@ public enum DorisErrorCode implements ErrorCode {
   REQUIRED_VALUE("DorisWriter-02", "You missed parameter which is required, please check your configuration."),
   UNSUPPORTED_TABLE_MODEL("DorisWriter-03", "Unsupported doris table model."),
   LOAD_FAILED("DorisWriter-04", "Failed to load data into doris"),
+  COMMIT_FAILED("DorisWriter-05", "Failed to commit data into doris"),
+  GET_BACKEND_FAILED("DorisWriter-06", "Failed to get doris backend"),
+  CONNECTED_FAILED("DorisWriter-07", "Failed to connected doris"),
+  FE_NOT_AVAILABLE("DorisWriter-08", "Fe nodes not available"),
+  PARSE_FAILED("DorisWriter-09", "Failed parse response"),
+  ABORT_FAILED("DorisWriter-10", "Fail to abort transaction"),
+  LABEL_ALREADY_EXIST("DorisWriter-11", "Label already exist"),
   ;
 
   private final String code;

@@ -1,12 +1,11 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,6 +30,7 @@ import com.bytedance.bitsail.connector.doris.sink.proxy.DorisReplaceProxy;
 import com.bytedance.bitsail.connector.doris.sink.proxy.DorisUpsertProxy;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,9 +64,6 @@ public class DorisWriter<InputT extends Row> implements Writer<InputT, DorisComm
         }
         writeModeProxy = new DorisReplaceProxy(dorisExecutionOptions, dorisOptions);
         break;
-      case STREAMING_TWO_PC:
-        //TODO implement 2PC write mode
-        throw new BitSailException(DorisErrorCode.PROXY_INIT_FAILED, "2PC commit is not supported currently");
       default:
         throw new BitSailException(DorisErrorCode.PROXY_INIT_FAILED, "Write mode is not valid");
     }
@@ -82,6 +79,9 @@ public class DorisWriter<InputT extends Row> implements Writer<InputT, DorisComm
   public void write(InputT in) throws IOException {
     String dorisRecord;
     dorisRecord = this.serializer.serialize(in);
+    if (StringUtils.isEmpty(dorisRecord)) {
+      return;
+    }
     writeModeProxy.write(dorisRecord);
   }
 

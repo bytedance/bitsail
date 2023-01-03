@@ -1,0 +1,9 @@
+{
+  "name": "bitsail-connector-unified-redis",
+  "classes": [
+    "com.bytedance.bitsail.connector.redis.sink.RedisSink"
+  ],
+  "libs": [
+    "connector-redis-${version}.jar"
+  ]
+}

@@ -1,12 +1,11 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -77,4 +76,31 @@ public class RedisSinkITCase {
     Assert.assertEquals(TOTAL_COUNT, redisContainer.getKeyCount());
   }
 
+  @Test
+  public void testhmashBatch() throws Exception {
+    BitSailConfiguration jobConfiguration = JobConfUtils.fromClasspath("fake_to_redis_mhash.json");
+    jobConfiguration.set(FakeReaderOptions.TOTAL_COUNT, TOTAL_COUNT);
+    jobConfiguration.set(CommonOptions.JOB_TYPE, "batch");
+    jobConfiguration.set(FakeReaderOptions.RATE, 1000);
+    jobConfiguration.set(RedisWriterOptions.HOST, redisHost);
+    jobConfiguration.set(RedisWriterOptions.PORT, redisPort);
+
+    EmbeddedFlinkCluster.submitJob(jobConfiguration);
+
+    Assert.assertEquals(TOTAL_COUNT, redisContainer.getKeyCount());
+  }
+
+  @Test
+  public void testHmashStreaming() throws Exception {
+    BitSailConfiguration jobConfiguration = JobConfUtils.fromClasspath("fake_to_redis_mhash.json");
+    jobConfiguration.set(FakeReaderOptions.TOTAL_COUNT, TOTAL_COUNT);
+    jobConfiguration.set(CommonOptions.JOB_TYPE, "streaming");
+    jobConfiguration.set(CommonOptions.CheckPointOptions.CHECKPOINT_ENABLE, true);
+    jobConfiguration.set(RedisWriterOptions.HOST, redisHost);
+    jobConfiguration.set(RedisWriterOptions.PORT, redisPort);
+
+    EmbeddedFlinkCluster.submitJob(jobConfiguration);
+
+    Assert.assertEquals(TOTAL_COUNT, redisContainer.getKeyCount());
+  }
 }
