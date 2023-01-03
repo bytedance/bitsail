@@ -8,6 +8,7 @@ dir:
 
 **BitSail** 支持以下连接器用于不同数据源：
 
+- [Assert 连接器](assert/assert.md)
 - [ClickHouse 连接器](clickhouse/clickhouse.md)
 - [Doris 连接器](doris/doris.md)
 - [Druid 连接器](druid/druid.md)

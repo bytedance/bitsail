@@ -8,6 +8,7 @@ dir:
 
 **BitSail** supports the following connectors for different data sources:
 
+- [Assert connector](assert/assert.md)
 - [ClickHouse connector](clickhouse/clickhouse.md)
 - [Doris connector](doris/doris.md)
 - [Druid connector](druid/druid.md)

@@ -1,29 +1,15 @@
+# Assert connector example
+
+Parent document: [Assert connector](./assert.md)
+
+The exact meaning of the following configuration.
+- Total number of data entries in the range `[10, 20]`
+- The `name` column is not-null and has a string length in the range `[1, 1000]`
+- The `price` column is not-null and has a value in the range `[2, 180]`
+
+```json
 {
   "job": {
-    "common": {
-      "cid": 0,
-      "domain": "test",
-      "job_id": -24,
-      "job_name": "bitsail_connector_assert_test",
-      "instance_id": -720,
-      "user_name": "root"
-    },
-    "reader": {
-      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
-      "total_count": 17,
-      "lower_limit": 5.2,
-      "upper_limit": 22.3,
-      "columns": [
-        {
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "name": "price",
-          "type": "double"
-        }
-      ]
-    },
     "writer": {
       "class": "com.bytedance.bitsail.connector.assertion.sink.AssertSink",
       "columns": [
@@ -55,3 +41,4 @@
     }
   }
 }
+```
