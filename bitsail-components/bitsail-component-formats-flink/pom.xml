@@ -30,7 +30,6 @@
         <module>bitsail-component-format-flink-json</module>
         <module>bitsail-component-format-flink-hive</module>
         <module>bitsail-component-format-flink-api</module>
-        <module>bitsail-component-format-flink-hbase</module>
     </modules>
 
     <properties>

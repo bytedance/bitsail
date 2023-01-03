@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.component.format.hbase;
+package com.bytedance.bitsail.connector.hbase.format;
 
 import com.bytedance.bitsail.base.format.DeserializationFormat;
 import com.bytedance.bitsail.base.format.DeserializationSchema;

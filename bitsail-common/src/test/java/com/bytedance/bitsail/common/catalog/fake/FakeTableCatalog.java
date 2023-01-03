@@ -27,8 +27,8 @@ import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
+import com.google.common.collect.Lists;
 import lombok.Getter;
-import org.apache.commons.compress.utils.Lists;
 
 import java.util.List;
 import java.util.stream.Collectors;

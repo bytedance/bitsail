@@ -106,7 +106,7 @@ public class HdfsTestService {
   public void stop() {
     LOG.info("HDFS Minicluster service being shut down.");
     if (miniDfsCluster != null) {
-      miniDfsCluster.shutdown(true, true);
+      miniDfsCluster.shutdown(true);
     }
     miniDfsCluster = null;
   }
@@ -130,7 +130,7 @@ public class HdfsTestService {
    * @return The updated Configuration object.
    */
   private static Configuration configureDFSCluster(Configuration config, String localDFSLocation, String bindIP,
-      int namenodeRpcPort, int datanodePort, int datanodeIpcPort, int datanodeHttpPort) {
+                                                   int namenodeRpcPort, int datanodePort, int datanodeIpcPort, int datanodeHttpPort) {
 
     LOG.info("HDFS force binding to ip: " + bindIP);
     config.set(DFSConfigKeys.FS_DEFAULT_NAME_KEY, "hdfs://" + bindIP + ":" + namenodeRpcPort);
