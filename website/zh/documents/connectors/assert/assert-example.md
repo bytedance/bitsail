@@ -1,29 +1,15 @@
+# Assert 连接器示例
+
+上级文档：[Assert 连接器](./assert.md)
+
+下面配置的具体含义：
+- 数据的总条数范围为 `[10, 20]`
+- `name` 列非空，字符串长度范围为 `[1, 1000]`
+- `price` 列非空，取值范围是 `[2, 180]`
+
+```json
 {
   "job": {
-    "common": {
-      "cid": 0,
-      "domain": "test",
-      "job_id": -24,
-      "job_name": "bitsail_connector_assert_test",
-      "instance_id": -720,
-      "user_name": "root"
-    },
-    "reader": {
-      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
-      "total_count": 17,
-      "lower_limit": 5.2,
-      "upper_limit": 22.3,
-      "columns": [
-        {
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "name": "price",
-          "type": "double"
-        }
-      ]
-    },
     "writer": {
       "class": "com.bytedance.bitsail.connector.assertion.sink.AssertSink",
       "columns": [
@@ -55,3 +41,4 @@
     }
   }
 }
+```
