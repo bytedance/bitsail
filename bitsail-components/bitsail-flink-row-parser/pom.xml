@@ -133,6 +133,54 @@
             <artifactId>flink-table-common</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- hadoop -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
+                    <artifactId>jackson-mapper-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
+                    <artifactId>jackson-core-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.codahale.metrics</groupId>
+                    <artifactId>metrics-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-util</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-http</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-rewrite</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-server</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-servlet</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jetty-webapp</artifactId>
+                    <groupId>org.eclipse.jetty</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
 

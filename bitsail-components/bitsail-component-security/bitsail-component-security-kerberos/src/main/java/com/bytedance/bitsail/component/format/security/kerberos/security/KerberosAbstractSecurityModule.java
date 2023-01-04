@@ -50,8 +50,7 @@ public abstract class KerberosAbstractSecurityModule implements SecurityModule {
       Config.refresh();
       KerberosName.resetDefaultRealm();
     } catch (KrbException e) {
-      LOG.warn("Failed to refresh krb5 config or reset default realm, current default realm {} will be used.",
-          KerberosName.getDefaultRealm(), e);
+      LOG.warn("Failed to refresh krb5 config or reset default realm, current default realm will be used.", e);
     }
   }
 }
