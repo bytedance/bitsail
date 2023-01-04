@@ -8,7 +8,7 @@
 
 **Bitsail**支持在本地IDE运行集成测试，为此需要:
 
-- JDK1.8
+- JDK1.8 或 JDK11
 - maven 3.6+
 - [Docker desktop](https://www.docker.com/products/docker-desktop/)
 
