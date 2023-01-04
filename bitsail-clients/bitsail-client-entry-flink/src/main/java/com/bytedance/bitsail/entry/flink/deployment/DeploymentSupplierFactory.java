@@ -18,6 +18,7 @@ package com.bytedance.bitsail.entry.flink.deployment;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
+import com.bytedance.bitsail.entry.flink.deployment.kubernetes.KubernetesDeploymentSupplier;
 import com.bytedance.bitsail.entry.flink.deployment.local.LocalDeploymentSupplier;
 import com.bytedance.bitsail.entry.flink.deployment.yarn.YarnDeploymentSupplier;
 
@@ -26,6 +27,8 @@ import com.bytedance.bitsail.entry.flink.deployment.yarn.YarnDeploymentSupplier;
  */
 public class DeploymentSupplierFactory {
 
+  public static final String DEPLOYMENT_KUBERNETES_APPLICATION = "kubernetes-application";
+  public static final String DEPLOYMENT_KUBERNETES_SESSION = "kubernetes-session";
   private static final String DEPLOYMENT_LOCAL = "local";
   private static final String DEPLOYMENT_REMOTE = "remote";
   private static final String DEPLOYMENT_YARN_PER_JOB = "yarn-per-job";
@@ -43,6 +46,9 @@ public class DeploymentSupplierFactory {
       case DEPLOYMENT_YARN_SESSION:
       case DEPLOYMENT_YARN_APPLICATION:
         return new YarnDeploymentSupplier(flinkCommandArgs, jobConfiguration);
+      case DEPLOYMENT_KUBERNETES_APPLICATION:
+      case DEPLOYMENT_KUBERNETES_SESSION:
+        return new KubernetesDeploymentSupplier(flinkCommandArgs, jobConfiguration);
       default:
         throw new UnsupportedOperationException("Unsupported deployment mode: " + deploymentMode);
     }
