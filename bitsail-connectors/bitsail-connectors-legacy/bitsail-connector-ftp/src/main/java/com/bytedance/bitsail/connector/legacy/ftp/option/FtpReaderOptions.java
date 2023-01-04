@@ -88,5 +88,8 @@ public interface FtpReaderOptions extends ReaderOptions.BaseReaderOptions {
       key(READER_PREFIX + "connect_pattern")
           .defaultValue("PASV");
 
+  ConfigOption<String> CHARSET =
+      key(READER_PREFIX + "charset")
+          .defaultValue("utf-8");
 }
 
