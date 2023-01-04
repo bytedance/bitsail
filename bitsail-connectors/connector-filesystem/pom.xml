@@ -24,7 +24,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>connector-local-csv</artifactId>
+    <artifactId>connector-filesystem</artifactId>
 
     <dependencies>
         <dependency>
@@ -39,16 +39,19 @@
             <version>${revision}</version>
         </dependency>
 
+        <!-- test -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-connector-print</artifactId>
             <version>${revision}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-connector-test</artifactId>
             <version>${revision}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.local.csv.source;
+package com.bytedance.bitsail.connector.filesystem.source.reader;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.component.format.csv.CsvDeserializationSchema;
 import com.bytedance.bitsail.connector.base.source.SimpleSourceReaderBase;
-import com.bytedance.bitsail.connector.local.csv.option.LocalCsvReaderOptions;
+import com.bytedance.bitsail.connector.filesystem.option.FileSystemReaderOptions;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -30,13 +30,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class LocalCsvSourceReader extends SimpleSourceReaderBase<Row> {
-  private final String csvPath;
+public class CsvSourceReader extends SimpleSourceReaderBase<Row> {
+  private final String filePath;
   private final BufferedReader bufferedReader;
   private final CsvDeserializationSchema deserializationSchema;
 
-  LocalCsvSourceReader(BitSailConfiguration readerConfiguration, Context context) {
-    this.csvPath = readerConfiguration.get(LocalCsvReaderOptions.CSV_PATH);
+  public CsvSourceReader(BitSailConfiguration readerConfiguration, Context context) {
+    this.filePath = readerConfiguration.get(FileSystemReaderOptions.FILE_PATH);
     this.bufferedReader = loadCsvFile();
     this.deserializationSchema = new CsvDeserializationSchema(
       readerConfiguration,
@@ -46,10 +46,10 @@ public class LocalCsvSourceReader extends SimpleSourceReaderBase<Row> {
   }
 
   private BufferedReader loadCsvFile() {
-    Path path = Paths.get(this.csvPath);
+    Path path = Paths.get(this.filePath);
     if (!Files.exists(path)) {
       throw new RuntimeException(new FileNotFoundException(
-        String.format("File %s does not exits!", this.csvPath)
+        String.format("File %s does not exits!", this.filePath)
       ));
     }
 

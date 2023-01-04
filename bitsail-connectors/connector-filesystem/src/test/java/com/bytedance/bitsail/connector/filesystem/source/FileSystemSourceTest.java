@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.local.csv.option;
+package com.bytedance.bitsail.connector.filesystem.source;
 
-import com.bytedance.bitsail.common.option.ConfigOption;
-import com.bytedance.bitsail.component.format.csv.option.CsvReaderOptions;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
+import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
-import static com.bytedance.bitsail.common.option.ConfigOptions.key;
-import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
+import org.junit.Test;
 
-public interface LocalCsvReaderOptions extends CsvReaderOptions {
-  ConfigOption<String> CSV_PATH =
-      key(READER_PREFIX + "csv_path")
-      .defaultValue("");
+public class FileSystemSourceTest {
+  @Test
+  public void testUnifiedFileSystemSource() throws Exception {
+    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("local-csv-to-print.json");
+    EmbeddedFlinkCluster.submitJob(jobConf);
+  }
 }

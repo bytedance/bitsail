@@ -7,8 +7,9 @@
       "user_name": "test"
     },
     "reader": {
-      "class": "com.bytedance.bitsail.connector.local.csv.source.LocalCsvSource",
-      "csv_path": "src/test/resources/test.csv",
+      "class": "com.bytedance.bitsail.connector.filesystem.source.FileSystemSource",
+      "file_path": "src/test/resources/test.csv",
+      "format": "CSV",
       "columns": [
         {
           "name": "id",

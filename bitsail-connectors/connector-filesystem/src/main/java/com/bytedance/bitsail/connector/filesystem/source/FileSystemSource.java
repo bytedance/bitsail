@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.local.csv.source;
+package com.bytedance.bitsail.connector.filesystem.source;
 
 import com.bytedance.bitsail.base.connector.reader.v1.Boundedness;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
@@ -23,7 +23,7 @@ import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.base.source.SimpleSourceBase;
 import com.bytedance.bitsail.connector.base.source.SimpleSourceReaderBase;
 
-public class LocalCsvSource extends SimpleSourceBase<Row> {
+public class FileSystemSource extends SimpleSourceBase<Row> {
 
   @Override
   public Boundedness getSourceBoundedness() {
@@ -32,12 +32,12 @@ public class LocalCsvSource extends SimpleSourceBase<Row> {
 
   @Override
   public String getReaderName() {
-    return "local-csv";
+    return "filesystem";
   }
 
   @Override
   public SimpleSourceReaderBase<Row> createSimpleReader(BitSailConfiguration readerConfiguration,
                                                         SourceReader.Context readerContext) {
-    return new LocalCsvSourceReader(readerConfiguration, readerContext);
+    return FileSystemSourceReaders.createReader(readerConfiguration, readerContext);
   }
 }
