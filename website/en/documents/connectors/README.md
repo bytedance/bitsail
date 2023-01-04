@@ -24,4 +24,6 @@ dir:
 - [LarkSheet connector](larksheet/larksheet.md)
 - [Kudu connector](kudu/kudu.md)
 - [Druid connector](druid/druid.md)
+- [Fake connector](fake/fake.md)
+- [Print connector](print/print.md)
 

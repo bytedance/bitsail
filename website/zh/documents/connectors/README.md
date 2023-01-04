@@ -23,3 +23,5 @@ dir:
 - [飞书表格连接器](larksheet/larksheet.md)
 - [Kudu连接器](kudu/kudu.md)
 - [Druid连接器](druid/druid.md)
+- [Fake连接器](fake/fake.md)
+- [Print连接器](print/print.md)
