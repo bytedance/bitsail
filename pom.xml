@@ -98,6 +98,7 @@
         <parquet.hadoop.version>1.8.3</parquet.hadoop.version>
 
         <!--   enforce dependency     -->
+        <curator.version>2.6.0</curator.version>
     </properties>
 
     <dependencyManagement>
@@ -779,6 +780,27 @@
                 <version>1.9.2</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro</artifactId>
+                <version>${avro.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-framework</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-client</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-recipes</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1030,7 +1052,7 @@
                         <id>enforce</id>
                         <configuration>
                             <rules>
-<!--                                <dependencyConvergence/>-->
+                                <dependencyConvergence/>
                                 <bannedDependencies>
                                     <excludes>
                                         <exclude>com.codahale.metrics:metrics-core</exclude>

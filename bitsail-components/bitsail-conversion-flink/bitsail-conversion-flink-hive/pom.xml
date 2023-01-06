@@ -30,7 +30,18 @@
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-shaded-hive</artifactId>
+            <scope>provided</scope>
             <version>${revision}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>derby</artifactId>
+                    <groupId>org.apache.derby</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

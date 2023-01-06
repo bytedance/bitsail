@@ -77,6 +77,10 @@
                     <artifactId>hadoop-hdfs</artifactId>
                     <groupId>org.apache.hadoop</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>kryo-shaded</artifactId>
+                    <groupId>com.esotericsoftware</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 

@@ -197,6 +197,34 @@
                     <artifactId>calcite-druid</artifactId>
                     <groupId>org.apache.calcite</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-shaded-hive</artifactId>
+            <version>${revision}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.ant</groupId>
+                    <artifactId>ant</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>log4j</artifactId>
+                    <groupId>log4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-net</artifactId>
+                    <groupId>commons-net</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>derby</artifactId>
+                    <groupId>org.apache.derby</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -206,6 +234,24 @@
             <artifactId>bitsail-connector-test</artifactId>
             <version>${revision}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>lettuce-core</artifactId>
+                    <groupId>io.lettuce</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>netty-handler</artifactId>
+                    <groupId>io.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>netty-resolver</artifactId>
+                    <groupId>io.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hppc</artifactId>
+                    <groupId>com.carrotsearch</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
