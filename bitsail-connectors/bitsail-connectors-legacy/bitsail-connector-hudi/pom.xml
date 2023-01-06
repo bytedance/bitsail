@@ -33,7 +33,6 @@
         <avro.version>1.10.0</avro.version>
         <junit.version>5.7.2</junit.version>
         <hudi.version>0.11.1</hudi.version>
-        <curator.version>2.12.0</curator.version>
         <kafka.clients.version>1.0.1</kafka.clients.version>
         <orc.core.version>1.6.0</orc.core.version>
     </properties>
@@ -44,24 +43,6 @@
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
                 <version>${avro.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.curator</groupId>
-                <artifactId>curator-client</artifactId>
-                <version>${curator.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.curator</groupId>
-                <artifactId>curator-framework</artifactId>
-                <version>${curator.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.curator</groupId>
-                <artifactId>curator-recipes</artifactId>
-                <version>${curator.version}</version>
             </dependency>
 
             <dependency>

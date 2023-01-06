@@ -905,8 +905,6 @@
                                         <exclude>org.apache.flink:flink-runtime_${scala.binary.version}</exclude>
                                         <exclude>org.apache.flink:flink-streaming-java_${scala.binary.version}</exclude>
                                         <exclude>org.apache.flink:force-shading</exclude>
-                                        <exclude>org.apache.hadoop:hadoop-client</exclude>
-                                        <exclude>org.apache.hadoop:hadoop-common</exclude>
                                     </excludes>
                                 </artifactSet>
                                 <transformers>

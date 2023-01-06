@@ -72,13 +72,10 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <createSourcesJar>true</createSourcesJar>
-                            <shadeSourcesContent>true</shadeSourcesContent>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
                                 <relocation>
                                     <pattern>com.google</pattern>
-                                    <shadedPattern>${bitsail.shaded.prefix}.hive.com.google</shadedPattern>
+                                    <shadedPattern>${bitsail.shaded.prefix}.hadoop.com.google</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.fasterxml.jackson</pattern>
@@ -86,11 +83,11 @@
                                 </relocation>
                                 <relocation>
                                     <pattern>io.netty</pattern>
-                                    <shadedPattern>${bitsail.shaded.prefix}.hive.io.netty</shadedPattern>
+                                    <shadedPattern>${bitsail.shaded.prefix}.hadoop.io.netty</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>org.apache.curator</pattern>
-                                    <shadedPattern>${bitsail.shaded.prefix}.hive.org.apache.curator</shadedPattern>
+                                    <shadedPattern>${bitsail.shaded.prefix}.hadoop.org.apache.curator</shadedPattern>
                                 </relocation>
                             </relocations>
                             <filters>

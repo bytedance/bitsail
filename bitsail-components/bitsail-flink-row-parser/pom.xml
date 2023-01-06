@@ -46,7 +46,6 @@
             <version>${revision}</version>
         </dependency>
 
-
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-shaded-hive</artifactId>
