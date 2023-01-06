@@ -259,7 +259,6 @@ public class DorisStreamLoad {
 
   public void setHostPort(String hostPort) {
     this.hostPort = hostPort;
-    this.loadUrlStr = String.format(STREAM_LOAD_URL_FORMAT, hostPort, dorisOptions.getDatabaseName(), dorisOptions.getTableName());
   }
 
   public Future<CloseableHttpResponse> getPendingLoadFuture() {
