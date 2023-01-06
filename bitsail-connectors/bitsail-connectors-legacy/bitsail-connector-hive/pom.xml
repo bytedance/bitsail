@@ -65,6 +65,10 @@
                     <artifactId>commons-net</artifactId>
                     <groupId>commons-net</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>derby</artifactId>
+                    <groupId>org.apache.derby</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 
