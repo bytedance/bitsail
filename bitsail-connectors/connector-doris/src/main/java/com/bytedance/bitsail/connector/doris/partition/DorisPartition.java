@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Data
 public class DorisPartition implements Serializable {
 
-  private static final String TEMP_PARTITION_PREFIX = "_bitsail_doris_temp_partition_";
+  private static final String TEMP_PARTITION_PREFIX = "bitsail_doris_temp_partition_";
 
   @JsonProperty(value = "name", required = true)
   private String name;

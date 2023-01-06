@@ -69,7 +69,7 @@ public class DorisUpsertProxy extends AbstractDorisWriteModeProxy {
       if (executionOptions.isEnable2PC()) {
         dorisStreamLoad.abortPreCommit(labelPrefix, lastCheckpointId);
       }
-      dorisStreamLoad.startLoad(labelGenerator.generateLabel(lastCheckpointId + 1));
+      dorisStreamLoad.startLoad(labelGenerator.generateLabel(lastCheckpointId + 1), false);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -106,7 +106,7 @@ public class DorisUpsertProxy extends AbstractDorisWriteModeProxy {
     //Dynamically refresh be Node
     dorisStreamLoad.setHostPort(RestService.getAvailableHost());
     try {
-      dorisStreamLoad.startLoad(labelGenerator.generateLabel(checkpointId + 1));
+      dorisStreamLoad.startLoad(labelGenerator.generateLabel(checkpointId + 1), false);
     } catch (IOException e) {
       LOG.warn("Failed to start load. checkpointId={}", checkpointId, e);
       throw new RuntimeException(e);
