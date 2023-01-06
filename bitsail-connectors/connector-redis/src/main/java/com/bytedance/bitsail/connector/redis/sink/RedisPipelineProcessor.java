@@ -1,12 +1,11 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,8 +24,7 @@ import com.bytedance.bitsail.connector.redis.core.api.SplitPolicy;
 
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisDataException;
@@ -34,8 +32,8 @@ import redis.clients.jedis.exceptions.JedisDataException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+@Slf4j
 public class RedisPipelineProcessor extends AbstractPipelineProcessor {
-  private static final Logger LOG = LoggerFactory.getLogger(RedisPipelineProcessor.class);
 
   public RedisPipelineProcessor(JedisPool jedisPool,
                                 Retryer.RetryerCallable<Jedis> jedisFetcher,
@@ -72,7 +70,7 @@ public class RedisPipelineProcessor extends AbstractPipelineProcessor {
     this.pipeline = jedis.pipelined();
     if (logConnection) {
       if (jedis != null) {
-        LOG.info("the {} attempt will connect to {}", attemptNumber.get(), jedis.getClient());
+        log.info("the {} attempt will connect to {}", attemptNumber.get(), jedis.getClient());
       }
     }
   }
@@ -85,7 +83,7 @@ public class RedisPipelineProcessor extends AbstractPipelineProcessor {
       clear();
     }
     if (hitLogSampling()) {
-      LOG.info("start to pipeline [{}] records, attempt number:[{}], split groups:[{}], processor id:[{}]",
+      log.info("start to pipeline [{}] records, attempt number:[{}], split groups:[{}], processor id:[{}]",
           requests.size(), attemptNumber.get(), splitRequests.size(), processorId);
     }
   }

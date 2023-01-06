@@ -1,8 +1,8 @@
-# Druid连接器配置示例
+# Druid 连接器示例
 
-父目录: [druid-connector](./druid.md)
+父目录：[Druid 连接器](./druid.md)
 
-## Druid写连接器示例配置
+## Druid 写连接器
 
 假设当前有一个测试Druid集群，其master地址为"127.0.0.1:64086"，则可以通过如下配置写入test_druid_datasource资料源。
 

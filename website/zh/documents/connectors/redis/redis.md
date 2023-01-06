@@ -1,8 +1,8 @@
-# Redis连接器
+# Redis 连接器
 
-上级文档: [connectors](../README.md)
+上级文档：[连接器](../README.md)
 
-***BitSail*** Redis连接器支持写redis库，主要功能点如下:
+**BitSail** Redis 连接器支持写 Redis 库，主要功能点如下:
 
 - 支持批式写入Redis
 - 支持写入多种格式
@@ -32,6 +32,7 @@
 | Hash | 3 | key | hash中的key | hash中的value |
 | Sorted Set (Zset) | 3 | key | score | 要插入到Set中的value |
 
+注意: 如果字段超过3个可以使用 `Mhash`。
 ### 主要参数
 
 写连接器参数在`job.writer`中配置，实际使用时请注意路径前缀。示例:
@@ -68,10 +69,10 @@
 | ttl | 否 | | 写入数据的ttl, 默认-1表示不设置 |
 | ttl_type | 否  | "DAY", "HOUR", "MINUTE", "SECOND" |  上面指定的ttl单位, 默认"DAY" |
 | write_batch_interval | 否 | | Redis指令攒批写入的大小, 默认50 | 
-| redis_data_type | 否 | "string"<br/>"set"<br/>"hash"<br/>"sorted_set" | 写入Redis的数据格式, 默认 string | 
+| redis_data_type | 否 | "string"<br/>"set"<br/>"hash"<br/>"sorted_set"<br/>"mhash" | 写入Redis的数据格式, 默认 string | 
 | password | 否 | | Redis连接密码 | 
 
 
 ## 相关文档
 
-配置示例文档: [redis-connector-example](./redis-example.md)
+配置示例文档：[Redis 连接器示例](./redis-example.md)

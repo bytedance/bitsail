@@ -1,8 +1,8 @@
-# MongoDB连接器
+# MongoDB 连接器
 
-上级文档: [connectors](../README.md)
+上级文档：[连接器](../README.md)
 
-***BitSail*** MongoDB连接器支持读写Collections，主要功能点如下:
+**BitSail** MongoDB 连接器支持读写 MongoDB 的 Collection，主要功能点如下:
 
 - 支持批式读取Collection中文档
 - 支持批式写入Collection
@@ -179,4 +179,4 @@ MongoDB写连接器将用户定义的一行数据写入到一个document中，�
 
 ## 相关文档
 
-配置示例文档: [mongodb-connector-example](./mongodb-example.md)
+配置示例文档：[MongoDB 连接器示例](./mongodb-example.md)

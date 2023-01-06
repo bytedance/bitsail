@@ -1,6 +1,6 @@
-# Hadoop connector examples
+# Hadoop connector example
 
-Parent document: [hadoop-connector](./hadoop.md)
+Parent document: [Hadoop connector](./hadoop.md)
 
 The following configuration shows how to organize parameter configuration to read the following json format hdfs file.
 

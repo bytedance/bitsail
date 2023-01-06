@@ -1,12 +1,11 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,7 +27,9 @@ import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 
+import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.CHINESE_STR;
 import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.DEFAULT_TIMEOUT;
 import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.FTP_PORT;
 import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.LOCALHOST;
@@ -36,6 +37,7 @@ import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.PASSWORD;
 import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.SFTP_PORT;
 import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.SUCCESS_TAG;
 import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.UPLOAD;
+import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.UPLOAD_CHARSET;
 import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.USER;
 
 public class SetupUtil {
@@ -59,6 +61,20 @@ public class SetupUtil {
     fakeFileSystem.add(new FileEntry(UPLOAD + "test1.csv", "c0,c1,c2,c3,c4\n111,aaa,1.1,1.12345,true,2022-11-01"));
     fakeFileSystem.add(new FileEntry(UPLOAD + "test2.csv", "c0,c1,c2,c3,c4\n-111,aaa,-1.1,-1.12345,false,2022-11-01"));
     fakeFileSystem.add(new FileEntry(UPLOAD + SUCCESS_TAG));
+
+    fakeFileSystem.add(new DirectoryEntry(UPLOAD_CHARSET));
+    FileEntry f1 = new FileEntry(UPLOAD_CHARSET + "test1.csv");
+    FileEntry f2 = new FileEntry(UPLOAD_CHARSET + "test2.csv");
+    try {
+      f1.setContents("c0,c1,c2,c3,c4\n111," + CHINESE_STR + ",1.1,1.12345,true,2022-11-01", "gbk");
+      f2.setContents("c0,c1,c2,c3,c4\n-111," + CHINESE_STR + ",-1.1,-1.12345,false,2022-11-01", "gbk");
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+    fakeFileSystem.add(f1);
+    fakeFileSystem.add(f2);
+    fakeFileSystem.add(new FileEntry(UPLOAD_CHARSET + SUCCESS_TAG));
+
     fakeFtpServer.setFileSystem(fakeFileSystem);
     fakeFtpServer.setServerControlPort(FTP_PORT);
     return fakeFtpServer;
@@ -72,5 +88,4 @@ public class SetupUtil {
         .withFileSystemBind(testDir.getAbsolutePath(), "/home/" + USER + UPLOAD, BindMode.READ_ONLY)
         .withCommand(USER + ":" + PASSWORD + ":1001");
   }
-
 }

@@ -1,12 +1,11 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,42 +35,45 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+import static com.bytedance.bitsail.common.exception.CommonErrorCode.CONVERT_NOT_SUPPORT;
 import static com.bytedance.bitsail.connector.redis.constant.RedisConstants.SORTED_SET_OR_HASH_COLUMN_SIZE;
 
+@Slf4j
 public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
-
-  private static final Logger LOG = LoggerFactory.getLogger(RedisWriter.class);
 
   /**
    * Jedis connection pool.
    */
-  private transient JedisPool jedisPool;
+  private final transient JedisPool jedisPool;
 
   /**
    * Retryer for obtaining jedis.
    */
-  private transient Retryer.RetryerCallable<Jedis> jedisFetcher;
+  private final transient Retryer.RetryerCallable<Jedis> jedisFetcher;
 
-  private transient Retryer<Boolean> retryer;
+  private final transient Retryer<Boolean> retryer;
 
-  private transient CircularFifoQueue<Row> recordQueue;
+  private final transient CircularFifoQueue<Row> recordQueue;
 
   /**
    * pipeline id for logging.
@@ -81,27 +83,27 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   /**
    * Command used in the job.
    */
-  private JedisCommandDescription commandDescription;
+  private final JedisCommandDescription commandDescription;
 
   /**
    * Number of columns to send in each record.
    */
-  private int columnSize;
+  private final int columnSize;
 
   /**
    * Complex type command with ttl.
    */
-  private boolean complexTypeWithTtl;
+  private final boolean complexTypeWithTtl;
 
   /**
    * Log interval of pipelines.
    */
-  private int logSampleInterval;
+  private final int logSampleInterval;
 
   /**
    * Retryer retry count
    */
-  private int maxAttemptCount;
+  private final int maxAttemptCount;
 
   @SuppressWarnings("checkstyle:MagicNumber")
   public RedisWriter(RedisOptions redisOptions, JedisPoolOptions jedisPoolOptions) {
@@ -156,10 +158,6 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
    * Pre-check data.
    */
   private void validate(Row record) throws BitSailException {
-    if (record.getArity() != columnSize) {
-      throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
-          String.format("The record's size is %d , but supposed to be %d!", record.getArity(), columnSize));
-    }
     for (int i = 0; i < columnSize; i++) {
       if (record.getField(i) == null) {
         throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_ENCODING,
@@ -178,7 +176,7 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     try {
       return Double.parseDouble(new String(scoreInBytes));
     } catch (NumberFormatException exception) {
-      throw new BitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
+      throw new BitSailException(CONVERT_NOT_SUPPORT,
           String.format("The score can't convert to double. And the score is %s.",
               new String(scoreInBytes)));
     }
@@ -209,6 +207,19 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
         } else if (commandDescription.getJedisCommand() == JedisCommand.HSET) {
           // hash
           processor.addInitialCommand(new Command(commandDescription, key, scoreOrHashKey, value));
+        } else if (commandDescription.getJedisCommand() == JedisCommand.HMSET) {
+          //mhset
+          if ((record.getArity() - 1) % 2 != 0) {
+            throw new BitSailException(CONVERT_NOT_SUPPORT, "Inconsistent data entry.");
+          }
+          List<byte[]> datas = Arrays.stream(record.getFields())
+              .collect(Collectors.toList()).stream().map(o -> ((String) o).getBytes())
+              .collect(Collectors.toList()).subList(1, record.getFields().length);
+          Map<byte[], byte[]> map = new HashMap<>((record.getArity() - 1) / 2);
+          for (int index = 0; index < datas.size(); index = index + 2) {
+            map.put(datas.get(index), datas.get(index + 1));
+          }
+          processor.addInitialCommand(new Command(commandDescription, key, map));
         } else {
           // set and string
           processor.addInitialCommand(new Command(commandDescription, key, value));
@@ -249,7 +260,7 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
         flush(true);
       }
     } catch (IOException e) {
-      LOG.error("flush the last pipeline occurs error.", e);
+      log.error("flush the last pipeline occurs error.", e);
       throw e;
     } finally {
       Writer.super.close();

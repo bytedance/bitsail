@@ -1,12 +1,11 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -99,7 +98,7 @@ public class DorisSink<InputT> implements Sink<InputT, DorisCommittable, DorisWr
 
   @Override
   public Optional<WriterCommitter<DorisCommittable>> createCommitter() {
-    return Optional.of(new DorisCommitter(dorisOptions, dorisExecutionOptions.getWriterMode()));
+    return Optional.of(new DorisCommitter(dorisOptions, dorisExecutionOptions));
   }
 
   @Override
@@ -155,8 +154,14 @@ public class DorisSink<InputT> implements Sink<InputT, DorisCommittable, DorisWr
         .maxRetries(writerConfiguration.get(DorisWriterOptions.SINK_MAX_RETRIES))
         .bufferCount(writerConfiguration.get(DorisWriterOptions.SINK_BUFFER_COUNT))
         .bufferSize(writerConfiguration.get(DorisWriterOptions.SINK_BUFFER_SIZE))
+        .recordCount(writerConfiguration.get(DorisWriterOptions.SINK_RECORD_COUNT))
+        .recordSize(writerConfiguration.get(DorisWriterOptions.SINK_RECORD_SIZE))
         .labelPrefix(writerConfiguration.get(DorisWriterOptions.SINK_LABEL_PREFIX))
         .enableDelete(writerConfiguration.get(DorisWriterOptions.SINK_ENABLE_DELETE))
+        .enable2PC(writerConfiguration.get(DorisWriterOptions.SINK_ENABLE_2PC))
+        .requestConnectTimeoutMs(writerConfiguration.get(DorisWriterOptions.REQUEST_CONNECT_TIMEOUTS))
+        .requestRetries(writerConfiguration.get(DorisWriterOptions.REQUEST_RETRIES))
+        .requestReadTimeoutMs(writerConfiguration.get(DorisWriterOptions.REQUEST_READ_TIMEOUTS))
         .writerMode(this.writeMode)
         .isBatch(this.writeMode.name().startsWith("BATCH"));
     Map<String, String> streamProperties =

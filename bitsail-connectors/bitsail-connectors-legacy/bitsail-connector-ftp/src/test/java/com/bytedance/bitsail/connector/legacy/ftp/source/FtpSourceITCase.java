@@ -1,12 +1,11 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,6 +27,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
+
+import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.GBK_CHARSET;
+import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.SUCCESS_TAG;
+import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.UPLOAD_CHARSET;
 
 public class FtpSourceITCase {
 
@@ -53,4 +56,14 @@ public class FtpSourceITCase {
     EmbeddedFlinkCluster.submitJob(globalConfiguration);
   }
 
+  @Test
+  public void testFtpSourceWithCharset() throws Exception {
+    BitSailConfiguration globalConfiguration = JobConfUtils.fromClasspath("scripts/ftp_to_print.json");
+    globalConfiguration.set(FtpReaderOptions.PROTOCOL, FtpConfig.Protocol.FTP.name());
+    globalConfiguration.set(FtpReaderOptions.PORT, ftpServer.getServerControlPort());
+    globalConfiguration.set(FtpReaderOptions.PATH_LIST, UPLOAD_CHARSET);
+    globalConfiguration.set(FtpReaderOptions.SUCCESS_FILE_PATH, UPLOAD_CHARSET + SUCCESS_TAG);
+    globalConfiguration.set(FtpReaderOptions.CHARSET, GBK_CHARSET);
+    EmbeddedFlinkCluster.submitJob(globalConfiguration);
+  }
 }

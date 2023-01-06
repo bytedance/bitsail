@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 export const cnFooter = `
   <div style="width: 100%;">
     <div style="padding-top: 100px; display: flex; width: 100%;">
@@ -11,6 +27,7 @@ export const cnFooter = `
           <div style="text-align: center;">
             <h3>文档</h3>
             <a style="display: block; color: rgb(209, 213, 219); margin-bottom: 10px;" href="/bitsail/zh/documents/start/index.html">快速开始</a>
+            <a style="display: block; color: rgb(209, 213, 219); margin-bottom: 10px;" href="/bitsail/zh/documents/faq/index.html">FAQ</a>
           </div>
           <div style="text-align: center; margin-left: 40px;">
             <h3>社区</h3>
@@ -45,6 +62,7 @@ export const enFooter = `
           <div style="text-align: center;">
             <h3>Documents</h3>
             <a style="display: block; color: rgb(209, 213, 219); margin-bottom: 10px;" href="/bitsail/en/documents/start/index.html">Quick Start</a>
+            <a style="display: block; color: rgb(209, 213, 219); margin-bottom: 10px;" href="/bitsail/en/documents/faq/index.html">FAQ</a>
           </div>
           <div style="text-align: center; margin-left: 40px;">
             <h3>Community</h3>

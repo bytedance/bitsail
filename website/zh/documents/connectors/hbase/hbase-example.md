@@ -1,8 +1,6 @@
 # Hbase 连接器示例
 
------
-
-父目录: [HBase连接器](./hbase.md)
+父目录：[HBase 连接器](./hbase.md)
 
 ## 读写的HBase配置示例
 
@@ -20,7 +18,7 @@
 create 'test_table', 'cf1', 'cf2', 'cf3'
 ```
 
-## 读连接器示例
+## HBase 读连接器
 
 ```json
 {
@@ -69,8 +67,7 @@ create 'test_table', 'cf1', 'cf2', 'cf3'
 }
 ```
 
-
-## 写连接器示例
+## HBase 写连接器
 
 ```json
 {

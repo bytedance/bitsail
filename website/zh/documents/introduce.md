@@ -4,22 +4,19 @@ order: 1
 
 <!--
 
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
+Copyright 2022 Bytedance Ltd. and/or its affiliates.
+         
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 -->
 
@@ -83,13 +80,20 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
 
 在Runtime层，支持多种执行模式，比如yarn、local，k8s在开发中
 
-## 支持连接器列表
+## 支持的连接器
+
 <table>
   <tr>
     <th>DataSource</th>
     <th>Sub Modules</th>
     <th>Reader</th>
     <th>Writer</th>
+  </tr>
+  <tr>
+    <td>ClickHouse</td>
+    <td>-</td>
+    <td>✅</td>
+    <td>-</td>
   </tr>
   <tr>
     <td>Doris</td>
@@ -104,7 +108,7 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <td>✅</td>
   </tr>
   <tr>
-    <td>ElasticSearch</td>
+    <td>Elasticsearch</td>
     <td>-</td>
     <td> </td>
     <td>✅</td>
@@ -122,19 +126,19 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <td> </td>
   </tr>
   <tr>
-    <td>Hive</td>
-    <td>-</td>
-    <td>✅</td>
-    <td>✅</td>
-  </tr>
-  <tr>
     <td>Hadoop</td>
     <td>-</td>
     <td>✅</td>
     <td>✅</td>
   </tr>
   <tr>
-    <td>Hbase</td>
+    <td>HBase</td>
+    <td>-</td>
+    <td>✅</td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>Hive</td>
     <td>-</td>
     <td>✅</td>
     <td>✅</td>
@@ -173,6 +177,12 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <td>✅</td>
   </tr>
   <tr>
+    <td>LarkSheet</td>
+    <td>-</td>
+    <td>✅</td>
+    <td> </td>
+  </tr>
+  <tr>
     <td>MongoDB</td>
     <td>-</td>
     <td>✅</td>
@@ -195,18 +205,6 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <td>-</td>
     <td> </td>
     <td>✅</td>
-  </tr>
-  <tr>
-    <td>LarkSheet</td>
-    <td>-</td>
-    <td>✅</td>
-    <td> </td>
-  </tr>
-  <tr>
-    <td>Clickhouse</td>
-    <td>-</td>
-    <td>✅</td>
-    <td> </td>
   </tr>
 </table>
 

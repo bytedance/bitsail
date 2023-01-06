@@ -1,8 +1,8 @@
 # Hive connector
 
-Parent document: [connectors](../README.md)
+Parent document: [Connectors](../README.md)
 
-The ***BitSail*** hive connector supports reading and writing to hive tables. The main function points are as follows:
+The **BitSail** hive connector supports reading and writing to hive tables. The main function points are as follows:
 
  - Support reading partitioned and non-partitioned tables
  - Support writing to partition table
@@ -161,7 +161,6 @@ The following mentioned parameters should be added to `job.writer` block when us
 |convert_error_column_as_null| false | | Whether to set the conversion error field to null. If false, throw an exception if the conversion fails |
 |hive_parquet_compression| gzip | | When the hive file is in parquet format, specify the compression method of the file |
 
+## Related documents
 
-## Related document
-
-Configuration examples: [hive-connector-example](./hive-example.md)
+Configuration examples: [Hive connector example](./hive-example.md)

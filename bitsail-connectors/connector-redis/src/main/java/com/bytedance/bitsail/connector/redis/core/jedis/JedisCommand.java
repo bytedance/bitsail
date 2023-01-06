@@ -1,12 +1,11 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,10 +16,14 @@
 
 package com.bytedance.bitsail.connector.redis.core.jedis;
 
+import com.bytedance.bitsail.common.model.ColumnInfo;
+
 import lombok.Getter;
 import org.apache.flink.api.common.typeinfo.PrimitiveArrayTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
+
+import java.util.List;
 
 /**
  * All available commands for Redis. Each command belongs to a {@link JedisDataType} group.
@@ -87,7 +90,12 @@ public enum JedisCommand {
    * Sets field in the hash stored at key to value. If key does not exist,
    * a new key holding a hash is created. If field already exists in the hash, it is overwritten.
    */
-  HSET(JedisDataType.HASH, 3);
+  HSET(JedisDataType.HASH, 3),
+
+  /**
+   * Support an upstream row contain one key and multiple pairs,and it unlimited number of fields.
+   */
+  HMSET(JedisDataType.SORTED_SET, Integer.MAX_VALUE);
 
   /**
    * The {@link JedisDataType} this command belongs to.
@@ -96,26 +104,28 @@ public enum JedisCommand {
   private JedisDataType jedisDataType;
 
   @Getter
-  private final int columnSize;
+  private int columnSize;
   @Getter
   private final int keyIndex;
   @Getter
   private final int valueIndex;
   @Getter
   private final int defaultScoreOrHashKeyIndex;
-  @Getter
-  private final RowTypeInfo rowTypeInfo;
 
   JedisCommand(JedisDataType jedisDataType, int columnSize) {
     this.jedisDataType = jedisDataType;
-    this.columnSize = columnSize;
     this.keyIndex = 0;
     this.valueIndex = columnSize - 1;
     this.defaultScoreOrHashKeyIndex = 1;
-    TypeInformation[] typeInformations = new TypeInformation[columnSize];
-    for (int i = 0; i < columnSize; i++) {
+
+  }
+
+  public RowTypeInfo getRowTypeInfo(List<ColumnInfo> columnInfos) {
+    this.columnSize = columnInfos.size();
+    TypeInformation[] typeInformations = new TypeInformation[columnInfos.size()];
+    for (int i = 0; i < columnInfos.size(); i++) {
       typeInformations[i] = PrimitiveArrayTypeInfo.BYTE_PRIMITIVE_ARRAY_TYPE_INFO;
     }
-    this.rowTypeInfo = new RowTypeInfo(typeInformations);
+    return new RowTypeInfo(typeInformations);
   }
 }
