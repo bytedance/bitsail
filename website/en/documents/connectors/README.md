@@ -27,3 +27,4 @@ dir:
 - [Redis-v1 connector](redis/v1/redis-v1.md)
 - [RocketMQ connector](rocketmq/rocketmq.md)
 - [StreamingFile(HDFS streaming) connector](streamingfile/streamingfile.md)
+- [SelectDB connector](selectdb/selectdb.md)

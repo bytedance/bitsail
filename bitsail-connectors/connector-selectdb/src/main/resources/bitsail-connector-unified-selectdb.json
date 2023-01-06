@@ -1,0 +1,9 @@
+{
+  "name": "bitsail-connector-unified-selectdb",
+  "classes": [
+    "com.bytedance.bitsail.connector.selectdb.sink.SelectdbSink"
+  ],
+  "libs": [
+    "connector-selectdb-${version}.jar"
+  ]
+}
