@@ -16,6 +16,8 @@
 
 package com.bytedance.bitsail.connector.legacy.ftp.util;
 
+import java.nio.charset.StandardCharsets;
+
 public class Constant {
   public static final int FTP_PORT = 60021;
   public static final int SFTP_PORT = 22;
@@ -25,5 +27,8 @@ public class Constant {
   public static final String USER = "user";
   public static final String PASSWORD = "password";
   public static final String UPLOAD = "/upload/";
+  public static final String UPLOAD_CHARSET = "/upload_charset/";
   public static final String SUCCESS_TAG = "_SUCCESS";
+  public static final String GBK_CHARSET = "gbk";
+  public static final String CHINESE_STR = new String(new byte[]{-28, -67, -96, -27, -91, -67}, StandardCharsets.UTF_8);
 }
