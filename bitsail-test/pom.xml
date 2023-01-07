@@ -41,9 +41,6 @@
         <jedis.version>4.2.2</jedis.version>
         <kudu.version>1.16.0</kudu.version>
         <rocketmq.version>4.9.2</rocketmq.version>
-
-        <!--        -->
-        <hadoop.version>3.1.1</hadoop.version>
     </properties>
 
 </project>

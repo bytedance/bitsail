@@ -110,22 +110,5 @@
             <version>${revision}</version>
             <scope>test</scope>
         </dependency>
-
-<!--        <dependency>-->
-        <!--            <groupId>org.apache.hadoop</groupId>-->
-        <!--            <artifactId>hadoop-minicluster</artifactId>-->
-        <!--            <version>${hadoop.version}</version>-->
-        <!--            <scope>test</scope>-->
-        <!--            <exclusions>-->
-        <!--                <exclusion>-->
-        <!--                    <artifactId>guice</artifactId>-->
-        <!--                    <groupId>com.google.inject</groupId>-->
-        <!--                </exclusion>-->
-        <!--                <exclusion>-->
-        <!--                    <artifactId>guice-servlet</artifactId>-->
-        <!--                    <groupId>com.google.inject.extensions</groupId>-->
-        <!--                </exclusion>-->
-        <!--            </exclusions>-->
-        <!--        </dependency>-->
     </dependencies>
 </project>
