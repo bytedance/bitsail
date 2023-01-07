@@ -69,4 +69,9 @@ public interface FileSystemReaderOptions extends ReaderOptions.BaseReaderOptions
       key(READER_PREFIX + "csv_multi_delimiter_replace_char")
           .defaultValue('§');
 
+  // whether to skip first line
+  ConfigOption<Boolean> SKIP_FIRST_LINE =
+      key(READER_PREFIX + "skip_first_line")
+          .defaultValue(false);
+
 }

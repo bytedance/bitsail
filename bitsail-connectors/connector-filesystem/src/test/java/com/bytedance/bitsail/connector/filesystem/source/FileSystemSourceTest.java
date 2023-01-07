@@ -25,7 +25,7 @@ import org.junit.Test;
 public class FileSystemSourceTest {
   @Test
   public void testUnifiedFileSystemSource() throws Exception {
-    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("local-csv-to-print.json");
+    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("scripts/local-csv-to-print.json");
     EmbeddedFlinkCluster.submitJob(jobConf);
   }
 }

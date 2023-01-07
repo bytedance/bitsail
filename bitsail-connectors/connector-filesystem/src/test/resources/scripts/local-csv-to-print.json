@@ -8,8 +8,8 @@
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.filesystem.source.FileSystemSource",
-      "file_path": "src/test/resources/test.csv",
-      "format": "CSV",
+      "file_path": "src/test/resources/data/csv/test.csv",
+      "format": "csv",
       "columns": [
         {
           "name": "id",
@@ -22,6 +22,10 @@
         {
           "name": "localdatetime_value",
           "type": "timestamp"
+        },
+        {
+          "name": "last_name",
+          "type": "string"
         },
         {
           "name": "bool_value",

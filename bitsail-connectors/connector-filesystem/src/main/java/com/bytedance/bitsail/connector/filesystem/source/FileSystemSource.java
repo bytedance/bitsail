@@ -22,6 +22,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.base.source.SimpleSourceBase;
 import com.bytedance.bitsail.connector.base.source.SimpleSourceReaderBase;
+import com.bytedance.bitsail.connector.filesystem.reader.FileSystemSourceReader;
 
 public class FileSystemSource extends SimpleSourceBase<Row> {
 
@@ -38,6 +39,6 @@ public class FileSystemSource extends SimpleSourceBase<Row> {
   @Override
   public SimpleSourceReaderBase<Row> createSimpleReader(BitSailConfiguration readerConfiguration,
                                                         SourceReader.Context readerContext) {
-    return FileSystemSourceReaders.createReader(readerConfiguration, readerContext);
+    return new FileSystemSourceReader(readerConfiguration, readerContext);
   }
 }

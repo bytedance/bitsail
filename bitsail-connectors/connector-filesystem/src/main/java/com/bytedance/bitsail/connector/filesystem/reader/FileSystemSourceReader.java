@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.filesystem.source.reader;
+package com.bytedance.bitsail.connector.filesystem.reader;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
+import com.bytedance.bitsail.base.format.DeserializationSchema;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.component.format.csv.CsvDeserializationSchema;
 import com.bytedance.bitsail.connector.base.source.SimpleSourceReaderBase;
-import com.bytedance.bitsail.connector.filesystem.option.FileSystemReaderOptions;
+import com.bytedance.bitsail.connector.filesystem.core.config.FileSystemConfig;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -30,18 +30,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class CsvSourceReader extends SimpleSourceReaderBase<Row> {
+public class FileSystemSourceReader extends SimpleSourceReaderBase<Row> {
+  private final FileSystemConfig fileSystemConfig;
   private final String filePath;
   private final BufferedReader bufferedReader;
-  private final CsvDeserializationSchema deserializationSchema;
+  private final transient DeserializationSchema<byte[], Row> deserializationSchema;
 
-  public CsvSourceReader(BitSailConfiguration readerConfiguration, Context context) {
-    this.filePath = readerConfiguration.get(FileSystemReaderOptions.FILE_PATH);
+  public FileSystemSourceReader(BitSailConfiguration jobConf, Context context) {
+    this.fileSystemConfig = new FileSystemConfig(jobConf);
+    this.filePath = fileSystemConfig.getFilePath();
     this.bufferedReader = loadCsvFile();
-    this.deserializationSchema = new CsvDeserializationSchema(
-      readerConfiguration,
-      context.getTypeInfos(),
-      context.getFieldNames()
+    this.deserializationSchema = DeserializationSchemaFactory.createDeserializationSchema(
+        jobConf,
+        fileSystemConfig,
+        context
     );
   }
 
@@ -56,6 +58,9 @@ public class CsvSourceReader extends SimpleSourceReaderBase<Row> {
     BufferedReader bufferedReader;
     try {
       bufferedReader = Files.newBufferedReader(path);
+      if (this.fileSystemConfig.getSkipFirstLine()) {
+        bufferedReader.readLine();
+      }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
