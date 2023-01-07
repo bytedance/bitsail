@@ -1,9 +1,0 @@
-{
-  "name": "bitsail-connector-unified-filesystem",
-  "classes": [
-    "com.bytedance.bitsail.connector.filesystem.source.FileSystemSource"
-  ],
-  "libs": [
-    "connector-filesystem-${version}.jar"
-  ]
-}

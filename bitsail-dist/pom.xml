@@ -274,7 +274,7 @@
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>connector-filesystem</artifactId>
+            <artifactId>connector-localfilesystem</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>
