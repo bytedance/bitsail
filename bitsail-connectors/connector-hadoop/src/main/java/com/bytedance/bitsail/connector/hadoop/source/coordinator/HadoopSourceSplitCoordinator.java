@@ -19,40 +19,70 @@ package com.bytedance.bitsail.connector.hadoop.source.coordinator;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.connector.hadoop.option.HadoopReaderOptions;
 import com.bytedance.bitsail.connector.hadoop.source.split.HadoopSourceSplit;
 
 import com.google.common.collect.Sets;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapred.FileInputFormat;
+import org.apache.hadoop.mapred.InputFormat;
+import org.apache.hadoop.mapred.InputSplit;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class HadoopSourceSplitCoordinator implements SourceSplitCoordinator<HadoopSourceSplit, EmptyState> {
+public class HadoopSourceSplitCoordinator<K, V> implements SourceSplitCoordinator<HadoopSourceSplit, EmptyState> {
   private static final Logger LOG = LoggerFactory.getLogger(HadoopSourceSplitCoordinator.class);
   private final Context<HadoopSourceSplit, EmptyState> coordinatorContext;
   private final BitSailConfiguration readerConfiguration;
   private final HashSet<HadoopSourceSplit> assignedHadoopSplits;
-  private final List<String> hadoopPathList;
   private HashSet<HadoopSourceSplit> pendingHadoopSplits;
+  private final JobConf jobConf;
+  private final InputFormat<K, V> mapredInputFormat;
 
   public HadoopSourceSplitCoordinator(BitSailConfiguration readerConfiguration,
                                              Context<HadoopSourceSplit, EmptyState> coordinatorContext, List<String> hadoopPathList) {
     this.coordinatorContext = coordinatorContext;
     this.readerConfiguration = readerConfiguration;
-    this.hadoopPathList = hadoopPathList;
+    this.jobConf = new JobConf();
+    for (String path : hadoopPathList) {
+      FileInputFormat.addInputPath(this.jobConf, new Path(path));
+    }
+    String inputClassName = readerConfiguration.get(HadoopReaderOptions.HADOOP_INPUT_FORMAT_CLASS);
+    Class<?> inputClass;
+    try {
+      inputClass = Class.forName(inputClassName);
+      this.mapredInputFormat = (InputFormat<K, V>) inputClass.newInstance();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    ReflectionUtils.setConf(mapredInputFormat, jobConf);
     this.assignedHadoopSplits = Sets.newHashSet();
   }
 
   @Override
   public void start() {
     this.pendingHadoopSplits = Sets.newHashSet();
-    hadoopPathList.forEach(k -> pendingHadoopSplits.add(new HadoopSourceSplit(k)));
+    int parallelismThreshold = readerConfiguration.get(HadoopReaderOptions.DEFAULT_HADOOP_PARALLELISM_THRESHOLD);
     int readerNum = coordinatorContext.totalParallelism();
+    int splitNum = readerNum * parallelismThreshold;
+    InputSplit[] splits;
+    try {
+      splits = mapredInputFormat.getSplits(jobConf, splitNum);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    Arrays.stream(splits).forEach(split -> pendingHadoopSplits.add(new HadoopSourceSplit(split)));
     LOG.info("Found {} readers and {} splits.", readerNum, pendingHadoopSplits.size());
     if (readerNum > pendingHadoopSplits.size()) {
       LOG.error("Reader number {} is larger than split number {}.", readerNum, pendingHadoopSplits.size());

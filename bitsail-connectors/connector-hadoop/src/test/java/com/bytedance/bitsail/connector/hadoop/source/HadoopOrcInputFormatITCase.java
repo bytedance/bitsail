@@ -33,8 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class HadoopSourceITCase {
-  private static final Logger LOG = LoggerFactory.getLogger(HadoopSourceITCase.class);
+public class HadoopOrcInputFormatITCase {
+  private static final Logger LOG = LoggerFactory.getLogger(HadoopOrcInputFormatITCase.class);
   private static FileSystem fs;
 
   @Before
@@ -50,17 +50,18 @@ public class HadoopSourceITCase {
   }
 
   @Test
-  public void testHadoopToPrintJson() throws Exception {
-    String localJsonFile = "test_namespace/source/test.json";
-    String remoteJsonFile = "/test_namespace/source/test.json";
+  public void testHadoopToPrintOrc() throws Exception {
+    String localJsonFile = "test_namespace/source/test_orc";
+    String remoteJsonFile = "/test_namespace/source/test_orc";
     Configuration conf = fs.getConf();
     String defaultFS = conf.get("fs.defaultFS");
     LOG.info("fs.defaultFS: {}", defaultFS);
     ClassLoader classLoader = JobConfUtils.class.getClassLoader();
     fs.copyFromLocalFile(new Path(classLoader.getResource(localJsonFile).getPath()), new Path(remoteJsonFile));
-    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("hadoop_to_print_json.json");
-    jobConf.set(HadoopReaderOptions.DEFAULT_FS, defaultFS);
-    jobConf.set(HadoopReaderOptions.PATH_LIST, remoteJsonFile);
+    String inputFormat = "org.apache.hadoop.hive.ql.io.orc.OrcInputFormat";
+    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("hadoop_to_print_hive.json");
+    jobConf.set(HadoopReaderOptions.HADOOP_INPUT_FORMAT_CLASS, inputFormat);
+    jobConf.set(HadoopReaderOptions.PATH_LIST, defaultFS + remoteJsonFile);
     EmbeddedFlinkCluster.submitJob(jobConf);
   }
 }

@@ -1,6 +1,6 @@
 # Hadoop连接器使用示例
 
-上级文档: [hadoop连接器](./hadoop_zh.md)
+上级文档: [hadoop连接器](./hadoop-v1.md)
 
 下面展示了如何使用用户参数配置读取如下json格式hdfs文件。
 
@@ -24,8 +24,6 @@
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.hadoop.source.HadoopSource",
-      "defaultFS": "hdfs://127.0.0.1:9000/",
-      "path_list": "/test_namespace/source/test.json",
       "content_type":"json",
       "reader_parallelism_num": 1,
       "columns": [
@@ -75,8 +73,6 @@
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.hadoop.source.HadoopSource",
-      "defaultFS": "hdfs://127.0.0.1:9000/",
-      "path_list": "/test_namespace/source/test.csv",
       "content_type":"csv",
       "reader_parallelism_num": 1,
       "columns": [

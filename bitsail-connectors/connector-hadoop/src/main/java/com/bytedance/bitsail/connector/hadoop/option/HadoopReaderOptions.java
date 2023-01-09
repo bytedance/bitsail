@@ -25,15 +25,10 @@ import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
 
 public interface HadoopReaderOptions extends ReaderOptions.BaseReaderOptions {
   @Essential
-  ConfigOption<String> DEFAULT_FS =
-      key(READER_PREFIX + "defaultFS")
-          .noDefaultValue(String.class);
-  @Essential
   ConfigOption<String> PATH_LIST =
       key(READER_PREFIX + "path_list")
           .noDefaultValue(String.class);
 
-  @Essential
   ConfigOption<String> CONTENT_TYPE =
       key(READER_PREFIX + "content_type")
           .noDefaultValue(String.class);
@@ -45,4 +40,8 @@ public interface HadoopReaderOptions extends ReaderOptions.BaseReaderOptions {
   ConfigOption<Integer> DEFAULT_HADOOP_PARALLELISM_THRESHOLD =
       key(READER_PREFIX + "default_hadoop_parallelism_threshold")
           .defaultValue(2);
+
+  ConfigOption<String> HADOOP_INPUT_FORMAT_CLASS =
+      key(READER_PREFIX + "hadoop_inputformat_class")
+          .defaultValue("org.apache.hadoop.mapred.TextInputFormat");
 }

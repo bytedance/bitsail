@@ -8,8 +8,6 @@
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.hadoop.source.HadoopSource",
-      "defaultFS": "hdfs://127.0.0.1:9000/",
-      "path_list": "/test_namespace/source/test.json",
       "content_type":"json",
       "reader_parallelism_num": 1,
       "columns": [
