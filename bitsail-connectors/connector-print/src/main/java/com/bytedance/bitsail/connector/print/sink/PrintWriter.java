@@ -23,6 +23,7 @@ import com.bytedance.bitsail.common.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +39,8 @@ public class PrintWriter implements Writer<Row, String, Integer> {
   private final List<String> commitBuffer;
 
   private final AtomicInteger printCount;
+
+  private transient PrintStream stream = System.out;
 
   public PrintWriter(int batchSize, List<String> fieldNames) {
     this(batchSize, fieldNames, 0);
@@ -69,6 +72,11 @@ public class PrintWriter implements Writer<Row, String, Integer> {
   @Override
   public void flush(boolean endOfInput) {
     commitBuffer.addAll(writeBuffer);
+
+    writeBuffer.forEach(
+        element -> this.stream.println(element)
+    );
+
     writeBuffer.clear();
     if (endOfInput) {
       LOG.info("all records are sent to commit buffer.");
