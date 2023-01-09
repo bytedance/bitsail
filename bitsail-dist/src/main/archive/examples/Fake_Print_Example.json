@@ -11,7 +11,7 @@
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource",
-      "total_count": 300,
+      "total_count": 20,
       "rate": 1,
       "random_null_rate": 0.1,
       "columns": [

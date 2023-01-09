@@ -58,5 +58,10 @@ public class BaseCommandArgs implements CommandArgs {
   @Parameter(names = {"--krb5-conf-path"})
   private String krb5ConfPath;
 
+  @Parameter(names = {"--parallelism"},
+          description = "The parallelism with which to run the program. Optional flag to override the default value " +
+                  "specified in the configuration.")
+  private int parallelism;
+
   private String[] unknownOptions;
 }

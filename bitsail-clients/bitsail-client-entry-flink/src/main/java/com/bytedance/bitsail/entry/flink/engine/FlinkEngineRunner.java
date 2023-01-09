@@ -21,8 +21,8 @@ import com.bytedance.bitsail.client.api.command.CommandAction;
 import com.bytedance.bitsail.client.api.command.CommandArgsParser;
 import com.bytedance.bitsail.client.api.engine.EngineRunner;
 import com.bytedance.bitsail.client.api.utils.PackageResolver;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
 import com.bytedance.bitsail.entry.flink.configuration.FlinkRunnerConfigOptions;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
@@ -37,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -48,6 +49,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.bytedance.bitsail.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_KUBERNETES_APPLICATION;
 
 /**
  * Created 2022/8/5
@@ -67,7 +71,7 @@ public class FlinkEngineRunner implements EngineRunner {
   public void initializeEngine(BitSailConfiguration sysConfiguration) {
     this.deploymentSupplierFactory = new DeploymentSupplierFactory();
     this.sysConfiguration = sysConfiguration;
-    this.flinkDir = Paths.get(sysConfiguration.getNecessaryOption(FlinkRunnerConfigOptions.FLINK_HOME, CommonErrorCode.CONFIG_ERROR));
+    this.flinkDir = Paths.get(sysConfiguration.getNecessaryOption(FlinkRunnerConfigOptions.FLINK_HOME, CONFIG_ERROR));
     LOG.info("Find flink dir = {} in System configuration.", flinkDir);
     if (!Files.exists(flinkDir)) {
       LOG.error("Flink dir = {} not exists in fact, plz check the system configuration.", flinkDir);
@@ -110,7 +114,13 @@ public class FlinkEngineRunner implements EngineRunner {
   ProcessBuilder getRunProcBuilder(BitSailConfiguration jobConfiguration,
                                    BaseCommandArgs baseCommandArgs) throws IOException {
     FlinkRunCommandArgs flinkCommandArgs = new FlinkRunCommandArgs();
+    for (String option : baseCommandArgs.getUnknownOptions().clone()) {
+      LOG.info("!!! get " + option);
+    }
+
     CommandArgsParser.parseArguments(baseCommandArgs.getUnknownOptions(), flinkCommandArgs);
+    LOG.info("??? get Job CPU " + flinkCommandArgs.getKubernetesJobManagerCpu());
+    LOG.info("??? get Task CPU " + flinkCommandArgs.getKubernetesTaskManagerCpu());
 
     DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(flinkCommandArgs,
         jobConfiguration);
@@ -134,6 +144,11 @@ public class FlinkEngineRunner implements EngineRunner {
       flinkCommands.add("--detached");
     }
 
+    if (baseCommandArgs.getParallelism() != 0) {
+      flinkCommands.add("--parallelism");
+      flinkCommands.add(String.valueOf(baseCommandArgs.getParallelism()));
+    }
+
     if (sysConfiguration.fieldExists(FlinkRunnerConfigOptions.FLINK_DEFAULT_PROPERTIES)) {
       for (Map.Entry<String, String> property : sysConfiguration.getFlattenMap(FlinkRunnerConfigOptions.FLINK_DEFAULT_PROPERTIES.key()).entrySet()) {
         LOG.info("Add System property {} = {}.", property.getKey(), property.getValue());
@@ -148,9 +163,26 @@ public class FlinkEngineRunner implements EngineRunner {
       flinkCommands.add(StringUtils.trim(property.getKey()) + "=" + StringUtils.trim(property.getValue()));
     }
 
-    flinkCommands.add(PackageResolver.getLibraryDir().resolve(ENTRY_JAR_NAME).toString());
-    flinkCommands.add("-xjob_conf");
-    flinkCommands.add(baseCommandArgs.getJobConf());
+    /**
+     * Customize path of BitSail JAR file and JobConf file for Kubernetes application mode, because Kubernetes
+     * application mode bundles BitSail JAR file and JobConf file together with the Flink image and runs the user
+     * code's main() method on the cluster. Programmed path for
+     * BitSail JAR: local:///opt/flink/usrlibs/bitsail-core.jar
+     * JobConf file: /opt/flink/usrconf/<JSON file>
+     */
+    if (DEPLOYMENT_KUBERNETES_APPLICATION.equalsIgnoreCase(flinkCommandArgs.getDeploymentMode())) {
+      final File jobConfFile = new File(baseCommandArgs.getJobConf());
+      if (!jobConfFile.exists()) {
+        throw new BitSailException(CONFIG_ERROR, baseCommandArgs.getJobConf() + "doesn't exist.");
+      }
+      flinkCommands.add("local:///opt/flink/usrlibs/" + ENTRY_JAR_NAME);
+      flinkCommands.add("-xjob_conf");
+      flinkCommands.add("/opt/flink/usrconf/" + jobConfFile.getName());
+    } else {
+      flinkCommands.add(PackageResolver.getLibraryDir().resolve(ENTRY_JAR_NAME).toString());
+      flinkCommands.add("-xjob_conf");
+      flinkCommands.add(baseCommandArgs.getJobConf());
+    }
 
     flinkProcBuilder.command(flinkCommands);
 
