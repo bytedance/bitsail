@@ -37,6 +37,8 @@ public class PrintSink implements Sink<Row, String, Integer> {
 
   private List<String> fieldNames;
   private int batchSize;
+  private boolean sampleWrite;
+  private int sampleLimit;
 
   @Override
   public String getWriterName() {
@@ -50,11 +52,13 @@ public class PrintSink implements Sink<Row, String, Integer> {
         .stream()
         .map(ColumnInfo::getName)
         .collect(Collectors.toList());
+    this.sampleWrite = writerConfiguration.get(PrintWriterOptions.SAMPLE_WRITE);
+    this.sampleLimit = writerConfiguration.get(PrintWriterOptions.SAMPLE_LIMIT);
   }
 
   @Override
   public Writer<Row, String, Integer> createWriter(Writer.Context<Integer> context) {
-    return new PrintWriter(batchSize, fieldNames);
+    return new PrintWriter(batchSize, fieldNames, sampleWrite, sampleLimit);
   }
 
   @Override

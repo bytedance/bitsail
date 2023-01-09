@@ -34,6 +34,8 @@ public class PrintWriter implements Writer<Row, String, Integer> {
 
   private final int batchSize;
   private final List<String> fieldNames;
+  private final boolean sampleWrite;
+  private final int sampleLimit;
 
   private final List<String> writeBuffer;
   private final List<String> commitBuffer;
@@ -42,14 +44,16 @@ public class PrintWriter implements Writer<Row, String, Integer> {
 
   private transient PrintStream stream = System.out;
 
-  public PrintWriter(int batchSize, List<String> fieldNames) {
-    this(batchSize, fieldNames, 0);
+  public PrintWriter(int batchSize, List<String> fieldNames, boolean sampleWrite, int sampleLimit) {
+    this(batchSize, fieldNames, sampleWrite, sampleLimit, 0);
   }
 
-  public PrintWriter(int batchSize, List<String> fieldNames, int alreadyPrintCount) {
+  public PrintWriter(int batchSize, List<String> fieldNames, boolean sampleWrite, int sampleLimit, int alreadyPrintCount) {
     Preconditions.checkState(batchSize > 0, "batch size must be larger than 0");
     this.batchSize = batchSize;
     this.fieldNames = fieldNames;
+    this.sampleWrite = sampleWrite;
+    this.sampleLimit = sampleLimit;
     this.writeBuffer = new ArrayList<>(batchSize);
     this.commitBuffer = new ArrayList<>(batchSize);
     printCount = new AtomicInteger(alreadyPrintCount);
@@ -57,14 +61,16 @@ public class PrintWriter implements Writer<Row, String, Integer> {
 
   @Override
   public void write(Row element) {
-    String[] fields = new String[element.getFields().length];
-    for (int i = 0; i < element.getFields().length; ++i) {
-      fields[i] = String.format("\"%s\":\"%s\"", fieldNames.get(i), element.getField(i).toString());
-    }
+    if (!this.sampleWrite || printCount.get() % this.sampleLimit == 0) {
+      String[] fields = new String[element.getFields().length];
+      for (int i = 0; i < element.getFields().length; ++i) {
+        fields[i] = String.format("\"%s\":\"%s\"", fieldNames.get(i), element.getField(i).toString());
+      }
 
-    writeBuffer.add("[" + String.join(",", fields) + "]");
-    if (writeBuffer.size() == batchSize) {
-      this.flush(false);
+      writeBuffer.add("[" + String.join(",", fields) + "]");
+      if (writeBuffer.size() == batchSize) {
+        this.flush(false);
+      }
     }
     printCount.incrementAndGet();
   }
