@@ -16,6 +16,7 @@ dir:
 - [FTP/SFTP 连接器](ftp/ftp.md)
 - [FTP/SFTP-v1 连接器](ftp/v1/ftp-v1.md)
 - [Hadoop 连接器](hadoop/hadoop.md)
+- [Hadoop-v1 连接器](hadoop/v1/hadoop-v1.md)
 - [HBase 连接器](hbase/hbase.md)
 - [Hive 连接器](hive/hive.md)
 - [Hudi 连接器](hudi/hudi.md)

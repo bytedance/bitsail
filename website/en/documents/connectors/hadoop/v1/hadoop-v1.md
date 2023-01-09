@@ -1,6 +1,6 @@
 # Hadoop connector
 
-Parent document: [connectors](../introduction.md)
+Parent document: [connectors](../../README.md)
 
 
 ## Main function
@@ -54,8 +54,6 @@ The following mentioned parameters should be added to `job.reader` block when us
   "job": {
     "reader": {
       "class": "com.bytedance.bitsail.connector.hadoop.source.HadoopSource",
-      "defaultFS": "hdfs://127.0.0.1:9000/",
-      "path_list": "/test_namespace/source/test.json",
       "content_type":"json",
       "reader_parallelism_num": 1,
       "columns": [
@@ -76,7 +74,7 @@ The following mentioned parameters should be added to `job.reader` block when us
           "type": "list<string>"
         }
       ]
-    }
+    },
   }
 }
 ```
@@ -86,16 +84,15 @@ The following mentioned parameters should be added to `job.reader` block when us
 | Param name   | Required | Optional value | Description                                                  |
 | :----------- | :------- | :------------- | :----------------------------------------------------------- |
 | class        | Yes      |                | Class name of hadoop connector, v1 connector is `com.bytedance.bitsail.connector.hadoop.source.HadoopSource` |
-| defaultFS    | Yes      |                | NameNode URI                                                 |
 | path_list    | Yes      |                | Specifies the path of the read in file. Multiple paths can be specified, separated by `','` |
 | content_type | Yes      | JSON<br>CSV    | Specify the format of the read in file.                      |
 | columns      | Yes      |                | Describing fields' names and types                           |
 
 ### Optional parameters
-| Param name                           | Required | Optional value | Description                                               |
-| :----------------------------------- | :------- | :------------- | :-------------------------------------------------------- |
-| default_hadoop_parallelism_threshold | No       |                | The number of files read by each reader, the default is 2 |
-| reader_parallelism_num               | No       |                | Reader parallelism                                        |
+| Param name                           | Required | Optional value | Description                                                |
+| :----------------------------------- | :------- | :------------- | :--------------------------------------------------------- |
+| default_hadoop_parallelism_threshold | No       |                | The number of splits read by each reader, the default is 2 |
+| reader_parallelism_num               | No       |                | Reader parallelism                                         |
 
 
 ## <span id="jump_format">Supported format</span>

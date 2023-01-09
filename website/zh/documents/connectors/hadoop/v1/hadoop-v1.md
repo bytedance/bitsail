@@ -1,6 +1,6 @@
 # Hadoop连接器
 
-上级文档: [connectors](../introduction_zh.md)
+上级文档: [connectors](../../README.md)
 
 
 ## 主要功能
@@ -50,42 +50,39 @@ Hadoop连接器可用于批式场景下的hdfs文件读取。其功能点主要�
 以下参数使用在`job.reader`配置中，实际使用时请注意路径前缀。示例:
 ```json
 {
-  "job": {
-    "reader": {
-      "class": "com.bytedance.bitsail.connector.hadoop.source.HadoopSource",
-      "defaultFS": "hdfs://127.0.0.1:9000/",
-      "path_list": "/test_namespace/source/test.json",
-      "content_type":"json",
-      "reader_parallelism_num": 1,
-      "columns": [
-        {
-          "name":"id",
-          "type": "int"
-        },
-        {
-          "name": "string_type",
-          "type": "string"
-        },
-        {
-          "name": "map_string_string",
-          "type": "map<string,string>"
-        },
-        {
-          "name": "array_string",
-          "type": "list<string>"
-        }
-      ]
-    }
-  }
+   "job": {
+      "reader": {
+         "class": "com.bytedance.bitsail.connector.hadoop.source.HadoopSource",
+         "content_type":"json",
+         "reader_parallelism_num": 1,
+         "columns": [
+            {
+               "name":"id",
+               "type": "int"
+            },
+            {
+               "name": "string_type",
+               "type": "string"
+            },
+            {
+               "name": "map_string_string",
+               "type": "map<string,string>"
+            },
+            {
+               "name": "array_string",
+               "type": "list<string>"
+            }
+         ]
+      },
+   }
 }
 ```
 
 ### 必需参数
 
-| 参数名称     | 参数是否必需 | 参数枚举值  | 参数含义                                                     |
-| :----------- | :----------- | :---------- | :----------------------------------------------------------- |
-| class        | 是           |             | Hadoop读连接器类名，v1 connector为为`com.bytedance.bitsail.connector.hadoop.source.HadoopSource` |
-| defaultFS    | 是           |             | NameNode URI                                                 |
+| 参数名称         | 参数是否必需 | 参数枚举值  | 参数含义                                                     |
+|:-------------| :----------- | :---------- | :----------------------------------------------------------- |
+| class        | 是           |             | Hadoop读连接器类名，v1 connector为为`com.bytedance.bitsail.connector.hadoop.source.HadoopSource` |                                      |
 | path_list    | 是           |             | 指定读入文件的路径。可指定多个路径，使用`','`分隔            |
 | content_type | 是           | JSON<br>CSV | 指定读入文件的格式                                           |
 | columns      | 是           |             | 数据字段名称及类型                                           |

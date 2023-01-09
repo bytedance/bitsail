@@ -1,6 +1,6 @@
 # Hadoop connector examples
 
-Parent document: [hadoop-connector](./hadoop.md)
+Parent document: [hadoop-connector](./hadoop-v1.md)
 
 The following configuration shows how to organize parameter configuration to read the following json format hdfs file.
 
@@ -24,8 +24,6 @@ The following configuration shows how to organize parameter configuration to rea
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.hadoop.source.HadoopSource",
-      "defaultFS": "hdfs://127.0.0.1:9000/",
-      "path_list": "/test_namespace/source/test.json",
       "content_type":"json",
       "reader_parallelism_num": 1,
       "columns": [
@@ -75,8 +73,6 @@ The following configuration shows how to organize parameter configuration to rea
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.hadoop.source.HadoopSource",
-      "defaultFS": "hdfs://127.0.0.1:9000/",
-      "path_list": "/test_namespace/source/test.csv",
       "content_type":"csv",
       "reader_parallelism_num": 1,
       "columns": [

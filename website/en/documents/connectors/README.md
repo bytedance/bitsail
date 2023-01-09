@@ -16,6 +16,7 @@ dir:
 - [FTP/SFTP connector](ftp/ftp.md)
 - [FTP/SFTP-v1 connector](ftp/v1/ftp-v1.md)
 - [Hadoop connector](hadoop/hadoop.md)
+- [Hadoop-v1 connector](hadoop/v1/hadoop-v1.md)
 - [HBase connector](hbase/hbase.md)
 - [Hive connector](hive/hive.md)
 - [Hudi connector](hudi/hudi.md)

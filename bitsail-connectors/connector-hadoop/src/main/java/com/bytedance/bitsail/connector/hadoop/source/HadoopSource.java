@@ -42,7 +42,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class HadoopSource implements Source<Row, HadoopSourceSplit, EmptyState>, ParallelismComputable {
+public class HadoopSource<K, V> implements Source<Row, HadoopSourceSplit, EmptyState>, ParallelismComputable {
   private static final Logger LOG = LoggerFactory.getLogger(HadoopSource.class);
 
   private BitSailConfiguration readerConfiguration;
@@ -61,12 +61,12 @@ public class HadoopSource implements Source<Row, HadoopSourceSplit, EmptyState>,
 
   @Override
   public SourceReader<Row, HadoopSourceSplit> createReader(SourceReader.Context readerContext) {
-    return new HadoopSourceReader(readerConfiguration, readerContext);
+    return new HadoopSourceReader<K, V>(readerConfiguration, readerContext, hadoopPathList);
   }
 
   @Override
   public SourceSplitCoordinator<HadoopSourceSplit, EmptyState> createSplitCoordinator(SourceSplitCoordinator.Context<HadoopSourceSplit, EmptyState> coordinatorContext) {
-    return new HadoopSourceSplitCoordinator(readerConfiguration, coordinatorContext, hadoopPathList);
+    return new HadoopSourceSplitCoordinator<K, V>(readerConfiguration, coordinatorContext, hadoopPathList);
   }
 
   @Override

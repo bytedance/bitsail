@@ -18,6 +18,4 @@ package com.bytedance.bitsail.connector.hadoop.constant;
 
 public class HadoopConstants {
   public static String HADOOP_CONNECTOR_NAME = "hadoop";
-  public static final String HDFS_IMPL = "org.apache.hadoop.hdfs.DistributedFileSystem";
-  public static final String SCHEMA = "hdfs";
 }

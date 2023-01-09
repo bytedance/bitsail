@@ -1,0 +1,56 @@
+{
+  "job": {
+    "common": {
+      "job_id": 313,
+      "instance_id": 3123,
+      "job_name": "bitsail_hadoop_to_print_test",
+      "user_name": "root"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.hadoop.source.HadoopSource",
+      "content_type":"json",
+      "reader_parallelism_num": 1,
+      "columns":[
+        {
+          "name":"id_card",
+          "type":"int"
+        },
+        {
+          "name":"tran_time",
+          "type":"string"
+        },
+        {
+          "name":"name",
+          "type":"string"
+        },
+        {
+          "name":"cash",
+          "type":"int"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
+      "content_type": "json",
+      "batch_size": 1,
+      "columns":[
+        {
+          "name":"id_card",
+          "type":"int"
+        },
+        {
+          "name":"tran_time",
+          "type":"string"
+        },
+        {
+          "name":"name",
+          "type":"string"
+        },
+        {
+          "name":"cash",
+          "type":"int"
+        }
+      ]
+    }
+  }
+}
