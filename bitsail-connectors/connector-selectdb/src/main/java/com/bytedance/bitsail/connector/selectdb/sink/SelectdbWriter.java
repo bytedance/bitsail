@@ -25,7 +25,7 @@ import com.bytedance.bitsail.connector.selectdb.config.SelectdbExecutionOptions;
 import com.bytedance.bitsail.connector.selectdb.config.SelectdbOptions;
 import com.bytedance.bitsail.connector.selectdb.error.SelectdbErrorCode;
 import com.bytedance.bitsail.connector.selectdb.serialize.SelectdbRowSerializer;
-import com.bytedance.bitsail.connector.selectdb.sink.proxy.AbstractDorisWriteModeProxy;
+import com.bytedance.bitsail.connector.selectdb.sink.proxy.AbstractSelectdbWriteModeProxy;
 import com.bytedance.bitsail.connector.selectdb.sink.proxy.SelectdbUpsertProxy;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -40,7 +40,7 @@ public class SelectdbWriter<InputT extends Row> implements Writer<InputT, Select
   private static final Logger LOG = LoggerFactory.getLogger(SelectdbWriter.class);
   protected BitSailConfiguration writerConfiguration;
   protected SelectdbRowSerializer serializer;
-  protected AbstractDorisWriteModeProxy writeModeProxy;
+  protected AbstractSelectdbWriteModeProxy writeModeProxy;
 
   public SelectdbWriter(BitSailConfiguration writerConfiguration, SelectdbOptions selectdbOptions, SelectdbExecutionOptions selectdbExecutionOptions) {
     this.writerConfiguration = writerConfiguration;

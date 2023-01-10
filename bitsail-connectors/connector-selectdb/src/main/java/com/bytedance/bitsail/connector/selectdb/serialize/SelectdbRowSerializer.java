@@ -106,7 +106,7 @@ public class SelectdbRowSerializer implements Serializable {
       fieldIndex++;
     }
     if (enableDelete) {
-      valueMap.put(SelectdbConstants.DORIS_DELETE_SIGN, parseDeleteSign(record.getKind()).getValue());
+      valueMap.put(SelectdbConstants.SELECTDB_DELETE_SIGN, parseDeleteSign(record.getKind()).getValue());
     }
     return objectMapper.writeValueAsString(valueMap);
   }

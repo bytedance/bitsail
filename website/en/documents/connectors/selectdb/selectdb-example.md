@@ -39,7 +39,7 @@ DISTRIBUTED BY HASH(`id`) BUCKETS 10;
 
 ## Selectdb writer
 
-You can use the following configuration to write data for table test_db.test_doris_table.
+You can use the following configuration to write data for table test_db.test_selectdb_table.
 
 ```json
 {
