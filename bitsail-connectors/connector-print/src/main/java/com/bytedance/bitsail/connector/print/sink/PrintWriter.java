@@ -32,66 +32,68 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PrintWriter implements Writer<Row, String, Integer> {
   private static final Logger LOG = LoggerFactory.getLogger(PrintWriter.class);
 
+  private final int subTaskId;
+
   private final int batchSize;
   private final List<String> fieldNames;
+
   private final boolean sampleWrite;
   private final int sampleLimit;
+  private final AtomicInteger samplePrintCount;
 
-  private final List<String> writeBuffer;
-  private final List<String> commitBuffer;
-
+  private final List<String> commitPrint;
   private final AtomicInteger printCount;
 
   private transient PrintStream stream = System.out;
 
-  public PrintWriter(int batchSize, List<String> fieldNames, boolean sampleWrite, int sampleLimit) {
-    this(batchSize, fieldNames, sampleWrite, sampleLimit, 0);
+  public PrintWriter(int batchSize, List<String> fieldNames, boolean sampleWrite, int sampleLimit, Writer.Context<Integer> context) {
+    this(batchSize, fieldNames, sampleWrite, sampleLimit, 0, context);
   }
 
-  public PrintWriter(int batchSize, List<String> fieldNames, boolean sampleWrite, int sampleLimit, int alreadyPrintCount) {
+  public PrintWriter(int batchSize, List<String> fieldNames, boolean sampleWrite, int sampleLimit, int alreadyPrintCount, Writer.Context<Integer> context) {
     Preconditions.checkState(batchSize > 0, "batch size must be larger than 0");
+    this.subTaskId = context.getIndexOfSubTaskId();
     this.batchSize = batchSize;
     this.fieldNames = fieldNames;
     this.sampleWrite = sampleWrite;
     this.sampleLimit = sampleLimit;
-    this.writeBuffer = new ArrayList<>(batchSize);
-    this.commitBuffer = new ArrayList<>(batchSize);
+    this.commitPrint = new ArrayList<>();
     printCount = new AtomicInteger(alreadyPrintCount);
+    samplePrintCount = new AtomicInteger(0);
+
+    LOG.info("Print sink writer {} is initialized.", subTaskId);
   }
 
   @Override
   public void write(Row element) {
-    if (!this.sampleWrite || printCount.get() % this.sampleLimit == 0) {
-      String[] fields = new String[element.getFields().length];
-      for (int i = 0; i < element.getFields().length; ++i) {
-        fields[i] = String.format("\"%s\":\"%s\"", fieldNames.get(i), element.getField(i).toString());
-      }
-
-      writeBuffer.add("[" + String.join(",", fields) + "]");
-      if (writeBuffer.size() == batchSize) {
-        this.flush(false);
-      }
+    if (!this.sampleWrite) {
+      this.stream.println(stringByRow(element));
+    } else if (printCount.get() % this.sampleLimit == 0) {
+      this.stream.println(stringByRow(element));
+      samplePrintCount.incrementAndGet();
     }
     printCount.incrementAndGet();
   }
 
-  @Override
-  public void flush(boolean endOfInput) {
-    commitBuffer.addAll(writeBuffer);
-
-    writeBuffer.forEach(
-        element -> this.stream.println(element)
-    );
-
-    writeBuffer.clear();
-    if (endOfInput) {
-      LOG.info("all records are sent to commit buffer.");
+  private String stringByRow(Row element) {
+    String[] fields = new String[element.getFields().length];
+    for (int i = 0; i < element.getFields().length; ++i) {
+      fields[i] = String.format("\"%s\":\"%s\"", fieldNames.get(i), element.getField(i).toString());
     }
+    return String.format("[%s]", String.join(",", fields));
   }
 
   @Override
+  public void flush(boolean endOfInput) {}
+
+  @Override
   public List<String> prepareCommit() {
-    return commitBuffer;
+    if (this.sampleWrite) {
+      this.commitPrint.add(String.format("PrintSink-%d got %d records, sample print %d records", this.subTaskId, this.printCount.get(), this.samplePrintCount.get()));
+    } else {
+      this.commitPrint.add(String.format("PrintSink-%d print %d records", this.subTaskId, this.printCount.get()));
+    }
+    return this.commitPrint;
   }
 
   @Override
