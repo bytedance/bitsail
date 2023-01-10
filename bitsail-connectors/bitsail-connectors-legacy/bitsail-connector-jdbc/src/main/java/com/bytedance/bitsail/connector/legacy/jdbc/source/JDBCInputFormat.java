@@ -63,10 +63,12 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -482,7 +484,6 @@ public class JDBCInputFormat extends InputFormatPlugin<Row, InputSplit> implemen
       LOG.info("Init sql is " + initSql);
     }
 
-    List<ColumnInfo> columns = inputSliceConfig.getNecessaryOption(JdbcReaderOptions.COLUMNS, JDBCPluginErrorCode.REQUIRED_VALUE);
     String splitPK = null;
     String table = null;
     String schema = null;
@@ -490,9 +491,6 @@ public class JDBCInputFormat extends InputFormatPlugin<Row, InputSplit> implemen
     SqlType.SqlTypes splitType = null;
     if (!useCustomizedSQL) {
       splitPK = inputSliceConfig.getNecessaryOption(JdbcReaderOptions.SPLIT_PK, JDBCPluginErrorCode.REQUIRED_VALUE);
-      String splitPkType = getOrDefaultSplitType(inputSliceConfig, columns, splitPK);
-      inputSliceConfig.set(JdbcReaderOptions.SPLIT_PK_JDBC_TYPE, splitPkType);
-      splitType = SqlType.getSqlType(splitPkType, getDriverName());
       table = inputSliceConfig.get(JdbcReaderOptions.TABLE_NAME);
       schema = inputSliceConfig.getUnNecessaryOption(JdbcReaderOptions.TABLE_SCHEMA, JdbcReaderOptions.TABLE_SCHEMA.defaultValue());
     }
@@ -509,6 +507,20 @@ public class JDBCInputFormat extends InputFormatPlugin<Row, InputSplit> implemen
     String shardSplitMode = inputSliceConfig.getUnNecessaryOption(JdbcReaderOptions.SHARD_SPLIT_MODE, FixedLenParametersProvider.ShardSplitMode.accurate.toString());
     // Generate from conf params
     DbClusterInfo dbClusterInfo = new DbClusterInfo(userName, password, schema, splitPK, shardKey, 1, 1, 1, 120, connections);
+
+    List<ColumnInfo> columns = null;
+    if (inputSliceConfig.fieldExists(JdbcReaderOptions.COLUMNS)) {
+      LOG.info("Get column schema by user configuration.");
+      columns = inputSliceConfig.getNecessaryOption(JdbcReaderOptions.COLUMNS, JDBCPluginErrorCode.REQUIRED_VALUE);
+    } else {
+      columns = getColumnInfoAutomatically(dbClusterInfo, table);
+    }
+
+    if (!useCustomizedSQL) {
+      String splitPkType = getOrDefaultSplitType(inputSliceConfig, columns, splitPK);
+      inputSliceConfig.set(JdbcReaderOptions.SPLIT_PK_JDBC_TYPE, splitPkType);
+      splitType = SqlType.getSqlType(splitPkType, getDriverName());
+    }
 
     ParameterValuesProvider paramProvider = null;
     // init paramProvider
@@ -534,6 +546,36 @@ public class JDBCInputFormat extends InputFormatPlugin<Row, InputSplit> implemen
 
     LOG.info("Row Type Info: " + rowTypeInfo);
     LOG.info("Validate plugin configuration parameters finished.");
+  }
+
+  @SuppressWarnings("checkstyle:MagicNumber")
+  private List<ColumnInfo> getColumnInfoAutomatically(DbClusterInfo dbClusterInfo, String tableName) {
+    LOG.info("Get column schema automatically by metadata.");
+    List<ColumnInfo> columnInfos = new ArrayList<>();
+    Map<Integer, List<DbShardInfo>> shardsInfo = dbClusterInfo.getShardsInfo();
+    try {
+      for (Map.Entry<Integer, List<DbShardInfo>> entry : shardsInfo.entrySet()) {
+        List<DbShardInfo> slaves = entry.getValue();
+        for (DbShardInfo host : slaves) {
+          val shardWithConn = new DbShardWithConn(host, dbClusterInfo, queryTemplateFormat, inputSliceConfig, getDriverName(), initSql);
+          DatabaseMetaData databaseMetaData = shardWithConn.getConnection().getMetaData();
+          ResultSet columns = databaseMetaData.getColumns(null, null, tableName, null);
+          int idx = 1;
+          while (columns.next()) {
+            String columnName = columns.getString("COLUMN_NAME");
+            String typeName = columns.getString("TYPE_NAME");
+            ColumnInfo columnInfo = new ColumnInfo(columnName, typeName);
+            columnInfos.add(columnInfo);
+            LOG.info("Column {}, column name: {}, type name: {}", idx++, columnName, typeName);
+          }
+          break;
+        }
+        break;
+      }
+    } catch (SQLException e) {
+      throw BitSailException.asBitSailException(DBUtilErrorCode.SQL_EXCEPTION, "fail to get meta data", e);
+    }
+    return columnInfos;
   }
 
   FixedLenParametersProvider getFixedLenParametersProvider(SqlType.SqlTypes splitType, int fetchSize,
