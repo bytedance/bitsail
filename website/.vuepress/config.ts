@@ -18,6 +18,10 @@ import { defineUserConfig } from "vuepress";
 import theme from "./theme.js";
 
 export default defineUserConfig({
+  head: [
+    ['link', { rel: 'icon', href: '/logo.jpg' }]
+  ],
+
   base: "/bitsail/",
 
   locales: {
