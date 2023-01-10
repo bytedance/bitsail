@@ -18,6 +18,6 @@ package com.bytedance.bitsail.connector.selectdb.constant;
 
 public class SelectdbConstants {
   public static final String NULL_VALUE = "\\N";
-  public static final String DORIS_DELETE_SIGN = "__DORIS_DELETE_SIGN__";
+  public static final String SELECTDB_DELETE_SIGN = "__DELETE_SIGN__";
 }
 

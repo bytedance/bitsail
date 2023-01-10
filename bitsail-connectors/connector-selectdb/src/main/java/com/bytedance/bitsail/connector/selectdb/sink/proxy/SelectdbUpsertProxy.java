@@ -37,7 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class SelectdbUpsertProxy extends AbstractDorisWriteModeProxy {
+public class SelectdbUpsertProxy extends AbstractSelectdbWriteModeProxy {
   private static final Logger LOG = LoggerFactory.getLogger(SelectdbUpsertProxy.class);
   private static final long MAX_CACHE_SIZE = 1024 * 1024L;
   private final SelectdbExecutionOptions executionOptions;

@@ -57,7 +57,7 @@ public class SelectdbSink<InputT> implements Sink<InputT, SelectdbCommittable, S
   @Override
   public void configure(BitSailConfiguration commonConfiguration, BitSailConfiguration writerConfiguration) throws IOException {
     this.writerConfiguration = writerConfiguration;
-    initDorisExecutionOptions(writerConfiguration);
+    initSelectdbExecutionOptions(writerConfiguration);
     initSelectdbOptions(writerConfiguration);
   }
 
@@ -102,7 +102,7 @@ public class SelectdbSink<InputT> implements Sink<InputT, SelectdbCommittable, S
     selectdbOptions = builder.build();
   }
 
-  private void initDorisExecutionOptions(BitSailConfiguration writerConfiguration) {
+  private void initSelectdbExecutionOptions(BitSailConfiguration writerConfiguration) {
     LOG.info("Start to init SelectdbExecutionOptions!");
     final SelectdbExecutionOptions.SelectdbExecutionOptionsBuilder builder = SelectdbExecutionOptions.builder();
     builder.flushIntervalMs(writerConfiguration.get(SelectdbWriterOptions.SINK_FLUSH_INTERVAL_MS))

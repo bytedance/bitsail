@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
-public abstract class AbstractDorisWriteModeProxy implements Serializable {
+public abstract class AbstractSelectdbWriteModeProxy implements Serializable {
   protected SelectdbExecutionOptions selectdbExecutionOptions;
   protected SelectdbOptions selectdbOptions;
   protected SelectdbUploadLoad selectdbUploadLoad;
