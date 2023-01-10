@@ -37,8 +37,6 @@ header:
     - 'bitsail-connectors/bitsail-connectors-legacy/bitsail-connector-ftp/src/test/resources/'
     - 'bitsail-base/src/test/resources/'
     - 'bitsail-connectors/connector-ftp/src/test/resources/'
-    - 'bitsail-test/bitsail-connector-test/src/main/java/com/bytedance/bitsail/test/connector/test/minicluster/'
-    - 'bitsail-test/bitsail-connector-test/src/main/java/com/bytedance/bitsail/test/connector/test/utils/'
     - 'website/.vuepress/'
     - 'yarn.lock'
 
