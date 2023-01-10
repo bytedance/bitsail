@@ -37,4 +37,4 @@ if [ -n "$HADOOP_HOME" ]; then
 fi
 export BITSAIL_HOME=${BITSAIL_HOME}
 
-exec java -cp ${HADOOP_CLASSPATH}:${BITSAIL_CLIENT_CLASSPATH}/*:${BITSAIL_CONF_DIR}/* com.bytedance.bitsail.client.entry.Entry ${args}
+exec java -cp ${BITSAIL_CLIENT_CLASSPATH}/*:${HADOOP_CLASSPATH}:${BITSAIL_CONF_DIR}/* com.bytedance.bitsail.client.entry.Entry ${args}

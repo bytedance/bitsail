@@ -14,29 +14,45 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>bitsail-clients</artifactId>
+        <artifactId>bitsail-shade</artifactId>
         <groupId>com.bytedance.bitsail</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitsail-client-entry</artifactId>
+    <artifactId>bitsail-shaded-hadoop</artifactId>
+
+    <properties>
+        <guava.version>11.0.2</guava.version>
+        <hadoop.version>3.1.1</hadoop.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-client-api</artifactId>
-            <version>${revision}</version>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>${hadoop.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-component-security-kerberos</artifactId>
-            <version>${revision}</version>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <version>${hadoop.version}</version>
         </dependency>
     </dependencies>
 
@@ -53,40 +69,40 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.google</pattern>
+                                    <shadedPattern>${bitsail.shaded.prefix}.hadoop.com.google</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.fasterxml.jackson</pattern>
+                                    <shadedPattern>${bitsail.shaded.prefix}.hadoop.com.fasterxml.jackson</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>io.netty</pattern>
+                                    <shadedPattern>${bitsail.shaded.prefix}.hadoop.io.netty</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache.curator</pattern>
+                                    <shadedPattern>${bitsail.shaded.prefix}.hadoop.org.apache.curator</shadedPattern>
+                                </relocation>
+                            </relocations>
                             <filters>
                                 <filter>
-                                    <artifact>*:*</artifact>
+                                    <artifact>org.apache.hadoop:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
-                                        <exclude>org/log4j/**</exclude>
-                                        <exclude>org/slf4j/impl/**</exclude>
-                                        <exclude>org/apache/logging/log4j/**</exclude>
-                                        <exclude>org/apache/log4j/**</exclude>
-                                        <exclude>log4j.properties</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
-                            <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.bytedance.bitsail.client.entry.Entry</mainClass>
-                                </transformer>
-                            </transformers>
-                            <artifactSet>
-                                <excludes>
-                                    <!-- Exclude old version metrics-core -->
-                                    <exclude>com.codahale.metrics:metrics-core</exclude>
-                                    <exclude>commons-collections:commons-collections</exclude>
-                                    <exclude>log4j:*</exclude>
-                                    <exclude>org.apache.flink:flink-runtime_${scala.binary.version}</exclude>
-                                </excludes>
-                            </artifactSet>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+
+
 </project>

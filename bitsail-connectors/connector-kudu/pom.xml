@@ -27,8 +27,7 @@
     <artifactId>connector-kudu</artifactId>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <kudu.version>1.16.0</kudu.version>
     </properties>
 
     <dependencies>

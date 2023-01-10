@@ -49,12 +49,14 @@
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-connector-print</artifactId>
+            <scope>test</scope>
             <version>${revision}</version>
         </dependency>
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-connector-test</artifactId>
+            <scope>test</scope>
             <version>${revision}</version>
         </dependency>
     </dependencies>

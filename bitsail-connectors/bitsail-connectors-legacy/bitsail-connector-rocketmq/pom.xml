@@ -28,8 +28,7 @@
     <artifactId>bitsail-connector-rocketmq</artifactId>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <rocketmq.version>4.9.2</rocketmq.version>
     </properties>
 
     <dependencies>
