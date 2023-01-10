@@ -508,7 +508,14 @@ public class JDBCInputFormat extends InputFormatPlugin<Row, InputSplit> implemen
     // Generate from conf params
     DbClusterInfo dbClusterInfo = new DbClusterInfo(userName, password, schema, splitPK, shardKey, 1, 1, 1, 120, connections);
 
-    List<ColumnInfo> columns = getColumnInfoAutomatically(dbClusterInfo, table);
+    List<ColumnInfo> columns = null;
+    if (inputSliceConfig.fieldExists(JdbcReaderOptions.COLUMNS)) {
+      LOG.info("Get column schema by user configuration.");
+      columns = inputSliceConfig.getNecessaryOption(JdbcReaderOptions.COLUMNS, JDBCPluginErrorCode.REQUIRED_VALUE);
+    } else {
+      columns = getColumnInfoAutomatically(dbClusterInfo, table);
+    }
+
     if (!useCustomizedSQL) {
       String splitPkType = getOrDefaultSplitType(inputSliceConfig, columns, splitPK);
       inputSliceConfig.set(JdbcReaderOptions.SPLIT_PK_JDBC_TYPE, splitPkType);
