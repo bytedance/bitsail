@@ -1,0 +1,9 @@
+{
+  "name": "bitsail-connector-unified-assert",
+  "classes": [
+    "com.bytedance.bitsail.connector.assertion.sink.AssertSink"
+  ],
+  "libs": [
+    "connector-assert-${version}.jar"
+  ]
+}

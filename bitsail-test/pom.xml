@@ -34,6 +34,13 @@
 
     <properties>
         <enforcer.skip>true</enforcer.skip>
+        <hbase.version>2.4.13</hbase.version>
+        <kafka.clients.version>1.0.1</kafka.clients.version>
+        <elasticsearch.version>7.5.1</elasticsearch.version>
+        <mongo.version>3.11.0</mongo.version>
+        <jedis.version>4.2.2</jedis.version>
+        <kudu.version>1.16.0</kudu.version>
+        <rocketmq.version>4.9.2</rocketmq.version>
     </properties>
 
 </project>

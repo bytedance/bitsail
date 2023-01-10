@@ -8,7 +8,7 @@
 
 #### MySQL table sync
 
-``` Json
+```json
 {
     "job":{
         "reader":{
@@ -56,7 +56,7 @@
 
 #### MySQL SQL sync
 
-``` Json
+```json
 {
     "job":{
         "reader":{
@@ -106,7 +106,7 @@
 
 #### MySQL insert sync
 
-``` json
+```json
 {
     "job":{
         "writer":{
@@ -148,7 +148,7 @@
 
 #### MySQL overwrite sync
 
-``` json
+```json
 {
     "job":{
         "writer":{
@@ -192,7 +192,7 @@
 
 ### Oracle source
 
-``` Json
+```json
 {
     "job":{
         "reader":{
@@ -258,7 +258,7 @@
 
 ### Oracle sink
 
-``` Json
+```json
 {
     "job":{
         "writer": {
@@ -328,7 +328,7 @@
 
 ### PostgreSQL source
 
-``` Json
+```json
 {
     "job":{
         "reader":{
@@ -378,7 +378,7 @@
 
 ### PostgreSQL sink
 
-``` Json
+```json
 {
     "job":{
         "writer":{
@@ -426,7 +426,7 @@
 
 ### SqlServer source
 
-``` Json
+```json
 {
     "job":{
         "reader":{
@@ -472,7 +472,7 @@
 
 ### SqlServer sink
 
-``` Json
+```json
 {
     "job":{
         "writer":{

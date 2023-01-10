@@ -28,8 +28,7 @@
     <artifactId>bitsail-connector-hbase</artifactId>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <hbase.version>2.4.13</hbase.version>
     </properties>
 
     <dependencies>
@@ -48,13 +47,6 @@
                     <groupId>org.apache.htrace</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-component-format-flink-hbase</artifactId>
-            <version>${revision}</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -85,6 +77,14 @@
                 <exclusion>
                     <groupId>org.jruby.jcodings</groupId>
                     <artifactId>jcodings</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

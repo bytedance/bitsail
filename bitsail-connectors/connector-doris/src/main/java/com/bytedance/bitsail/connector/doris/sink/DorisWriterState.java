@@ -16,8 +16,16 @@
 
 package com.bytedance.bitsail.connector.doris.sink;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
+@Data
 public class DorisWriterState implements Serializable {
-  //TODO support 2PC commit
+  String labelPrefix;
+
+  public DorisWriterState(String labelPrefix) {
+    this.labelPrefix = labelPrefix;
+  }
+
 }

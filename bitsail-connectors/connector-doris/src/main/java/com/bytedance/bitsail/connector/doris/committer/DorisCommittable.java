@@ -16,16 +16,19 @@
 
 package com.bytedance.bitsail.connector.doris.committer;
 
-import com.bytedance.bitsail.connector.doris.config.DorisOptions;
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-@AllArgsConstructor
 public class DorisCommittable implements Serializable {
-  //TODO support 2PC commit
-  public DorisOptions dorisOptions;
+  private final String hostPort;
+  private final String db;
+  private final long txnID;
+
+  public DorisCommittable(String hostPort, String db, long txnID) {
+    this.hostPort = hostPort;
+    this.db = db;
+    this.txnID = txnID;
+  }
 }
