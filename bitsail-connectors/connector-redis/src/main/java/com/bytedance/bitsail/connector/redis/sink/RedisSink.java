@@ -53,7 +53,7 @@ public class RedisSink<CommitT extends Serializable> implements Sink<Row, Commit
 
   @Override
   public Writer<Row, CommitT, EmptyState> createWriter(Writer.Context<EmptyState> context) {
-    return new RedisWriter<>(writerConf);
+    return new RedisWriter<>(writerConf, context);
   }
 
   @Override

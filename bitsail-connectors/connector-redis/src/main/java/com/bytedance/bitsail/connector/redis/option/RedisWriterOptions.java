@@ -60,7 +60,7 @@ public interface RedisWriterOptions extends WriterOptions.BaseWriterOptions {
       key(WRITER_PREFIX + "ttl_type")
           .defaultValue("DAY");
 
-  ConfigOption<Integer> WRITE_BATCH_INTERVAL =
+  ConfigOption<Integer> WRITE_BATCH_SIZE =
       key(WRITER_PREFIX + "write_batch_interval")
           .defaultValue(50);
 
