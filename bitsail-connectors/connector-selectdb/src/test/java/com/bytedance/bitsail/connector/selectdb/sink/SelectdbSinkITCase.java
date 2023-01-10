@@ -29,7 +29,7 @@ public class SelectdbSinkITCase {
   @Test
   public void test() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("fake_to_selectdb.json");
-    addDorisInfo(jobConf);
+    addSelectdbInfo(jobConf);
     EmbeddedFlinkCluster.submitJob(jobConf);
   }
 
@@ -37,7 +37,7 @@ public class SelectdbSinkITCase {
    * Add your selectdb setting to job configuration.
    * Below codes are just example.
    */
-  public void addDorisInfo(BitSailConfiguration jobConf) {
+  public void addSelectdbInfo(BitSailConfiguration jobConf) {
     jobConf.set(SelectdbWriterOptions.LOAD_URL, "127.0.0.1:1234");
     jobConf.set(SelectdbWriterOptions.JDBC_URL, "127.0.0.1:1234");
     jobConf.set(SelectdbWriterOptions.CLUSTER_NAME, "test_cluster");
