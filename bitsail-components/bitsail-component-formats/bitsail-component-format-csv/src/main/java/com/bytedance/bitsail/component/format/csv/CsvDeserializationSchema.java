@@ -96,7 +96,16 @@ public class CsvDeserializationSchema implements DeserializationSchema<byte[], R
   public Row deserialize(byte[] message) {
     CSVRecord csvRecord;
     try {
-      CSVParser parser = CSVParser.parse(new String(message), csvFormat);
+      String inputStr = new String(message);
+      String csvMultiDelimiterReplaceString = csvMultiDelimiterReplaceChar.toString();
+      if ((csvDelimiter.length() > 1) && inputStr.contains(csvMultiDelimiterReplaceString)) {
+        throw new BitSailException(CsvFormatErrorCode.CSV_FORMAT_SCHEMA_PARSE_FAILED,
+            String.format("Input row contains '%c', the csv_multi_delimiter_replace_char option should be set to other character e.g. '⊙'.",
+                csvMultiDelimiterReplaceChar));
+      } else if (csvDelimiter.length() > 1) {
+        inputStr = inputStr.replace(csvDelimiter, csvMultiDelimiterReplaceString);
+      }
+      CSVParser parser = CSVParser.parse(inputStr, csvFormat);
       csvRecord =  parser.getRecords().get(0);
     } catch (Exception e) {
       throw BitSailException.asBitSailException(CsvFormatErrorCode.CSV_FORMAT_SCHEMA_PARSE_FAILED, e);
