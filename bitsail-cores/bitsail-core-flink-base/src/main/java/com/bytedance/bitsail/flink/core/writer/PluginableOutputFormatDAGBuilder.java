@@ -38,6 +38,7 @@ import com.google.common.annotations.VisibleForTesting;
 import lombok.Getter;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.typeutils.GenericTypeInfo;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -108,7 +109,11 @@ public class PluginableOutputFormatDAGBuilder<OUT extends Row> extends FlinkData
 
   private static <OUT> TypeSystem extractUpstreamTypeSystem(DataStream<OUT> parent) {
     TypeInformation<OUT> typeInformation = parent.getType();
-    if (!(typeInformation instanceof RowTypeInfo)) {
+    if (typeInformation instanceof GenericTypeInfo) {
+      return TypeSystem.FLINK;
+    }
+
+    if ((!(typeInformation instanceof RowTypeInfo))) {
       throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,
           "TypeInformation should be row type info.");
     }
