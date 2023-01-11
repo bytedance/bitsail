@@ -23,11 +23,9 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
-import com.bytedance.bitsail.connector.redis.core.CommandFactory;
 import com.bytedance.bitsail.connector.redis.core.TtlType;
 import com.bytedance.bitsail.connector.redis.core.api.PipelineProcessor;
 import com.bytedance.bitsail.connector.redis.core.jedis.JedisCommand;
-import com.bytedance.bitsail.connector.redis.core.jedis.JedisCommandDescription;
 import com.bytedance.bitsail.connector.redis.core.jedis.JedisDataType;
 import com.bytedance.bitsail.connector.redis.error.RedisPluginErrorCode;
 import com.bytedance.bitsail.connector.redis.error.RedisUnexpectedException;
@@ -77,9 +75,9 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   private long processorId;
 
   /**
-   * Command Factory used in the job.
+   * Command used in the job.
    */
-  private final CommandFactory commandFactory;
+  private final JedisCommand jedisCommand;
 
   /**
    * Complex type command with ttl.
@@ -113,7 +111,7 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     // initialize command factory
     String redisDataType = StringUtils.upperCase(writerConfiguration.get(RedisWriterOptions.REDIS_DATA_TYPE));
     String additionalKey = writerConfiguration.getUnNecessaryOption(RedisWriterOptions.ADDITIONAL_KEY, "default_redis_key");
-    this.commandFactory = initCommandFactory(redisDataType, ttlInSeconds, additionalKey, context.getTypeInfos());
+    this.jedisCommand = initJedisCommand(redisDataType, ttlInSeconds, additionalKey, context.getTypeInfos());
 
     // initialize jedis pool
     JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
@@ -155,7 +153,7 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
         .build();
   }
 
-  private CommandFactory initCommandFactory(String redisDataType, int ttlSeconds, String additionalKey, TypeInfo<?>[] typeInfos) {
+  private JedisCommand initJedisCommand(String redisDataType, int ttlSeconds, String additionalKey, TypeInfo<?>[] typeInfos) {
     JedisDataType dataType = JedisDataType.valueOf(redisDataType.toUpperCase());
     JedisCommand jedisCommand;
     this.complexTypeWithTtl = ttlSeconds > 0;
@@ -181,12 +179,12 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
         break;
       default:
         throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR, "The configure date type " + redisDataType +
-            " is not supported, only support string, set, hash, hmset, sorted set.");
+            " is not supported, only support string, set, hash, multi-hash, sorted set.");
     }
     if (ttlSeconds <= 0) {
-      return CommandFactory.createCommandFactory(new JedisCommandDescription(jedisCommand, additionalKey), typeInfos);
+      return jedisCommand.initialize(additionalKey, null, typeInfos);
     }
-    return CommandFactory.createCommandFactory(new JedisCommandDescription(jedisCommand, additionalKey, ttlSeconds), typeInfos);
+    return jedisCommand.initialize(additionalKey, ttlSeconds, typeInfos);
   }
 
   @Override
@@ -217,7 +215,7 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     try (PipelineProcessor processor = genPipelineProcessor(recordQueue.size(), this.complexTypeWithTtl)) {
       Row record;
       while ((record = recordQueue.poll()) != null) {
-        processor.addInitialCommand(commandFactory.getCommand(record));
+        processor.addInitialCommand(jedisCommand.applyCommand(record));
       }
       retryer.call(processor::run);
     } catch (ExecutionException | RetryException e) {
