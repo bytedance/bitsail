@@ -41,7 +41,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,13 +54,12 @@ import static com.bytedance.bitsail.connector.doris.sink.streamload.LoadStatus.S
 public class DorisReplaceProxy extends AbstractDorisWriteModeProxy {
   private static final Logger LOG = LoggerFactory.getLogger(DorisReplaceProxy.class);
   private static final List<String> DORIS_SUCCESS_STATUS = new ArrayList<>(Arrays.asList(SUCCESS, PUBLISH_TIMEOUT));
-  private RecordStream recordStream;
   private LabelGenerator labelGenerator;
   private DorisWriterState dorisWriterState;
   private AtomicInteger cacheRecordSize;
   private AtomicInteger cacheRecordCount;
   private volatile boolean loading = false;
-  private final ArrayList<byte[]> cache = new ArrayList<>();
+  private final BlockingQueue<byte[]> cache = new LinkedBlockingQueue<>();
   private volatile Exception loadException = null;
   private int flushRecordCacheSize;
   private int flushRecordCacheCount;
@@ -71,8 +72,8 @@ public class DorisReplaceProxy extends AbstractDorisWriteModeProxy {
     this.dorisExecutionOptions = dorisExecutionOptions;
     this.dorisOptions = dorisOptions;
     this.labelGenerator = new LabelGenerator(dorisExecutionOptions.getLabelPrefix(), dorisExecutionOptions.isEnable2PC());
-    this.recordStream = new RecordStream(dorisExecutionOptions.getBufferSize(), dorisExecutionOptions.getBufferCount());
-    this.dorisStreamLoad = new DorisStreamLoad(dorisExecutionOptions, dorisOptions, labelGenerator, recordStream);
+    this.dorisStreamLoad = new DorisStreamLoad(dorisExecutionOptions, dorisOptions, labelGenerator,
+        new RecordStream(dorisExecutionOptions.getBufferSize(), dorisExecutionOptions.getBufferCount()));
     this.dorisWriterState = new DorisWriterState(dorisExecutionOptions.getLabelPrefix());
     this.lineDelimiter = dorisOptions.getLineDelimiter().getBytes();
     this.intervalTime = dorisExecutionOptions.getCheckInterval();
@@ -136,9 +137,7 @@ public class DorisReplaceProxy extends AbstractDorisWriteModeProxy {
         }
         buf.put(flushCache.get(i));
       }
-      byte[] array = buf.array();
       dorisStreamLoad.writeRecord(buf.array());
-      this.dorisStreamLoad.writeRecord(array);
     }
     this.loading = true;
   }
