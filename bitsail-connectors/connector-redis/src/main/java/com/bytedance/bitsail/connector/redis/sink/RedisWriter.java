@@ -22,10 +22,8 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
-import com.bytedance.bitsail.common.typeinfo.BasicTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
-import com.bytedance.bitsail.connector.redis.core.Command;
+import com.bytedance.bitsail.connector.redis.core.CommandFactory;
 import com.bytedance.bitsail.connector.redis.core.TtlType;
 import com.bytedance.bitsail.connector.redis.core.api.PipelineProcessor;
 import com.bytedance.bitsail.connector.redis.core.jedis.JedisCommand;
@@ -51,15 +49,10 @@ import redis.clients.jedis.JedisPoolConfig;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-
-import static com.bytedance.bitsail.common.exception.CommonErrorCode.CONVERT_NOT_SUPPORT;
-import static com.bytedance.bitsail.connector.redis.constant.RedisConstants.SORTED_SET_OR_HASH_COLUMN_SIZE;
 
 @Slf4j
 public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
@@ -78,22 +71,15 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
 
   private final CircularFifoQueue<Row> recordQueue;
 
-  private final TypeInfo<?>[] typeInfos;
-
   /**
    * pipeline id for logging.
    */
   private long processorId;
 
   /**
-   * Command used in the job.
+   * Command Factory used in the job.
    */
-  private final JedisCommandDescription commandDescription;
-
-  /**
-   * Number of columns to send in each record.
-   */
-  private final int columnSize;
+  private final CommandFactory commandFactory;
 
   /**
    * Complex type command with ttl.
@@ -124,11 +110,10 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     int ttlInSeconds = ttl < 0 ? -1 : ttl * ttlType.getContainSeconds();
     log.info("ttl is {}(s)", ttlInSeconds);
 
-    // initialize commandDescription
+    // initialize command factory
     String redisDataType = StringUtils.upperCase(writerConfiguration.get(RedisWriterOptions.REDIS_DATA_TYPE));
     String additionalKey = writerConfiguration.getUnNecessaryOption(RedisWriterOptions.ADDITIONAL_KEY, "default_redis_key");
-    this.commandDescription = initJedisCommandDescription(redisDataType, ttlInSeconds, additionalKey);
-    this.columnSize = writerConfiguration.get(RedisWriterOptions.COLUMNS).size();
+    this.commandFactory = initCommandFactory(redisDataType, ttlInSeconds, additionalKey, context.getTypeInfos());
 
     // initialize jedis pool
     JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
@@ -162,7 +147,6 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
         .wrap(jedisPool::getResource);
 
     this.maxAttemptCount = writerConfiguration.get(RedisWriterOptions.MAX_ATTEMPT_COUNT);
-    this.typeInfos = context.getTypeInfos();
     this.retryer = RetryerBuilder.<Boolean>newBuilder()
         .retryIfResult(needRetry -> Objects.equals(needRetry, true))
         .retryIfException(e -> !(e instanceof BitSailException))
@@ -171,7 +155,7 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
         .build();
   }
 
-  private JedisCommandDescription initJedisCommandDescription(String redisDataType, int ttlSeconds, String additionalKey) {
+  private CommandFactory initCommandFactory(String redisDataType, int ttlSeconds, String additionalKey, TypeInfo<?>[] typeInfos) {
     JedisDataType dataType = JedisDataType.valueOf(redisDataType.toUpperCase());
     JedisCommand jedisCommand;
     this.complexTypeWithTtl = ttlSeconds > 0;
@@ -197,12 +181,12 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
         break;
       default:
         throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR, "The configure date type " + redisDataType +
-            " is not supported, only support string, set, hash, sorted set.");
+            " is not supported, only support string, set, hash, hmset, sorted set.");
     }
     if (ttlSeconds <= 0) {
-      return new JedisCommandDescription(jedisCommand, additionalKey);
+      return CommandFactory.createCommandFactory(new JedisCommandDescription(jedisCommand, additionalKey), typeInfos);
     }
-    return new JedisCommandDescription(jedisCommand, additionalKey, ttlSeconds);
+    return CommandFactory.createCommandFactory(new JedisCommandDescription(jedisCommand, additionalKey, ttlSeconds), typeInfos);
   }
 
   @Override
@@ -218,7 +202,7 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
    * Pre-check data.
    */
   private void validate(Row record) throws BitSailException {
-    for (int i = 0; i < columnSize; i++) {
+    for (int i = 0; i < record.getArity(); i++) {
       if (record.getField(i) == null) {
         throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_ENCODING,
             String.format("record contains null element in index[%d]", i));
@@ -226,68 +210,14 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     }
   }
 
-  /**
-   * check if score field can be parsed to double.
-   */
-  private double parseScoreFromBytes(byte[] scoreInBytes) throws BitSailException {
-    try {
-      return Double.parseDouble(new String(scoreInBytes));
-    } catch (NumberFormatException exception) {
-      throw new BitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-          String.format("The score can't convert to double. And the score is %s.", new String(scoreInBytes)));
-    }
-  }
-
-  private byte[] fieldToBytesConverter(Object field, TypeInfo<?> typeInfo) {
-    if (typeInfo instanceof BasicTypeInfo) {
-      return String.valueOf(field).getBytes();
-    } else if (BasicArrayTypeInfo.BINARY_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return (byte[]) field;
-    }
-    throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_COLUMN_TYPE,
-        typeInfo.getTypeClass().getName() + " is not supported in redis writer yet.");
-  }
-
   @Override
   @SneakyThrows
-  public void flush(boolean endOfInput) throws IOException {
+  public void flush(boolean endOfInput) {
     processorId++;
     try (PipelineProcessor processor = genPipelineProcessor(recordQueue.size(), this.complexTypeWithTtl)) {
       Row record;
       while ((record = recordQueue.poll()) != null) {
-
-        byte[] key = fieldToBytesConverter(record.getField(0), typeInfos[0]);
-        byte[] value = fieldToBytesConverter(record.getField(1), typeInfos[1]);
-        byte[] scoreOrHashKey = value;
-        if (columnSize == SORTED_SET_OR_HASH_COLUMN_SIZE) {
-          value = fieldToBytesConverter(record.getField(2), typeInfos[2]);
-          // Replace empty key with additionalKey in sorted set and hash.
-          if (key.length == 0) {
-            key = commandDescription.getAdditionalKey().getBytes();
-          }
-        }
-
-        if (commandDescription.getJedisCommand() == JedisCommand.ZADD) {
-          // sorted set
-          processor.addInitialCommand(new Command(commandDescription, key, parseScoreFromBytes(scoreOrHashKey), value));
-        } else if (commandDescription.getJedisCommand() == JedisCommand.HSET) {
-          // hash
-          processor.addInitialCommand(new Command(commandDescription, key, scoreOrHashKey, value));
-        } else if (commandDescription.getJedisCommand() == JedisCommand.HMSET) {
-          // mhset
-          if ((record.getArity() - 1) % 2 != 0) {
-            throw new BitSailException(CONVERT_NOT_SUPPORT, "Inconsistent data entry.");
-          }
-          Map<byte[], byte[]> map = new HashMap<>((record.getArity() - 1) / 2);
-          for (int index = 1; index < record.getArity(); index += 2) {
-            map.put(fieldToBytesConverter(record.getField(index), typeInfos[index]),
-                fieldToBytesConverter(record.getField(index + 1), typeInfos[index + 1]));
-          }
-          processor.addInitialCommand(new Command(commandDescription, key, map));
-        } else {
-          // set and string
-          processor.addInitialCommand(new Command(commandDescription, key, value));
-        }
+        processor.addInitialCommand(commandFactory.getCommand(record));
       }
       retryer.call(processor::run);
     } catch (ExecutionException | RetryException e) {

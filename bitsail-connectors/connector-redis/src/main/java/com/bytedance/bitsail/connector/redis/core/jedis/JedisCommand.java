@@ -94,14 +94,8 @@ public enum JedisCommand {
    */
   @Getter
   private final JedisDataType jedisDataType;
-  @Getter
-  private final int keyIndex;
-  @Getter
-  private final int defaultScoreOrHashKeyIndex;
 
   JedisCommand(JedisDataType jedisDataType) {
     this.jedisDataType = jedisDataType;
-    this.keyIndex = 0;
-    this.defaultScoreOrHashKeyIndex = 1;
   }
 }
