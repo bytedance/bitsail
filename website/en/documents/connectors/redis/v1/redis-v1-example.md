@@ -51,6 +51,7 @@ String
         },
         {
           "index": 1,
+          "name": "fake_value",
           "type": "string"
         }
       ]

@@ -69,9 +69,7 @@ The following mentioned parameters should be added to `job.writer` block when us
 | class             | Yes  |       | Class name of redis writer, `com.bytedance.bitsail.connector.legacy.redis.sink.RedisOutputFormat` |
 | redis_host   | Yes  |       | host of redis |
 | redis_port        | Yes  |       | port of redis |
-| columns | Yes | | Describing fields' names, types all set String |
-
-
+| columns | Yes | | Describing fields' name and type, type can be `binary` or `string` or other basic types.   The `binary` type is `byte[]`. |
 
 #### Optional parameters
 
@@ -82,7 +80,7 @@ The following mentioned parameters should be added to `job.writer` block when us
 | ttl                              | No | | Ttl of inserted data. Default -1 means not setting ttl |
 | ttl_type                         | No  | "DAY", "HOUR", "MINUTE", "SECOND" |  Time unit of ttl. Default "DAY" |
 | write_batch_interval             | No | | Redis instruction write batch size. Default 50 |
-| redis_data_type                  | No | "string"<br/>"set"<br/>"hash"<br/>"sorted_set" | Data type to insert. Default "string" |
+| redis_data_type                  | No | "string"<br/>"set"<br/>"hash"<br/>"sorted_set"<br/>"mhash" | Data type to insert. Default "string" |
 | password                         | No | | Password of redis |
 | connection_pool_max_total        | No | | Jedis pool max total connection |
 | connection_pool_max_idle         | No | | jedis pool max idle connection |
