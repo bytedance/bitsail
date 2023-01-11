@@ -20,27 +20,19 @@ import com.bytedance.bitsail.base.connector.writer.v1.Sink;
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.base.connector.writer.v1.WriterCommitter;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
-import com.bytedance.bitsail.connector.print.sink.option.PrintWriterOptions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class PrintSink implements Sink<Row, String, Integer> {
   private static final Logger LOG = LoggerFactory.getLogger(PrintSink.class);
 
-  private List<String> fieldNames;
-  private int batchSize;
-  private boolean sampleWrite;
-  private int sampleLimit;
+  private BitSailConfiguration writerConfiguration;
 
   @Override
   public String getWriterName() {
@@ -49,18 +41,12 @@ public class PrintSink implements Sink<Row, String, Integer> {
 
   @Override
   public void configure(BitSailConfiguration commonConfiguration, BitSailConfiguration writerConfiguration) {
-    this.batchSize = writerConfiguration.get(PrintWriterOptions.BATCH_SIZE);
-    this.fieldNames = writerConfiguration.get(WriterOptions.BaseWriterOptions.COLUMNS)
-        .stream()
-        .map(ColumnInfo::getName)
-        .collect(Collectors.toList());
-    this.sampleWrite = writerConfiguration.get(PrintWriterOptions.SAMPLE_WRITE);
-    this.sampleLimit = writerConfiguration.get(PrintWriterOptions.SAMPLE_LIMIT);
+    this.writerConfiguration = writerConfiguration;
   }
 
   @Override
   public Writer<Row, String, Integer> createWriter(Writer.Context<Integer> context) {
-    return new PrintWriter(batchSize, fieldNames, sampleWrite, sampleLimit, context);
+    return new PrintWriter(writerConfiguration, context);
   }
 
   @Override
