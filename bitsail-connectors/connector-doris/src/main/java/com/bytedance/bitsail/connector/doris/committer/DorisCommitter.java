@@ -90,6 +90,9 @@ public class DorisCommitter implements WriterCommitter<DorisCommittable> {
   }
 
   private void replacePartOrTab(List<DorisCommittable> committables) throws IOException {
+    if (committables.isEmpty()) {
+      return;
+    }
     LOG.info("Try to commit temporary partition or table, num of committing events: {}", committables.size());
     try {
       dorisConnectionHolder = DorisSchemaManagerGenerator.getDorisConnection(new DorisConnectionHolder(), dorisOptions);

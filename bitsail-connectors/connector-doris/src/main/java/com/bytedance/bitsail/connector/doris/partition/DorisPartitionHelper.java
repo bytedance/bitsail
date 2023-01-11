@@ -167,9 +167,13 @@ public class DorisPartitionHelper {
     String tempPartitions = partitionList.stream().map(DorisPartition::getTempName).collect(Collectors.joining(","));
     String formalPartitions = partitionList.stream().map(DorisPartition::getName).collect(Collectors.joining(","));
     String sqlReplacePartition = String.format(SQL_TEMPLATE_REPLACE_PARTITIONS, table, formalPartitions, tempPartitions);
-    log.info("replace partition sql: {}", sqlReplacePartition);
-    statement.executeUpdate(sqlReplacePartition);
-    log.info("Succeed replace partition: replace partition ({}) with temporary partition ({})", formalPartitions, tempPartitions);
+    String sqlQueryTemporaryPartition = String.format(SQL_TEMPLATE_SHOW_TEMP_PARTITIONS, database, table, tempPartitions);
+    log.info("Query temporary partition sql: {}", sqlQueryTemporaryPartition);
+    if (statement.executeUpdate(sqlQueryTemporaryPartition) != 0) {
+      log.info("replace partition sql: {}", sqlReplacePartition);
+      statement.executeUpdate(sqlReplacePartition);
+      log.info("Succeed replace partition: replace partition ({}) with temporary partition ({})", formalPartitions, tempPartitions);
+    }
   }
 
   public void replaceTable(String tempTable) throws SQLException {

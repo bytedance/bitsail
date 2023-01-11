@@ -18,6 +18,7 @@ package com.bytedance.bitsail.connector.doris.http;
 
 import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 import com.bytedance.bitsail.connector.doris.constant.DorisConstants;
+import com.bytedance.bitsail.connector.doris.partition.DorisPartition;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.flink.util.Preconditions;
@@ -30,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * Builder for HttpPut.
@@ -82,6 +84,14 @@ public class HttpPutBuilder {
 
   public HttpPutBuilder setEntity(HttpEntity httpEntity) {
     this.httpEntity = httpEntity;
+    return this;
+  }
+
+  public HttpPutBuilder setTemporaryPartition(boolean isTemp, DorisOptions dorisOptions) {
+    if (isTemp && dorisOptions.isTableHasPartitions()) {
+      String tempPartitions = dorisOptions.getPartitions().stream().map(DorisPartition::getTempName).collect(Collectors.joining(","));
+      header.put("temporary_partitions", tempPartitions);
+    }
     return this;
   }
 
