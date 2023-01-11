@@ -2,6 +2,8 @@
 
 [English](../../../en/documents/start/deployment.md) | 简体中文
 
+-----
+
 > 目前 BitSail 仅支持本地和Yarn上部署。
 > 其他平台的部署（例如原生kubernetes）将在不久后支持。
 
@@ -175,4 +177,3 @@ bash bin/bitsail run \
   --conf examples/Fake_Hive_Example.json \
   --jm-address <job-manager-address>
   ```
-
