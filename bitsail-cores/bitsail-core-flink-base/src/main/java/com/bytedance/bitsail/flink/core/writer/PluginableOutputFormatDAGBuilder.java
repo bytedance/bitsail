@@ -87,7 +87,8 @@ public class PluginableOutputFormatDAGBuilder<OUT extends Row> extends FlinkData
     TypeSystem writerTypeSystem = outputFormatPlugin.getTypeSystem();
     LOG.info("Upstream type system: {}, writer type system: {}.", upstreamTypeSystem, writerTypeSystem);
 
-    if (!upstreamTypeSystem.equals(writerTypeSystem)) {
+    if (!upstreamTypeSystem.equals(writerTypeSystem) &&
+        TypeSystem.FLINK.equals(writerTypeSystem)) {
       BitSailConfiguration outputAdapterConfiguration = outputFormatPlugin.getAdapterConf();
       RowTypeInfo rowTypeInfo = (RowTypeInfo) ((ResultTypeQueryable) outputFormatPlugin).getProducedType();
 
