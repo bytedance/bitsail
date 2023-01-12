@@ -133,3 +133,10 @@ dir:
 27. **增量更新是怎么做的？**
 
 > 字节内部有一套CDC的机制，将全量数据和增量数据全部都打到Message Queue里面，BitSail引擎直接对接Message Queue，做全量和增量的结合。
+
+28. **How to deploy bitsail in hive2.x or hive3.x?**
+
+> BitSail使用`bitsail-shaded-hive`模块来管理hive依赖，在其中使用**3.1.0**作为默认hive版本。
+> 因此，用户如果想在其他版本的hive环境中部署和使用BitSail，需要先修改 [bitsail-shaded-hive](https://github.com/bytedance/bitsail/blob/master/bitsail-shade/bitsail-shaded-hive/pom.xml) 中的hive版本信息（如下图所示）。
+>
+> ![](../../../images/change-hive-version.png)
