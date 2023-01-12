@@ -45,6 +45,8 @@
         <module>connector-ftp</module>
         <module>connector-druid</module>
         <module>connector-assert</module>
+        <module>connector-hbase</module>
+        <module>connector-hbase</module>
     </modules>
 
     <dependencyManagement>
