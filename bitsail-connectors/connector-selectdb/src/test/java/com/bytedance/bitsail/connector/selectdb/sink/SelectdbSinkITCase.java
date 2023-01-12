@@ -38,13 +38,11 @@ public class SelectdbSinkITCase {
    * Below codes are just example.
    */
   public void addSelectdbInfo(BitSailConfiguration jobConf) {
-//    jobConf.set(SelectdbWriterOptions.LOAD_URL, "<selectdb url>:<http port>");
-    jobConf.set(SelectdbWriterOptions.LOAD_URL, "129.204.199.176:43072");
-    jobConf.set(SelectdbWriterOptions.JDBC_URL, "129.204.199.176:34517");
-//    jobConf.set(SelectdbWriterOptions.JDBC_URL, "<selectdb url>:<mysql port>");
-    jobConf.set(SelectdbWriterOptions.CLUSTER_NAME, "wdl_test");
+    jobConf.set(SelectdbWriterOptions.LOAD_URL, "<selectdb url>:<http port>");
+    jobConf.set(SelectdbWriterOptions.JDBC_URL, "<selectdb url>:<mysql port>");
+    jobConf.set(SelectdbWriterOptions.CLUSTER_NAME, "test_cluster");
     jobConf.set(SelectdbWriterOptions.USER, "admin");
-    jobConf.set(SelectdbWriterOptions.PASSWORD, "Selectdb2022");
+    jobConf.set(SelectdbWriterOptions.PASSWORD, "password");
     jobConf.set(SelectdbWriterOptions.TABLE_IDENTIFIER, "test.test_bitsail");
     jobConf.set(SelectdbWriterOptions.SINK_LABEL_PREFIX, "bitsail-selectdb");
     jobConf.set(CommonOptions.CheckPointOptions.CHECKPOINT_ENABLE, true);
