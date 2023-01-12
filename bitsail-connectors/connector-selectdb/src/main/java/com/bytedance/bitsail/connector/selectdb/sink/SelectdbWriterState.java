@@ -16,11 +16,8 @@
 
 package com.bytedance.bitsail.connector.selectdb.sink;
 
-import lombok.Data;
-
 import java.io.Serializable;
 
-@Data
 public class SelectdbWriterState implements Serializable {
   String labelPrefix;
 
