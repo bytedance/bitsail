@@ -7,13 +7,13 @@
 假设 Selectdb 集群配置如下:
 
 - cluster: test_cluster
-- load_url: `127.0.0.1:1234`
-- jdbc_url: `127.0.0.1:2345`
+- load_url: `<selectdb url>:<http port>`
+- jdbc_url: `<selectdb url>:<mysql port>`
 
 账户信息为:
 
 - 用户: `admin`
-- 密码: `1234567`
+- 密码: `password`
 
 要写入的库表为:
 

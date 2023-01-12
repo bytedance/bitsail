@@ -7,13 +7,13 @@ Parent documents: [selectdb-connector](./selectdb.md)
 Selectdb cluster info
 
 - cluster: test_cluster
-- load_url: `127.0.0.1:1234`
-- jdbc_url: `127.0.0.1:2345`
+- load_url: `<selectdb url>:<http port>`
+- jdbc_url: `<selectdb url>:<mysql port>`
 
 Account:
 
 - User: `admin`
-- Password: `1234567`
+- Password: `password`
 
 Target database and table:
 
