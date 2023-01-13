@@ -24,6 +24,19 @@ export default defineUserConfig({
 
   base: "/bitsail/",
 
+  title: "BitSail",
+  description: "BitSail Document",
+
+  head: [
+    [
+      "link",
+      {
+        rel: "icon",
+        href: "/bitsail/logo.jpg",
+      },
+    ]
+  ],
+
   locales: {
     "/": {
       lang: "en-US",
