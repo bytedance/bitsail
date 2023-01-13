@@ -23,8 +23,6 @@ import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import java.util.List;
 
 /**
@@ -41,11 +39,6 @@ public class YarnDeploymentSupplier implements DeploymentSupplier {
   private BitSailConfiguration jobConfiguration;
 
   private String deploymentMode;
-
-  @VisibleForTesting
-  public YarnDeploymentSupplier(FlinkRunCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
-    configure(flinkCommandArgs, jobConfiguration);
-  }
 
   @Override
   public boolean accept(FlinkRunCommandArgs flinkCommandArgs) {
