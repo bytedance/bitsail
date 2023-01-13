@@ -58,7 +58,7 @@
         <main.basedir>${project.basedir}</main.basedir>
 
         <!--    project version    -->
-        <revision>0.1.0-SNAPSHOT</revision>
+        <revision>0.2.0-SNAPSHOT</revision>
         <flink.version>1.11.6</flink.version>
         <scala.version>2.11.12</scala.version>
         <scala.binary.version>2.11</scala.binary.version>

@@ -15,16 +15,12 @@
 # limitations under the License.
 #
 
-set -e
+RELEASE_VERSION=`grep -A 1 "<revision>" pom.xml  | grep '<revision>' | sed -e 's/<revision>//' -e 's/<\/revision>//' -e 's/ //g'`
 
-mvnProfile=flink-embedded
-revision="0.2.0-SNAPSHOT"   # modify ${revision} when version updated
-
-echo "mvn profile = ${mvnProfile}"
-mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true -U -P${mvnProfile}
-
-# Copy bitsail files into `output` directory
-rm -rf output
-mkdir -p output
-
-cp -r bitsail-dist/target/bitsail-dist-${revision}-bin/bitsail-archive-${revision}/* output/ || { echo 'cp bitsail-dist failed' ; exit 1; }
+cd src_release
+# verity the release source code
+gpg --verify bitsail-${RELEASE_VERSION}.src.tgz.asc bitsail-${RELEASE_VERSION}.src.tgz
+# build the source code from the tar ball
+tar -zxvf bitsail-${RELEASE_VERSION}.src.tgz && cd bitsail-${RELEASE_VERSION} && mvn clean verify -pl bitsail-dist -am -U -DskipUT=true -DskipITCase=false
+# remove the tmp directory
+cd ../ && rm -rf bitsail-${RELEASE_VERSION}

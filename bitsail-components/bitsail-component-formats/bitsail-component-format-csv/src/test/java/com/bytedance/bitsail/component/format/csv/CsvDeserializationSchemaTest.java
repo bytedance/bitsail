@@ -40,7 +40,7 @@ public class CsvDeserializationSchemaTest {
   }
 
   @Test
-  public void testCsvDeltmiter() {
+  public void testCsvDelimiter() {
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
     jobConf.set(CsvReaderOptions.CSV_DELIMITER, "#");
     TypeInfo<?>[] typeInfos = {TypeInfos.STRING_TYPE_INFO, TypeInfos.INT_TYPE_INFO};
@@ -61,6 +61,19 @@ public class CsvDeserializationSchemaTest {
     TypeInfo<?>[] typeInfos = {TypeInfos.STRING_TYPE_INFO, TypeInfos.INT_TYPE_INFO};
     String[] fieldNames = {"c1", "c2"};
     String csv = "\"star\"#2222";
+    CsvDeserializationSchema deserializationSchema = new CsvDeserializationSchema(jobConf, typeInfos, fieldNames);
+    Row row = deserializationSchema.deserialize(csv.getBytes());
+    Assert.assertEquals(row.getField(0).toString(), "star");
+    Assert.assertEquals((int) row.getField(1), 2222);
+  }
+
+  @Test
+  public void testCsvMultiDelimiterReplaceChar() {
+    BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
+    jobConf.set(CsvReaderOptions.CSV_DELIMITER, "##");
+    TypeInfo<?>[] typeInfos = {TypeInfos.STRING_TYPE_INFO, TypeInfos.INT_TYPE_INFO};
+    String[] fieldNames = {"c1", "c2"};
+    String csv = "star##2222";
     CsvDeserializationSchema deserializationSchema = new CsvDeserializationSchema(jobConf, typeInfos, fieldNames);
     Row row = deserializationSchema.deserialize(csv.getBytes());
     Assert.assertEquals(row.getField(0).toString(), "star");

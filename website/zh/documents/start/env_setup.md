@@ -15,6 +15,16 @@
 在安装上述必需组件后，您可以在本地的IDE上直接运行已有的集成测试。
 
 ## 从源代码编译
+
+### 适配hive环境
+
+BitSail使用`bitsail-shaded-hive`模块来管理hive依赖，在其中使用**3.1.0**作为默认hive版本。
+因此，用户如果想在其他版本的hive环境中部署和使用BitSail，需要先修改 [bitsail-shaded-hive](https://github.com/bytedance/bitsail/blob/master/bitsail-shade/bitsail-shaded-hive/pom.xml) 中的hive版本信息（如下图所示）。
+
+![](../../../images/change-hive-version.png)
+
+### 打包&产物结构
+
 - 运行此脚本在编译时将Flink嵌入到BitSail的包中。`bash build.sh`。如果Flink已经在你们的集群中提供，则可以打包时只包含BitSail相关代码 `mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true`
 
 完成打包后，输出的文件在此目录下`bitsail-dist/target/`.

@@ -15,16 +15,13 @@
 # limitations under the License.
 #
 
-set -e
+CURR_DIR=`pwd`
+if [[ `basename $CURR_DIR` != "bitsail" ]] ; then
+  echo "You have to call the script from the bitsail/ dir"
+  exit 1
+fi
 
-mvnProfile=flink-embedded
-revision="0.2.0-SNAPSHOT"   # modify ${revision} when version updated
+RELEASE_VERSION=`grep -A 1 "<revision>" pom.xml  | grep '<revision>' | sed -e 's/<revision>//' -e 's/<\/revision>//' -e 's/ //g'`
 
-echo "mvn profile = ${mvnProfile}"
-mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true -U -P${mvnProfile}
-
-# Copy bitsail files into `output` directory
-rm -rf output
-mkdir -p output
-
-cp -r bitsail-dist/target/bitsail-dist-${revision}-bin/bitsail-archive-${revision}/* output/ || { echo 'cp bitsail-dist failed' ; exit 1; }
+bash build.sh
+tar czf bitsail-dist-${RELEASE_VERSION}.tgz output
