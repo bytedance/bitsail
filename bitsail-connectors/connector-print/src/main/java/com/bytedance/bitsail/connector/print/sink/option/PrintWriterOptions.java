@@ -28,4 +28,12 @@ public interface PrintWriterOptions {
   ConfigOption<Integer> BATCH_SIZE =
       key(WRITER_PREFIX + "batch_size")
           .defaultValue(10);
+
+  ConfigOption<Boolean> SAMPLE_WRITE =
+      key(WRITER_PREFIX + "sample_write")
+          .defaultValue(false);
+
+  ConfigOption<Integer> SAMPLE_LIMIT =
+      key(WRITER_PREFIX + "sample_limit")
+          .defaultValue(5);
 }
