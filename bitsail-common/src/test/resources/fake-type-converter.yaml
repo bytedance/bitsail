@@ -8,7 +8,7 @@ engine.type.to.bitsail.type.converter:
   - source.type: date
     target.type: date.date
 
-  - source.type: long
+  - source.type: Long
     target.type: long
 
   - source.type: string

@@ -113,7 +113,7 @@ public class FileMappingTypeInfoReader implements Serializable {
             .format("Engine type %s not support transform to custom type.", entry.getValue()));
       }
 
-      toTypeInformation.put(entry.getKey(), customTypeInfo);
+      toTypeInformation.put(StringUtils.lowerCase(entry.getKey()), customTypeInfo);
     }
   }
 
@@ -125,7 +125,7 @@ public class FileMappingTypeInfoReader implements Serializable {
         throw new IllegalArgumentException(String.format("From Custom type %s is invalid.", entry.getKey()));
       }
 
-      fromTypeInformation.put(typeInfo, entry.getValue());
+      fromTypeInformation.put(typeInfo, StringUtils.lowerCase(entry.getValue()));
     }
   }
 }
