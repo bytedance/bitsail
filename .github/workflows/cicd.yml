@@ -63,6 +63,9 @@ jobs:
           architecture: x64
 
       - name: Maven Verify Unit Test
+        uses: s4u/maven-settings-action@v2.8.0
+        with:
+          sonatypeSnapshots: true
         run:
           mvn clean verify -pl bitsail-dist -am -U -DskipUT=false -DskipITCase=true
 
@@ -86,5 +89,8 @@ jobs:
           architecture: x64
 
       - name: Maven Verify Integration Test
+        uses: s4u/maven-settings-action@v2.8.0
+        with:
+          sonatypeSnapshots: true
         run:
           mvn clean verify -pl bitsail-dist -am -U -DskipUT=true -DskipITCase=false
