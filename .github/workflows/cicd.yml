@@ -61,11 +61,11 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
           architecture: x64
-
-      - name: Maven Verify Unit Test
+      - name: Setting Maven Repository
         uses: s4u/maven-settings-action@v2.8.0
         with:
           sonatypeSnapshots: true
+      - name: Maven Verify Unit Test
         run:
           mvn clean verify -pl bitsail-dist -am -U -DskipUT=false -DskipITCase=true
 
@@ -87,10 +87,10 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
           architecture: x64
-
-      - name: Maven Verify Integration Test
+      - name: Setting Maven Repository
         uses: s4u/maven-settings-action@v2.8.0
         with:
           sonatypeSnapshots: true
+      - name: Maven Verify Integration Test
         run:
           mvn clean verify -pl bitsail-dist -am -U -DskipUT=true -DskipITCase=false
