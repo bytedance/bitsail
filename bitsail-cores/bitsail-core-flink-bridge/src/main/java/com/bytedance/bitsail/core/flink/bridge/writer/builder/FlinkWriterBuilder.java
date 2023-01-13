@@ -133,8 +133,7 @@ public class FlinkWriterBuilder<InputT, CommitT extends Serializable, WriterStat
               getWriterCommitterOperatorName(),
               TypeInformation.of(new TypeHint<CommittableMessage<CommitT>>() {
               }),
-              DelegateFlinkCommitter.of(committer.get(),
-                  sink.getCommittableSerializer(), isBatchMode, isCheckpointingEnabled))
+              new DelegateFlinkCommitter<>(sink, isBatchMode, isCheckpointingEnabled))
           .uid(getWriterCommitterOperatorName())
           .name(getWriterCommitterOperatorName())
           .setParallelism(writerParallelism);

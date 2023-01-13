@@ -85,7 +85,6 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
   private final TypeInfo<?>[] typeInfos;
   private transient Writer<InputT, CommitT, WriterStateT> writer;
   private transient ListState<WriterStateT> writeState;
-  private final DelegateSimpleVersionedSerializer<WriterStateT> writeStateSerializer;
   private boolean endOfInput = false;
 
   @Setter
@@ -118,10 +117,6 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
         typeInfos,
         columnInfos,
         this.commonConfiguration);
-
-    this.writeStateSerializer = DelegateSimpleVersionedSerializer
-        .delegate(sink.getWriteStateSerializer());
-
   }
 
   @Override
@@ -151,11 +146,13 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
   @Override
   public void initializeState(StateInitializationContext context) throws Exception {
     super.initializeState(context);
-    ListState<byte[]> rawWriteState = context
+    ListState<byte[]> binaryWriterState = context
         .getOperatorStateStore()
         .getListState(WRITE_STATES_DESCRIPTOR);
 
-    writeState = new SimpleVersionedListState<>(rawWriteState, writeStateSerializer);
+    writeState = new SimpleVersionedListState<>(binaryWriterState,
+        DelegateSimpleVersionedSerializer
+            .delegate(sink.getWriteStateSerializer()));
     Writer.Context<WriterStateT> writeSinkContext = new Writer.Context<WriterStateT>() {
 
       @Override
