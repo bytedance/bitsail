@@ -14,36 +14,47 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.entry.flink.deployment.local;
+package com.bytedance.bitsail.entry.flink.deployment.remote;
 
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 /**
- * Run flink job in local mini cluster.
+ * Run flink job in flink session.
  */
-public class LocalDeploymentSupplier implements DeploymentSupplier {
+public class RemoteDeploymentSupplier implements DeploymentSupplier {
+  private static final Logger LOG = LoggerFactory.getLogger(RemoteDeploymentSupplier.class);
+  private static final String DEPLOYMENT_REMOTE = "remote";
 
-  private static final String DEPLOYMENT_LOCAL = "local";
+  private FlinkRunCommandArgs flinkCommandArgs;
 
   @Override
   public boolean accept(FlinkRunCommandArgs flinkCommandArgs) {
     String deploymentMode = flinkCommandArgs.getDeploymentMode().toLowerCase().trim();
-    return deploymentMode.equals(DEPLOYMENT_LOCAL);
+    return deploymentMode.equals(DEPLOYMENT_REMOTE);
   }
 
   @Override
   public void configure(FlinkRunCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
-
+    this.flinkCommandArgs = flinkCommandArgs;
   }
 
   @Override
   public void addDeploymentCommands(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
-    flinkCommands.add("-t");
-    flinkCommands.add("local");
+    String jobManagerAddress = flinkCommandArgs.getJobManagerAddress();
+    if (StringUtils.isNotEmpty(jobManagerAddress)) {
+      flinkCommands.add("-m");
+      flinkCommands.add(jobManagerAddress);
+    } else {
+      LOG.info("Job manager is not specified. Job will be submit to default job manager.");
+    }
   }
 }

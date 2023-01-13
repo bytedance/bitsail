@@ -23,6 +23,8 @@ import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import java.util.List;
 
 /**
@@ -30,13 +32,31 @@ import java.util.List;
  */
 public class YarnDeploymentSupplier implements DeploymentSupplier {
 
+  private static final String DEPLOYMENT_YARN_PER_JOB = "yarn-per-job";
+  private static final String DEPLOYMENT_YARN_SESSION = "yarn-session";
+  private static final String DEPLOYMENT_YARN_APPLICATION = "yarn-application";
+
   private FlinkRunCommandArgs flinkCommandArgs;
 
   private BitSailConfiguration jobConfiguration;
 
   private String deploymentMode;
 
+  @VisibleForTesting
   public YarnDeploymentSupplier(FlinkRunCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
+    configure(flinkCommandArgs, jobConfiguration);
+  }
+
+  @Override
+  public boolean accept(FlinkRunCommandArgs flinkCommandArgs) {
+    String deploymentMode = flinkCommandArgs.getDeploymentMode().toLowerCase().trim();
+    return deploymentMode.equals(DEPLOYMENT_YARN_PER_JOB)
+        || deploymentMode.equals(DEPLOYMENT_YARN_SESSION)
+        || deploymentMode.equals(DEPLOYMENT_YARN_APPLICATION);
+  }
+
+  @Override
+  public void configure(FlinkRunCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
     this.flinkCommandArgs = flinkCommandArgs;
     this.jobConfiguration = jobConfiguration;
     this.deploymentMode = flinkCommandArgs.getDeploymentMode();

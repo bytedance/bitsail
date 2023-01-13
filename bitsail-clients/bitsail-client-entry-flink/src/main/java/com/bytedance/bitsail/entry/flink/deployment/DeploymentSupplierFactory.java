@@ -18,33 +18,35 @@ package com.bytedance.bitsail.entry.flink.deployment;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
-import com.bytedance.bitsail.entry.flink.deployment.local.LocalDeploymentSupplier;
-import com.bytedance.bitsail.entry.flink.deployment.yarn.YarnDeploymentSupplier;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ServiceLoader;
 
 /**
  * Created 2022/8/8
  */
 public class DeploymentSupplierFactory {
 
-  private static final String DEPLOYMENT_LOCAL = "local";
-  private static final String DEPLOYMENT_REMOTE = "remote";
-  private static final String DEPLOYMENT_YARN_PER_JOB = "yarn-per-job";
-  private static final String DEPLOYMENT_YARN_SESSION = "yarn-session";
-  private static final String DEPLOYMENT_YARN_APPLICATION = "yarn-application";
-
   public DeploymentSupplier getDeploymentSupplier(FlinkRunCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
-    String deploymentMode = flinkCommandArgs.getDeploymentMode().toLowerCase().trim();
+    ServiceLoader<DeploymentSupplier> loader = ServiceLoader.load(DeploymentSupplier.class);
 
-    switch (deploymentMode) {
-      case DEPLOYMENT_LOCAL:
-      case DEPLOYMENT_REMOTE:
-        return new LocalDeploymentSupplier(flinkCommandArgs);
-      case DEPLOYMENT_YARN_PER_JOB:
-      case DEPLOYMENT_YARN_SESSION:
-      case DEPLOYMENT_YARN_APPLICATION:
-        return new YarnDeploymentSupplier(flinkCommandArgs, jobConfiguration);
-      default:
-        throw new UnsupportedOperationException("Unsupported deployment mode: " + deploymentMode);
+    List<DeploymentSupplier> acceptableSupplier = new ArrayList<>();
+    for (DeploymentSupplier deploymentSupplier : loader) {
+      if (deploymentSupplier != null && deploymentSupplier.accept(flinkCommandArgs)) {
+        acceptableSupplier.add(deploymentSupplier);
+      }
     }
+
+    if (acceptableSupplier.size() > 1) {
+      throw new IllegalStateException("Multiple deployment suppliers are accepted.");
+    }
+    if (acceptableSupplier.isEmpty()) {
+      throw new IllegalStateException("No deployment supplier found.");
+    }
+
+    DeploymentSupplier supplier = acceptableSupplier.get(0);
+    supplier.configure(flinkCommandArgs, jobConfiguration);
+    return supplier;
   }
 }
