@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.clickhouse.source;
+package com.bytedance.bitsail.connector.clickhouse.sink;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.clickhouse.ClickhouseContainerHolder;
 import com.bytedance.bitsail.connector.clickhouse.option.ClickhouseReaderOptions;
-import com.bytedance.bitsail.connector.clickhouse.source.split.strategy.SimpleDivideSplitConstructor.SplitConfiguration;
+import com.bytedance.bitsail.connector.clickhouse.option.ClickhouseWriterOptions;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ClickhouseReaderITCase {
-  private static final int TOTAL_COUNT = 300;
+public class Clickhouse2ClickhouseITCase {
+  private static final int TOTAL_COUNT = 100;
 
   private ClickhouseContainerHolder containerHolder;
 
@@ -39,23 +38,22 @@ public class ClickhouseReaderITCase {
     containerHolder.start();
     containerHolder.createExampleSourceTable();
     containerHolder.insertData(TOTAL_COUNT);
+
+    containerHolder.createExampleSinkTable();
+
   }
 
   @Test
   public void testClickhouseToPrint() throws Exception {
-    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("clickhouse_to_print.json");
+    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("clickhouse_to_clickhouse.json");
 
     jobConf.set(ClickhouseReaderOptions.JDBC_URL, containerHolder.getJdbcHostUrl());
-    jobConf.set(ClickhouseReaderOptions.DB_NAME, containerHolder.getDatabase());
-    jobConf.set(ClickhouseReaderOptions.TABLE_NAME, containerHolder.getTable());
     jobConf.set(ClickhouseReaderOptions.USER_NAME, containerHolder.getUsername());
     jobConf.set(ClickhouseReaderOptions.PASSWORD, containerHolder.getPassword());
 
-    SplitConfiguration splitConf = new SplitConfiguration();
-    splitConf.setName("id");
-    splitConf.setSplitNum(3);
-    splitConf.setLower((long) TOTAL_COUNT / 2);
-    jobConf.set(ClickhouseReaderOptions.SPLIT_CONFIGURATION, new ObjectMapper().writeValueAsString(splitConf));
+    jobConf.set(ClickhouseWriterOptions.JDBC_URL, containerHolder.getJdbcHostUrl());
+    jobConf.set(ClickhouseWriterOptions.USER_NAME, containerHolder.getUsername());
+    jobConf.set(ClickhouseWriterOptions.PASSWORD, containerHolder.getPassword());
 
     EmbeddedFlinkCluster.submitJob(jobConf);
   }

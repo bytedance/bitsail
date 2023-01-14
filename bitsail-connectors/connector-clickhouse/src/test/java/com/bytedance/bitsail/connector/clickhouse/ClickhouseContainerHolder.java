@@ -49,12 +49,14 @@ public class ClickhouseContainerHolder {
 
   private static final String CLICKHOUSE_IMAGE_NAME = "clickhouse/clickhouse-server:22-alpine";
   private static final String DATABASE = "default";
-  private static final String TABLE = "test_ch_table";
+  private static final String TABLE_SOURCE = "test_ch_table";
+  private static final String TABLE_SINK = "test_ch_table_sink";
   private static final int HTTP_PORT = 8123;
 
-  private static final String DROP_TABLE_SQL = "DROP TABLE IF EXISTS " + TABLE;
-  private static final String CREATE_TABLE_SQL =
-          "CREATE TABLE " + TABLE + "\n" +
+  private static final String DROP_SOURCE_TABLE_SQL = "DROP TABLE IF EXISTS " + TABLE_SOURCE;
+  private static final String DROP_SINK_TABLE_SQL = "DROP TABLE IF EXISTS " + TABLE_SINK;
+  private static final String CREATE_SOURCE_TABLE_SQL =
+          "CREATE TABLE " + TABLE_SOURCE + "\n" +
                   "(\n" +
                   "    `id`            `Int64`,\n" +
                   "    `int_type`      `Int32`,\n" +
@@ -62,14 +64,27 @@ public class ClickhouseContainerHolder {
                   "    `string_type`   `String`,\n" +
                   "    `p_date`        `Date`,\n" +
                   "    `int_128`       `Int128`,\n" +
-                  "    `int_256`       `Int256`\n" +
+                  "    `int_256`       `Int256`,\n" +
+                  "    `decimal_type`  Decimal256(76)\n" +
                   ") ENGINE = MergeTree()\n" +
                   "PARTITION BY toYYYYMM(p_date)\n" +
                   "PRIMARY KEY (id);";
-  private static final String INSERT_SQL_HEADER = "INSERT INTO " + TABLE
-          + " (id, int_type, double_type, string_type, p_date, int_128, int_256) VALUES ";
-  private static final String COUNT_SQL = "SELECT count(id) FROM " + TABLE;
-  private static final String SCAN_SQL = "SELECT id, int_type, double_type, string_type, p_date, int_128, int_256 from " + TABLE + " ORDER BY id";
+  private static final String CREATE_SINK_TABLE_SQL =
+      "CREATE TABLE " + TABLE_SINK + "\n" +
+      "(\n" +
+      "    `id`            Nullable(Int64),\n" +
+      "    `int_type`      Nullable(Int32),\n" +
+      "    `double_type`   Nullable(Float64),\n" +
+      "    `string_type`   Nullable(String),\n" +
+      "    `p_date`        Nullable(Date),\n" +
+      "    `int_128`       Nullable(Int128),\n" +
+      "    `int_256`       Nullable(Int256),\n" +
+      "    `decimal_type`  Nullable(Decimal256(76))\n" +
+      ") ENGINE = TinyLog\n";
+  private static final String INSERT_SQL_HEADER = "INSERT INTO " + TABLE_SOURCE
+          + " (id, int_type, double_type, string_type, p_date, int_128, int_256,decimal_type) VALUES ";
+  private static final String COUNT_SQL = "SELECT count(id) FROM " + TABLE_SOURCE;
+  private static final String SCAN_SQL = "SELECT id, int_type, double_type, string_type, p_date, int_128, int_256,decimal_type from " + TABLE_SOURCE + " ORDER BY id";
   private static final int INSERT_BATCH_SIZE = 10;
 
   private ClickHouseContainer container;
@@ -99,7 +114,7 @@ public class ClickhouseContainerHolder {
   }
 
   public String getTable() {
-    return TABLE;
+    return TABLE_SOURCE;
   }
 
   public String getUsername() {
@@ -110,9 +125,14 @@ public class ClickhouseContainerHolder {
     return container.getPassword();
   }
 
-  public void createExampleTable() throws SQLException {
-    performQuery(DROP_TABLE_SQL);
-    performQuery(CREATE_TABLE_SQL);
+  public void createExampleSourceTable() throws SQLException {
+    performQuery(DROP_SOURCE_TABLE_SQL);
+    performQuery(CREATE_SOURCE_TABLE_SQL);
+  }
+
+  public void createExampleSinkTable() throws SQLException {
+    performQuery(DROP_SINK_TABLE_SQL);
+    performQuery(CREATE_SINK_TABLE_SQL);
   }
 
   public long countTable() throws SQLException {
@@ -138,7 +158,7 @@ public class ClickhouseContainerHolder {
       String insertSql = values.stream().collect(Collectors.joining(", ", INSERT_SQL_HEADER, ";"));
       performQuery(insertSql);
     }
-    LOG.info("Successfully insert {} rows into table [{}]", totalCount, TABLE);
+    LOG.info("Successfully insert {} rows into table [{}]", totalCount, TABLE_SOURCE);
   }
 
   public void importData() throws Exception {
@@ -148,7 +168,7 @@ public class ClickhouseContainerHolder {
 
     try (ClickHouseClient client = ClickHouseClient.newInstance(server.getProtocol())) {
       client.connect(server).write()
-          .table(TABLE)
+          .table(TABLE_SOURCE)
           .data(file)
           .executeAndWait();
     }
@@ -171,7 +191,8 @@ public class ClickhouseContainerHolder {
         "'text_" + index + "'",            // string_type
         "'" + sdf.format(calendar.getTime()) + "'",      // date_type
         new BigInteger("17014118346046923173168730371588").toString(),  // int128
-        new BigInteger("578960446186580977117854925043439539266349923328202820").toString()  // int256
+        new BigInteger("578960446186580977117854925043439539266349923328202820").toString(),  // int256
+        Double.valueOf((100000.0 + index) / 1000000.0).toString()   //decimal_type
     );
     return data.stream().collect(Collectors.joining(", ", "(", ")"));
   }

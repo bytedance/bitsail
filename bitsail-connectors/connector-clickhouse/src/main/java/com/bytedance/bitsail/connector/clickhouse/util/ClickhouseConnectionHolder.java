@@ -19,6 +19,7 @@ package com.bytedance.bitsail.connector.clickhouse.util;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.clickhouse.error.ClickhouseErrorCode;
 import com.bytedance.bitsail.connector.clickhouse.option.ClickhouseReaderOptions;
+import com.bytedance.bitsail.connector.clickhouse.option.ClickhouseWriterOptions;
 
 import com.clickhouse.jdbc.ClickHouseConnection;
 import com.clickhouse.jdbc.ClickHouseDataSource;
@@ -53,6 +54,22 @@ public class ClickhouseConnectionHolder implements AutoCloseable {
     this.connectionProperties = new Properties();
     if (jobConf.fieldExists(ClickhouseReaderOptions.CUSTOMIZED_CONNECTION_PROPERTIES)) {
       jobConf.get(ClickhouseReaderOptions.CUSTOMIZED_CONNECTION_PROPERTIES)
+          .forEach(connectionProperties::setProperty);
+    }
+  }
+
+  public ClickhouseConnectionHolder(BitSailConfiguration jobConf, Boolean isWriter) {
+    this.jdbcUrl = jobConf.getNecessaryOption(ClickhouseWriterOptions.JDBC_URL,
+      ClickhouseErrorCode.REQUIRED_VALUE);
+    this.dbName = jobConf.getNecessaryOption(ClickhouseWriterOptions.DB_NAME,
+      ClickhouseErrorCode.REQUIRED_VALUE);
+
+    this.userName = jobConf.get(ClickhouseWriterOptions.USER_NAME);
+    this.password = jobConf.get(ClickhouseWriterOptions.PASSWORD);
+
+    this.connectionProperties = new Properties();
+    if (jobConf.fieldExists(ClickhouseWriterOptions.CUSTOMIZED_CONNECTION_PROPERTIES)) {
+      jobConf.get(ClickhouseWriterOptions.CUSTOMIZED_CONNECTION_PROPERTIES)
           .forEach(connectionProperties::setProperty);
     }
   }

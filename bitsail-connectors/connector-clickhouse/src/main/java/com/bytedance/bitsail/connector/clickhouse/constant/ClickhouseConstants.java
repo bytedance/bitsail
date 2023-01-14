@@ -18,4 +18,6 @@ package com.bytedance.bitsail.connector.clickhouse.constant;
 
 public class ClickhouseConstants {
   public static String CLICKHOUSE_CONNECTOR_NAME = "clickhouse";
+
+  public static String CLICKHOUSE_DECIMAL_INPUT_TYPE = "Decimal(76, 76)";
 }
