@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.e2e.base;
+package com.bytedance.bitsail.test.e2e.base.datasource;
 
-import com.bytedance.bitsail.test.e2e.base.container.AbstractContainer;
+import com.bytedance.bitsail.test.e2e.base.AbstractContainer;
 
 public abstract class AbstractDataSource extends AbstractContainer {
 }

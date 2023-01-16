@@ -16,30 +16,17 @@
 
 package com.bytedance.bitsail.test.e2e.base;
 
-import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.test.e2e.base.container.AbstractContainer;
+import com.bytedance.bitsail.common.option.ConfigOption;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.bytedance.bitsail.common.option.CommonOptions.COMMON_PREFIX;
+import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 
-/**
- * Executor for running BitSail job.
- */
-public abstract class AbstractExecutor extends AbstractContainer {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractExecutor.class);
+public interface E2ETestOptions {
 
   /**
-   * Configure the executor before initialization.
+   * Root dir of e2e test.
    */
-  abstract void configure(BitSailConfiguration executorConf);
-
-  /**
-   * Initialize the executor.
-   */
-  abstract void init();
-
-  /**
-   * Run BitSail job in the executor.
-   */
-  abstract void run() throws Exception;
+  ConfigOption<String> PROJECT_ROOT_DIR =
+      key(COMMON_PREFIX + "e2e_root_dir")
+          .noDefaultValue(String.class);
 }

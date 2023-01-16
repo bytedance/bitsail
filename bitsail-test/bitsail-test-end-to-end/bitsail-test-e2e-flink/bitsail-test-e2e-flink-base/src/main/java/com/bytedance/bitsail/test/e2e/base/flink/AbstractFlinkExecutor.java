@@ -14,14 +14,24 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.e2e.base.transfer;
+package com.bytedance.bitsail.test.e2e.base.flink;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.bytedance.bitsail.test.e2e.base.executor.AbstractExecutor;
 
-/**
- * Transfer files from host to container.
- */
-public class ContainerFileTransfer {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+
+public abstract class AbstractFlinkExecutor extends AbstractExecutor {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractFlinkExecutor.class);
+
+  /**
+   * Opensource flink docker image.
+   */
+  abstract String getDockerImage();
+
+
+
 
 }

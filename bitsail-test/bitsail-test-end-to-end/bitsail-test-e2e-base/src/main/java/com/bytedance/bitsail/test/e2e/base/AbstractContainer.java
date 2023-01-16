@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.e2e.base.container;
+package com.bytedance.bitsail.test.e2e.base;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

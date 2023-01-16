@@ -14,36 +14,25 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.e2e.base.error;
+package com.bytedance.bitsail.test.e2e.base.transfer;
 
-import com.bytedance.bitsail.common.exception.ErrorCode;
+import lombok.AllArgsConstructor;
 
-public class DataSourceErrorCode implements ErrorCode {
+@AllArgsConstructor
+public class TransferableFile {
+  /**
+   * Absolute path in host.
+   */
+  private final String hostPath;
 
-
-
-  private final String code;
-
-  private final String describe;
-
-  DataSourceErrorCode(String code, String describe) {
-    this.code = code;
-    this.describe = describe;
-  }
-
-  @Override
-  public String getCode() {
-    return code;
-  }
-
-  @Override
-  public String getDescription() {
-    return describe;
-  }
+  /**
+   * Absolute path in container.
+   */
+  private final String containerPath;
 
   @Override
   public String toString() {
-    return String.format("Code:[%s], Describe:[%s]", this.code,
-        this.describe);
+    return String.format("{\"host_path\":\"%s\", \"container_path\":\"%s\"}", hostPath, containerPath);
   }
 }
+
