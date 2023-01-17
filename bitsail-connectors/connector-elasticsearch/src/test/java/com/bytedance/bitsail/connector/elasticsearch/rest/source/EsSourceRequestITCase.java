@@ -35,9 +35,9 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class EsSourceRequestTest {
+public class EsSourceRequestITCase {
 
-  private static final Logger LOG = LoggerFactory.getLogger(EsSourceRequestTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(EsSourceRequestITCase.class);
   private SourceSetupUtils sourceEnv;
 
   private ElasticsearchCluster esCluster;

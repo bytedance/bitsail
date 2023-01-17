@@ -42,9 +42,9 @@ import java.util.function.BiConsumer;
 
 import static org.junit.Assert.assertEquals;
 
-public class ElasticsearchSourceSplitCoordinatorTest {
+public class ElasticsearchSourceSplitCoordinatorITCase {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchSourceSplitCoordinatorTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchSourceSplitCoordinatorITCase.class);
 
   private ElasticsearchCluster esCluster;
 
