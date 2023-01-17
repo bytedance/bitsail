@@ -200,6 +200,9 @@ public abstract class PartitionWriter<T> {
     if (clearPartFileInfo) {
       clearPartFileInfo();
     }
+    for (String partition: getOutputFormats().keySet()) {
+      closeFormatForPartition(partition);
+    }
   }
 
   public void clearPartFileInfo() {
