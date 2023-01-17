@@ -53,4 +53,6 @@ public class EsConstants {
   public static final String DEFAULT_OPERATION_TYPE = OPERATION_TYPE_INDEX;
 
   public static final String ES_CONNECTOR_NAME = "elasticsearch";
+
+  public static final String SPLIT_COMMA = ",\\s*";
 }

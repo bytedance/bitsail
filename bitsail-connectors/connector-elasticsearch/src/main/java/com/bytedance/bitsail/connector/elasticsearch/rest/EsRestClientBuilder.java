@@ -19,8 +19,11 @@ package com.bytedance.bitsail.connector.elasticsearch.rest;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.option.ReaderOptions;
+import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.elasticsearch.base.NetUtil;
+import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchReaderOptions;
 import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchWriterOptions;
 
 import org.apache.commons.lang.StringUtils;
@@ -46,7 +49,13 @@ public class EsRestClientBuilder {
   private final RestClientBuilder builder;
 
   public EsRestClientBuilder(BitSailConfiguration jobConf) {
-    List<String> hostAddressList = jobConf.get(ElasticsearchWriterOptions.ES_HOSTS);
+    List<String> hostAddressList = null;
+    if (jobConf.fieldExists(ReaderOptions.READER_PREFIX)) {
+      hostAddressList = jobConf.get(ElasticsearchReaderOptions.ES_HOSTS);
+    } else if (jobConf.fieldExists(WriterOptions.WRITER_PREFIX)) {
+      hostAddressList = jobConf.get(ElasticsearchWriterOptions.ES_HOSTS);
+    }
+
     List<HttpHost> hosts = parseHostsAddress(hostAddressList);
     Preconditions.checkState(!hosts.isEmpty(), "cannot find any valid host from configurations.");
     LOG.info("Elasticsearch http client hosts: {}", hosts);

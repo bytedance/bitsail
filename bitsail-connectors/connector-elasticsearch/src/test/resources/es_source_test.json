@@ -1,0 +1,48 @@
+{
+  "job": {
+    "common": {
+      "cid": 0,
+      "domain": "test",
+      "job_id": -24,
+      "job_name": "bitsail_connector_es_batch_source_test",
+      "instance_id": -720,
+      "user_name": "root"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.elasticsearch.source.ElasticsearchSource",
+      "scroll_size": 3,
+      "scroll_time": "1m",
+      "columns": [
+        {
+          "index": 0,
+          "name": "id",
+          "type": "integer"
+        },
+        {
+          "index": 1,
+          "name": "text_type",
+          "type": "text"
+        },
+        {
+          "index": 2,
+          "name": "keyword_type",
+          "type": "keyword"
+        },
+        {
+          "index": 3,
+          "name": "long_type",
+          "type": "long"
+        },
+        {
+          "index": 4,
+          "name": "date_type",
+          "type": "date"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink",
+      "writer_parallelism_num": 2
+    }
+  }
+}
