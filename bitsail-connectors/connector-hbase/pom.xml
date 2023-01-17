@@ -19,6 +19,13 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-component-security-kerberos</artifactId>
+            <version>${revision}</version>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- hbase -->
         <dependency>
             <groupId>org.apache.hbase</groupId>
