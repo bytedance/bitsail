@@ -16,9 +16,13 @@
 
 package com.bytedance.bitsail.test.e2e.base;
 
+import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.utility.MountableFile;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -37,12 +41,12 @@ public abstract class AbstractContainer implements Closeable {
   /**
    * Identifier for each container.
    */
-  abstract String getContainerName();
+  protected abstract String getContainerName();
 
   /**
    * Initialize network for the container.
    */
-  abstract void initNetwork();
+  protected abstract void initNetwork();
 
   /**
    * Terminate the container.
@@ -50,5 +54,17 @@ public abstract class AbstractContainer implements Closeable {
   @Override
   public void close() throws IOException {
     LOG.info("Container {} is closed.", getContainerName());
+  }
+
+  /**
+   * Copy file from host to container.
+   */
+  protected static void copyToContainer(GenericContainer<?> container, TransferableFile file) {
+
+    container.withCopyFileToContainer(
+        MountableFile.forHostPath(file.getHostPath()),
+        file.getContainerPath()
+    );
+    LOG.info("Successfully copy file: {}", file);
   }
 }

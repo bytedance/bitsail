@@ -16,8 +16,17 @@
 
 package com.bytedance.bitsail.test.e2e.base.transfer;
 
-import lombok.AllArgsConstructor;
+import com.bytedance.bitsail.common.util.Preconditions;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+@Getter
 @AllArgsConstructor
 public class TransferableFile {
   /**
@@ -30,9 +39,27 @@ public class TransferableFile {
    */
   private final String containerPath;
 
+  public void checkExist() {
+    Path filePath = Paths.get(hostPath);
+    Preconditions.checkState(filePath.toFile().exists(),
+        "File " + hostPath + " doesn't exist");
+  }
+
   @Override
   public String toString() {
     return String.format("{\"host_path\":\"%s\", \"container_path\":\"%s\"}", hostPath, containerPath);
+  }
+
+  @Override
+  public int hashCode() {
+    return this.toString().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof TransferableFile
+        && StringUtils.equals(hostPath, ((TransferableFile) obj).hostPath)
+        && StringUtils.equals(containerPath, ((TransferableFile) obj).containerPath);
   }
 }
 

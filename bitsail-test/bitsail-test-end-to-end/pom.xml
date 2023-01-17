@@ -29,6 +29,7 @@
     <modules>
         <module>bitsail-test-e2e-base</module>
         <module>bitsail-test-e2e-flink</module>
+        <module>bitsail-test-e2e-datasource</module>
     </modules>
 
     <properties>
@@ -44,6 +45,12 @@
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-base</artifactId>
+        </dependency>
+
+        <!-- test -->
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
         </dependency>
     </dependencies>
 </project>

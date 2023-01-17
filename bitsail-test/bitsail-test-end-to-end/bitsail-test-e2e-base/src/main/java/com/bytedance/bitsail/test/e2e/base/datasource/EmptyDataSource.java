@@ -18,32 +18,38 @@ package com.bytedance.bitsail.test.e2e.base.datasource;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.test.e2e.base.AbstractContainer;
-import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
 
-import java.util.Set;
+import org.testcontainers.containers.Network;
 
-public abstract class AbstractDataSource extends AbstractContainer {
+public class EmptyDataSource extends AbstractDataSource {
 
-  protected Set<TransferableFile> transferableFiles;
+  @Override
+  protected String getContainerName() {
+    return "DATA-SOURCE:empty";
+  }
 
-  /**
-   * Configure the data source, like docker image name or version.
-   */
-  public abstract void configure(BitSailConfiguration dataSourceConf);
+  @Override
+  protected void initNetwork() {
 
-  /**
-   * Start the data source.
-   */
-  public abstract void start();
+  }
 
-  /**
-   * Produce some data if it is for source.
-   */
-  public abstract void fillData();
+  @Override
+  public void configure(BitSailConfiguration dataSourceConf) {
 
-  /**
-   * Validate data if it is for sink.
-   */
-  public abstract void validate() throws BitSailException;
+  }
+
+  @Override
+  public void start() {
+
+  }
+
+  @Override
+  public void fillData() {
+
+  }
+
+  @Override
+  public void validate() throws BitSailException {
+
+  }
 }

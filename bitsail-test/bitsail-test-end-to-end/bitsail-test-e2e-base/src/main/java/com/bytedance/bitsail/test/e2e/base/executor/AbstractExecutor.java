@@ -18,57 +18,60 @@ package com.bytedance.bitsail.test.e2e.base.executor;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.test.e2e.base.AbstractContainer;
-import com.bytedance.bitsail.test.e2e.base.E2ETestOptions;
+import com.bytedance.bitsail.test.e2e.base.TestOptions;
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.Data;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Executor for running BitSail job.
  */
+@Data
 public abstract class AbstractExecutor extends AbstractContainer {
+
+  public static final String BITSAIL_REVISION = "bitsail.revision";
+  public static final String BITSAIL_ROOT_DIR = "bitsail.rootDir";
+
+  /**
+   * Revision of bitsail libs.
+   */
+  protected String revision;
 
   /**
    * Files to copy from local resource to executor, including jar files and job configurations.
    */
-  protected List<TransferableFile> transferableFiles;
+  protected Set<TransferableFile> transferableFiles;
 
   /**
-   * Root dir of the project when running e2e test.
+   * Root dir of the project in executor when running e2e test.
    */
-  protected String projectDir;
+  protected String executorRootDir;
+
+  /**
+   * Local project dir.
+   */
+  protected String localRootDir;
 
   /**
    * Configure the executor before initialization.
    */
-  void configure(BitSailConfiguration executorConf) {
-    this.transferableFiles = new ArrayList<>();
-    this.projectDir = executorConf.get(E2ETestOptions.PROJECT_ROOT_DIR);
+  public void configure(BitSailConfiguration executorConf) {
+    this.revision = System.getProperty(BITSAIL_REVISION);
+    this.transferableFiles = new HashSet<>();
+    this.executorRootDir = executorConf.get(TestOptions.PROJECT_ROOT_DIR);
+    this.localRootDir = System.getProperty(BITSAIL_ROOT_DIR);
   }
-
-  /**
-   * Register connector libs to transfer to executor.
-   */
-  abstract void registerConnector(String... connectors);
-
-  /**
-   * Register core libs.
-   */
-  abstract void registerEngine();
-
-  /**
-   * Register common files, like job configuration.
-   */
-  abstract void registerCommonFile(String... files);
 
   /**
    * Initialize the executor.
    */
-  abstract void init();
+  public abstract void init();
 
   /**
    * Run BitSail job in the executor.
    */
-  abstract void run() throws Exception;
+  public abstract int run() throws Exception;
 }

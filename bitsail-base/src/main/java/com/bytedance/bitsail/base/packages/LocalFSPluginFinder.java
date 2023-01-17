@@ -95,7 +95,7 @@ public class LocalFSPluginFinder implements PluginFinder {
   }
 
   @Override
-  public void loadPlugin(String canonicalName) {
+  public List<URL> loadPlugin(String canonicalName) {
     List<URL> pluginUrls = null;
     for (PluginStore pluginStore : pluginStores) {
       pluginUrls = pluginStore.getPluginUrls(canonicalName);
@@ -111,6 +111,7 @@ public class LocalFSPluginFinder implements PluginFinder {
     }
 
     tryAddPluginToClassloader(pluginClassloader, pluginUrls);
+    return pluginUrls;
   }
 
   @Override

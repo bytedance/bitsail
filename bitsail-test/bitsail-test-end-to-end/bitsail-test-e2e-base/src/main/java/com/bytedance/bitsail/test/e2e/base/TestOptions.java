@@ -21,12 +21,16 @@ import com.bytedance.bitsail.common.option.ConfigOption;
 import static com.bytedance.bitsail.common.option.CommonOptions.COMMON_PREFIX;
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 
-public interface E2ETestOptions {
+public interface TestOptions {
 
   /**
    * Root dir of e2e test.
    */
   ConfigOption<String> PROJECT_ROOT_DIR =
-      key(COMMON_PREFIX + "e2e_root_dir")
-          .noDefaultValue(String.class);
+      key(COMMON_PREFIX + "executor_root_dir")
+          .defaultValue("/opt/bitsail");
+
+  ConfigOption<Integer> TEST_TIMEOUT =
+      key(COMMON_PREFIX + "executor_timeout")
+          .defaultValue(300);
 }

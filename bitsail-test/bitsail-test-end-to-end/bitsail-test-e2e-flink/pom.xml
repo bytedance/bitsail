@@ -28,7 +28,7 @@
     <artifactId>bitsail-test-e2e-flink</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>bitsail-test-e2e-flink-base</module>
+
     </modules>
 
     <dependencies>

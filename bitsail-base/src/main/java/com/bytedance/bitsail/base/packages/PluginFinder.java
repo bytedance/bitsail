@@ -25,6 +25,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 public interface PluginFinder extends Serializable, ComponentBuilder<Void> {
@@ -42,7 +43,7 @@ public interface PluginFinder extends Serializable, ComponentBuilder<Void> {
   /**
    * Load plugin jar to the plugin finder.
    */
-  void loadPlugin(String plugin);
+  List<URL> loadPlugin(String plugin);
 
   /**
    * Get all founded plugins
