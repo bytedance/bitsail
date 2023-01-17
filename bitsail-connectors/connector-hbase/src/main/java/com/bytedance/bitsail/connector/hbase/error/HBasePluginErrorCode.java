@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.connector.hbase.error;
+package com.bytedance.bitsail.connector.hbase.error;
 
 import com.bytedance.bitsail.common.exception.ErrorCode;
 

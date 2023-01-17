@@ -1,4 +1,4 @@
-package com.bytedance.connector.hbase.source;
+package com.bytedance.bitsail.connector.hbase.source;
 
 import com.bytedance.bitsail.base.connector.reader.v1.Boundedness;
 import com.bytedance.bitsail.base.connector.reader.v1.Source;
@@ -12,9 +12,9 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
-import com.bytedance.connector.hbase.source.split.HBaseSourceSplit;
-import com.bytedance.connector.hbase.source.reader.HBaseSourceReader;
-import com.bytedance.connector.hbase.source.split.coordinator.HBaseSourceSplitCoordinator;
+import com.bytedance.bitsail.connector.hbase.source.split.HBaseSourceSplit;
+import com.bytedance.bitsail.connector.hbase.source.reader.HBaseSourceReader;
+import com.bytedance.bitsail.connector.hbase.source.split.coordinator.HBaseSourceSplitCoordinator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

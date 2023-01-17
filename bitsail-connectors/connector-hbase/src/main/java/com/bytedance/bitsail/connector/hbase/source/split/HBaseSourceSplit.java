@@ -1,4 +1,4 @@
-package com.bytedance.connector.hbase.source.split;
+package com.bytedance.bitsail.connector.hbase.source.split;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplit;
 

@@ -1,4 +1,4 @@
-package com.bytedance.connector.hbase.source.split.coordinator;
+package com.bytedance.bitsail.connector.hbase.source.split.coordinator;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourceEvent;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.connector.hbase;
+package com.bytedance.bitsail.connector.hbase;
 
 import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.hbase.auth.KerberosAuthenticator;

@@ -1,4 +1,4 @@
-package com.bytedance.connector.hbase.source.reader;
+package com.bytedance.bitsail.connector.hbase.source.reader;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourceEvent;
 import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
@@ -10,12 +10,12 @@ import com.bytedance.bitsail.common.constants.Constants;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
-import com.bytedance.bitsail.common.typeinfo.TypeInfoUtils;
 import com.bytedance.bitsail.common.util.Preconditions;
-import com.bytedance.connector.hbase.HBaseHelper;
-import com.bytedance.connector.hbase.error.HBasePluginErrorCode;
-import com.bytedance.connector.hbase.option.HBaseReaderOptions;
-import com.bytedance.connector.hbase.source.split.HBaseSourceSplit;
+import com.bytedance.bitsail.connector.hbase.HBaseHelper;
+import com.bytedance.bitsail.connector.hbase.format.HBaseDeserializationFormat;
+import com.bytedance.bitsail.connector.hbase.error.HBasePluginErrorCode;
+import com.bytedance.bitsail.connector.hbase.option.HBaseReaderOptions;
+import com.bytedance.bitsail.connector.hbase.source.split.HBaseSourceSplit;
 
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
@@ -26,24 +26,14 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
-import org.apache.hadoop.hbase.mapreduce.TableSplit;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.JobContext;
-import org.apache.hadoop.mapred.JobContextImpl;
-import org.apache.hadoop.mapred.JobID;
-import org.apache.hadoop.mapred.TaskAttemptContext;
-import org.apache.hadoop.mapred.TaskAttemptContextImpl;
-import org.apache.hadoop.mapred.TaskAttemptID;
-import org.apache.hadoop.mapreduce.RecordReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -123,6 +113,9 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
                 .forEach(column -> columnFamilies.add(column.split(":")[0]));
         // this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(createTypeInfoConverter(), columnInfos);
         LOG.info("HBase source reader {} is initialized.", subTaskId);
+
+        deserializationFormat = new HBaseDeserializationFormat(jobConf);
+        deserializationSchema = deserializationFormat.createRuntimeDeserializationSchema(typeInfos);
     }
 
     @Override
@@ -130,8 +123,6 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
         tableInputFormat = new TableInputFormat();
         tableInputFormat.setConf(getConf());
         namesMap = Maps.newConcurrentMap();
-        deserializationFormat = new HBaseDeserializationFormat(inputSliceConfig);
-        deserializationSchema = deserializationFormat.createRuntimeDeserializationSchema(typeInfos);
         LOG.info("Starting config HBase input format, maybe so slow........");
     }
 
@@ -173,5 +164,12 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
     @Override
     public void close() throws Exception {
 
+    }
+
+    public JobConf getConf() {
+        JobConf jobConf = new JobConf(false);
+        jobConf.set(TableInputFormat.INPUT_TABLE, tableName);
+        hbaseConfig.forEach((key, value) -> jobConf.set(key, value.toString()));
+        return jobConf;
     }
 }
