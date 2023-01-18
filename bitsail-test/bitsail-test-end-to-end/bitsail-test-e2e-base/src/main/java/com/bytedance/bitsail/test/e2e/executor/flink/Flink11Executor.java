@@ -26,8 +26,8 @@ import java.util.List;
 public class Flink11Executor extends AbstractFlinkExecutor {
 
   @Override
-  protected String getContainerName() {
-    return "test-container-flink-1.11.6";
+  public String getContainerName() {
+    return "test-container:flink-1.11.6";
   }
 
   @Override

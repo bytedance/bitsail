@@ -16,43 +16,87 @@
 
 package com.bytedance.bitsail.test.e2e;
 
+import com.bytedance.bitsail.base.version.VersionHolder;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
+import com.bytedance.bitsail.common.util.Preconditions;
+import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 
-public class AbstractE2ETest {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public abstract class AbstractE2ETest {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractE2ETest.class);
 
   public static final String EMPTY_SOURCE = "empty";
-  public static final String ENGINE_FLINK = "flink11";
+
+  protected static final String REVISION;
+  protected static final String ROOT_DIR;
+
+  static {
+    REVISION = System.getenv(AbstractExecutor.BITSAIL_REVISION);
+    ROOT_DIR = System.getenv(AbstractExecutor.BITSAIL_ROOT_DIR);
+
+    VersionHolder versionHolder = VersionHolder.getHolder();
+    String buildVersion = versionHolder.getBuildVersion();
+    if (!VersionHolder.isBuildVersionValid(buildVersion)) {
+      try {
+        Field versionField = VersionHolder.class.getDeclaredField("gitBuildVersion");
+        versionField.setAccessible(true);
+        versionField.set(versionHolder, REVISION);
+        LOG.info("Modify build version from [{}] to [{}].", buildVersion, REVISION);
+      } catch (Exception e) {
+        throw new IllegalStateException("Failed to modify git version.", e);
+      }
+      Preconditions.checkState(REVISION.equals(VersionHolder.getHolder().getBuildVersion()));
+    }
+  }
 
   /**
    * @param jobConf Job conf to run.
    * @param engineType Executor engine type.
    * @param sourceType Reader data source type.
    * @param sinkType Writer data source type.
-   * @return Exit code of test job.
    */
-  public int submitJob(BitSailConfiguration jobConf,
+  protected static void submitJob(BitSailConfiguration jobConf,
                        String engineType,
                        String sourceType,
                        String sinkType) throws Exception {
-    TestJob testJob = TestJob.builder()
+    addCommonSettings(jobConf);
+
+    int exitCode;
+    try (TestJob testJob = TestJob.builder()
         .withJobConf(jobConf)
         .withEngineType(engineType)
         .withSourceType(sourceType)
         .withSinkType(sinkType)
-        .build();
+        .build()) {
+      exitCode = testJob.run();
+    }
 
-    return testJob.run();
+    if (exitCode != 0) {
+      throw new RuntimeException("Failed to execute job with exit code " + exitCode);
+    }
   }
 
-  public int submitJob(BitSailConfiguration jobConf, String engineType) throws Exception {
-    return submitJob(jobConf, engineType, EMPTY_SOURCE, EMPTY_SOURCE);
+  protected static void submitJob(BitSailConfiguration jobConf, String engineType) throws Exception {
+    submitJob(jobConf, engineType, EMPTY_SOURCE, EMPTY_SOURCE);
   }
 
-  public int submitFlink11Job(BitSailConfiguration jobConf, String sourceType, String sinkType) throws Exception {
-    return submitJob(jobConf, "flink11", sourceType, sinkType);
+  protected static void submitFlink11Job(BitSailConfiguration jobConf, String sourceType, String sinkType) throws Exception {
+    submitJob(jobConf, "flink11", sourceType, sinkType);
   }
 
-  public int submitFlink11Job(BitSailConfiguration jobConf) throws Exception {
-    return submitJob(jobConf, "flink11", EMPTY_SOURCE, EMPTY_SOURCE);
+  protected static void submitFlink11Job(BitSailConfiguration jobConf) throws Exception {
+    submitJob(jobConf, "flink11", EMPTY_SOURCE, EMPTY_SOURCE);
+  }
+
+  protected static void addCommonSettings(BitSailConfiguration jobConf) {
+    Path libBaseDir = Paths.get(ROOT_DIR, "libs");
+    jobConf.set(CommonOptions.JOB_PLUGIN_ROOT_PATH, libBaseDir.toString());
   }
 }

@@ -21,9 +21,9 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
-import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 import com.bytedance.bitsail.test.e2e.base.transfer.FileMappingTransfer;
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
+import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 
 import com.google.common.collect.Lists;
 import org.junit.Assert;
@@ -31,7 +31,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
@@ -39,7 +38,7 @@ import java.util.Set;
 public class FlinkExecutorTest {
 
   final String bitsailRevision = "0.2.0";
-  final String bitsailRootDir = "/Users/bytedance/Desktop/output";
+  final String bitsailRootDir = "/local/bitsail";
   final String readerClass = "com.bytedance.bitsail.connector.fake.source.FakeSource";
   final String writerClass = "com.bytedance.bitsail.connector.print.sink.PrintSink";
   final String readerLib = "/tmp/bitsail/libs/connectors/connector-fake-" + bitsailRevision + ".jar";
@@ -54,8 +53,7 @@ public class FlinkExecutorTest {
     System.setProperty(AbstractExecutor.BITSAIL_REVISION, bitsailRevision);
     System.setProperty(AbstractExecutor.BITSAIL_ROOT_DIR, bitsailRootDir);
 
-    conf = BitSailConfiguration.from(
-        new File(Paths.get(getClass().getClassLoader().getResource("fake_to_print.json").toURI()).toString()));
+    conf = BitSailConfiguration.newDefault();
     conf.set(ReaderOptions.READER_CLASS, readerClass);
     conf.set(WriterOptions.WRITER_CLASS, writerClass);
 

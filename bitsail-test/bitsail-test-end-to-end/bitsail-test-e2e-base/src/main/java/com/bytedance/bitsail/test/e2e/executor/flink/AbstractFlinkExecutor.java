@@ -19,6 +19,7 @@ package com.bytedance.bitsail.test.e2e.executor.flink;
 import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.base.packages.PluginFinderFactory;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.test.e2e.base.transfer.FileMappingTransfer;
@@ -40,6 +41,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
@@ -132,12 +134,16 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
    * Register job configuration file.
    */
   protected void registerJobConf() {
+    BitSailConfiguration jobConf = conf.clone();
+    Path libPath = Paths.get(executorRootDir, "libs").toAbsolutePath();
+    jobConf.set(CommonOptions.JOB_PLUGIN_ROOT_PATH, libPath.toString());
+
     File tmpJobConf;
     try {
       tmpJobConf = File.createTempFile("jobConf", ".json");
       tmpJobConf.deleteOnExit();
       BufferedWriter out = new BufferedWriter(new FileWriter(tmpJobConf));
-      out.write(conf.toJSON());
+      out.write(jobConf.toJSON());
       out.newLine();
       out.close();
     } catch (IOException e) {
@@ -187,6 +193,7 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
 
     String stdOut = result.getStdout();
     String stdErr = result.getStderr();
+    int exitCode = result.getExitCode();
 
     LOG.info("Finish test : [{}], Container: [{}]\n"
         + "================== STDOUT ==================\n"
@@ -196,7 +203,18 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
         + "============================================\n",
         testId, getContainerName(), stdOut == null ? "null" : stdOut, stdErr == null ? "null" : stdErr);
 
-    return result.getExitCode();
+    if (exitCode != 0) {
+      Path flinkLogPath = Paths.get(flinkRootDir, "log", "flink-*-client-*.log").toAbsolutePath();
+      result = executor.execInContainer("bash", "-c", "cat " + flinkLogPath);
+
+      LOG.error("Job exited with code {}, will print the client log now:\n"
+          + "================== CLIENT LOG ==================\n"
+          + "{}\n"
+          + "================================================\n",
+          exitCode, result.getStdout());
+    }
+
+    return exitCode;
   }
 
   @Override

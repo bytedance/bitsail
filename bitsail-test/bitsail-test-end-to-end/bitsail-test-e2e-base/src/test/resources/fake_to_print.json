@@ -7,13 +7,27 @@
       "user_name": "test"
     },
     "writer": {
-      "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink"
+      "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
+      "content_type": "json",
+      "batch_size": 10,
+      "sample_write": true,
+      "sample_limit": 10,
+      "columns": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "age",
+          "type": "int"
+        }
+      ]
     },
     "reader": {
-      "class": "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource",
-      "total_count": 300,
-      "rate": 100,
-      "random_null_rate": 0.1,
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
+      "total_count": 30,
+      "rate": 10,
+      "null_percentage": 20,
       "columns": [
         {
           "name": "name",

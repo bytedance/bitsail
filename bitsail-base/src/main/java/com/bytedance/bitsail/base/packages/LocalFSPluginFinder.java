@@ -39,7 +39,7 @@ public class LocalFSPluginFinder implements PluginFinder {
   private static final Logger LOG = LoggerFactory.getLogger(LocalFSPluginFinder.class);
 
   private static final String DEFAULT_PLUGIN_FINDER_NAME = "localFS";
-  protected List<PluginStore> pluginStores;
+  private List<PluginStore> pluginStores;
   private URLClassLoader pluginClassloader;
 
   @Override

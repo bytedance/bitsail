@@ -92,7 +92,6 @@ public class TestJob implements AutoCloseable {
     this.sourceType = sourceType.trim().toLowerCase();
     this.sinkType = sinkType.trim().toLowerCase();
     this.engineType = engineType.trim().toLowerCase();
-    this.executor = prepareExecutor(jobConf);
   }
 
   /**
@@ -103,6 +102,7 @@ public class TestJob implements AutoCloseable {
     pluginFinder.configure(jobConf);
     source = prepareSource(jobConf);
     sink = prepareSink(jobConf);
+    executor = prepareExecutor(jobConf);
   }
 
   /**
@@ -113,13 +113,17 @@ public class TestJob implements AutoCloseable {
     if ("empty".equals(sourceType)) {
       dataSource = new EmptyDataSource();
     } else {
-      dataSource = pluginFinder.findPluginInstance(sourceType);
+      try {
+        dataSource = pluginFinder.findPluginInstance(sourceType);
+      } catch (BitSailException e) {
+        dataSource = new EmptyDataSource();
+      }
     }
     dataSource.configure(jobConf);
     dataSource.start();
     dataSource.fillData();
 
-    LOG.info("DataSource {} is started as source.", sourceType);
+    LOG.info("DataSource {} is started as source in [{}].", sourceType, dataSource.getContainerName());
     return dataSource;
   };
 
@@ -131,12 +135,16 @@ public class TestJob implements AutoCloseable {
     if ("empty".equals(sinkType)) {
       dataSource = new EmptyDataSource();
     } else {
-      dataSource = pluginFinder.findPluginInstance(sinkType);
+      try {
+        dataSource = pluginFinder.findPluginInstance(sinkType);
+      } catch (BitSailException e) {
+        dataSource = new EmptyDataSource();
+      }
     }
     dataSource.configure(jobConf);
     dataSource.start();
 
-    LOG.info("DataSource {} is started as sink.", sourceType);
+    LOG.info("DataSource {} is started as sink in [{}].", sourceType, dataSource.getContainerName());
     return dataSource;
   }
 
@@ -146,8 +154,8 @@ public class TestJob implements AutoCloseable {
   protected AbstractExecutor prepareExecutor(BitSailConfiguration jobConf) {
     switch (engineType) {
       case "flink11":
-        AbstractFlinkExecutor executor = new Flink11Executor();
-        executor.setPluginFinder(pluginFinder);
+        executor = new Flink11Executor();
+        ((AbstractFlinkExecutor) executor).setPluginFinder(pluginFinder);
         break;
       default:
         throw new UnsupportedOperationException("engine type " + engineType + " is not supported yet.");

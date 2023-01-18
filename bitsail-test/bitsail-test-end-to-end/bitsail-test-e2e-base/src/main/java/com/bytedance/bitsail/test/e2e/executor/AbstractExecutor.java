@@ -59,10 +59,10 @@ public abstract class AbstractExecutor extends AbstractContainer {
    * Configure the executor before initialization.
    */
   public void configure(BitSailConfiguration executorConf) {
-    this.revision = System.getProperty(BITSAIL_REVISION);
+    this.revision = System.getenv(BITSAIL_REVISION);
+    this.localRootDir = System.getenv(BITSAIL_ROOT_DIR);
     this.transferableFiles = new HashSet<>();
     this.executorRootDir = executorConf.get(CommonOptions.E2EOptions.E2E_EXECUTOR_ROOT_DIR);
-    this.localRootDir = System.getProperty(BITSAIL_ROOT_DIR);
   }
 
   /**

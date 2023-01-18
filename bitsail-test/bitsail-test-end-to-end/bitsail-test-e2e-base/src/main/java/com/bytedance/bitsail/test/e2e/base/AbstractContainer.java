@@ -41,7 +41,7 @@ public abstract class AbstractContainer implements Closeable {
   /**
    * Identifier for each container.
    */
-  protected abstract String getContainerName();
+  public abstract String getContainerName();
 
   /**
    * Initialize network for the container.

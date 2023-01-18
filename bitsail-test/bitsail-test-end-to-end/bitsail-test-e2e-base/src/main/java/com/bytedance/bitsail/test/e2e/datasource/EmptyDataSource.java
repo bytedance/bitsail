@@ -21,8 +21,8 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 public class EmptyDataSource extends AbstractDataSource {
 
   @Override
-  protected String getContainerName() {
-    return "DATA-SOURCE:empty";
+  public String getContainerName() {
+    return "data-source:empty";
   }
 
   @Override
