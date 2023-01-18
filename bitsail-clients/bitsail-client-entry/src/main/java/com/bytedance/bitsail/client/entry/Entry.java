@@ -80,7 +80,7 @@ public class Entry {
     //load command arguments.
     BaseCommandArgs baseCommandArgs = loadCommandArguments(args);
 
-    int exit;
+    int exit = EntryConstants.ERROR_EXIT_CODE_UNKNOWN_FAILED;
     try {
       Entry entry = new Entry(sysConfiguration, baseCommandArgs);
 
@@ -90,10 +90,11 @@ public class Entry {
       exit = securityContext.doAs(
           entry::runCommand);
 
-      System.exit(exit);
     } catch (Exception e) {
       LOG.error("Exception occurred when run command .", e);
       exit = EntryConstants.ERROR_EXIT_CODE_UNKNOWN_FAILED;
+    } finally {
+      LOG.info("BitSail Job Finished.");
       System.exit(exit);
     }
   }
