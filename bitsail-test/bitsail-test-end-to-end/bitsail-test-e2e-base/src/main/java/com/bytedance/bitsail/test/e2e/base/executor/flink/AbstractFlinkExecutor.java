@@ -163,7 +163,7 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
         .withStartupAttempts(1)
         .withWorkingDirectory(executorRootDir)
         .waitingFor(new LogMessageWaitStrategy()
-        .withRegEx(".*BitSail Job Finished.*")
+        .withRegEx(".*Job with JobID .* has finished.*")
         .withStartupTimeout(Duration.ofSeconds(executeTimeout)));
 
     for (TransferableFile file : transferableFiles) {
