@@ -30,6 +30,7 @@ import com.google.common.collect.Lists;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.Container;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
@@ -48,6 +49,8 @@ import java.util.stream.Stream;
 
 public abstract class AbstractFlinkExecutor extends AbstractExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractFlinkExecutor.class);
+
+  protected static final String EXECUTOR_READY_MSG = "BitSail Test Executor Ready.";
 
   /**
    * Plugin finder to locate libs.
@@ -162,8 +165,9 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
         .withLogConsumer(new Slf4jLogConsumer(DockerLoggerFactory.getLogger(flinkDockerImage)).withSeparateOutputStreams())
         .withStartupAttempts(1)
         .withWorkingDirectory(executorRootDir)
+        .withCommand("bash", "-c", "echo " + EXECUTOR_READY_MSG + "; while true; do sleep 5; done")
         .waitingFor(new LogMessageWaitStrategy()
-        .withRegEx(".*Job with JobID .* has finished.*")
+        .withRegEx(".*" + EXECUTOR_READY_MSG + ".*")
         .withStartupTimeout(Duration.ofSeconds(executeTimeout)));
 
     for (TransferableFile file : transferableFiles) {
@@ -171,10 +175,30 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
     }
   }
 
-  public int run() {
-    executor.withCommand("bash", "-c", String.join(" ", getExecCommand()));
+  public int run(String testId) throws IOException, InterruptedException {
     Startables.deepStart(Stream.of(executor)).join();
-    return 0;
+
+    String commands = String.join(" ", getExecCommand());
+    LOG.info("Begin test: [{}], Container: [{}]\n"
+        + "=============== Test Command ===============\n"
+        + commands + "\n"
+        + "============================================\n",
+        testId, getContainerName());
+
+    Container.ExecResult result = executor.execInContainer("bash", "-c", commands);
+
+    String stdOut = result.getStdout();
+    String stdErr = result.getStderr();
+
+    LOG.info("Finish test : [{}], Container: [{}]\n"
+        + "================== STDOUT ==================\n"
+        + "{}\n"
+        + "================== STDERR ==================\n"
+        + "{}\n"
+        + "============================================\n",
+        testId, getContainerName(), stdOut == null ? "null" : stdOut, stdErr == null ? "null" : stdErr);
+
+    return result.getExitCode();
   }
 
   @Override

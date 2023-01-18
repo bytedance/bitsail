@@ -63,12 +63,12 @@ public class FakeToPrintTest {
   }
 
   @Test
-  public void testFakeToPrint() {
+  public void testFakeToPrint() throws Exception {
     Flink11Executor executor = new Flink11Executor();
     executor.setPluginFinder(mockPluginFinder);
     executor.configure(conf);
     executor.init();
-    executor.run();
+    executor.run("Fake_To_Print");
   }
 
   @After

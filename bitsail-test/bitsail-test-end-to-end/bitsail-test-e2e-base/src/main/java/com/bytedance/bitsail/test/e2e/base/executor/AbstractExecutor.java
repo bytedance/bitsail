@@ -72,6 +72,8 @@ public abstract class AbstractExecutor extends AbstractContainer {
 
   /**
    * Run BitSail job in the executor.
+   * @param testId Identification of current test case.
+   * @return Exit code of bitsail program.
    */
-  public abstract int run() throws Exception;
+  public abstract int run(String testId) throws Exception;
 }

@@ -51,7 +51,7 @@ public class TestJob implements AutoCloseable {
 
     int exitCode;
     try {
-      exitCode =  executor.run();
+      exitCode = executor.run("test");
     } catch (Exception e) {
       e.printStackTrace();
       throw e;
