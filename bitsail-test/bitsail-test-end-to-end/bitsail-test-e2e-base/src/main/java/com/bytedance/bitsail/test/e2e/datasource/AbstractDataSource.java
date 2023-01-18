@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.e2e.base.datasource;
+package com.bytedance.bitsail.test.e2e.datasource;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
@@ -44,6 +44,9 @@ public abstract class AbstractDataSource extends AbstractContainer {
 
   /**
    * Validate data if it is for sink.
+   * @throws BitSailException Throws BitSailException when validation is not passed.
    */
-  public abstract void validate() throws BitSailException;
+  public void validate() throws BitSailException {
+
+  }
 }

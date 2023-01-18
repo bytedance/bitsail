@@ -14,23 +14,34 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.e2e.base;
+package com.bytedance.bitsail.test.e2e.datasource;
 
-import com.bytedance.bitsail.common.option.ConfigOption;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
-import static com.bytedance.bitsail.common.option.CommonOptions.COMMON_PREFIX;
-import static com.bytedance.bitsail.common.option.ConfigOptions.key;
+public class EmptyDataSource extends AbstractDataSource {
 
-public interface TestOptions {
+  @Override
+  protected String getContainerName() {
+    return "DATA-SOURCE:empty";
+  }
 
-  /**
-   * Root dir of e2e test.
-   */
-  ConfigOption<String> PROJECT_ROOT_DIR =
-      key(COMMON_PREFIX + "executor_root_dir")
-          .defaultValue("/opt/bitsail");
+  @Override
+  protected void initNetwork() {
 
-  ConfigOption<Integer> TEST_TIMEOUT =
-      key(COMMON_PREFIX + "executor_timeout")
-          .defaultValue(300);
+  }
+
+  @Override
+  public void configure(BitSailConfiguration dataSourceConf) {
+
+  }
+
+  @Override
+  public void start() {
+
+  }
+
+  @Override
+  public void fillData() {
+
+  }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bigsail.component.format.json;
+package com.bytedance.bitsail.component.format.json;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;

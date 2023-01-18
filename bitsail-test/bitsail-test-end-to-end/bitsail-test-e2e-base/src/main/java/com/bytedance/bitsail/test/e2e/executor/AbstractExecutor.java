@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.e2e.base.executor;
+package com.bytedance.bitsail.test.e2e.executor;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.test.e2e.base.AbstractContainer;
-import com.bytedance.bitsail.test.e2e.base.TestOptions;
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
 
 import lombok.Data;
@@ -61,7 +61,7 @@ public abstract class AbstractExecutor extends AbstractContainer {
   public void configure(BitSailConfiguration executorConf) {
     this.revision = System.getProperty(BITSAIL_REVISION);
     this.transferableFiles = new HashSet<>();
-    this.executorRootDir = executorConf.get(TestOptions.PROJECT_ROOT_DIR);
+    this.executorRootDir = executorConf.get(CommonOptions.E2EOptions.E2E_EXECUTOR_ROOT_DIR);
     this.localRootDir = System.getProperty(BITSAIL_ROOT_DIR);
   }
 

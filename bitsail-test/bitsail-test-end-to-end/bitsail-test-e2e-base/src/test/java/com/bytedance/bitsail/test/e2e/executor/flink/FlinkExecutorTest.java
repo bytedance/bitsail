@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.e2e.base.executor.flink;
+package com.bytedance.bitsail.test.e2e.executor.flink;
 
 import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
-import com.bytedance.bitsail.test.e2e.base.TestOptions;
-import com.bytedance.bitsail.test.e2e.base.executor.AbstractExecutor;
+import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 import com.bytedance.bitsail.test.e2e.base.transfer.FileMappingTransfer;
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
 
@@ -83,7 +83,8 @@ public class FlinkExecutorTest {
         "libs/connectors/mapping/"
     );
 
-    FileMappingTransfer transfer = new FileMappingTransfer(bitsailRootDir, conf.get(TestOptions.PROJECT_ROOT_DIR));
+    FileMappingTransfer transfer = new FileMappingTransfer(bitsailRootDir,
+        conf.get(CommonOptions.E2EOptions.E2E_EXECUTOR_ROOT_DIR));
     for (String expectFile : expectedFiles) {
       TransferableFile file = transfer.transfer(expectFile);
       Assert.assertTrue(actualFiles.contains(file));

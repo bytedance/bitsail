@@ -20,20 +20,18 @@ import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
-import com.bytedance.bitsail.test.e2e.base.executor.AbstractExecutor;
-import com.bytedance.bitsail.test.e2e.base.executor.flink.Flink11Executor;
+import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
+import com.bytedance.bitsail.test.e2e.executor.flink.Flink11Executor;
 
 import com.google.common.collect.Lists;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.io.File;
 import java.nio.file.Paths;
 
-@Ignore
 public class FakeToPrintTest {
 
   final String bitsailRevision = "0.2.0-SNAPSHOT";

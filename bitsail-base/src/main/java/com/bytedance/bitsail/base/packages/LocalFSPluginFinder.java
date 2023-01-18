@@ -39,7 +39,7 @@ public class LocalFSPluginFinder implements PluginFinder {
   private static final Logger LOG = LoggerFactory.getLogger(LocalFSPluginFinder.class);
 
   private static final String DEFAULT_PLUGIN_FINDER_NAME = "localFS";
-  private List<PluginStore> pluginStores;
+  protected List<PluginStore> pluginStores;
   private URLClassLoader pluginClassloader;
 
   @Override
@@ -65,6 +65,14 @@ public class LocalFSPluginFinder implements PluginFinder {
     pluginStores.add(PluginStore.builder()
         .pluginBaseDirPath(frameworkBaseDirPath.resolve(engineDirName))
         .pluginMappingBaseDirPath(frameworkBaseDirPath.resolve(engineMappingDirName))
+        .build());
+
+    String datasourceDirName = commonConfiguration.get(CommonOptions.E2EOptions.E2E_DATASOURCE_DIR_NAME);
+    String datasourceMappingDirName = commonConfiguration.get(CommonOptions.E2EOptions.E2E_DATASOURCE_MAPPING_DIR_NAME);
+
+    pluginStores.add(PluginStore.builder()
+        .pluginBaseDirPath(frameworkBaseDirPath.resolve(datasourceDirName))
+        .pluginMappingBaseDirPath(frameworkBaseDirPath.resolve(datasourceMappingDirName))
         .build());
 
     this.pluginClassloader = URLClassLoader.newInstance(new URL[] {}, Thread.currentThread()

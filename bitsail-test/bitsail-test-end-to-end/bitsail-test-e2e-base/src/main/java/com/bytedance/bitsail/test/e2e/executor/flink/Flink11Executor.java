@@ -14,42 +14,40 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.e2e.base.datasource;
+package com.bytedance.bitsail.test.e2e.executor.flink;
 
-import com.bytedance.bitsail.common.BitSailException;
-import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.google.common.collect.Lists;
+import lombok.NoArgsConstructor;
 
-import org.testcontainers.containers.Network;
+import java.nio.file.Paths;
+import java.util.List;
 
-public class EmptyDataSource extends AbstractDataSource {
+@NoArgsConstructor
+public class Flink11Executor extends AbstractFlinkExecutor {
 
   @Override
   protected String getContainerName() {
-    return "DATA-SOURCE:empty";
+    return "test-container-flink-1.11.6";
   }
 
   @Override
-  protected void initNetwork() {
-
+  protected String getFlinkDockerImage() {
+    return "flink:1.11.6";
   }
 
   @Override
-  public void configure(BitSailConfiguration dataSourceConf) {
-
+  protected String getFlinkRootDir() {
+    return "/opt/flink";
   }
 
   @Override
-  public void start() {
-
-  }
-
-  @Override
-  public void fillData() {
-
-  }
-
-  @Override
-  public void validate() throws BitSailException {
-
+  protected List<String> getExecCommand() {
+    return Lists.newArrayList(
+        "bin/bitsail run",
+        "--engine flink",
+        "--execution-mode run",
+        "--deployment-mode local",
+        "--conf " + Paths.get(executorRootDir, "/jobConf.json")
+    );
   }
 }

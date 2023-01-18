@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.e2e.base.executor.flink;
+package com.bytedance.bitsail.test.e2e.executor.flink;
 
 import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.base.packages.PluginFinderFactory;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
-import com.bytedance.bitsail.test.e2e.base.TestOptions;
-import com.bytedance.bitsail.test.e2e.base.executor.AbstractExecutor;
 import com.bytedance.bitsail.test.e2e.base.transfer.FileMappingTransfer;
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
+import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 
 import com.google.common.collect.Lists;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
@@ -55,8 +53,7 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
   /**
    * Plugin finder to locate libs.
    */
-  @Setter
-  protected static PluginFinder pluginFinder = PluginFinderFactory.getPluginFinder("localFS");
+  protected PluginFinder pluginFinder;
 
   /**
    * Whole test configuration.
@@ -73,22 +70,23 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
    */
   protected GenericContainer<?> executor;
 
-  /**
-   * Timeout of test in seconds.
-   */
-  protected int executeTimeout;
-
   @Override
   public void configure(BitSailConfiguration executorConf) {
     super.configure(executorConf);
     this.conf = executorConf;
     this.flinkRootDir = getFlinkRootDir();
-    this.executeTimeout = executorConf.get(TestOptions.TEST_TIMEOUT);
 
+    setPluginFinder(PluginFinderFactory.getPluginFinder("localFS"));
     registerEngine();
     registerConnector(conf.get(ReaderOptions.READER_CLASS));
     registerConnector(conf.get(WriterOptions.WRITER_CLASS));
     registerJobConf();
+  }
+
+  public void setPluginFinder(PluginFinder pluginFinder) {
+    if (this.pluginFinder == null) {
+      this.pluginFinder = pluginFinder;
+    }
   }
 
   /**
@@ -168,7 +166,7 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
         .withCommand("bash", "-c", "echo " + EXECUTOR_READY_MSG + "; while true; do sleep 5; done")
         .waitingFor(new LogMessageWaitStrategy()
         .withRegEx(".*" + EXECUTOR_READY_MSG + ".*")
-        .withStartupTimeout(Duration.ofSeconds(executeTimeout)));
+        .withStartupTimeout(Duration.ofSeconds(30)));
 
     for (TransferableFile file : transferableFiles) {
       copyToContainer(executor, file);

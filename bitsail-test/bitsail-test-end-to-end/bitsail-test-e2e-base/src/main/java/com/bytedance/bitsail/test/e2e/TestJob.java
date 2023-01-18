@@ -16,55 +16,226 @@
 
 package com.bytedance.bitsail.test.e2e;
 
+import com.bytedance.bitsail.base.packages.LocalFSPluginFinder;
+import com.bytedance.bitsail.base.packages.PluginFinder;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.test.e2e.base.datasource.AbstractDataSource;
-import com.bytedance.bitsail.test.e2e.base.executor.AbstractExecutor;
+import com.bytedance.bitsail.common.util.Preconditions;
+import com.bytedance.bitsail.test.e2e.datasource.AbstractDataSource;
+import com.bytedance.bitsail.test.e2e.datasource.EmptyDataSource;
+import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
+import com.bytedance.bitsail.test.e2e.executor.flink.AbstractFlinkExecutor;
+import com.bytedance.bitsail.test.e2e.executor.flink.Flink11Executor;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @AllArgsConstructor
 @Builder
 public class TestJob implements AutoCloseable {
+  private static final Logger LOG = LoggerFactory.getLogger(TestJob.class);
 
+  public static final int SUCCESS_EXIT_CODE = 0;
+  public static final int FAILURE_EXIT_CODE = 1;
+  public static final int VALIDATION_EXIT_CODE = 2;
+
+  /**
+   * Format the test case name, test_{sourceType}_to_{sinkType}_on_{engine_type}.
+   */
+  protected static final String TEST_CASE_NAME_TEMPLATE = "test_%s_to_%s_on_%s";
+
+  /**
+   * Job conf to run.
+   */
+  protected final BitSailConfiguration jobConf;
+
+  /**
+   * Engine type.
+   */
+  protected final String engineType;
+
+  /**
+   * Data source type for reader.
+   */
+  protected final String sourceType;
+
+  /**
+   * Data source type for writer.
+   */
+  protected final String sinkType;
+
+  /**
+   * Plugin finder for loading datasource and engine libs.
+   */
+  protected PluginFinder pluginFinder;
+
+  /**
+   * Data source for reader.
+   */
   protected AbstractDataSource source;
+
+  /**
+   * Data source for writer.
+   */
   protected AbstractDataSource sink;
+
+  /**
+   * Executor.
+   */
   protected AbstractExecutor executor;
 
-  protected void prepareSource(BitSailConfiguration sourceConf) {
-    source.configure(sourceConf);
-    source.start();
-    source.fillData();
+  TestJob(BitSailConfiguration jobConf, String sourceType, String sinkType, String engineType) {
+    this.jobConf = jobConf;
+    this.sourceType = sourceType.trim().toLowerCase();
+    this.sinkType = sinkType.trim().toLowerCase();
+    this.engineType = engineType.trim().toLowerCase();
+    this.executor = prepareExecutor(jobConf);
   }
 
-  protected void prepareSink(BitSailConfiguration sinkConf) {
-    sink.configure(sinkConf);
-    sink.start();
+  /**
+   * Prepare data sources and executor.
+   */
+  protected void init() {
+    pluginFinder = new LocalFSPluginFinder();
+    pluginFinder.configure(jobConf);
+    source = prepareSource(jobConf);
+    sink = prepareSink(jobConf);
   }
 
-  public int run(BitSailConfiguration testConf) throws Exception {
-    prepareSource(testConf);
-    prepareSink(testConf);
+  /**
+   * Create data source for reader.
+   */
+  protected AbstractDataSource prepareSource(BitSailConfiguration jobConf) {
+    AbstractDataSource dataSource;
+    if ("empty".equals(sourceType)) {
+      dataSource = new EmptyDataSource();
+    } else {
+      dataSource = pluginFinder.findPluginInstance(sourceType);
+    }
+    dataSource.configure(jobConf);
+    dataSource.start();
+    dataSource.fillData();
 
-    executor.configure(testConf);
+    LOG.info("DataSource {} is started as source.", sourceType);
+    return dataSource;
+  };
+
+  /**
+   * Create data source for writer.
+   */
+  protected AbstractDataSource prepareSink(BitSailConfiguration jobConf) {
+    AbstractDataSource dataSource;
+    if ("empty".equals(sinkType)) {
+      dataSource = new EmptyDataSource();
+    } else {
+      dataSource = pluginFinder.findPluginInstance(sinkType);
+    }
+    dataSource.configure(jobConf);
+    dataSource.start();
+
+    LOG.info("DataSource {} is started as sink.", sourceType);
+    return dataSource;
+  }
+
+  /**
+   * Create test executor.
+   */
+  protected AbstractExecutor prepareExecutor(BitSailConfiguration jobConf) {
+    switch (engineType) {
+      case "flink11":
+        AbstractFlinkExecutor executor = new Flink11Executor();
+        executor.setPluginFinder(pluginFinder);
+        break;
+      default:
+        throw new UnsupportedOperationException("engine type " + engineType + " is not supported yet.");
+    }
+
+    executor.configure(jobConf);
     executor.init();
+    return executor;
+  }
+
+  /**
+   * Run a job.
+   */
+  public int run() throws Exception {
+    init();
 
     int exitCode;
     try {
-      exitCode = executor.run("test");
+      exitCode = executor.run(String.format(TEST_CASE_NAME_TEMPLATE, sourceType, sinkType, engineType));
     } catch (Exception e) {
       e.printStackTrace();
       throw e;
     }
-    sink.validate();
+
+    if (exitCode != 0) {
+      LOG.error("Test return code is {}, will directly exit.", exitCode);
+      return exitCode;
+    }
+
+    try {
+      sink.validate();
+    } catch (BitSailException ex) {
+      LOG.error("Failed to validate sink data after job.", ex);
+      return VALIDATION_EXIT_CODE;
+    }
 
     return exitCode;
   }
 
   @Override
-  public void close() throws Exception {
-    executor.close();
-    source.close();
-    sink.close();
+  public void close() {
+    IOUtils.closeQuietly(executor);
+    IOUtils.closeQuietly(source);
+    IOUtils.closeQuietly(sink);
+  }
+
+  /**
+   * @return A Job Builder.
+   */
+  public static TestJobBuilder builder() {
+    return new TestJobBuilder();
+  }
+
+  /**
+   * Job Builder.
+   */
+  public static class TestJobBuilder {
+    private BitSailConfiguration jobConf;
+    private String sourceType;
+    private String sinkType;
+    private String engineType;
+
+    public TestJobBuilder withJobConf(BitSailConfiguration jobConf) {
+      this.jobConf = jobConf;
+      return this;
+    }
+
+    public TestJobBuilder withSourceType(String sourceType) {
+      this.sourceType = sourceType;
+      return this;
+    }
+
+    public TestJobBuilder withSinkType(String sinkType) {
+      this.sinkType = sinkType;
+      return this;
+    }
+
+    public TestJobBuilder withEngineType(String engineType) {
+      this.engineType = engineType;
+      return this;
+    }
+
+    public TestJob build() {
+      Preconditions.checkNotNull(jobConf);
+      Preconditions.checkNotNull(sourceType);
+      Preconditions.checkNotNull(sinkType);
+      Preconditions.checkNotNull(engineType);
+      return new TestJob(jobConf, sourceType, sinkType, engineType);
+    }
   }
 }
