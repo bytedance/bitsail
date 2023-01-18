@@ -16,13 +16,21 @@
 
 package com.bytedance.bitsail.test.e2e.executor;
 
+import com.bytedance.bitsail.base.version.VersionHolder;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
+import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.test.e2e.base.AbstractContainer;
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
 
 import lombok.Data;
+import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,6 +39,7 @@ import java.util.Set;
  */
 @Data
 public abstract class AbstractExecutor extends AbstractContainer {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractExecutor.class);
 
   public static final String BITSAIL_REVISION = "bitsail.revision";
   public static final String BITSAIL_ROOT_DIR = "bitsail.rootDir";
@@ -53,14 +62,38 @@ public abstract class AbstractExecutor extends AbstractContainer {
   /**
    * Local project dir.
    */
-  protected String localRootDir;
+  @Getter
+  protected static String localRootDir;
+
+  static {
+    // init project root dir
+    String envRootDir = System.getenv(AbstractExecutor.BITSAIL_ROOT_DIR);
+    if (envRootDir != null && new File(envRootDir).exists()) {
+      localRootDir = envRootDir;
+    } else {
+      try {
+        Path curPath = Paths.get(AbstractExecutor.class
+            .getProtectionDomain()
+            .getCodeSource()
+            .getLocation()
+            .toURI());
+        Path e2eModule = curPath.getParent().getParent().getParent();
+        Path projectDir = e2eModule.getParent().getParent();
+        Path outputDir = projectDir.resolve("output");
+        localRootDir = outputDir.toAbsolutePath().toString();
+      } catch (Exception e) {
+        throw new IllegalStateException("Failed to locate project dir.", e);
+      }
+    }
+    Preconditions.checkState(new File(localRootDir).exists());
+    LOG.info("Detect project root dir: {}", localRootDir);
+  }
 
   /**
    * Configure the executor before initialization.
    */
   public void configure(BitSailConfiguration executorConf) {
-    this.revision = System.getenv(BITSAIL_REVISION);
-    this.localRootDir = System.getenv(BITSAIL_ROOT_DIR);
+    this.revision = VersionHolder.getHolder().getBuildVersion();
     this.transferableFiles = new HashSet<>();
     this.executorRootDir = executorConf.get(CommonOptions.E2EOptions.E2E_EXECUTOR_ROOT_DIR);
   }

@@ -34,26 +34,27 @@ public abstract class AbstractE2ETest {
 
   public static final String EMPTY_SOURCE = "empty";
 
-  protected static final String REVISION;
-  protected static final String ROOT_DIR;
-
   static {
-    REVISION = System.getenv(AbstractExecutor.BITSAIL_REVISION);
-    ROOT_DIR = System.getenv(AbstractExecutor.BITSAIL_ROOT_DIR);
+    // init build version
+    final String finalRevision;
 
     VersionHolder versionHolder = VersionHolder.getHolder();
     String buildVersion = versionHolder.getBuildVersion();
-    if (!VersionHolder.isBuildVersionValid(buildVersion)) {
+    if (VersionHolder.isBuildVersionValid(buildVersion)) {
+      finalRevision = buildVersion;
+    } else {
+      finalRevision = System.getenv(AbstractExecutor.BITSAIL_REVISION);
       try {
         Field versionField = VersionHolder.class.getDeclaredField("gitBuildVersion");
         versionField.setAccessible(true);
-        versionField.set(versionHolder, REVISION);
-        LOG.info("Modify build version from [{}] to [{}].", buildVersion, REVISION);
+        versionField.set(versionHolder, finalRevision);
+        LOG.info("Modify build version from [{}] to [{}].", buildVersion, finalRevision);
       } catch (Exception e) {
         throw new IllegalStateException("Failed to modify git version.", e);
       }
-      Preconditions.checkState(REVISION.equals(VersionHolder.getHolder().getBuildVersion()));
     }
+    Preconditions.checkState(VersionHolder.isBuildVersionValid(finalRevision));
+    LOG.info("Detect build version: {}", finalRevision);
   }
 
   /**
@@ -96,7 +97,7 @@ public abstract class AbstractE2ETest {
   }
 
   protected static void addCommonSettings(BitSailConfiguration jobConf) {
-    Path libBaseDir = Paths.get(ROOT_DIR, "libs");
+    Path libBaseDir = Paths.get(AbstractExecutor.getLocalRootDir(), "libs");
     jobConf.set(CommonOptions.JOB_PLUGIN_ROOT_PATH, libBaseDir.toString());
   }
 }
