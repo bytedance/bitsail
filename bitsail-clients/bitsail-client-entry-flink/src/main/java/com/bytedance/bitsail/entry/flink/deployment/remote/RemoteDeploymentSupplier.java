@@ -14,60 +14,47 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.entry.flink.deployment.yarn;
+package com.bytedance.bitsail.entry.flink.deployment.remote;
 
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.exception.CommonErrorCode;
-import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 /**
- * Created 2022/8/8
+ * Run flink job in flink session.
  */
-public class YarnDeploymentSupplier implements DeploymentSupplier {
-
-  private static final String DEPLOYMENT_YARN_PER_JOB = "yarn-per-job";
-  private static final String DEPLOYMENT_YARN_SESSION = "yarn-session";
-  private static final String DEPLOYMENT_YARN_APPLICATION = "yarn-application";
+public class RemoteDeploymentSupplier implements DeploymentSupplier {
+  private static final Logger LOG = LoggerFactory.getLogger(RemoteDeploymentSupplier.class);
+  private static final String DEPLOYMENT_REMOTE = "remote";
 
   private FlinkRunCommandArgs flinkCommandArgs;
-
-  private BitSailConfiguration jobConfiguration;
-
-  private String deploymentMode;
 
   @Override
   public boolean accept(FlinkRunCommandArgs flinkCommandArgs) {
     String deploymentMode = flinkCommandArgs.getDeploymentMode().toLowerCase().trim();
-    return deploymentMode.equals(DEPLOYMENT_YARN_PER_JOB)
-        || deploymentMode.equals(DEPLOYMENT_YARN_SESSION)
-        || deploymentMode.equals(DEPLOYMENT_YARN_APPLICATION);
+    return deploymentMode.equals(DEPLOYMENT_REMOTE);
   }
 
   @Override
   public void configure(FlinkRunCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
     this.flinkCommandArgs = flinkCommandArgs;
-    this.jobConfiguration = jobConfiguration;
-    this.deploymentMode = flinkCommandArgs.getDeploymentMode();
   }
 
   @Override
   public void addDeploymentCommands(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
-    flinkCommands.add("-t");
-    flinkCommands.add(deploymentMode);
-
-    baseCommandArgs.getProperties()
-        .put("yarn.application.name", jobConfiguration.getNecessaryOption(
-            CommonOptions.JOB_NAME, CommonErrorCode.CONFIG_ERROR));
-
-    baseCommandArgs.getProperties()
-        .put("yarn.application.queue", flinkCommandArgs.getQueue());
-
-    baseCommandArgs.getProperties()
-        .put("yarn.application.priority", String.valueOf(flinkCommandArgs.getPriority()));
+    String jobManagerAddress = flinkCommandArgs.getJobManagerAddress();
+    if (StringUtils.isNotEmpty(jobManagerAddress)) {
+      flinkCommands.add("-m");
+      flinkCommands.add(jobManagerAddress);
+    } else {
+      LOG.info("Job manager is not specified. Job will be submit to default job manager.");
+    }
   }
 }

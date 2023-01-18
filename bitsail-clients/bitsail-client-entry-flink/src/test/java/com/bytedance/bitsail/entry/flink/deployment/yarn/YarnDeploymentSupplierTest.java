@@ -41,7 +41,8 @@ public class YarnDeploymentSupplierTest {
     BitSailConfiguration conf = BitSailConfiguration.newDefault();
     conf.set(CommonOptions.JOB_NAME, "test");
 
-    YarnDeploymentSupplier deploymentSupplier = new YarnDeploymentSupplier(flinkRunCommandArgs, conf);
+    YarnDeploymentSupplier deploymentSupplier = new YarnDeploymentSupplier();
+    deploymentSupplier.configure(flinkRunCommandArgs, conf);
     BaseCommandArgs baseCommandArgs = new BaseCommandArgs();
     List<String> flinkCommands = new ArrayList<>();
     deploymentSupplier.addDeploymentCommands(baseCommandArgs, flinkCommands);
