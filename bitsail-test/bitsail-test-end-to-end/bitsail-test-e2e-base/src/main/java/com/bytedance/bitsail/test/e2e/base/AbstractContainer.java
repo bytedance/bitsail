@@ -57,6 +57,17 @@ public abstract class AbstractContainer implements Closeable {
   }
 
   /**
+   * Close without exception threw.
+   */
+  public void closeQuietly() {
+    try {
+      close();
+    } catch (IOException e) {
+      LOG.warn("Ignore exception when closing {}", getContainerName(), e);
+    }
+  }
+
+  /**
    * Copy file from host to container.
    */
   protected static void copyToContainer(GenericContainer<?> container, TransferableFile file) {

@@ -29,7 +29,6 @@ import com.bytedance.bitsail.test.e2e.executor.flink.Flink11Executor;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -197,9 +196,9 @@ public class TestJob implements AutoCloseable {
 
   @Override
   public void close() {
-    IOUtils.closeQuietly(executor);
-    IOUtils.closeQuietly(source);
-    IOUtils.closeQuietly(sink);
+    executor.closeQuietly();
+    source.closeQuietly();
+    sink.closeQuietly();
   }
 
   /**
