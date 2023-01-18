@@ -72,13 +72,8 @@ public abstract class AbstractExecutor extends AbstractContainer {
       localRootDir = envRootDir;
     } else {
       try {
-        Path curPath = Paths.get(AbstractExecutor.class
-            .getProtectionDomain()
-            .getCodeSource()
-            .getLocation()
-            .toURI());
-        Path e2eModule = curPath.getParent().getParent().getParent();
-        Path projectDir = e2eModule.getParent().getParent();
+        Path curPath = Paths.get(System.getProperty("user.dir"));
+        Path projectDir = curPath.getParent().getParent().getParent();
         Path outputDir = projectDir.resolve("output");
         localRootDir = outputDir.toAbsolutePath().toString();
       } catch (Exception e) {
