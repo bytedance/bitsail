@@ -42,6 +42,7 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractFlinkExecutor.class);
 
   protected static final String EXECUTOR_READY_MSG = "BitSail Test Executor Ready.";
+  protected static final int EXECUTOR_READY_TIMEOUT = 30;
 
   /**
    * Whole test configuration.
@@ -88,7 +89,7 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
         .withCommand("bash", "-c", String.join(" ;", initCommands))
         .waitingFor(new LogMessageWaitStrategy()
         .withRegEx(".*" + EXECUTOR_READY_MSG + ".*")
-        .withStartupTimeout(Duration.ofSeconds(30)));
+        .withStartupTimeout(Duration.ofSeconds(EXECUTOR_READY_TIMEOUT)));
 
     for (TransferableFile file : transferableFiles) {
       copyToContainer(executor, file);

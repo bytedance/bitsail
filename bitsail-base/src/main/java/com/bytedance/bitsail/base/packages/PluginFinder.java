@@ -25,7 +25,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 public interface PluginFinder extends Serializable, ComponentBuilder<Void> {

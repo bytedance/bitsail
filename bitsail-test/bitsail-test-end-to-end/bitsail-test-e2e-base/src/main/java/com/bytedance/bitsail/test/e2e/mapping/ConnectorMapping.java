@@ -109,9 +109,9 @@ public class ConnectorMapping {
 
   @AllArgsConstructor
   static class ConnectorInfo {
-    final private Plugin plugin;        // content of mapping file
-    final private String connectorPath; // module path
-    final private String mappingPath;   // path of mapping file
+    private final Plugin plugin;        // content of mapping file
+    private final String connectorPath; // module path
+    private final String mappingPath;   // path of mapping file
 
     public boolean match(String canonicalName) {
       if (canonicalName == null) {

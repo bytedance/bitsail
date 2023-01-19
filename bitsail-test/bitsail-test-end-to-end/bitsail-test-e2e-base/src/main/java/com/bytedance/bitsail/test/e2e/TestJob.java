@@ -103,7 +103,7 @@ public class TestJob implements AutoCloseable {
       dataSource = new EmptyDataSource();
     } else {
       try {
-        // todo: 修改这里，支持动态加载
+        // todo: add dynamic load here
         dataSource = new EmptyDataSource();
       } catch (BitSailException e) {
         dataSource = new EmptyDataSource();
@@ -115,7 +115,7 @@ public class TestJob implements AutoCloseable {
 
     LOG.info("DataSource {} is started as source in [{}].", sourceType, dataSource.getContainerName());
     return dataSource;
-  };
+  }
 
   /**
    * Create data source for writer.
@@ -126,7 +126,7 @@ public class TestJob implements AutoCloseable {
       dataSource = new EmptyDataSource();
     } else {
       try {
-        // todo: 修改这里，支持动态加载
+        // todo: add dynamic load here
         dataSource = new EmptyDataSource();
       } catch (BitSailException e) {
         dataSource = new EmptyDataSource();
