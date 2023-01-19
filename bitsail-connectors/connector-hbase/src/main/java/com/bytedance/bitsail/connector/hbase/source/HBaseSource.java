@@ -12,6 +12,8 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
+import com.bytedance.bitsail.connector.hbase.constant.HBaseConstants;
+import com.bytedance.bitsail.connector.hbase.option.HBaseReaderOptions;
 import com.bytedance.bitsail.connector.hbase.source.split.HBaseSourceSplit;
 import com.bytedance.bitsail.connector.hbase.source.reader.HBaseSourceReader;
 import com.bytedance.bitsail.connector.hbase.source.split.coordinator.HBaseSourceSplitCoordinator;
@@ -39,7 +41,7 @@ public class HBaseSource implements Source<Row, HBaseSourceSplit, EmptyState>, P
     }
 
     @Override
-    public SourceSplitCoordinator<HBaseSource, EmptyState> createSplitCoordinator(
+    public SourceSplitCoordinator<HBaseSourceSplit, EmptyState> createSplitCoordinator(
             SourceSplitCoordinator.Context<HBaseSourceSplit, EmptyState> coordinatorContext) {
         return new HBaseSourceSplitCoordinator(coordinatorContext, jobConf);
     }

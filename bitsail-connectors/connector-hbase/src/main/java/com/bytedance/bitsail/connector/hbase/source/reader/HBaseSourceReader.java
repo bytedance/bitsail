@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -64,6 +65,10 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
 
     private transient Result value;
 
+    private boolean hasNoMoreSplits = false;
+    private int totalSplitNum = 0;
+    private final Deque<HBaseSourceSplit> splits;
+    private final transient HBaseRowDeserializer rowDeserializer;
     private TypeInfo<?>[] typeInfos;
     private RowTypeInfo rowTypeInfo;
     private List<String> columnNames;
@@ -108,14 +113,16 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
 
         // Check if input column names are in format: [ columnFamily:column ].
         this.columnNames.stream().peek(column -> Preconditions.checkArgument(
-                        (column.contains(":") && column.split(":").length == 2) || ROW_KEY.equalsIgnoreCase(column),
+                (column.contains(":") && column.split(":").length == 2) ||
+                            ROW_KEY.equalsIgnoreCase(column),
                         "Invalid column names, it should be [ColumnFamily:Column] format"))
                 .forEach(column -> columnFamilies.add(column.split(":")[0]));
         // this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(createTypeInfoConverter(), columnInfos);
         LOG.info("HBase source reader {} is initialized.", subTaskId);
 
-        deserializationFormat = new HBaseDeserializationFormat(jobConf);
-        deserializationSchema = deserializationFormat.createRuntimeDeserializationSchema(typeInfos);
+        this.splits = new ConcurrentLinkedDeque<>();
+        this.deserializationFormat = new HBaseDeserializationFormat(jobConf);
+        this.deserializationSchema = deserializationFormat.createRuntimeDeserializationSchema(typeInfos);
     }
 
     @Override
@@ -132,13 +139,18 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
     }
 
     @Override
-    public void addSplits(List<HBaseSourceSplit> splits) {
-
+    public void addSplits(List<HBaseSourceSplit> splitList) {
+        totalSplitNum += splitList.size();
+        splits.addAll(splitList);
     }
 
     @Override
     public boolean hasMoreElements() {
-        return false;
+        if (hasNoMoreSplits && splits.isEmpty() && currentScanner == null) {
+            LOG.info("Finish reading all {} splits.", totalSplitNum);
+            return false;
+        }
+        return true;
     }
 
     @Override
