@@ -67,14 +67,6 @@ public class LocalFSPluginFinder implements PluginFinder {
         .pluginMappingBaseDirPath(frameworkBaseDirPath.resolve(engineMappingDirName))
         .build());
 
-    String datasourceDirName = commonConfiguration.get(CommonOptions.E2EOptions.E2E_DATASOURCE_DIR_NAME);
-    String datasourceMappingDirName = commonConfiguration.get(CommonOptions.E2EOptions.E2E_DATASOURCE_MAPPING_DIR_NAME);
-
-    pluginStores.add(PluginStore.builder()
-        .pluginBaseDirPath(frameworkBaseDirPath.resolve(datasourceDirName))
-        .pluginMappingBaseDirPath(frameworkBaseDirPath.resolve(datasourceMappingDirName))
-        .build());
-
     this.pluginClassloader = URLClassLoader.newInstance(new URL[] {}, Thread.currentThread()
         .getContextClassLoader());
   }
@@ -103,7 +95,7 @@ public class LocalFSPluginFinder implements PluginFinder {
   }
 
   @Override
-  public List<URL> loadPlugin(String canonicalName) {
+  public void loadPlugin(String canonicalName) {
     List<URL> pluginUrls = null;
     for (PluginStore pluginStore : pluginStores) {
       pluginUrls = pluginStore.getPluginUrls(canonicalName);
@@ -119,7 +111,6 @@ public class LocalFSPluginFinder implements PluginFinder {
     }
 
     tryAddPluginToClassloader(pluginClassloader, pluginUrls);
-    return pluginUrls;
   }
 
   @Override

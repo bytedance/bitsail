@@ -75,7 +75,7 @@ public class FlinkExecutorTest {
     );
 
     FileMappingTransfer transfer = new FileMappingTransfer(bitsailRootDir,
-        conf.get(CommonOptions.E2EOptions.E2E_EXECUTOR_ROOT_DIR));
+        conf.get(CommonOptions.E2E_EXECUTOR_ROOT_DIR));
     for (String expectFile : expectedFiles) {
       TransferableFile file = transfer.transfer(expectFile);
       Assert.assertTrue(actualFiles.contains(file));

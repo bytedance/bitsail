@@ -43,7 +43,7 @@ public interface PluginFinder extends Serializable, ComponentBuilder<Void> {
   /**
    * Load plugin jar to the plugin finder.
    */
-  List<URL> loadPlugin(String plugin);
+  void loadPlugin(String plugin);
 
   /**
    * Get all founded plugins

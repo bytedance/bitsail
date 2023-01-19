@@ -102,7 +102,7 @@ public abstract class AbstractExecutor extends AbstractContainer {
     this.executorConf = executorConf;
     this.revision = VersionHolder.getHolder().getBuildVersion();
     this.transferableFiles = new HashSet<>();
-    this.executorRootDir = executorConf.get(CommonOptions.E2EOptions.E2E_EXECUTOR_ROOT_DIR);
+    this.executorRootDir = executorConf.get(CommonOptions.E2E_EXECUTOR_ROOT_DIR);
 
     try {
       initBitsailLibs();

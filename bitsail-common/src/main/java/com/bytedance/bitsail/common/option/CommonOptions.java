@@ -65,6 +65,13 @@ public interface CommonOptions {
       key(COMMON_PREFIX + "job_engine_lib_dir")
           .defaultValue("engines");
 
+  /**
+   * Root dir of bitsail in e2e-test executor.
+   */
+  ConfigOption<String> E2E_EXECUTOR_ROOT_DIR =
+      key(COMMON_PREFIX + "e2e_executor_root_dir")
+          .defaultValue("/opt/bitsail");
+
   ConfigOption<Integer> GLOBAL_PARALLELISM_NUM =
       key(COMMON_PREFIX + "global_parallelism_num")
           .defaultValue(-1);
@@ -284,22 +291,5 @@ public interface CommonOptions {
 
     ConfigOption<String> COLUMN_ENCODING = key(COMMON_PREFIX + "column.encoding")
         .defaultValue("utf-8");
-  }
-
-  interface E2EOptions {
-    ConfigOption<String> E2E_DATASOURCE_DIR_NAME =
-        key(COMMON_PREFIX + "e2e_datasource_lib_dir")
-            .defaultValue("e2e/datasource");
-
-    ConfigOption<String> E2E_DATASOURCE_MAPPING_DIR_NAME =
-        key(COMMON_PREFIX + "e2e_datasource_conf_dir")
-            .defaultValue("e2e/datasource/mapping");
-
-    /**
-     * Root dir of e2e test in executor.
-     */
-    ConfigOption<String> E2E_EXECUTOR_ROOT_DIR =
-        key(COMMON_PREFIX + "e2e_executor_root_dir")
-            .defaultValue("/opt/bitsail");
   }
 }
