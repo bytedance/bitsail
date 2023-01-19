@@ -101,16 +101,16 @@ jobs:
         run:
           mvn clean verify -pl bitsail-dist -am -U -DskipUT=true -DskipITCase=false -P _maven.oracle.com_
 
-  # This workflow contains a single job called "end-to-end-tests"
+    # This workflow contains a single job called "integration-tests"
   end-to-end-tests:
     name: End-to-End Test
     # The type of runner that the job will run on
     runs-on: ${{ matrix.os }}
-      strategy:
-        matrix:
-          os: [ ubuntu-latest ]
-      # Steps represent a sequence of tasks that will be executed as part of the job
-      steps:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
       - run: git config --global core.longpaths true
       - uses: actions/checkout@v3
       - name: Set up JDK 8
@@ -126,6 +126,6 @@ jobs:
           sonatypeSnapshots: true
           oracleRepo: true
 
-      - name: Maven Verify End to End Test
+      - name: Maven Verify End-to-End Test
         run:
           mvn clean verify -DskipUT=true -DskipITCase=true -DskipE2E=false -D"checkstyle.skip"=true -D"license.skipAddThirdParty"=true --no-snapshot-updates -am -P _maven.oracle.com_
