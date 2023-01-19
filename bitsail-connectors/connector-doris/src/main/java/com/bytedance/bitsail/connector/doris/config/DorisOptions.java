@@ -44,13 +44,6 @@ public class DorisOptions implements Serializable {
 
   private String tmpTableName;
 
-  /**
-   * Doris supports AGGREGATE, DUPLICATE and UNIQUE model.<br/>
-   * <p>
-   * Currently, we only support UNIQUE table writer.
-   */
-  private TableModel tableModel;
-
   private String fieldDelimiter;
 
   private String lineDelimiter;
@@ -74,45 +67,6 @@ public class DorisOptions implements Serializable {
   public enum LOAD_CONTENT_TYPE {
     JSON,
     CSV
-  }
-
-  /**
-   * Doris Table Model
-   */
-  public enum TableModel {
-    /**
-     * Doris AGGREGATE Table
-     */
-    AGGREGATE("AGGREGATE"),
-
-    /**
-     * Doris UNIQUE Table
-     */
-    UNIQUE("UNIQUE"),
-
-    /**
-     * Doris DUPLICATE Table
-     */
-    DUPLICATE("DUPLICATE");
-
-    private final String model;
-
-    TableModel(String model) {
-      this.model = model;
-    }
-
-    public String getModel() {
-      return this.model;
-    }
-
-    public TableModel of(@NonNull String model) {
-
-      // compatible with internal doris-client
-      if (StringUtils.equalsIgnoreCase(model, "UNI")) {
-        return UNIQUE;
-      }
-      return TableModel.valueOf(model.toUpperCase());
-    }
   }
 }
 
