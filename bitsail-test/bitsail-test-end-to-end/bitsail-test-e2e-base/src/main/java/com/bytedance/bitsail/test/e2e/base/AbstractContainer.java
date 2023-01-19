@@ -71,7 +71,7 @@ public abstract class AbstractContainer implements Closeable {
    * Copy file from host to container.
    */
   protected static void copyToContainer(GenericContainer<?> container, TransferableFile file) {
-
+    file.checkExist();
     container.withCopyFileToContainer(
         MountableFile.forHostPath(file.getHostPath()),
         file.getContainerPath()

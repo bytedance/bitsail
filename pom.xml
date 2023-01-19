@@ -36,15 +36,6 @@
         <module>bitsail-clients</module>
     </modules>
 
-    <profiles>
-        <profile>
-            <id>e2e_ci</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-        </profile>
-    </profiles>
-
     <properties>
         <!--    maven properties    -->
         <maven.deploy.skip>false</maven.deploy.skip>

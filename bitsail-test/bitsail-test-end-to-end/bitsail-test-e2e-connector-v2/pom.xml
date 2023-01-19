@@ -25,10 +25,11 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitsail-test-e2e-flink</artifactId>
+    <artifactId>bitsail-test-e2e-connector-v2</artifactId>
     <packaging>pom</packaging>
-    <modules>
 
+    <modules>
+        <module>bitsail-test-e2e-connector-v2-print</module>
     </modules>
 
     <dependencies>
@@ -36,6 +37,43 @@
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-test-e2e-base</artifactId>
             <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- core -->
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-core-entry</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- engine -->
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-core-flink-bridge</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- clients -->
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-client-api</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-client-entry</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-client-entry-flink</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

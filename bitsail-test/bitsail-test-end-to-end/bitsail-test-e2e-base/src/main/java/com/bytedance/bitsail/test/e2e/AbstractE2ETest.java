@@ -18,7 +18,6 @@ package com.bytedance.bitsail.test.e2e;
 
 import com.bytedance.bitsail.base.version.VersionHolder;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 
@@ -26,8 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public abstract class AbstractE2ETest {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractE2ETest.class);
@@ -67,8 +64,6 @@ public abstract class AbstractE2ETest {
                        String engineType,
                        String sourceType,
                        String sinkType) throws Exception {
-    addCommonSettings(jobConf);
-
     int exitCode;
     try (TestJob testJob = TestJob.builder()
         .withJobConf(jobConf)
@@ -77,6 +72,9 @@ public abstract class AbstractE2ETest {
         .withSinkType(sinkType)
         .build()) {
       exitCode = testJob.run();
+    } catch (Throwable t) {
+      t.printStackTrace();
+      throw t;
     }
 
     if (exitCode != 0) {
@@ -94,10 +92,5 @@ public abstract class AbstractE2ETest {
 
   protected static void submitFlink11Job(BitSailConfiguration jobConf) throws Exception {
     submitJob(jobConf, "flink11", EMPTY_SOURCE, EMPTY_SOURCE);
-  }
-
-  protected static void addCommonSettings(BitSailConfiguration jobConf) {
-    Path libBaseDir = Paths.get(AbstractExecutor.getLocalRootDir(), "libs");
-    jobConf.set(CommonOptions.JOB_PLUGIN_ROOT_PATH, libBaseDir.toString());
   }
 }

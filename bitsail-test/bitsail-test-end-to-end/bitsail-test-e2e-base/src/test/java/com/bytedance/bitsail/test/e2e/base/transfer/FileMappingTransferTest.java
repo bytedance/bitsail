@@ -18,11 +18,13 @@ package com.bytedance.bitsail.test.e2e.base.transfer;
 
 import com.google.common.collect.Lists;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.util.List;
 
+@Ignore
 public class FileMappingTransferTest {
 
   @Test

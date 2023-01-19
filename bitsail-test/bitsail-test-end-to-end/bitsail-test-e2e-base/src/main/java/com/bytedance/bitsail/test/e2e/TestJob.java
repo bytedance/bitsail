@@ -16,15 +16,12 @@
 
 package com.bytedance.bitsail.test.e2e;
 
-import com.bytedance.bitsail.base.packages.LocalFSPluginFinder;
-import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.test.e2e.datasource.AbstractDataSource;
 import com.bytedance.bitsail.test.e2e.datasource.EmptyDataSource;
 import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
-import com.bytedance.bitsail.test.e2e.executor.flink.AbstractFlinkExecutor;
 import com.bytedance.bitsail.test.e2e.executor.flink.Flink11Executor;
 
 import lombok.AllArgsConstructor;
@@ -67,11 +64,6 @@ public class TestJob implements AutoCloseable {
   protected final String sinkType;
 
   /**
-   * Plugin finder for loading datasource and engine libs.
-   */
-  protected PluginFinder pluginFinder;
-
-  /**
    * Data source for reader.
    */
   protected AbstractDataSource source;
@@ -97,8 +89,6 @@ public class TestJob implements AutoCloseable {
    * Prepare data sources and executor.
    */
   protected void init() {
-    pluginFinder = new LocalFSPluginFinder();
-    pluginFinder.configure(jobConf);
     source = prepareSource(jobConf);
     sink = prepareSink(jobConf);
     executor = prepareExecutor(jobConf);
@@ -113,7 +103,8 @@ public class TestJob implements AutoCloseable {
       dataSource = new EmptyDataSource();
     } else {
       try {
-        dataSource = pluginFinder.findPluginInstance(sourceType);
+        // todo: 修改这里，支持动态加载
+        dataSource = new EmptyDataSource();
       } catch (BitSailException e) {
         dataSource = new EmptyDataSource();
       }
@@ -135,7 +126,8 @@ public class TestJob implements AutoCloseable {
       dataSource = new EmptyDataSource();
     } else {
       try {
-        dataSource = pluginFinder.findPluginInstance(sinkType);
+        // todo: 修改这里，支持动态加载
+        dataSource = new EmptyDataSource();
       } catch (BitSailException e) {
         dataSource = new EmptyDataSource();
       }
@@ -154,7 +146,6 @@ public class TestJob implements AutoCloseable {
     switch (engineType) {
       case "flink11":
         executor = new Flink11Executor();
-        ((AbstractFlinkExecutor) executor).setPluginFinder(pluginFinder);
         break;
       default:
         throw new UnsupportedOperationException("engine type " + engineType + " is not supported yet.");
