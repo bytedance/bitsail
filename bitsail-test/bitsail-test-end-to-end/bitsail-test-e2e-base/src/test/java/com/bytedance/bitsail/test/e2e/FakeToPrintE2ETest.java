@@ -23,7 +23,7 @@ import org.junit.Test;
 import java.io.File;
 import java.nio.file.Paths;
 
-public class FakeToPrintTest extends AbstractE2ETest {
+public class FakeToPrintE2ETest extends AbstractE2ETest {
 
   @Test
   public void testFakeToPrint() throws Exception {
