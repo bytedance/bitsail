@@ -34,7 +34,7 @@ import java.security.PrivilegedAction;
 import java.util.Map;
 import java.util.Objects;
 
-public class HBaseHelper {
+public class HBaseHelper implements AutoCloseable {
   private static final Logger LOG = LoggerFactory.getLogger(HBaseHelper.class);
 
   /**
@@ -123,5 +123,10 @@ public class HBaseHelper {
     } catch (Exception e) {
       throw new RuntimeException("Failed to close.", e);
     }
+  }
+
+  @Override
+  public void close() throws Exception {
+
   }
 }

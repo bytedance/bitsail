@@ -9,7 +9,8 @@ import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
-import org.apache.flink.types.Row;
+import com.bytedance.bitsail.common.row.Row;
+
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.nio.charset.Charset;

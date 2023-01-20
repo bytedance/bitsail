@@ -24,15 +24,17 @@ import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.JobContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
@@ -44,16 +46,6 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
     private final int subTaskId;
 
     /**
-     * InputFormat natively supported by HBase.
-     */
-    private transient TableInputFormat tableInputFormat;
-
-    /**
-     * Fake JobContext for constructing {@link TableInputFormat}.
-     */
-    private transient JobContext jobContext;
-
-    /**
      * Used to de duplicate user-defined fields with the same name.
      */
     private transient Map<String, byte[][]> namesMap;
@@ -62,19 +54,20 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
      * Schema Settings.
      */
     private String tableName;
-
-    private transient Result value;
+    private final transient Connection connection;
+    private ResultScanner currentScanner;
+    private HBaseSourceSplit currentSplit;
 
     private boolean hasNoMoreSplits = false;
     private int totalSplitNum = 0;
     private final Deque<HBaseSourceSplit> splits;
-    private final transient HBaseRowDeserializer rowDeserializer;
+    // private final transient HBaseRowDeserializer rowDeserializer;
     private TypeInfo<?>[] typeInfos;
     private RowTypeInfo rowTypeInfo;
     private List<String> columnNames;
     private Set<String> columnFamilies;
-    private transient DeserializationFormat<byte[][], org.apache.flink.types.Row> deserializationFormat;
-    private transient DeserializationSchema<byte[][], org.apache.flink.types.Row> deserializationSchema;
+    private transient DeserializationFormat<byte[][], Row> deserializationFormat;
+    private transient DeserializationSchema<byte[][], Row> deserializationSchema;
 
     /**
      * Parameters for Hbase/TableInputFormat.
@@ -103,39 +96,72 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
                 HBaseReaderOptions.COLUMNS, HBasePluginErrorCode.REQUIRED_VALUE);
         //typeInfos = TypeInfoUtils.getTypeInfos(createTypeInfoConverter(), columnInfos);
         this.columnNames = columnInfos.stream().map(ColumnInfo::getName).collect(Collectors.toList());
-
-        // Get region numbers in hbase.
-        this.regionCount = (int) RETRYER.call(() -> {
-            Connection conn = HBaseHelper.getHbaseConnection(hbaseConfig);
-            return conn.getAdmin().getRegions(TableName.valueOf(tableName)).size();
-        });
-        LOG.info("Got HBase region count {} to set Flink parallelism", regionCount);
-
         // Check if input column names are in format: [ columnFamily:column ].
         this.columnNames.stream().peek(column -> Preconditions.checkArgument(
                 (column.contains(":") && column.split(":").length == 2) ||
                             ROW_KEY.equalsIgnoreCase(column),
                         "Invalid column names, it should be [ColumnFamily:Column] format"))
                 .forEach(column -> columnFamilies.add(column.split(":")[0]));
-        // this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(createTypeInfoConverter(), columnInfos);
-        LOG.info("HBase source reader {} is initialized.", subTaskId);
+
+        this.connection = HBaseHelper.getHbaseConnection(hbaseConfig);
+        LOG.info("HBase source reader {} has connection created.", subTaskId);
 
         this.splits = new ConcurrentLinkedDeque<>();
         this.deserializationFormat = new HBaseDeserializationFormat(jobConf);
         this.deserializationSchema = deserializationFormat.createRuntimeDeserializationSchema(typeInfos);
+
+        LOG.info("HBase source reader {} is initialized.", subTaskId);
     }
 
     @Override
-    public void start() {
-        tableInputFormat = new TableInputFormat();
-        tableInputFormat.setConf(getConf());
-        namesMap = Maps.newConcurrentMap();
-        LOG.info("Starting config HBase input format, maybe so slow........");
-    }
+    public void start() {}
 
     @Override
     public void pollNext(SourcePipeline<Row> pipeline) throws Exception {
+        if (currentScanner == null && splits.isEmpty()) {
+            return;
+        }
 
+        if (currentScanner == null) {
+            this.currentSplit = splits.poll();
+
+            Scan scan = new Scan();
+            this.columnFamilies.forEach(cf -> scan.addFamily(Bytes.toBytes(cf)));
+            this.currentScanner = connection.getTable(TableName.valueOf(this.tableName)).getScanner(scan);
+        }
+        Result result = this.currentScanner.next();
+        if (result != null) {
+            pipeline.output(deserializationSchema.deserialize(convertRawRow(result)));
+        }
+    }
+
+    private byte[][] convertRawRow(Result result) {
+        byte[][] rawRow = new byte[columnNames.size()][];
+        for (int i = 0; i < columnNames.size(); ++i) {
+            String columnName = columnNames.get(i);
+            byte[] bytes;
+            try {
+                // If it is rowkey defined by users, directly use it.
+                if (ROW_KEY.equals(columnName)) {
+                    bytes = result.getRow();
+                } else {
+                    byte[][] arr = namesMap.get(columnName);
+                    // Deduplicate
+                    if (Objects.isNull(arr)) {
+                        arr = new byte[2][];
+                        String[] arr1 = columnName.split(":");
+                        arr[0] = arr1[0].trim().getBytes(StandardCharsets.UTF_8);
+                        arr[1] = arr1[1].trim().getBytes(StandardCharsets.UTF_8);
+                        namesMap.put(columnName, arr);
+                    }
+                    bytes = result.getValue(arr[0], arr[1]);
+                }
+                rawRow[i] = bytes;
+            } catch (Exception e) {
+                LOG.error("Cannot read data from {}, reason: \n", tableName, e);
+            }
+        }
+        return rawRow;
     }
 
     @Override
@@ -155,7 +181,8 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
 
     @Override
     public void notifyNoMoreSplits() {
-        SourceReader.super.notifyNoMoreSplits();
+        hasNoMoreSplits = true;
+        LOG.info("No more splits will be assigned.");
     }
 
     @Override

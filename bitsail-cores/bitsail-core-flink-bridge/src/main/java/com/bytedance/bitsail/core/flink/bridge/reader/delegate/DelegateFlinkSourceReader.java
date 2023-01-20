@@ -57,12 +57,10 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
   private final String[] fieldNames;
   private final List<ColumnInfo> columnInfos;
   private final String readerName;
-
   private transient com.bytedance.bitsail.base.connector.reader.v1.SourceReader<T, SplitT> sourceReader;
   private transient DelegateSourcePipeline<T> pipeline;
   private transient FlinkRowConvertSerializer flinkRowConvertSerializer;
   private transient CompletableFuture<Void> available;
-
   private transient Messenger messenger;
   private transient AbstractDirtyCollector dirtyCollector;
   private transient MetricManager metricManager;
