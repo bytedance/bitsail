@@ -24,5 +24,6 @@ mvn clean verify \
  -D"checkstyle.skip"=true \
  -D"license.skipAddThirdParty"=true \
  --no-snapshot-updates \
+ -P _maven.oracle.com_ \
  -am \
  -pl :${test_module}
