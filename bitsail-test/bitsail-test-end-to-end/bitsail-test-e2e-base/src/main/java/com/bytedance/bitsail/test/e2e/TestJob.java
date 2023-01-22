@@ -20,6 +20,7 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.test.e2e.datasource.AbstractDataSource;
+import com.bytedance.bitsail.test.e2e.datasource.DataSourceFactory;
 import com.bytedance.bitsail.test.e2e.datasource.EmptyDataSource;
 import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 import com.bytedance.bitsail.test.e2e.executor.flink.Flink11Executor;
@@ -103,15 +104,13 @@ public class TestJob implements AutoCloseable {
   protected AbstractDataSource prepareSource(BitSailConfiguration jobConf,
                                              Network executorNetwork) {
     AbstractDataSource dataSource;
-    if ("empty".equals(sourceType)) {
+    try {
+      dataSource = DataSourceFactory.getDataSource(jobConf, sourceType);
+    } catch (BitSailException e) {
       dataSource = new EmptyDataSource();
-    } else {
-      try {
-        // todo: add dynamic load here
-        dataSource = new EmptyDataSource();
-      } catch (BitSailException e) {
-        dataSource = new EmptyDataSource();
-      }
+    }
+    if (dataSource == null) {
+      dataSource = new EmptyDataSource();
     }
     dataSource.configure(jobConf);
     dataSource.initNetwork(executorNetwork);
@@ -128,15 +127,13 @@ public class TestJob implements AutoCloseable {
   protected AbstractDataSource prepareSink(BitSailConfiguration jobConf,
                                            Network executorNetwork) {
     AbstractDataSource dataSource;
-    if ("empty".equals(sinkType)) {
+    try {
+      dataSource = DataSourceFactory.getDataSource(jobConf, sinkType);
+    } catch (BitSailException e) {
       dataSource = new EmptyDataSource();
-    } else {
-      try {
-        // todo: add dynamic load here
-        dataSource = new EmptyDataSource();
-      } catch (BitSailException e) {
-        dataSource = new EmptyDataSource();
-      }
+    }
+    if (dataSource == null) {
+      dataSource = new EmptyDataSource();
     }
     dataSource.configure(jobConf);
     dataSource.initNetwork(executorNetwork);

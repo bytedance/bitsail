@@ -3,7 +3,7 @@
     "common": {
       "job_id": 312,
       "instance_id": 3124,
-      "job_name": "BitSail_fake_to_print_test",
+      "job_name": "BitSail_fake_to_print_e2e_test",
       "user_name": "test"
     },
     "writer": {

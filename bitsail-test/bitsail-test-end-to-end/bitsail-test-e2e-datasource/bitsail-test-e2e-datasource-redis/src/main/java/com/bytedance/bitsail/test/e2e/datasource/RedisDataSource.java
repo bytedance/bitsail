@@ -18,7 +18,9 @@ package com.bytedance.bitsail.test.e2e.datasource;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.connector.legacy.redis.option.RedisWriterOptions;
+import com.bytedance.bitsail.connector.redis.sink.RedisSink;
 
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
@@ -58,6 +60,15 @@ public class RedisDataSource extends AbstractDataSource {
   @Override
   public void configure(BitSailConfiguration dataSourceConf) {
 
+  }
+
+  @Override
+  public boolean accept(BitSailConfiguration jobConf, String sourceType) {
+    if ("redis".equalsIgnoreCase(sourceType)) {
+      return true;
+    }
+    String writerClass = jobConf.get(ReaderOptions.READER_CLASS);
+    return RedisSink.class.getName().equals(writerClass);
   }
 
   @Override

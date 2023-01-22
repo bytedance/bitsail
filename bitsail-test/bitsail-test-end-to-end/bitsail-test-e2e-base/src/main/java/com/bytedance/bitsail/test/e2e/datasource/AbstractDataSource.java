@@ -28,6 +28,11 @@ public abstract class AbstractDataSource extends AbstractContainer {
   protected Set<TransferableFile> transferableFiles;
 
   /**
+   * Check if this data source can be used for the test.
+   */
+  public abstract boolean accept(BitSailConfiguration jobConf, String sourceType);
+
+  /**
    * Configure the data source, like docker image name or version.
    */
   public abstract void configure(BitSailConfiguration dataSourceConf);

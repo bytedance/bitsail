@@ -14,46 +14,23 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.e2e.datasource;
+package com.bytedance.bitsail.test.e2e;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
-import org.testcontainers.containers.Network;
+import org.junit.Test;
 
-public class EmptyDataSource extends AbstractDataSource {
+import java.io.File;
+import java.nio.file.Paths;
 
-  @Override
-  public String getContainerName() {
-    return "data-source:empty";
-  }
+public class FakeToRedisE2ETest extends AbstractE2ETest {
 
-  @Override
-  public void initNetwork(Network executorNetwork) {
-
-  }
-
-  @Override
-  public boolean accept(BitSailConfiguration jobConf, String sourceType) {
-    return "empty".equalsIgnoreCase(sourceType);
-  }
-
-  @Override
-  public void configure(BitSailConfiguration dataSourceConf) {
-
-  }
-
-  @Override
-  public void modifyJobConf(BitSailConfiguration jobConf) {
-
-  }
-
-  @Override
-  public void start() {
-
-  }
-
-  @Override
-  public void fillData() {
-
+  @Test
+  public void testFakeToRedis() throws Exception {
+    BitSailConfiguration jobConf = BitSailConfiguration.from(
+        new File(Paths.get(getClass().getClassLoader()
+            .getResource("fake_to_redis.json")
+            .toURI()).toString()));
+    submitFlink11Job(jobConf);
   }
 }
