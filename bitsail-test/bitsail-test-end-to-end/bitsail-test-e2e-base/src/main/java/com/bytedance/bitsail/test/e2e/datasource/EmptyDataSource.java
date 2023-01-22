@@ -18,6 +18,8 @@ package com.bytedance.bitsail.test.e2e.datasource;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
+import org.testcontainers.containers.Network;
+
 public class EmptyDataSource extends AbstractDataSource {
 
   @Override
@@ -26,12 +28,17 @@ public class EmptyDataSource extends AbstractDataSource {
   }
 
   @Override
-  protected void initNetwork() {
+  public void initNetwork(Network executorNetwork) {
 
   }
 
   @Override
   public void configure(BitSailConfiguration dataSourceConf) {
+
+  }
+
+  @Override
+  public void modifyJobConf(BitSailConfiguration jobConf) {
 
   }
 

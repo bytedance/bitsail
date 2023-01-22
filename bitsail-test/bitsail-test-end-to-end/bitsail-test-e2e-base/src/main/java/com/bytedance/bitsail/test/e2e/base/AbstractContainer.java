@@ -18,6 +18,7 @@ package com.bytedance.bitsail.test.e2e.base;
 
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
 
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -36,6 +37,7 @@ public abstract class AbstractContainer implements Closeable {
   /**
    * Network of the container.
    */
+  @Getter
   protected Network network;
 
   /**
@@ -46,7 +48,7 @@ public abstract class AbstractContainer implements Closeable {
   /**
    * Initialize network for the container.
    */
-  protected abstract void initNetwork();
+  public abstract void initNetwork(Network executorNetwork);
 
   /**
    * Terminate the container.

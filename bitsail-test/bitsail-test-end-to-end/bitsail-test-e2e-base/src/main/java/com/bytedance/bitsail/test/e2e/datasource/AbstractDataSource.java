@@ -33,6 +33,11 @@ public abstract class AbstractDataSource extends AbstractContainer {
   public abstract void configure(BitSailConfiguration dataSourceConf);
 
   /**
+   * Add data source setting into job conf.
+   */
+  public abstract void modifyJobConf(BitSailConfiguration jobConf);
+
+  /**
    * Start the data source.
    */
   public abstract void start();

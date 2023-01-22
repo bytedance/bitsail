@@ -59,6 +59,10 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
    */
   protected GenericContainer<?> executor;
 
+  public AbstractFlinkExecutor() {
+    initNetwork(null);
+  }
+
   @Override
   public void configure(BitSailConfiguration executorConf) {
     super.configure(executorConf);
@@ -67,13 +71,12 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
   }
 
   @Override
-  protected void initNetwork() {
+  public void initNetwork(Network executorNetwork) {
     network = Network.newNetwork();
   }
 
   @Override
   public void init() {
-    initNetwork();
     String flinkDockerImage = getFlinkDockerImage();
 
     List<String> initCommands = Lists.newArrayList(

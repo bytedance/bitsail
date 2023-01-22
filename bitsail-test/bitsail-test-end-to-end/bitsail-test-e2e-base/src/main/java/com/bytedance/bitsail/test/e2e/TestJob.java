@@ -28,6 +28,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.Network;
 
 @AllArgsConstructor
 @Builder
@@ -89,15 +90,18 @@ public class TestJob implements AutoCloseable {
    * Prepare data sources and executor.
    */
   protected void init() {
-    source = prepareSource(jobConf);
-    sink = prepareSink(jobConf);
-    executor = prepareExecutor(jobConf);
+    executor = createExecutor();
+    Network executorNetwork = executor.getNetwork();
+
+    source = prepareSource(jobConf, executorNetwork);
+    sink = prepareSink(jobConf, executorNetwork);
   }
 
   /**
    * Create data source for reader.
    */
-  protected AbstractDataSource prepareSource(BitSailConfiguration jobConf) {
+  protected AbstractDataSource prepareSource(BitSailConfiguration jobConf,
+                                             Network executorNetwork) {
     AbstractDataSource dataSource;
     if ("empty".equals(sourceType)) {
       dataSource = new EmptyDataSource();
@@ -110,6 +114,7 @@ public class TestJob implements AutoCloseable {
       }
     }
     dataSource.configure(jobConf);
+    dataSource.initNetwork(executorNetwork);
     dataSource.start();
     dataSource.fillData();
 
@@ -120,7 +125,8 @@ public class TestJob implements AutoCloseable {
   /**
    * Create data source for writer.
    */
-  protected AbstractDataSource prepareSink(BitSailConfiguration jobConf) {
+  protected AbstractDataSource prepareSink(BitSailConfiguration jobConf,
+                                           Network executorNetwork) {
     AbstractDataSource dataSource;
     if ("empty".equals(sinkType)) {
       dataSource = new EmptyDataSource();
@@ -133,6 +139,7 @@ public class TestJob implements AutoCloseable {
       }
     }
     dataSource.configure(jobConf);
+    dataSource.initNetwork(executorNetwork);
     dataSource.start();
 
     LOG.info("DataSource {} is started as sink in [{}].", sourceType, dataSource.getContainerName());
@@ -142,7 +149,7 @@ public class TestJob implements AutoCloseable {
   /**
    * Create test executor.
    */
-  protected AbstractExecutor prepareExecutor(BitSailConfiguration jobConf) {
+  protected AbstractExecutor createExecutor() {
     switch (engineType) {
       case "flink11":
         executor = new Flink11Executor();
@@ -150,9 +157,6 @@ public class TestJob implements AutoCloseable {
       default:
         throw new UnsupportedOperationException("engine type " + engineType + " is not supported yet.");
     }
-
-    executor.configure(jobConf);
-    executor.init();
     return executor;
   }
 
@@ -161,6 +165,12 @@ public class TestJob implements AutoCloseable {
    */
   public int run() throws Exception {
     init();
+
+    source.modifyJobConf(jobConf);
+    sink.modifyJobConf(jobConf);
+
+    executor.configure(jobConf);
+    executor.init();
 
     int exitCode;
     try {
