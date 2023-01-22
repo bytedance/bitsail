@@ -16,13 +16,11 @@
 
 package com.bytedance.bitsail.test.e2e.datasource;
 
-import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.connector.legacy.redis.option.RedisWriterOptions;
 import com.bytedance.bitsail.connector.redis.sink.RedisSink;
 
-import com.fasterxml.jackson.databind.deser.impl.ReadableObjectId;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
 import org.slf4j.Logger;
@@ -50,7 +48,7 @@ public class RedisDataSource extends AbstractDataSource {
 
   @Override
   public String getContainerName() {
-    return "data-source:redis";
+    return "data-source-redis";
   }
 
   @Override
@@ -78,25 +76,23 @@ public class RedisDataSource extends AbstractDataSource {
     jobConf.set(RedisWriterOptions.PORT, port);
   }
 
+  @SuppressWarnings("checkstyle:MagicNumber")
   @Override
   public void start() {
+    this.host = getContainerName() + "-" + role;
+    this.port = DEFAULT_EXPOSED_PORT;
+
     redis = new GenericContainer<>(DockerImageName.parse(REDIS_VERSION))
-        .withExposedPorts(DEFAULT_EXPOSED_PORT)
-        .withNetwork(network);
+        .withNetwork(network)
+        .withExposedPorts(port)
+        .withNetworkAliases(host);
     redis.start();
-    this.host = redis.getHost();
-    this.port = redis.getFirstMappedPort();
     LOG.info("Redis container starts! Host is: [{}], port is: [{}].", host, port);
   }
 
   @Override
   public void fillData() {
 
-  }
-
-  @Override
-  public void validate() throws BitSailException {
-    // todo: add validation here.
   }
 
   @Override
@@ -116,7 +112,7 @@ public class RedisDataSource extends AbstractDataSource {
    */
   public String getKey(String key) {
     if (Objects.isNull(backedCache)) {
-      backedCache = new RedisBackedCache(host, port);
+      backedCache = new RedisBackedCache(redis.getHost(), redis.getFirstMappedPort());
     }
     return backedCache.get(key);
   }
@@ -126,7 +122,7 @@ public class RedisDataSource extends AbstractDataSource {
    */
   public int getKeyCount() {
     if (Objects.isNull(backedCache)) {
-      backedCache = new RedisBackedCache(host, port);
+      backedCache = new RedisBackedCache(redis.getHost(), redis.getFirstMappedPort());
     }
     List<String> keys = backedCache.getAllKeys();
     LOG.info("Get {} keys from redis.", keys.size());

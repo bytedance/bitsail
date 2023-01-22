@@ -16,7 +16,6 @@
 
 package com.bytedance.bitsail.test.e2e.datasource;
 
-import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.test.e2e.base.AbstractContainer;
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
@@ -56,14 +55,6 @@ public abstract class AbstractDataSource extends AbstractContainer {
    * Produce some data if it is for source.
    */
   public abstract void fillData();
-
-  /**
-   * Validate data if it is for sink.
-   * @throws BitSailException Throws BitSailException when validation is not passed.
-   */
-  public void validate() throws BitSailException {
-
-  }
 
   enum Role {
     SOURCE,

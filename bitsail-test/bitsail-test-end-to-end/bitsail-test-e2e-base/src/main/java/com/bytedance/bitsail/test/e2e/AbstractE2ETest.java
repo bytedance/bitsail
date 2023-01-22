@@ -19,12 +19,14 @@ package com.bytedance.bitsail.test.e2e;
 import com.bytedance.bitsail.base.version.VersionHolder;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.util.Preconditions;
+import com.bytedance.bitsail.test.e2e.datasource.AbstractDataSource;
 import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.util.function.Consumer;
 
 public abstract class AbstractE2ETest {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractE2ETest.class);
@@ -57,30 +59,36 @@ public abstract class AbstractE2ETest {
   /**
    * @param jobConf Job conf to run.
    * @param engineType Executor engine type.
-   * @param sourceType Reader data source type.
-   * @param sinkType Writer data source type.
    */
   protected static void submitJob(BitSailConfiguration jobConf,
                                   String engineType,
-                                  String jobName) throws Exception {
+                                  String jobName,
+                                  Consumer<AbstractDataSource> validation) throws Exception {
     int exitCode;
     try (TestJob testJob = TestJob.builder()
         .withJobConf(jobConf)
         .withEngineType(engineType)
         .build()) {
       exitCode = testJob.run(jobName);
+      if (exitCode != 0) {
+        throw new IllegalStateException("Failed to execute job with exit code " + exitCode);
+      }
+
+      testJob.validate(validation);
     } catch (Throwable t) {
       t.printStackTrace();
       throw t;
-    }
-
-    if (exitCode != 0) {
-      throw new RuntimeException("Failed to execute job with exit code " + exitCode);
     }
   }
 
   protected static void submitFlink11Job(BitSailConfiguration jobConf,
                                          String jobName) throws Exception {
-    submitJob(jobConf, "flink11", jobName);
+    submitJob(jobConf, "flink11", jobName, null);
+  }
+
+  protected static void submitFlink11Job(BitSailConfiguration jobConf,
+                                         String jobName,
+                                         Consumer<AbstractDataSource> validation) throws Exception {
+    submitJob(jobConf, "flink11", jobName, validation);
   }
 }

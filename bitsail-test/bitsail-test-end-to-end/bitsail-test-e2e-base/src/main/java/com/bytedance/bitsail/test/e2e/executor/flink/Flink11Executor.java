@@ -33,7 +33,7 @@ public class Flink11Executor extends AbstractFlinkExecutor {
 
   @Override
   public String getContainerName() {
-    return "test-container:flink-1.11.6";
+    return "test-container-flink-1.11.6";
   }
 
   @Override

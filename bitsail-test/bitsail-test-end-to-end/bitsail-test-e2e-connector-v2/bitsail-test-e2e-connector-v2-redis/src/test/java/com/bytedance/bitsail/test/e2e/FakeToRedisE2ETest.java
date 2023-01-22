@@ -17,7 +17,10 @@
 package com.bytedance.bitsail.test.e2e;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.connector.fake.option.FakeReaderOptions;
+import com.bytedance.bitsail.test.e2e.datasource.RedisDataSource;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
@@ -31,6 +34,14 @@ public class FakeToRedisE2ETest extends AbstractE2ETest {
         new File(Paths.get(getClass().getClassLoader()
             .getResource("fake_to_redis.json")
             .toURI()).toString()));
-    submitFlink11Job(jobConf, "test_fake_to_redis");
+    jobConf.set(FakeReaderOptions.TOTAL_COUNT, 500);
+
+    // Check if there are 500 keys in redis.
+    submitFlink11Job(jobConf,
+        "test_fake_to_redis",
+        dataSource -> Assert.assertEquals(
+            500,
+            ((RedisDataSource) dataSource).getKeyCount()
+        ));
   }
 }

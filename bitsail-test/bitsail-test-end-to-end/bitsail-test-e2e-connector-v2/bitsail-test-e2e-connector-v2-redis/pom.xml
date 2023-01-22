@@ -48,6 +48,13 @@
             <version>${revision}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.reactivestreams</groupId>
+            <artifactId>reactive-streams</artifactId>
+            <version>1.0.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

@@ -28,7 +28,7 @@ public class EmptyDataSource extends AbstractDataSource {
 
   @Override
   public String getContainerName() {
-    return "data-source:empty";
+    return "data-source-empty";
   }
 
   @Override

@@ -18,6 +18,7 @@ package com.bytedance.bitsail.test.e2e;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.test.e2e.datasource.AbstractDataSource;
 import com.bytedance.bitsail.test.e2e.datasource.DataSourceFactory;
@@ -30,6 +31,8 @@ import lombok.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
+
+import java.util.function.Consumer;
 
 @AllArgsConstructor
 @Builder
@@ -160,26 +163,31 @@ public class TestJob implements AutoCloseable {
       throw e;
     }
 
-    if (exitCode != 0) {
-      LOG.error("Test return code is {}, will directly exit.", exitCode);
-      return exitCode;
-    }
-
-    try {
-      sink.validate();
-    } catch (BitSailException ex) {
-      LOG.error("Failed to validate sink data after job.", ex);
-      return VALIDATION_EXIT_CODE;
-    }
-
     return exitCode;
+  }
+
+  /**
+   * Validate result in sink after run.
+   */
+  public void validate(Consumer<AbstractDataSource> validation) {
+    if (validation != null) {
+      LOG.info("Start validation...");
+      try {
+        validation.accept(sink);
+      } catch (Exception e) {
+        throw BitSailException.asBitSailException(CommonErrorCode.VALIDATION_EXCEPTION, e);
+      }
+      LOG.info("Pass validation!");
+    }
   }
 
   @Override
   public void close() {
+    LOG.info("Test Job Closing...");
     executor.closeQuietly();
     source.closeQuietly();
     sink.closeQuietly();
+    LOG.info("Test Job Closed!");
   }
 
   /**
