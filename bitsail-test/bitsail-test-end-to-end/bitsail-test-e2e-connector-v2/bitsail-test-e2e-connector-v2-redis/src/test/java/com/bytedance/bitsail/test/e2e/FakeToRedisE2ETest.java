@@ -31,6 +31,6 @@ public class FakeToRedisE2ETest extends AbstractE2ETest {
         new File(Paths.get(getClass().getClassLoader()
             .getResource("fake_to_redis.json")
             .toURI()).toString()));
-    submitFlink11Job(jobConf);
+    submitFlink11Job(jobConf, "test_fake_to_redis");
   }
 }

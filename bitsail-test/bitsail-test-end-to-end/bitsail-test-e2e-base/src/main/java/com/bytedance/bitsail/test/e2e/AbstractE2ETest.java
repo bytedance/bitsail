@@ -61,17 +61,14 @@ public abstract class AbstractE2ETest {
    * @param sinkType Writer data source type.
    */
   protected static void submitJob(BitSailConfiguration jobConf,
-                       String engineType,
-                       String sourceType,
-                       String sinkType) throws Exception {
+                                  String engineType,
+                                  String jobName) throws Exception {
     int exitCode;
     try (TestJob testJob = TestJob.builder()
         .withJobConf(jobConf)
         .withEngineType(engineType)
-        .withSourceType(sourceType)
-        .withSinkType(sinkType)
         .build()) {
-      exitCode = testJob.run();
+      exitCode = testJob.run(jobName);
     } catch (Throwable t) {
       t.printStackTrace();
       throw t;
@@ -82,15 +79,8 @@ public abstract class AbstractE2ETest {
     }
   }
 
-  protected static void submitJob(BitSailConfiguration jobConf, String engineType) throws Exception {
-    submitJob(jobConf, engineType, EMPTY_SOURCE, EMPTY_SOURCE);
-  }
-
-  protected static void submitFlink11Job(BitSailConfiguration jobConf, String sourceType, String sinkType) throws Exception {
-    submitJob(jobConf, "flink11", sourceType, sinkType);
-  }
-
-  protected static void submitFlink11Job(BitSailConfiguration jobConf) throws Exception {
-    submitJob(jobConf, "flink11", EMPTY_SOURCE, EMPTY_SOURCE);
+  protected static void submitFlink11Job(BitSailConfiguration jobConf,
+                                         String jobName) throws Exception {
+    submitJob(jobConf, "flink11", jobName);
   }
 }

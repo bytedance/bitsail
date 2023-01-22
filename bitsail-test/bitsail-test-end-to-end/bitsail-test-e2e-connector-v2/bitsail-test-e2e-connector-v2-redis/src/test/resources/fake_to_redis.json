@@ -26,7 +26,17 @@
     },
     "writer": {
       "class": "com.bytedance.bitsail.connector.redis.sink.RedisSink",
-      "redis_data_type": "string"
+      "redis_data_type": "string",
+      "columns": [
+        {
+          "name": "fake_key",
+          "type": "string"
+        },
+        {
+          "name": "fake_value",
+          "type": "string"
+        }
+      ]
     }
   }
 }

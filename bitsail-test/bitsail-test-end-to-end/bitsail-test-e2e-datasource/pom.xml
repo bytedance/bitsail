@@ -37,5 +37,12 @@
             <artifactId>bitsail-test-e2e-base</artifactId>
             <version>${revision}</version>
         </dependency>
+
+        <!-- junit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>

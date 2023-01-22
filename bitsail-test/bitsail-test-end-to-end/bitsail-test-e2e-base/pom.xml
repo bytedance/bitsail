@@ -71,6 +71,18 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-fake</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-print</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
         <!-- test container -->
         <dependency>
             <groupId>org.testcontainers</groupId>

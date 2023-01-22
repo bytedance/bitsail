@@ -41,11 +41,6 @@ public class TestJob implements AutoCloseable {
   public static final int VALIDATION_EXIT_CODE = 2;
 
   /**
-   * Format the test case name, test_{sourceType}_to_{sinkType}_on_{engine_type}.
-   */
-  protected static final String TEST_CASE_NAME_TEMPLATE = "test_%s_to_%s_on_%s";
-
-  /**
    * Job conf to run.
    */
   protected final BitSailConfiguration jobConf;
@@ -54,16 +49,6 @@ public class TestJob implements AutoCloseable {
    * Engine type.
    */
   protected final String engineType;
-
-  /**
-   * Data source type for reader.
-   */
-  protected final String sourceType;
-
-  /**
-   * Data source type for writer.
-   */
-  protected final String sinkType;
 
   /**
    * Data source for reader.
@@ -80,10 +65,8 @@ public class TestJob implements AutoCloseable {
    */
   protected AbstractExecutor executor;
 
-  TestJob(BitSailConfiguration jobConf, String sourceType, String sinkType, String engineType) {
+  TestJob(BitSailConfiguration jobConf, String engineType) {
     this.jobConf = jobConf;
-    this.sourceType = sourceType.trim().toLowerCase();
-    this.sinkType = sinkType.trim().toLowerCase();
     this.engineType = engineType.trim().toLowerCase();
   }
 
@@ -105,7 +88,7 @@ public class TestJob implements AutoCloseable {
                                              Network executorNetwork) {
     AbstractDataSource dataSource;
     try {
-      dataSource = DataSourceFactory.getDataSource(jobConf, sourceType);
+      dataSource = DataSourceFactory.getAsSource(jobConf);
     } catch (BitSailException e) {
       dataSource = new EmptyDataSource();
     }
@@ -117,7 +100,7 @@ public class TestJob implements AutoCloseable {
     dataSource.start();
     dataSource.fillData();
 
-    LOG.info("DataSource {} is started as source in [{}].", sourceType, dataSource.getContainerName());
+    LOG.info("DataSource is started as source in [{}].", dataSource.getContainerName());
     return dataSource;
   }
 
@@ -128,7 +111,7 @@ public class TestJob implements AutoCloseable {
                                            Network executorNetwork) {
     AbstractDataSource dataSource;
     try {
-      dataSource = DataSourceFactory.getDataSource(jobConf, sinkType);
+      dataSource = DataSourceFactory.getAsSink(jobConf);
     } catch (BitSailException e) {
       dataSource = new EmptyDataSource();
     }
@@ -139,7 +122,7 @@ public class TestJob implements AutoCloseable {
     dataSource.initNetwork(executorNetwork);
     dataSource.start();
 
-    LOG.info("DataSource {} is started as sink in [{}].", sourceType, dataSource.getContainerName());
+    LOG.info("DataSource is started as sink in [{}].", dataSource.getContainerName());
     return dataSource;
   }
 
@@ -160,7 +143,7 @@ public class TestJob implements AutoCloseable {
   /**
    * Run a job.
    */
-  public int run() throws Exception {
+  public int run(String caseName) throws Exception {
     init();
 
     source.modifyJobConf(jobConf);
@@ -171,7 +154,7 @@ public class TestJob implements AutoCloseable {
 
     int exitCode;
     try {
-      exitCode = executor.run(String.format(TEST_CASE_NAME_TEMPLATE, sourceType, sinkType, engineType));
+      exitCode = executor.run(String.format("%s_on_%s", caseName, engineType));
     } catch (Exception e) {
       e.printStackTrace();
       throw e;
@@ -211,22 +194,10 @@ public class TestJob implements AutoCloseable {
    */
   public static class TestJobBuilder {
     private BitSailConfiguration jobConf;
-    private String sourceType;
-    private String sinkType;
     private String engineType;
 
     public TestJobBuilder withJobConf(BitSailConfiguration jobConf) {
       this.jobConf = jobConf;
-      return this;
-    }
-
-    public TestJobBuilder withSourceType(String sourceType) {
-      this.sourceType = sourceType;
-      return this;
-    }
-
-    public TestJobBuilder withSinkType(String sinkType) {
-      this.sinkType = sinkType;
       return this;
     }
 
@@ -237,10 +208,8 @@ public class TestJob implements AutoCloseable {
 
     public TestJob build() {
       Preconditions.checkNotNull(jobConf);
-      Preconditions.checkNotNull(sourceType);
-      Preconditions.checkNotNull(sinkType);
       Preconditions.checkNotNull(engineType);
-      return new TestJob(jobConf, sourceType, sinkType, engineType);
+      return new TestJob(jobConf, engineType);
     }
   }
 }

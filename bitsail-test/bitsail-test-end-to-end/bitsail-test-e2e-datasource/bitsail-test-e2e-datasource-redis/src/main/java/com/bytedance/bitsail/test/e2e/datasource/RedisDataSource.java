@@ -18,10 +18,11 @@ package com.bytedance.bitsail.test.e2e.datasource;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.option.ReaderOptions;
+import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.connector.legacy.redis.option.RedisWriterOptions;
 import com.bytedance.bitsail.connector.redis.sink.RedisSink;
 
+import com.fasterxml.jackson.databind.deser.impl.ReadableObjectId;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
 import org.slf4j.Logger;
@@ -63,12 +64,12 @@ public class RedisDataSource extends AbstractDataSource {
   }
 
   @Override
-  public boolean accept(BitSailConfiguration jobConf, String sourceType) {
-    if ("redis".equalsIgnoreCase(sourceType)) {
-      return true;
+  public boolean accept(BitSailConfiguration jobConf, Role role) {
+    String writerClass = jobConf.get(WriterOptions.WRITER_CLASS);
+    if (role == Role.SINK) {
+      return RedisSink.class.getName().equals(writerClass);
     }
-    String writerClass = jobConf.get(ReaderOptions.READER_CLASS);
-    return RedisSink.class.getName().equals(writerClass);
+    return false;
   }
 
   @Override
@@ -80,7 +81,8 @@ public class RedisDataSource extends AbstractDataSource {
   @Override
   public void start() {
     redis = new GenericContainer<>(DockerImageName.parse(REDIS_VERSION))
-        .withExposedPorts(DEFAULT_EXPOSED_PORT);
+        .withExposedPorts(DEFAULT_EXPOSED_PORT)
+        .withNetwork(network);
     redis.start();
     this.host = redis.getHost();
     this.port = redis.getFirstMappedPort();

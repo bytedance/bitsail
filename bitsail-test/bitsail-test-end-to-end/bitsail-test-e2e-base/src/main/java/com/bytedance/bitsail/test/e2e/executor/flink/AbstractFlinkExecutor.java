@@ -86,6 +86,7 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
     );
     executor = new GenericContainer<>(flinkDockerImage)
         .withNetwork(network)
+        .withNetworkAliases(getContainerName())
         .withLogConsumer(new Slf4jLogConsumer(DockerLoggerFactory.getLogger(flinkDockerImage)).withSeparateOutputStreams())
         .withStartupAttempts(1)
         .withWorkingDirectory(executorRootDir)
@@ -104,6 +105,8 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
 
     String commands = String.join(" ", getExecCommand());
     LOG.info("Begin test: [{}], Container: [{}]\n"
+        + "================ Test  Conf ================\n"
+        + conf + "\n"
         + "=============== Test Command ===============\n"
         + commands + "\n"
         + "============================================\n",

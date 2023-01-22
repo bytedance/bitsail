@@ -21,16 +21,21 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.test.e2e.base.AbstractContainer;
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
 
+import lombok.Setter;
+
 import java.util.Set;
 
 public abstract class AbstractDataSource extends AbstractContainer {
 
   protected Set<TransferableFile> transferableFiles;
 
+  @Setter
+  protected Role role;
+
   /**
    * Check if this data source can be used for the test.
    */
-  public abstract boolean accept(BitSailConfiguration jobConf, String sourceType);
+  public abstract boolean accept(BitSailConfiguration jobConf, Role role);
 
   /**
    * Configure the data source, like docker image name or version.
@@ -58,5 +63,10 @@ public abstract class AbstractDataSource extends AbstractContainer {
    */
   public void validate() throws BitSailException {
 
+  }
+
+  enum Role {
+    SOURCE,
+    SINK
   }
 }

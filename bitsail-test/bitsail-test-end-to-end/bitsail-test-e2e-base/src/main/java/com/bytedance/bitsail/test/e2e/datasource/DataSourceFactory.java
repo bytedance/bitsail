@@ -16,21 +16,35 @@
 
 package com.bytedance.bitsail.test.e2e.datasource;
 
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 
 public class DataSourceFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(DataSourceFactory.class);
 
-  public static AbstractDataSource getDataSource(BitSailConfiguration jobConf,
-                                                 String sourceType) {
+  public static AbstractDataSource getAsSource(BitSailConfiguration jobConf) {
+    return getDataSource(jobConf, AbstractDataSource.Role.SOURCE);
+  }
+
+  public static AbstractDataSource getAsSink(BitSailConfiguration jobConf) {
+    return getDataSource(jobConf, AbstractDataSource.Role.SINK);
+  }
+
+  private static AbstractDataSource getDataSource(BitSailConfiguration jobConf,
+                                                  AbstractDataSource.Role role) {
     ServiceLoader<AbstractDataSource> loader = ServiceLoader.load(AbstractDataSource.class);
 
     List<AbstractDataSource> acceptedDataSource = new ArrayList<>();
     for (AbstractDataSource dataSource : loader) {
-      if (dataSource != null && dataSource.accept(jobConf, sourceType)) {
+      if (dataSource != null && dataSource.accept(jobConf, role)) {
         acceptedDataSource.add(dataSource);
       }
     }
@@ -39,9 +53,13 @@ public class DataSourceFactory {
       throw new IllegalStateException("Multiple data sources are accepted.");
     }
     if (acceptedDataSource.isEmpty()) {
-      throw new IllegalStateException("No matched data source found.");
+      throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
+          "No matched data source found.");
     }
 
-    return acceptedDataSource.get(0);
+    AbstractDataSource accept = acceptedDataSource.get(0);
+    accept.setRole(role);
+    LOG.info("Load data source [{}] as {}.", accept.getContainerName(), accept.role);
+    return accept;
   }
 }

@@ -17,6 +17,10 @@
 package com.bytedance.bitsail.test.e2e.datasource;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.ReaderOptions;
+import com.bytedance.bitsail.common.option.WriterOptions;
+import com.bytedance.bitsail.connector.fake.source.FakeSource;
+import com.bytedance.bitsail.connector.print.sink.PrintSink;
 
 import org.testcontainers.containers.Network;
 
@@ -33,8 +37,18 @@ public class EmptyDataSource extends AbstractDataSource {
   }
 
   @Override
-  public boolean accept(BitSailConfiguration jobConf, String sourceType) {
-    return "empty".equalsIgnoreCase(sourceType);
+  public boolean accept(BitSailConfiguration jobConf, Role role) {
+    String readerClass = jobConf.get(ReaderOptions.READER_CLASS);
+    String writerClass = jobConf.get(WriterOptions.WRITER_CLASS);
+
+    switch (role) {
+      case SOURCE:
+        return FakeSource.class.getName().equals(readerClass);
+      case SINK:
+        return PrintSink.class.getName().equals(writerClass);
+      default:
+        return false;
+    }
   }
 
   @Override
