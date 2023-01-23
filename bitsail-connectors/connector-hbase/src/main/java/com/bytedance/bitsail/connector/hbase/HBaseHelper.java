@@ -18,6 +18,7 @@ package com.bytedance.bitsail.connector.hbase;
 
 import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.hbase.auth.KerberosAuthenticator;
+
 import org.apache.commons.collections.MapUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;

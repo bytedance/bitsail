@@ -1,6 +1,8 @@
 package com.bytedance.bitsail.connector.hbase.auth;
 
 import com.bytedance.bitsail.common.util.Preconditions;
+import com.bytedance.bitsail.connector.hbase.constant.HBaseConstants;
+
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -12,8 +14,13 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.Map;
 
-import static com.bytedance.bitsail.connector.hbase.constant.HBaseConstants.*;
+import static com.bytedance.bitsail.connector.hbase.constant.HBaseConstants.KEY_JAVA_SECURITY_KRB5_CONF;
 import static com.bytedance.bitsail.connector.hbase.constant.HBaseConstants.KEY_KEYTAB_CONTENT;
+import static com.bytedance.bitsail.connector.hbase.constant.HBaseConstants.KEY_KEYTAB_CONTENT_TMP_FILEPATH;
+import static com.bytedance.bitsail.connector.hbase.constant.HBaseConstants.KEY_KRB5_CONTENT;
+import static com.bytedance.bitsail.connector.hbase.constant.HBaseConstants.KEY_KRB5_CONTENT_TMP_FILEPATH;
+import static com.bytedance.bitsail.connector.hbase.constant.HBaseConstants.KEY_USE_BASE64_CONTENT;
+import static com.bytedance.bitsail.connector.hbase.constant.HBaseConstants.KEY_USE_LOCAL_FILE;
 
 public class KerberosFileHandler {
   private static final Logger LOG = LoggerFactory.getLogger(KerberosFileHandler.class);
@@ -28,7 +35,7 @@ public class KerberosFileHandler {
   public static void adjustHbaseConf(Map<String, Object> hbaseConfigMap) {
     boolean useBase64Content = MapUtils.getBooleanValue(hbaseConfigMap, KEY_USE_BASE64_CONTENT);
     if (useBase64Content) {
-      hbaseConfigMap.put(KEY_PRINCIPAL_FILE, KEY_KEYTAB_CONTENT_TMP_FILEPATH);
+      hbaseConfigMap.put(HBaseConstants.KEY_PRINCIPAL_FILE, KEY_KEYTAB_CONTENT_TMP_FILEPATH);
       hbaseConfigMap.put(KEY_JAVA_SECURITY_KRB5_CONF, KEY_KRB5_CONTENT_TMP_FILEPATH);
       hbaseConfigMap.put(KEY_USE_LOCAL_FILE, true);
     }
@@ -36,6 +43,7 @@ public class KerberosFileHandler {
 
   /**
    * Store kerberos authentication content into local files.
+   *
    * @param hbaseConfigMap User defined hbase configuration.
    */
   public static void loadConfContent(Map<String, Object> hbaseConfigMap) throws IOException {
@@ -48,6 +56,7 @@ public class KerberosFileHandler {
 
   /**
    * Return the principal file name defined in configuration.
+   *
    * @param config HBase configuration.
    * @return Principal file name.
    */
@@ -67,6 +76,7 @@ public class KerberosFileHandler {
 
   /**
    * Load krb.conf file.
+   *
    * @param kerberosConfig HBase configuration.
    */
   public static void loadKrb5Conf(Map<String, Object> kerberosConfig) {
@@ -146,8 +156,9 @@ public class KerberosFileHandler {
 
   /**
    * Write base64 encoded content into local files.
+   *
    * @param base64Content Base64 encoded content.
-   * @param filePath Path of file.
+   * @param filePath      Path of file.
    */
   private static void writeBase64ContentToFile(String base64Content, String filePath) throws IOException {
     // Write data to a temporary file to prevent write failure and ensure the correctness of file contents.

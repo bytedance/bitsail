@@ -3,6 +3,7 @@ package com.bytedance.bitsail.connector.hbase.auth;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.component.format.security.kerberos.option.KerberosOptions;
 import com.bytedance.bitsail.component.format.security.kerberos.security.HadoopSecurityModule;
+
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -16,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.bytedance.bitsail.connector.hbase.constant.HBaseConstants.KEY_PRINCIPAL;
 import static com.bytedance.bitsail.connector.hbase.constant.HBaseConstants.AUTHENTICATION_TYPE;
 import static com.bytedance.bitsail.connector.hbase.constant.HBaseConstants.KEY_FS_HDFS_IMPL_DISABLE_CACHE;
 import static com.bytedance.bitsail.connector.hbase.constant.HBaseConstants.KEY_HBASE_SECURITY_AUTHENTICATION;
