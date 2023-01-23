@@ -19,31 +19,28 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>bitsail-test-end-to-end</artifactId>
+        <artifactId>bitsail-test-e2e-datasource</artifactId>
         <groupId>com.bytedance.bitsail</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitsail-test-e2e-datasource</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>bitsail-test-e2e-datasource-redis</module>
-        <module>bitsail-test-e2e-datasource-ftp</module>
-    </modules>
+    <artifactId>bitsail-test-e2e-datasource-ftp</artifactId>
 
     <dependencies>
+        <!-- ftp client -->
         <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-test-e2e-base</artifactId>
-            <version>${revision}</version>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>3.6</version>
+            <scope>compile</scope>
         </dependency>
 
-        <!-- junit -->
+        <!-- ftp/sftp connector -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>compile</scope>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-ftp</artifactId>
+            <version>${revision}</version>
         </dependency>
     </dependencies>
 </project>
