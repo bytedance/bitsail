@@ -39,7 +39,7 @@
       "reader_parallelism_num":1
     },
     "writer": {
-      "class": "com.bytedance.bitsail.connector.print.sink.PrintSink"
+      "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink"
     }
   }
 }
