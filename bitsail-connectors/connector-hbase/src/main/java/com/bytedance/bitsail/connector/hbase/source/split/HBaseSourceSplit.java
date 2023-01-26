@@ -18,12 +18,16 @@ package com.bytedance.bitsail.connector.hbase.source.split;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplit;
 
+import lombok.Getter;
 import lombok.Setter;
 
 @Setter
+@Getter
 public class HBaseSourceSplit implements SourceSplit {
   public static final String HBASE_SOURCE_SPLIT_PREFIX = "hbase_source_split_";
   private final String splitId;
+  private byte[] startRow;
+  private byte[] endRow;
 
   /**
    * Read whole table or not
@@ -32,6 +36,12 @@ public class HBaseSourceSplit implements SourceSplit {
 
   public HBaseSourceSplit(int splitId) {
     this.splitId = HBASE_SOURCE_SPLIT_PREFIX + splitId;
+  }
+
+  public HBaseSourceSplit(int splitId, byte[] startRow, byte[] endRow) {
+    this.splitId = HBASE_SOURCE_SPLIT_PREFIX + splitId;
+    this.startRow = startRow;
+    this.endRow = endRow;
   }
 
   @Override

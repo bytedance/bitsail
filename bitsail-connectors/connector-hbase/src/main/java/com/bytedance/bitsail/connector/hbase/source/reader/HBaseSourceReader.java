@@ -37,6 +37,7 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import com.google.common.collect.Maps;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Result;
@@ -118,16 +119,17 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
     // Check if input column names are in format: [ columnFamily:column ].
     this.columnNames.stream().peek(column -> Preconditions.checkArgument(
             (column.contains(":") && column.split(":").length == 2) ||
-                ROW_KEY.equalsIgnoreCase(column),
+                    this.ROW_KEY.equalsIgnoreCase(column),
             "Invalid column names, it should be [ColumnFamily:Column] format"))
-        .forEach(column -> columnFamilies.add(column.split(":")[0]));
+        .forEach(column -> this.columnFamilies.add(column.split(":")[0]));
 
-    this.connection = HBaseHelper.getHbaseConnection(hbaseConfig);
+    this.connection = HBaseHelper.getHbaseConnection(this.hbaseConfig);
     LOG.info("HBase source reader {} has connection created.", subTaskId);
 
     this.splits = new ConcurrentLinkedDeque<>();
+    this.namesMap = Maps.newConcurrentMap();
     this.deserializationFormat = new HBaseDeserializationFormat(jobConf);
-    this.deserializationSchema = deserializationFormat.createRuntimeDeserializationSchema(typeInfos);
+    this.deserializationSchema = this.deserializationFormat.createRuntimeDeserializationSchema(this.typeInfos);
 
     LOG.info("HBase source reader {} is initialized.", subTaskId);
   }
@@ -138,47 +140,47 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
 
   @Override
   public void pollNext(SourcePipeline<Row> pipeline) throws Exception {
-    if (currentScanner == null && splits.isEmpty()) {
+    if (this.currentScanner == null && this.splits.isEmpty()) {
       return;
     }
 
-    if (currentScanner == null) {
-      this.currentSplit = splits.poll();
+    if (this.currentScanner == null) {
+      this.currentSplit = this.splits.poll();
 
       Scan scan = new Scan();
       this.columnFamilies.forEach(cf -> scan.addFamily(Bytes.toBytes(cf)));
-      this.currentScanner = connection.getTable(TableName.valueOf(this.tableName)).getScanner(scan);
+      this.currentScanner = this.connection.getTable(TableName.valueOf(this.tableName)).getScanner(scan);
     }
     Result result = this.currentScanner.next();
     if (result != null) {
-      pipeline.output(deserializationSchema.deserialize(convertRawRow(result)));
+      pipeline.output(this.deserializationSchema.deserialize(convertRawRow(result)));
     }
   }
 
   private byte[][] convertRawRow(Result result) {
-    byte[][] rawRow = new byte[columnNames.size()][];
-    for (int i = 0; i < columnNames.size(); ++i) {
-      String columnName = columnNames.get(i);
+    byte[][] rawRow = new byte[this.columnNames.size()][];
+    for (int i = 0; i < this.columnNames.size(); ++i) {
+      String columnName = this.columnNames.get(i);
       byte[] bytes;
       try {
         // If it is rowkey defined by users, directly use it.
-        if (ROW_KEY.equals(columnName)) {
+        if (this.ROW_KEY.equals(columnName)) {
           bytes = result.getRow();
         } else {
-          byte[][] arr = namesMap.get(columnName);
+          byte[][] arr = this.namesMap.get(columnName);
           // Deduplicate
           if (Objects.isNull(arr)) {
             arr = new byte[2][];
             String[] arr1 = columnName.split(":");
             arr[0] = arr1[0].trim().getBytes(StandardCharsets.UTF_8);
             arr[1] = arr1[1].trim().getBytes(StandardCharsets.UTF_8);
-            namesMap.put(columnName, arr);
+            this.namesMap.put(columnName, arr);
           }
           bytes = result.getValue(arr[0], arr[1]);
         }
         rawRow[i] = bytes;
       } catch (Exception e) {
-        LOG.error("Cannot read data from {}, reason: \n", tableName, e);
+        LOG.error("Cannot read data from {}, reason: \n", this.tableName, e);
       }
     }
     return rawRow;
@@ -186,14 +188,14 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
 
   @Override
   public void addSplits(List<HBaseSourceSplit> splitList) {
-    totalSplitNum += splitList.size();
-    splits.addAll(splitList);
+    this.totalSplitNum += splitList.size();
+    this.splits.addAll(splitList);
   }
 
   @Override
   public boolean hasMoreElements() {
-    if (hasNoMoreSplits && splits.isEmpty() && currentScanner == null) {
-      LOG.info("Finish reading all {} splits.", totalSplitNum);
+    if (this.hasNoMoreSplits && this.splits.isEmpty() && this.currentScanner == null) {
+      LOG.info("Finish reading all {} splits.", this.totalSplitNum);
       return false;
     }
     return true;
@@ -201,7 +203,7 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
 
   @Override
   public void notifyNoMoreSplits() {
-    hasNoMoreSplits = true;
+    this.hasNoMoreSplits = true;
     LOG.info("No more splits will be assigned.");
   }
 
@@ -222,16 +224,16 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
 
   @Override
   public void close() throws Exception {
-    if (currentScanner != null) {
+    if (this.currentScanner != null) {
       try {
-        currentScanner.close();
+        this.currentScanner.close();
       } catch (Exception e) {
         throw new IOException("Failed to close HBase Scanner.", e);
       }
     }
-    if (connection != null) {
+    if (this.connection != null) {
       try {
-        connection.close();
+        this.connection.close();
       } catch (Exception e) {
         throw new IOException("Failed to close HBase connection.", e);
       }
@@ -241,8 +243,8 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
 
   public JobConf getConf() {
     JobConf jobConf = new JobConf(false);
-    jobConf.set(TableInputFormat.INPUT_TABLE, tableName);
-    hbaseConfig.forEach((key, value) -> jobConf.set(key, value.toString()));
+    jobConf.set(TableInputFormat.INPUT_TABLE, this.tableName);
+    this.hbaseConfig.forEach((key, value) -> jobConf.set(key, value.toString()));
     return jobConf;
   }
 }
