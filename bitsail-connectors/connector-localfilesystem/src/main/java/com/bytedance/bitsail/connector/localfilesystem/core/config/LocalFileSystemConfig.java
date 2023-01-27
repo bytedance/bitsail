@@ -17,7 +17,7 @@
 package com.bytedance.bitsail.connector.localfilesystem.core.config;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.connector.localfilesystem.option.FileSystemReaderOptions;
+import com.bytedance.bitsail.connector.localfilesystem.option.LocalFileSystemReaderOptions;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +26,7 @@ import java.io.Serializable;
 
 @Setter
 @Getter
-public class FileSystemConfig implements Serializable {
+public class LocalFileSystemConfig implements Serializable {
   private String filePath;
   private FileSystemType fileSystemType;
   private ContentType contentType;
@@ -41,12 +41,12 @@ public class FileSystemConfig implements Serializable {
     JSON
   }
 
-  public FileSystemConfig() {}
+  public LocalFileSystemConfig() {}
 
-  public FileSystemConfig(BitSailConfiguration jobConf) {
-    this.filePath = jobConf.get(FileSystemReaderOptions.FILE_PATH);
-    this.contentType = FileSystemConfig.ContentType.valueOf(jobConf.get(FileSystemReaderOptions.CONTENT_TYPE).toUpperCase());
-    this.skipFirstLine = jobConf.get(FileSystemReaderOptions.SKIP_FIRST_LINE);
+  public LocalFileSystemConfig(BitSailConfiguration jobConf) {
+    this.filePath = jobConf.get(LocalFileSystemReaderOptions.FILE_PATH);
+    this.contentType = LocalFileSystemConfig.ContentType.valueOf(jobConf.get(LocalFileSystemReaderOptions.CONTENT_TYPE).toUpperCase());
+    this.skipFirstLine = jobConf.get(LocalFileSystemReaderOptions.SKIP_FIRST_LINE);
   }
 }
 

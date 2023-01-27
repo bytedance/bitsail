@@ -24,13 +24,13 @@ import org.junit.Test;
 
 public class LocalFileSystemSourceTest {
   @Test
-  public void testUnifiedLocalFSSourceReaderWithCSV() throws Exception {
+  public void testUnifiedLocalFSSourceWithCSV() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("scripts/local-csv-to-print.json");
     EmbeddedFlinkCluster.submitJob(jobConf);
   }
 
   @Test
-  public void testUnifiedLocalFSSourceReaderWithJSON() throws Exception {
+  public void testUnifiedLocalFSSourceWithJSON() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("scripts/local-json-to-print.json");
     EmbeddedFlinkCluster.submitJob(jobConf);
   }

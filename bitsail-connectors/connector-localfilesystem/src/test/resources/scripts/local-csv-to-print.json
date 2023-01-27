@@ -16,7 +16,7 @@
           "type": "long"
         },
         {
-          "name": "id",
+          "name": "date",
           "type": "date"
         },
         {

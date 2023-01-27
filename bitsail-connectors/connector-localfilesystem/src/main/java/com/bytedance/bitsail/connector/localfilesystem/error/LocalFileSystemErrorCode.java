@@ -18,13 +18,13 @@ package com.bytedance.bitsail.connector.localfilesystem.error;
 
 import com.bytedance.bitsail.common.exception.ErrorCode;
 
-public enum FileSystemErrorCode implements ErrorCode {
+public enum LocalFileSystemErrorCode implements ErrorCode {
   UNSUPPORTED_CONTENT_TYPE("FileSystem-01", "Content type only supports CSV and JSON.");
 
   private final String code;
   private final String description;
 
-  FileSystemErrorCode(String code, String description) {
+  LocalFileSystemErrorCode(String code, String description) {
     this.code = code;
     this.description = description;
   }

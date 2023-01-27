@@ -33,7 +33,7 @@ public class LocalFileSystemSource extends SimpleSourceBase<Row> {
 
   @Override
   public String getReaderName() {
-    return "filesystem";
+    return "localfilesystem";
   }
 
   @Override

@@ -21,7 +21,7 @@ import com.bytedance.bitsail.base.format.DeserializationSchema;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.base.source.SimpleSourceReaderBase;
-import com.bytedance.bitsail.connector.localfilesystem.core.config.FileSystemConfig;
+import com.bytedance.bitsail.connector.localfilesystem.core.config.LocalFileSystemConfig;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -31,35 +31,40 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class LocalFileSystemSourceReader extends SimpleSourceReaderBase<Row> {
-  private final FileSystemConfig fileSystemConfig;
+  private final LocalFileSystemConfig localFileSystemConfig;
   private final String filePath;
   private final BufferedReader bufferedReader;
+  private String line;
   private final transient DeserializationSchema<byte[], Row> deserializationSchema;
 
   public LocalFileSystemSourceReader(BitSailConfiguration jobConf, Context context) {
-    this.fileSystemConfig = new FileSystemConfig(jobConf);
-    this.filePath = fileSystemConfig.getFilePath();
-    this.bufferedReader = loadCsvFile();
+    this.localFileSystemConfig = new LocalFileSystemConfig(jobConf);
+    this.filePath = localFileSystemConfig.getFilePath();
+    this.bufferedReader = loadLocalFile();
     this.deserializationSchema = DeserializationSchemaFactory.createDeserializationSchema(
         jobConf,
         context,
-        fileSystemConfig
+        localFileSystemConfig
     );
   }
 
-  private BufferedReader loadCsvFile() {
-    Path path = Paths.get(this.filePath);
+  private BufferedReader loadLocalFile() {
+    Path path = Paths.get(filePath);
     if (!Files.exists(path)) {
       throw new RuntimeException(new FileNotFoundException(
-        String.format("File %s does not exits!", this.filePath)
+        String.format("File %s does not exits!", filePath)
       ));
     }
 
     BufferedReader bufferedReader;
     try {
       bufferedReader = Files.newBufferedReader(path);
-      if (this.fileSystemConfig.getSkipFirstLine()) {
+      if (localFileSystemConfig.getSkipFirstLine()) {
         bufferedReader.readLine();
+      }
+      line = bufferedReader.readLine();
+      if (line == null) {
+        bufferedReader.close();
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -69,21 +74,25 @@ public class LocalFileSystemSourceReader extends SimpleSourceReaderBase<Row> {
 
   @Override
   public void pollNext(SourcePipeline<Row> pipeline) throws Exception {
-    String line = this.bufferedReader.readLine();
-    Row row = deserializationSchema.deserialize(line.getBytes());
-    pipeline.output(row);
+    synchronized (this) {
+      // Avoid NPE
+      if (line == null) {
+        return;
+      }
+
+      Row row = deserializationSchema.deserialize(line.getBytes());
+      pipeline.output(row);
+      line = bufferedReader.readLine();
+      if (line == null) {
+        bufferedReader.close();
+      }
+    }
   }
 
   @Override
   public boolean hasMoreElements() {
-    try {
-      boolean isReady = this.bufferedReader.ready();
-      if (!isReady) {
-        this.bufferedReader.close();
-      }
-      return isReady;
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    synchronized (this) {
+      return line != null;
     }
   }
 }

@@ -22,7 +22,7 @@ import com.bytedance.bitsail.common.option.ReaderOptions;
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
 
-public interface FileSystemReaderOptions extends ReaderOptions.BaseReaderOptions {
+public interface LocalFileSystemReaderOptions extends ReaderOptions.BaseReaderOptions {
   /**
    * Common Options
    */
