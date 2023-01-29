@@ -25,14 +25,12 @@ import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
 
 public class SftpDataSource extends AbstractDataSource {
   private static final Logger LOG = LoggerFactory.getLogger(SftpDataSource.class);
@@ -112,9 +110,9 @@ public class SftpDataSource extends AbstractDataSource {
         .withExposedPorts(port)
         .withCommand(String.format("%s:%s:1001", USER_NAME, PASSWORD));
 
+    File dataFolder = new File("src/main/resources/data");
     TransferableFile dataResource = new TransferableFile(
-        new File(Objects.requireNonNull(
-            SftpDataSource.class.getResource("/data")).getPath()).getAbsolutePath(),
+        dataFolder.getAbsolutePath(),
         CONTAINER_PATH
     );
     copyToContainer(sftpServer, dataResource);
