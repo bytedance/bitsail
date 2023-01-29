@@ -121,8 +121,9 @@ public class ElasticsearchDataSource extends AbstractDataSource {
   }
 
   @Override
-  public void close() {
+  public void close() throws IOException {
     esContainer.close();
+    super.close();
   }
 
   /**

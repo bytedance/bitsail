@@ -18,22 +18,19 @@ package com.bytedance.bitsail.test.e2e.datasource;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.ReaderOptions;
-import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.ftp.core.config.FtpConfig;
 import com.bytedance.bitsail.connector.ftp.option.FtpReaderOptions;
 import com.bytedance.bitsail.connector.ftp.source.FtpSource;
-import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.MountableFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class SftpDataSource extends AbstractDataSource {
   private static final Logger LOG = LoggerFactory.getLogger(SftpDataSource.class);
@@ -112,18 +109,11 @@ public class SftpDataSource extends AbstractDataSource {
         .withNetworkAliases(host)
         .withExposedPorts(port)
         .withCommand(String.format("%s:%s:1001", USER_NAME, PASSWORD));
-
-    File dir = new File(SftpDataSource.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-    Preconditions.checkNotNull(dir);
-    while (!"bitsail-test-e2e-datasource-ftp".equals(dir.getName())) {
-      dir = dir.getParentFile();
-    }
-    Path dataFolder = Paths.get(dir.getPath(), "src", "main", "resources", "data");
-    TransferableFile dataResource = new TransferableFile(
-        dataFolder.toAbsolutePath().toString(),
-        CONTAINER_PATH
+    sftpServer.addFileSystemBind(
+        MountableFile.forClasspathResource("/data").getFilesystemPath(),
+        CONTAINER_PATH,
+        BindMode.READ_ONLY
     );
-    copyToContainer(sftpServer, dataResource);
 
     sftpServer.start();
     LOG.info("Sftp container starts! Host is: [{}], port is: [{}].", host, port);
