@@ -106,7 +106,8 @@ public class SftpDataSource extends AbstractDataSource {
     this.port = SFTP_PORT;
 
     File dataResources = new File(Objects.requireNonNull(
-        SftpDataSource.class.getClassLoader().getResource("data")).getPath());
+        SftpDataSource.class.getResource("/data")).getPath());
+    LOG.info("Current resource location: {}", dataResources.getAbsolutePath());
 
     sftpServer = new GenericContainer<>(DockerImageName.parse(SFTP_VERSION))
         .withNetwork(network)
