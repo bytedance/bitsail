@@ -12,8 +12,6 @@
       "success_file_path": "/data/json/_SUCCESS",
       "content_type": "json",
       "skip_first_line": false,
-      "max_retry_time": 3,
-      "retry_interval_ms": 1000,
       "columns": [
         {
           "name": "c0",
@@ -55,7 +53,6 @@
     },
     "writer": {
       "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
-      "batch_size": 10,
       "columns": [
         {
           "name": "c0",

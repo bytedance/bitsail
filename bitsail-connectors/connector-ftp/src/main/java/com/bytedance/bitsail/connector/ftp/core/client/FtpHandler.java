@@ -119,16 +119,7 @@ public class FtpHandler implements IFtpHandler {
   @Override
   public boolean isFileExist(String filePath) {
     boolean isExitFlag = false;
-    log.info("checn file exist: {}", filePath);
     try {
-      String[] names = ftpClient.listNames("/");
-      if (names != null) {
-        for (String name : names) {
-          log.info(">>> {}", name);
-        }
-      } else {
-        log.info("cannot find any file from /data/json");
-      }
       FTPFile[] ftpFiles = ftpClient.listFiles(new String(filePath.getBytes(StandardCharsets.UTF_8), FTP.DEFAULT_CONTROL_ENCODING));
       if (ftpFiles.length == 1 && ftpFiles[0].isFile()) {
         isExitFlag = true;

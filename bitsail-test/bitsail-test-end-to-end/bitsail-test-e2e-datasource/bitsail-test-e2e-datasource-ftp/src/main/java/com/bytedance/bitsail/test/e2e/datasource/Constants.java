@@ -17,7 +17,7 @@
 package com.bytedance.bitsail.test.e2e.datasource;
 
 public class Constants {
-  public static final int FTP_PORT = 21;
+  public static final int FTP_PORT = 60021;
   public static final int SFTP_PORT = 22;
   public static final int DEFAULT_TIMEOUT = 5000;
 
