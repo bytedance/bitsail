@@ -17,6 +17,7 @@
 package com.bytedance.bitsail.connector.fake.source;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.BasicTypeInfo;
@@ -38,7 +39,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.bytedance.bitsail.common.typeinfo.TypeProperty.NULLABLE;
 
@@ -52,6 +59,7 @@ public class FakeRowGenerator {
   private final long lower;
   private final transient Timestamp fromTimestamp;
   private final transient Timestamp toTimestamp;
+  private final List<ColumnInfo> columnInfos;
 
   public FakeRowGenerator(BitSailConfiguration jobConf, int taskId) {
     this.faker = new Faker();
@@ -62,6 +70,7 @@ public class FakeRowGenerator {
     this.lower = jobConf.get(FakeReaderOptions.LOWER_LIMIT);
     this.fromTimestamp = Timestamp.valueOf(jobConf.get(FakeReaderOptions.FROM_TIMESTAMP));
     this.toTimestamp = Timestamp.valueOf(jobConf.get(FakeReaderOptions.TO_TIMESTAMP));
+    this.columnInfos = jobConf.get(FakeReaderOptions.COLUMNS);
   }
 
   public Row fakeOneRecord(TypeInfo<?>[] typeInfos) {
@@ -71,7 +80,12 @@ public class FakeRowGenerator {
       if (isNullable(typeInfo) && isNull()) {
         row.setField(index, null);
       } else {
-        row.setField(index, fakeRawValue(typeInfo));
+        Object constantValue = this.columnInfos.get(index).getDefaultValue();
+        if (Objects.isNull(constantValue)) {
+          row.setField(index, fakeRawValue(typeInfo));
+        } else {
+          row.setField(index, constantRawValue(typeInfo, constantValue.toString()));
+        }
       }
     }
     return row;
@@ -155,6 +169,109 @@ public class FakeRowGenerator {
       MapTypeInfo<?, ?> mapTypeInfo = (MapTypeInfo<?, ?>) typeInfo;
       Map<Object, Object> mapRawValue = Maps.newHashMap();
       mapRawValue.put(fakeRawValue(mapTypeInfo.getKeyTypeInfo()), fakeRawValue(mapTypeInfo.getValueTypeInfo()));
+      return mapRawValue;
+    }
+    throw new RuntimeException("Unsupported type " + typeInfo);
+  }
+
+  @SuppressWarnings("checkstyle:MagicNumber")
+  private Object constantRawValue(TypeInfo<?> typeInfo, String constantValue) {
+
+    if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (CollectionUtils.isNotEmpty(typeInfo.getTypeProperties()) && typeInfo.getTypeProperties().contains(TypeProperty.UNIQUE)) {
+        throw new RuntimeException("unique and defaultValue can't be specified at the same time");
+      } else {
+        return Long.valueOf(constantValue).longValue();
+      }
+    } else if (TypeInfos.INT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return Long.valueOf(constantValue).intValue();
+
+    } else if (TypeInfos.SHORT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return Long.valueOf(constantValue).shortValue();
+
+    } else if (TypeInfos.STRING_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return constantValue;
+
+    } else if (TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return Boolean.valueOf(constantValue).booleanValue();
+
+    } else if (TypeInfos.DOUBLE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return Double.valueOf(constantValue).doubleValue();
+
+    } else if (TypeInfos.FLOAT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return Double.valueOf(constantValue).floatValue();
+
+    } else if (TypeInfos.BIG_DECIMAL_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return BigDecimal.valueOf(Double.valueOf(constantValue));
+
+    } else if (TypeInfos.BIG_INTEGER_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return BigInteger.valueOf(Long.valueOf(constantValue));
+
+    } else if (BasicArrayTypeInfo.BINARY_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return constantValue.getBytes();
+
+    } else if (TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (constantValue.equalsIgnoreCase("now")) {
+        return new java.sql.Date(System.currentTimeMillis());
+      } else {
+        return java.sql.Date.valueOf(constantValue);
+      }
+
+    } else if (TypeInfos.SQL_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (constantValue.equalsIgnoreCase("now")) {
+        return new Time(System.currentTimeMillis());
+      } else {
+        return Time.valueOf(constantValue);
+      }
+
+    } else if (TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (constantValue.equalsIgnoreCase("now")) {
+        return new Timestamp(System.currentTimeMillis());
+      } else {
+        return new Timestamp(Long.valueOf(constantValue));
+      }
+
+    } else if (TypeInfos.LOCAL_DATE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (constantValue.equalsIgnoreCase("now")) {
+        return LocalDate.now();
+      } else {
+        return LocalDate.parse(constantValue);
+      }
+
+    } else if (TypeInfos.LOCAL_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (constantValue.equalsIgnoreCase("now")) {
+        return LocalTime.now();
+      } else {
+        return LocalTime.parse(constantValue);
+      }
+
+    } else if (TypeInfos.LOCAL_DATE_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (constantValue.equalsIgnoreCase("now")) {
+        return LocalDateTime.now();
+      } else if (constantValue.contains(":")) {
+        DateTimeFormatter fm = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+        return LocalDateTime.parse(constantValue, fm);
+      } else {
+        throw new IllegalArgumentException(String.format("unSupport timestamp value [%s]", constantValue));
+      }
+
+    } else if (TypeInfos.VOID_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return null;
+    }
+
+    if (typeInfo instanceof ListTypeInfo) {
+      ListTypeInfo<?> listTypeInfo = (ListTypeInfo<?>) typeInfo;
+      return Lists.newArrayList(constantRawValue(listTypeInfo.getElementTypeInfo(), constantValue));
+    }
+
+    if (typeInfo instanceof MapTypeInfo) {
+      MapTypeInfo<?, ?> mapTypeInfo = (MapTypeInfo<?, ?>) typeInfo;
+      Map<Object, Object> mapRawValue = Maps.newHashMap();
+      String[] kv = constantValue.split("_:_");
+      if (kv.length < 2) {
+        throw new IllegalArgumentException("defualt value of MapType requires key and value with _:_ as splitor");
+      }
+      mapRawValue.put(constantRawValue(mapTypeInfo.getKeyTypeInfo(), kv[0]), constantRawValue(mapTypeInfo.getValueTypeInfo(), kv[1]));
       return mapRawValue;
     }
     throw new RuntimeException("Unsupported type " + typeInfo);
