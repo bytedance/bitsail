@@ -168,6 +168,7 @@ public class FtpSourceSplitCoordinator implements SourceSplitCoordinator<FtpSour
     int successFileRetryLeftTimes = ftpConfig.getMaxRetryTime();
     String successFilePath = ftpConfig.getSuccessFilePath();
     while (!fileExistFlag && successFileRetryLeftTimes-- > 0) {
+      LOG.info("check {} times!!!", successFileRetryLeftTimes);
       fileExistFlag = ftpHandler.isFileExist(successFilePath);
       if (!fileExistFlag) {
         LOG.info("SUCCESS tag file " + successFilePath + " is not exist, waiting for retry...");
