@@ -32,6 +32,7 @@
         <module>bitsail-test-e2e-connector-v2-print</module>
         <module>bitsail-test-e2e-connector-v2-redis</module>
         <module>bitsail-test-e2e-connector-v2-ftp</module>
+        <module>bitsail-test-e2e-connector-v2-elasticsearch</module>
     </modules>
 
     <dependencies>

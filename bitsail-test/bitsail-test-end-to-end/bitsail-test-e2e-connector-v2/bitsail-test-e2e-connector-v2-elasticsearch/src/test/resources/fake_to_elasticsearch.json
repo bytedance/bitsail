@@ -1,0 +1,57 @@
+{
+  "job": {
+    "common": {
+      "job_id": -25,
+      "job_name": "bitsail_connector_fake_to_es_e2e_test",
+      "instance_id": -205,
+      "user_name": "user"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 100,
+      "null_percentage": 0,
+      "columns": [
+        {
+          "name": "id",
+          "type": "string",
+          "properties": "unique"
+        },
+        {
+          "name": "varchar_type",
+          "type": "string"
+        },
+        {
+          "name": "text_type",
+          "type": "string"
+        },
+        {
+          "name": "bigint_type",
+          "type": "bigint"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchSink",
+      "es_id_fields": "id",
+      "columns": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "varchar_type",
+          "type": "string"
+        },
+        {
+          "name": "text_type",
+          "type": "string"
+        },
+        {
+          "name": "bigint_type",
+          "type": "bigint"
+        }
+      ]
+    }
+  }
+}

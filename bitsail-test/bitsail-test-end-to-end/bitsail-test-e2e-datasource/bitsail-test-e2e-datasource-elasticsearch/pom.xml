@@ -19,32 +19,26 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>bitsail-test-end-to-end</artifactId>
+        <artifactId>bitsail-test-e2e-datasource</artifactId>
         <groupId>com.bytedance.bitsail</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitsail-test-e2e-datasource</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>bitsail-test-e2e-datasource-redis</module>
-        <module>bitsail-test-e2e-datasource-ftp</module>
-        <module>bitsail-test-e2e-datasource-elasticsearch</module>
-    </modules>
+    <artifactId>bitsail-test-e2e-datasource-elasticsearch</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-test-e2e-base</artifactId>
+            <artifactId>connector-elasticsearch</artifactId>
             <version>${revision}</version>
         </dependency>
 
-        <!-- junit -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>compile</scope>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>1.17.3</version>
         </dependency>
     </dependencies>
+
 </project>

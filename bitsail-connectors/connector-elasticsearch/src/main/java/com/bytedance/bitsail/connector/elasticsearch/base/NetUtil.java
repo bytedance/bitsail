@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 @Slf4j
 public class NetUtil {
 
-  private static final String IPV4_HTTP_PORT_FORMAT = "([.0-9]*):(\\d+)";
+  private static final String IPV4_HTTP_PORT_FORMAT = "(.*):(\\d+)";
   private static final String IPV6_HTTP_PORT_FORMAT = "(\\[.*\\]):(\\d+)";
 
   public static boolean isIpv6Address(String h) {
