@@ -55,8 +55,7 @@ public class PrintWriter implements Writer<Row, String, Integer> {
   }
 
   public PrintWriter(BitSailConfiguration writerConfiguration, Writer.Context<Integer> context, int alreadyPrintCount) {
-    this.batchSize = writerConfiguration.getNecessaryOption(PrintWriterOptions.BATCH_SIZE,
-      PrintErrorCode.REQUIRED_VALUE);
+    this.batchSize = writerConfiguration.get(PrintWriterOptions.BATCH_SIZE);
     Preconditions.checkState(this.batchSize > 0, "batch size must be larger than 0");
 
     this.sampleWrite = writerConfiguration.get(PrintWriterOptions.SAMPLE_WRITE);
