@@ -21,6 +21,7 @@ import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.connector.ftp.core.config.FtpConfig;
 import com.bytedance.bitsail.connector.ftp.option.FtpReaderOptions;
 import com.bytedance.bitsail.connector.ftp.source.FtpSource;
+import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,18 +106,19 @@ public class SftpDataSource extends AbstractDataSource {
     this.host = getContainerName() + "-" + role;
     this.port = SFTP_PORT;
 
-    File dataResources = new File(Objects.requireNonNull(
-        SftpDataSource.class.getResource("/data")).getPath());
-    LOG.info("Current resource location: {}", dataResources.getAbsolutePath());
-
     sftpServer = new GenericContainer<>(DockerImageName.parse(SFTP_VERSION))
         .withNetwork(network)
         .withNetworkAliases(host)
         .withExposedPorts(port)
-        .withFileSystemBind(dataResources.getAbsolutePath(),
-            CONTAINER_PATH,
-            BindMode.READ_ONLY)
         .withCommand(String.format("%s:%s:1001", USER_NAME, PASSWORD));
+
+    TransferableFile dataResource = new TransferableFile(
+        new File(Objects.requireNonNull(
+            SftpDataSource.class.getResource("/data")).getPath()).getAbsolutePath(),
+        CONTAINER_PATH
+    );
+    copyToContainer(sftpServer, dataResource);
+
     sftpServer.start();
     LOG.info("Sftp container starts! Host is: [{}], port is: [{}].", host, port);
   }
