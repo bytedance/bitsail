@@ -116,7 +116,7 @@ public abstract class AbstractExecutor extends AbstractContainer {
       throw new RuntimeException("Failed to load connector libs.", e);
     }
 
-    addJobConf();
+    addJobConf(executorConf);
   }
 
   /**
@@ -236,7 +236,7 @@ public abstract class AbstractExecutor extends AbstractContainer {
   /**
    * Add job conf file.
    */
-  protected void addJobConf() {
+  protected void addJobConf(BitSailConfiguration executorConf) {
     BitSailConfiguration jobConf = executorConf.clone();
     Path libPath = Paths.get(executorRootDir, "libs").toAbsolutePath();
     jobConf.set(CommonOptions.JOB_PLUGIN_ROOT_PATH, libPath.toString());

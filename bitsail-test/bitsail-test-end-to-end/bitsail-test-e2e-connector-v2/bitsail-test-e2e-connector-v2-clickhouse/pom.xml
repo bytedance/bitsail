@@ -19,65 +19,35 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>bitsail-test-end-to-end</artifactId>
+        <artifactId>bitsail-test-e2e-connector-v2</artifactId>
         <groupId>com.bytedance.bitsail</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitsail-test-e2e-connector-v2</artifactId>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>bitsail-test-e2e-connector-v2-print</module>
-        <module>bitsail-test-e2e-connector-v2-redis</module>
-        <module>bitsail-test-e2e-connector-v2-ftp</module>
-        <module>bitsail-test-e2e-connector-v2-elasticsearch</module>
-        <module>bitsail-test-e2e-connector-v2-clickhouse</module>
-    </modules>
+    <artifactId>bitsail-test-e2e-connector-v2-clickhouse</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-test-e2e-base</artifactId>
+            <artifactId>connector-clickhouse</artifactId>
             <version>${revision}</version>
             <scope>test</scope>
         </dependency>
 
-        <!-- core -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-core-entry</artifactId>
+            <artifactId>connector-print</artifactId>
             <version>${revision}</version>
             <scope>test</scope>
         </dependency>
 
-        <!-- engine -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-core-flink-bridge</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- clients -->
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-client-api</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-client-entry</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-client-entry-flink</artifactId>
+            <artifactId>bitsail-test-e2e-datasource-clickhouse</artifactId>
             <version>${revision}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
 </project>
