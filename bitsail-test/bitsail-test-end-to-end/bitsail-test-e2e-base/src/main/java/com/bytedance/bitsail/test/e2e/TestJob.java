@@ -32,6 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 @AllArgsConstructor
@@ -146,7 +151,8 @@ public class TestJob implements AutoCloseable {
   /**
    * Run a job.
    */
-  public int run(String caseName) throws Exception {
+  public int run(String caseName,
+                 int allowedTimeout) throws Exception {
     init();
 
     source.modifyJobConf(jobConf);
@@ -155,15 +161,26 @@ public class TestJob implements AutoCloseable {
     executor.configure(jobConf);
     executor.init();
 
-    int exitCode;
+    boolean allowTimeout = allowedTimeout > 0;
+    int execTimeout = allowTimeout ? allowedTimeout : 300;
+
+    ExecutorService service = Executors.newSingleThreadExecutor();
     try {
-      exitCode = executor.run(String.format("%s_on_%s", caseName, engineType));
+      Future<?> future = service.submit(() ->
+          executor.run(String.format("%s_on_%s", caseName, engineType)));
+      return (Integer) future.get(execTimeout, TimeUnit.SECONDS);
+    } catch (TimeoutException te) {
+      if (allowTimeout) {
+        LOG.info("Execute more than {} seconds, will terminate it.", allowedTimeout);
+        return 0;
+      } else {
+        LOG.error("Execute more than {} seconds.", allowedTimeout);
+        throw te;
+      }
     } catch (Exception e) {
       e.printStackTrace();
       throw e;
     }
-
-    return exitCode;
   }
 
   /**

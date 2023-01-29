@@ -26,6 +26,7 @@ import com.bytedance.bitsail.base.extension.ParallelismComputable;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
+import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.rocketmq.option.RocketMQSourceOptions;
 import com.bytedance.bitsail.connector.rocketmq.source.coordinator.RocketMQSourceSplitCoordinator;
@@ -91,6 +92,15 @@ public class RocketMQSource
   public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConfiguration,
                                                 BitSailConfiguration rocketmqConfiguration,
                                                 ParallelismAdvice upstreamAdvice) throws Exception {
+    if (rocketmqConfiguration.fieldExists(ReaderOptions.BaseReaderOptions.READER_PARALLELISM_NUM)) {
+      int readerParallelismNum = rocketmqConfiguration.get(
+          ReaderOptions.BaseReaderOptions.READER_PARALLELISM_NUM);
+      return ParallelismAdvice.builder()
+          .adviceParallelism(readerParallelismNum)
+          .enforceDownStreamChain(true)
+          .build();
+    }
+
     String cluster = rocketmqConfiguration.get(RocketMQSourceOptions.CLUSTER);
     String topic = rocketmqConfiguration.get(RocketMQSourceOptions.TOPIC);
     String consumerGroup = rocketmqConfiguration.get(RocketMQSourceOptions.CONSUMER_GROUP);

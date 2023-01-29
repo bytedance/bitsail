@@ -34,6 +34,7 @@
         <module>bitsail-test-e2e-connector-v2-ftp</module>
         <module>bitsail-test-e2e-connector-v2-elasticsearch</module>
         <module>bitsail-test-e2e-connector-v2-clickhouse</module>
+        <module>bitsail-test-e2e-connector-v2-rocketmq</module>
     </modules>
 
     <dependencies>

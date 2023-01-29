@@ -63,13 +63,14 @@ public abstract class AbstractE2ETest {
   protected static void submitJob(BitSailConfiguration jobConf,
                                   String engineType,
                                   String jobName,
+                                  int timeout,
                                   Consumer<AbstractDataSource> validation) throws Exception {
     int exitCode;
     try (TestJob testJob = TestJob.builder()
         .withJobConf(jobConf)
         .withEngineType(engineType)
         .build()) {
-      exitCode = testJob.run(jobName);
+      exitCode = testJob.run(jobName, timeout);
       if (exitCode != 0) {
         throw new IllegalStateException("Failed to execute job with exit code " + exitCode);
       }
@@ -83,12 +84,18 @@ public abstract class AbstractE2ETest {
 
   protected static void submitFlink11Job(BitSailConfiguration jobConf,
                                          String jobName) throws Exception {
-    submitJob(jobConf, "flink11", jobName, null);
+    submitJob(jobConf, "flink11", jobName, 0, null);
+  }
+
+  protected static void submitFlink11Job(BitSailConfiguration jobConf,
+                                         String jobName,
+                                         int timeout) throws Exception {
+    submitJob(jobConf, "flink11", jobName, timeout, null);
   }
 
   protected static void submitFlink11Job(BitSailConfiguration jobConf,
                                          String jobName,
                                          Consumer<AbstractDataSource> validation) throws Exception {
-    submitJob(jobConf, "flink11", jobName, validation);
+    submitJob(jobConf, "flink11", jobName, 0, validation);
   }
 }

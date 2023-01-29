@@ -19,16 +19,20 @@ package com.bytedance.bitsail.test.e2e.datasource;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfoUtils;
 import com.bytedance.bitsail.common.util.JsonSerializer;
+import com.bytedance.bitsail.connector.rocketmq.option.RocketMQSourceOptions;
 import com.bytedance.bitsail.connector.rocketmq.source.RocketMQSource;
 
+import com.alibaba.dcm.DnsCacheManipulator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.common.message.MessageQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
@@ -47,26 +51,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-public abstract class RocketMQDataSource extends AbstractDataSource {
+public class RocketMQDataSource extends AbstractDataSource {
   private static final Logger LOG = LoggerFactory.getLogger(RocketMQDataSource.class);
 
-  private static final String ROCKETMQ_SOURCE_VERSION = "4.9.4";
   private static final DockerImageName ROCKET_MQ_DOCKER_IMAGE = DockerImageName
       .parse("apache/rocketmq:4.9.4");
 
-  private static final String DEFAULT_PRODUCE_GROUP = "bitsail";
-  private static final String DEFAULT_TOPIC = "TBW102";
+  private static final String PRODUCE_GROUP = "bitsail";
+  private static final String TOPIC_NAME = "test_topic";
 
   private GenericContainer<?> nameServ;
   private GenericContainer<?> brokerServ;
 
-  private DefaultMQProducer producer;
-  private ScheduledExecutorService producerExecutor;
   private TypeInfo<?>[] producerTypes;
 
   @Override
@@ -98,7 +97,12 @@ public abstract class RocketMQDataSource extends AbstractDataSource {
 
   @Override
   public void modifyJobConf(BitSailConfiguration jobConf) {
-    // todo
+    jobConf.set(RocketMQSourceOptions.CLUSTER, "nameserv:9876");
+    jobConf.set(RocketMQSourceOptions.TOPIC, TOPIC_NAME);
+    jobConf.set(RocketMQSourceOptions.CONSUMER_OFFSET_MODE, "earliest");
+    jobConf.set(RocketMQSourceOptions.CONSUMER_GROUP, PRODUCE_GROUP);
+
+    jobConf.set(CommonOptions.JOB_TYPE, "batch");
   }
 
   @SuppressWarnings("checkstyle:MagicNumber")
@@ -149,8 +153,12 @@ public abstract class RocketMQDataSource extends AbstractDataSource {
   @SuppressWarnings("checkstyle:MagicNumber")
   @Override
   public void fillData() {
+    synchronized (RocketMQSource.class) {
+      DnsCacheManipulator.setDnsCache("broker", "127.0.0.1");
+    }
+
     // create producer
-    producer = new DefaultMQProducer(DEFAULT_PRODUCE_GROUP);
+    DefaultMQProducer producer = new DefaultMQProducer(PRODUCE_GROUP);
     producer.setNamesrvAddr("localhost:9876");
     try {
       producer.start();
@@ -161,8 +169,22 @@ public abstract class RocketMQDataSource extends AbstractDataSource {
     producer.setSendMsgTimeout(5 * 1000);
     producer.setMqClientApiTimeout(5 * 1000);
 
-    startProduceMessages(producerTypes);
-    LOG.info("Start producing data to mq.");
+    // produce
+    for (int batchCount = 0; batchCount < 10; ++batchCount) {
+      List<Message> messages = Lists.newArrayList();
+      for (int i = 0; i < 100; ++i) {
+        messages.add(new Message(TOPIC_NAME, fakeJsonObject(i, producerTypes)));
+      }
+      try {
+        producer.send(messages);
+        TimeUnit.MILLISECONDS.sleep(500);
+      } catch (Exception e) {
+        throw BitSailException.asBitSailException(CommonErrorCode.RUNTIME_ERROR,
+            "Failed to produce data.", e);
+      }
+    }
+    producer.shutdown();
+    LOG.info("Successfully produce 1000 records to rocket mq.");
   }
 
   @Override
@@ -175,30 +197,10 @@ public abstract class RocketMQDataSource extends AbstractDataSource {
       brokerServ.close();
       brokerServ = null;
     }
-    if (Objects.nonNull(producerExecutor)) {
-      producerExecutor.shutdown();
-      producerExecutor = null;
-    }
     super.close();
   }
 
-  @SuppressWarnings("checkstyle:MagicNumber")
-  private void startProduceMessages(TypeInfo<?>[] typeInfos) {
-    producerExecutor = Executors.newSingleThreadScheduledExecutor();
-    producerExecutor.scheduleAtFixedRate(
-        new Thread(() -> {
-          try {
-            List<Message> messages = Lists.newArrayList();
-            for (int i = 0; i < 100; i++) {
-              messages.add(new Message(DEFAULT_TOPIC, fakeJsonObject(i, typeInfos)));
-            }
-            producer.send(messages);
-          } catch (Exception e) {
-            LOG.error("Produce failed.", e);
-          }
-        }), 0, 5, TimeUnit.SECONDS);
-  }
-
+  // todo: support other types
   private static byte[] fakeJsonObject(int index, TypeInfo<?>[] typeInfos) {
     Map<Object, Object> demo = Maps.newHashMap();
     demo.put("id", index);
