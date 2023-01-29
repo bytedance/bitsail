@@ -18,6 +18,7 @@ package com.bytedance.bitsail.test.e2e.datasource;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.ReaderOptions;
+import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.ftp.core.config.FtpConfig;
 import com.bytedance.bitsail.connector.ftp.option.FtpReaderOptions;
 import com.bytedance.bitsail.connector.ftp.source.FtpSource;
@@ -31,6 +32,8 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class SftpDataSource extends AbstractDataSource {
   private static final Logger LOG = LoggerFactory.getLogger(SftpDataSource.class);
@@ -110,9 +113,14 @@ public class SftpDataSource extends AbstractDataSource {
         .withExposedPorts(port)
         .withCommand(String.format("%s:%s:1001", USER_NAME, PASSWORD));
 
-    File dataFolder = new File("src/main/resources/data");
+    File dir = new File(SftpDataSource.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+    Preconditions.checkNotNull(dir);
+    while (!"bitsail-test-e2e-datasource-ftp".equals(dir.getName())) {
+      dir = dir.getParentFile();
+    }
+    Path dataFolder = Paths.get(dir.getPath(), "src", "main", "resources", "data");
     TransferableFile dataResource = new TransferableFile(
-        dataFolder.getAbsolutePath(),
+        dataFolder.toAbsolutePath().toString(),
         CONTAINER_PATH
     );
     copyToContainer(sftpServer, dataResource);
