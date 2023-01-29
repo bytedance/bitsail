@@ -106,7 +106,7 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
     String commands = String.join(" ", getExecCommand());
     LOG.info("Begin test: [{}], Container: [{}]\n"
         + "================ Test  Conf ================\n"
-        + conf.desensitizedBeautify() + "\n"
+        + conf + "\n"
         + "=============== Test Command ===============\n"
         + commands + "\n"
         + "============================================\n",

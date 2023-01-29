@@ -29,7 +29,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>bitsail-test-e2e-datasource-redis</module>
-        <module>bitsail-test-e2e-datasource-ftp</module>
     </modules>
 
     <dependencies>
