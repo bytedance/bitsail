@@ -303,6 +303,7 @@
                         <version>1.6.8</version>
                         <executions>
                             <execution>
+                                <id>obtain-flink</id>
                                 <!-- the wget goal actually binds itself to this phase by default -->
                                 <phase>process-resources</phase>
                                 <goals>
@@ -315,6 +316,21 @@
                                     <unpack>true</unpack>
                                     <!-- default target location, just to demonstrate the parameter -->
                                     <outputDirectory>${project.build.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>obtain-flink-shaded-hadoop-uber</id>
+                                <!-- get flink-shaded-hadoop-uber -->
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>wget</goal>
+                                </goals>
+                                <configuration>
+                                    <url>
+                                        https://repo.maven.apache.org/maven2/org/apache/flink/flink-shaded-hadoop-2-uber/2.7.5-10.0/flink-shaded-hadoop-2-uber-2.7.5-10.0.jar
+                                    </url>
+                                    <unpack>false</unpack>
+                                    <outputDirectory>${project.build.directory}/flink-${flink.version}/lib/</outputDirectory>
                                 </configuration>
                             </execution>
                         </executions>

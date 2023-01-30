@@ -1,0 +1,31 @@
+{
+   "job": {
+      "common": {
+         "job_id": 312124,
+         "instance_id": 31244321,
+         "job_name": "BitSail_hive_to_print_test",
+         "user_name": "test"
+       },
+       "writer": {
+         "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink"
+       },
+      "reader": {
+         "class": "com.bytedance.bitsail.connector.legacy.hive.source.HiveInputFormat",
+         "columns": [
+            {
+               "name": "id",
+               "type": "bigint"
+            },
+            {
+               "name": "date_type",
+               "type": "date"
+            }
+         ],
+         "db_name": "dts",
+         "table_name": "test_fake_to_hive",
+         "metastore_properties": "{\"hive.metastore.uris\":\"thrift://10.227.17.202:9083\"}",
+         "partition": "date=20180101",
+         "reader_parallelism_num": 1
+      }
+   }
+}
