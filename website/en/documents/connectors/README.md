@@ -30,3 +30,4 @@ dir:
 - [StreamingFile(HDFS streaming) connector](streamingfile/streamingfile.md)
 - [Fake connector](fake/fake.md)
 - [Print connector](print/print.md)
+- [SelectDB connector](selectdb/selectdb.md)

@@ -1,0 +1,106 @@
+{
+  "job": {
+    "common": {
+      "job_id": -2413,
+      "job_name": "bitsail_fake_to_selectdb_test",
+      "instance_id": -20413,
+      "user_name": "user"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 100000,
+      "random_null_rate": 0,
+      "unique_fields": "id",
+      "columns_with_fixed_value": [
+        {
+          "name": "partition_date",
+          "fixed_value": "2022-10-10"
+        }
+      ],
+      "columns": [
+        {
+          "index": 0,
+          "name": "id",
+          "type": "bigint"
+        },
+        {
+          "index": 1,
+          "name": "bigint_type",
+          "type": "bigint"
+        },
+        {
+          "index": 2,
+          "name": "string_type",
+          "type": "string"
+        },
+        {
+          "index": 3,
+          "name": "double_type",
+          "type": "double"
+        },
+        {
+          "index": 4,
+          "name": "decimal_type",
+          "type": "double"
+        },
+        {
+          "index": 5,
+          "name": "date_type",
+          "type": "date.date"
+        },
+        {
+          "index": 6,
+          "name": "partition_date",
+          "type": "string"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.selectdb.sink.SelectdbSink",
+      "load_url": "<your selectdb http hosts>",
+      "jdbc_url": "<your selectdb mysql hosts>",
+      "cluster_name": "<selectdb cluster name>",
+      "user": "<user name>",
+      "password": "<password>",
+      "table_identifier": "<selectdb table identifier, like: test_db.test_selectdb_table>",
+      "columns": [
+        {
+          "index": 0,
+          "name": "id",
+          "type": "bigint"
+        },
+        {
+          "index": 1,
+          "name": "bigint_type",
+          "type": "bigint"
+        },
+        {
+          "index": 2,
+          "name": "string_type",
+          "type": "varchar"
+        },
+        {
+          "index": 3,
+          "name": "double_type",
+          "type": "double"
+        },
+        {
+          "index": 4,
+          "name": "decimal_type",
+          "type": "double"
+        },
+        {
+          "index": 5,
+          "name": "date_type",
+          "type": "date"
+        },
+        {
+          "index": 6,
+          "name": "partition_date",
+          "type": "date"
+        }
+      ]
+    }
+  }
+}

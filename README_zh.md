@@ -204,6 +204,12 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <td> </td>
     <td>✅</td>
   </tr>
+  <tr>
+    <td>SelectDB</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
 </table>
 
 详情见：[Connectors详细文档](website/zh/documents/connectors/README.md).

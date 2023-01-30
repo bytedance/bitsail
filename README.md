@@ -220,6 +220,12 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <td> </td>
     <td>✅</td>
   </tr>
+  <tr>
+    <td>SelectDB</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
 </table>
 
 Documentation for [Connectors](website/en/documents/connectors/README.md).
