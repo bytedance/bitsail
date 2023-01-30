@@ -32,7 +32,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.common.message.Message;
-import org.apache.rocketmq.common.message.MessageQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
@@ -185,6 +184,10 @@ public class RocketMQDataSource extends AbstractDataSource {
     }
     producer.shutdown();
     LOG.info("Successfully produce 1000 records to rocket mq.");
+
+    synchronized (RocketMQSource.class) {
+      DnsCacheManipulator.removeDnsCache("broker");
+    }
   }
 
   @Override
