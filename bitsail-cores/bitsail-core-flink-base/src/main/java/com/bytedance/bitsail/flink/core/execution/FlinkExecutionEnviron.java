@@ -41,6 +41,7 @@ import com.bytedance.bitsail.flink.core.writer.FlinkDataWriterDAGBuilder;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.dag.Transformation;
@@ -126,6 +127,22 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
   public void beforeExecution(List<DataReaderDAGBuilder> readerBuilders,
                               List<DataTransformDAGBuilder> transformDAGBuilders,
                               List<DataWriterDAGBuilder> writerBuilders) throws Exception {
+    if (globalConfiguration.get(CommonOptions.IGNORE_HADOOP_SHUTDOWN_HOOK_ERROR)) {
+      Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+        @SneakyThrows
+        @Override
+        public void uncaughtException(Thread t, Throwable e) {
+          // Check if it the error is caused by Hadoop shutdown hook
+          if (e instanceof NoClassDefFoundError
+              && e.getMessage().contains("org/apache/hadoop/util/ShutdownHookManager")) {
+            LOG.info(e.getMessage());
+            LOG.error("Ignore hadoop shutdown error from thread {}.", t, e);
+          } else {
+            throw e;
+          }
+        }
+      });
+    }
 
     /* initialize and launch runtime plugins */
     BitSailRuntimePluginConfigurer runtimePluginConfigurer = new BitSailRuntimePluginConfigurer(flinkJobMode);

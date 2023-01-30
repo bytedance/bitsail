@@ -210,6 +210,10 @@ public interface CommonOptions {
           .onlyReference(new TypeReference<Map<String, String>>() {
           });
 
+  ConfigOption<Boolean> IGNORE_HADOOP_SHUTDOWN_HOOK_ERROR =
+      key(COMMON_PREFIX + "ignore_hadoop_shutdown_hook_error")
+          .defaultValue(false);
+
   interface CheckPointOptions {
     ConfigOption<Boolean> CHECKPOINT_ENABLE =
         key(COMMON_PREFIX + "checkpoint_enable")
