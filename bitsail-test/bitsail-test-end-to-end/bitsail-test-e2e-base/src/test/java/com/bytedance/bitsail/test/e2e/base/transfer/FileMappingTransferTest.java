@@ -24,7 +24,6 @@ import org.junit.Test;
 import java.io.File;
 import java.util.List;
 
-@Ignore
 public class FileMappingTransferTest {
 
   @Test

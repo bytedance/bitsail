@@ -53,6 +53,7 @@ public abstract class AbstractExecutor extends AbstractContainer {
 
   public static final String BITSAIL_REVISION = "bitsail.revision";
   public static final String BITSAIL_ROOT_DIR = "bitsail.rootDir";
+  public static final String BITSAIL_E2E_EXECUTOR_ROOT_DIR = "opt/bitsail";
 
   /**
    * Configuration of executor and job.
@@ -102,7 +103,7 @@ public abstract class AbstractExecutor extends AbstractContainer {
     this.executorConf = executorConf;
     this.revision = VersionHolder.getHolder().getBuildVersion();
     this.transferableFiles = new HashSet<>();
-    this.executorRootDir = executorConf.get(CommonOptions.E2E_EXECUTOR_ROOT_DIR);
+    this.executorRootDir = BITSAIL_E2E_EXECUTOR_ROOT_DIR;
 
     try {
       initBitsailLibs();

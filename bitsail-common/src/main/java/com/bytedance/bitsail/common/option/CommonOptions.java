@@ -65,13 +65,6 @@ public interface CommonOptions {
       key(COMMON_PREFIX + "job_engine_lib_dir")
           .defaultValue("engines");
 
-  /**
-   * Root dir of bitsail in e2e-test executor.
-   */
-  ConfigOption<String> E2E_EXECUTOR_ROOT_DIR =
-      key(COMMON_PREFIX + "e2e_executor_root_dir")
-          .defaultValue("/opt/bitsail");
-
   ConfigOption<Integer> GLOBAL_PARALLELISM_NUM =
       key(COMMON_PREFIX + "global_parallelism_num")
           .defaultValue(-1);

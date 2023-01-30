@@ -31,8 +31,6 @@ import java.util.function.Consumer;
 public abstract class AbstractE2ETest {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractE2ETest.class);
 
-  public static final String EMPTY_SOURCE = "empty";
-
   static {
     // init build version
     final String finalRevision;

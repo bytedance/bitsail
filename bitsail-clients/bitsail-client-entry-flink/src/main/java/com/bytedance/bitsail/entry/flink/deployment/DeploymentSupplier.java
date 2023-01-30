@@ -28,7 +28,7 @@ import java.util.List;
 public interface DeploymentSupplier {
 
   /**
-   * Check deployment supplier could accept the input global configuration
+   * Check whether deployment supplier could accept the input global configuration
    */
   boolean accept(FlinkRunCommandArgs flinkCommandArgs);
 
