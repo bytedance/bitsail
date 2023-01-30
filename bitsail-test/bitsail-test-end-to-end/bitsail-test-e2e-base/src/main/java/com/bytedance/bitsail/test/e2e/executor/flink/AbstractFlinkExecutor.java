@@ -17,7 +17,6 @@
 package com.bytedance.bitsail.test.e2e.executor.flink;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
@@ -157,7 +156,6 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
   protected void addJobConf(BitSailConfiguration executorConf) {
     executorConf.set(ReaderOptions.BaseReaderOptions.READER_PARALLELISM_NUM, 1);
     executorConf.set(WriterOptions.BaseWriterOptions.WRITER_PARALLELISM_NUM, 1);
-    executorConf.set(CommonOptions.IGNORE_HADOOP_SHUTDOWN_HOOK_ERROR, true);
     super.addJobConf(executorConf);
   }
 
