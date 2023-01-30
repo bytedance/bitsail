@@ -118,7 +118,7 @@ jobs:
       - name: Set up JDK 8
         uses: actions/setup-java@v3
         with:
-          java-version: '8'
+          java-version: '8.0.301'
           distribution: 'adopt'
           architecture: x64
       - name: Setting Maven Repository
