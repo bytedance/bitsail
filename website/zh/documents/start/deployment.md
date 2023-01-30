@@ -126,30 +126,56 @@ bash ./bin/bitsail run --engine flink --conf ~/bitsail-archive-0.1.0-SNAPSHOT/ex
 
 -----
 
-## 本地提交
+## Flink提交
+
 
 假设BitSail的安装路径为: `${BITSAIL_HOME}`。打包BitSail后，我们可以在如下路径中找到可运行jar包以及示例作业配置文件:
 
 ```shell
 cd ${BITSAIL_HOME}/bitsail-dist/target/bitsail-dist-0.1.0-SNAPSHOT-bin/bitsail-archive-0.1.0-SNAPSHOT/
 ```
-### 运行Fake_to_Print示例作业
-以 [examples/Fake_Print_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Print_Example.json) 为例来启动一个本地BitSail作业:
+
+### 远程提交
+
+用户可以通过 `--deployment-mode remote` 选项来将作业提交到指定的flink session。以 [examples/Fake_Print_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Print_Example.json) 为例，可以通过如下指令进行提交:
+
 - `<job-manager-address>`: 要连接的的JobManager地址，格式为host:port，例如`localhost:8081`。
 
 ```shell
 bash bin/bitsail run \
   --engine flink \
   --execution-mode run \
-  --deployment-mode local \
+  --deployment-mode remote \
   --conf examples/Fake_Print_Example.json \
   --jm-address <job-manager-address>
 ```
 
+例如，使用`bitsail-archive-0.1.0-SNAPSHOT/embedded/flink/bin/start-cluster.sh`脚本可以在本地启动一个flink standalone集群，此时 `<job-manager-address>` 就是 `localhost:8081`。
+
+```shell
+bash bin/bitsail run \
+  --engine flink \
+  --execution-mode run \
+  --deployment-mode remote \
+  --conf examples/Fake_Print_Example.json \
+  --jm-address localhost:8081
+```
 执行命令后，可以在Flink WebUI中查看运行的Fake_to_Print作业。在task manager的stdout文件中可以看到作业输出。
 
+### 本地提交
 
-### 运行Fake_to_Hive示例作业
+用户可以通过 `--deployment-mode local` 选项在本地运行作业。以 [examples/Fake_Print_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Print_Example.json) 为例，可以通过如下指令进行提交:
+
+```shell
+bash bin/bitsail run \
+  --engine flink \
+  --execution-mode run \
+  --deployment-mode local \
+  --conf examples/Fake_Print_Example.json
+```
+
+
+#### 运行Fake_to_Hive示例作业
 以 [examples/Fake_hive_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Hive_Example.json) 为例:
 - 在运行前补充完整配置文件中的hive信息:
     - `job.writer.db_name`: 要写入的hive库.
@@ -165,14 +191,13 @@ bash bin/bitsail run \
        }
     ```
 
-执行如下命令，便可以在指定的Flink session中启动一个Fake_to_Hive作业:
+执行如下命令，便可以在本地启动一个Fake_to_Hive作业:
 
 ```shell
 bash bin/bitsail run \
   --engine flink \
   --execution-mode run \
   --deployment-mode local \
-  --conf examples/Fake_Hive_Example.json \
-  --jm-address <job-manager-address>
+  --conf examples/Fake_Hive_Example.json
   ```
 

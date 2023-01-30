@@ -53,7 +53,7 @@ public abstract class AbstractExecutor extends AbstractContainer {
 
   public static final String BITSAIL_REVISION = "bitsail.revision";
   public static final String BITSAIL_ROOT_DIR = "bitsail.rootDir";
-  public static final String BITSAIL_E2E_EXECUTOR_ROOT_DIR = "opt/bitsail";
+  public static final String BITSAIL_E2E_EXECUTOR_ROOT_DIR = "/opt/bitsail";
 
   /**
    * Configuration of executor and job.

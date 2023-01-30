@@ -118,7 +118,7 @@ Please go to Yarn WebUI to check the logs of Flink JobManager and TaskManager.
 
 -----
 
-## Submit to Local Flink Session
+## Submit to Flink
 
 Suppose that BitSail install path is: `${BITSAIL_HOME}`.
 
@@ -127,8 +127,9 @@ After building BitSail, we can enter the following path and find runnable jars a
 cd ${BITSAIL_HOME}/bitsail-dist/target/bitsail-dist-0.1.0-SNAPSHOT-bin/bitsail-archive-0.1.0-SNAPSHOT/
 ```
 
-### Run Fake_to_Print example
+### Run in Remote Flink Session
 
+Users can use commands `--deployment-mode remote` to submit a BitSail job to remote flink session.
 Use [examples/Fake_Print_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Print_Example.json) as example to start a BitSail job:
 
 - `<job-manager-address>`: the address of job manager, should be host:port, _e.g._ `localhost:8081`.
@@ -137,16 +138,39 @@ Use [examples/Fake_Print_Example.json](https://github.com/bytedance/bitsail/blob
 bash bin/bitsail run \
   --engine flink \
   --execution-mode run \
-  --deployment-mode local \
+  --deployment-mode remote \
   --conf examples/Fake_Print_Example.json \
   --jm-address <job-manager-address>
 ```
 
+For example, we can use the script `bitsail-archive-0.1.0-SNAPSHOT/embedded/flink/bin/start-cluster.sh` to start a standalone session. Then we can run the example with following commands:
+
+```shell
+bash bin/bitsail run \
+  --engine flink \
+  --execution-mode run \
+  --deployment-mode remote \
+  --conf examples/Fake_Print_Example.json \
+  --jm-address localhost:8081
+```
 Then you can visit Flink WebUI to see the running job.
 In task manager, we can see the output of the Fake_to_Print job in its stdout.
 
+### Run Locally
 
-### Run Fake_to_Hive example
+
+Users can use commands `--deployment-mode local` to run a BitSail job locally.
+Use [examples/Fake_Print_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Print_Example.json) as example to start a BitSail job:
+
+```shell
+bash bin/bitsail run \
+  --engine flink \
+  --execution-mode run \
+  --deployment-mode local \
+  --conf examples/Fake_Print_Example.json
+```
+
+#### Run Fake_to_Print example
 
 Use [examples/Fake_hive_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Hive_Example.json) as an example:
 - Remember fulfilling the job configuration with an available hive source before run the command:
@@ -170,6 +194,5 @@ bash bin/bitsail run \
   --engine flink \
   --execution-mode run \
   --deployment-mode local \
-  --conf examples/Fake_Hive_Example.json \
-  --jm-address <job-manager-address>
+  --conf examples/Fake_Hive_Example.json
   ```
