@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.elasticsearch.utils;
+package com.bytedance.bitsail.connector.elasticsearch.util;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.bytedance.bitsail.connector.elasticsearch.base.EsConstants.SPLIT_COMMA;
 
-public class SplitStringUtils {
+public class SplitStringUtil {
 
   public static String[] splitString(String indices) {
     String[] splits = indices.split(SPLIT_COMMA);

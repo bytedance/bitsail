@@ -18,7 +18,7 @@ package com.bytedance.bitsail.connector.elasticsearch.rest.source;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchWriterOptions;
-import com.bytedance.bitsail.connector.elasticsearch.utils.SourceSetupUtils;
+import com.bytedance.bitsail.connector.elasticsearch.util.SourceSetupUtil;
 import com.bytedance.bitsail.test.connector.test.testcontainers.elasticsearch.ElasticsearchCluster;
 
 import org.junit.After;
@@ -38,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 public class EsSourceRequestITCase {
 
   private static final Logger LOG = LoggerFactory.getLogger(EsSourceRequestITCase.class);
-  private SourceSetupUtils sourceEnv;
+  private SourceSetupUtil sourceEnv;
 
   private ElasticsearchCluster esCluster;
 
@@ -59,7 +59,7 @@ public class EsSourceRequestITCase {
         Collections.singletonList(esCluster.getHttpHostAddress()));
 
     this.sourceEnv =
-        SourceSetupUtils.builder()
+        SourceSetupUtil.builder()
             .esCluster(esCluster)
             .jobConf(jobConf)
             .indices(Collections.singletonList(index))

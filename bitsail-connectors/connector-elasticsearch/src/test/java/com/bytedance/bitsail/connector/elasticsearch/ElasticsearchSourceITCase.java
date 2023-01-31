@@ -19,7 +19,7 @@ package com.bytedance.bitsail.connector.elasticsearch;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchReaderOptions;
 import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchWriterOptions;
-import com.bytedance.bitsail.connector.elasticsearch.utils.SourceSetupUtils;
+import com.bytedance.bitsail.connector.elasticsearch.util.SourceSetupUtil;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.testcontainers.elasticsearch.ElasticsearchCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
@@ -44,7 +44,7 @@ public class ElasticsearchSourceITCase {
 
   private final int count = 10;
 
-  private SourceSetupUtils sourceEnv;
+  private SourceSetupUtil sourceEnv;
 
   @Before
   public void prepareEsCluster() throws Exception {
@@ -57,7 +57,7 @@ public class ElasticsearchSourceITCase {
         Collections.singletonList(esCluster.getHttpHostAddress()));
 
     this.sourceEnv =
-        SourceSetupUtils.builder()
+        SourceSetupUtil.builder()
             .esCluster(esCluster)
             .jobConf(jobConf)
             .indices(Arrays.asList("test1", "test2"))

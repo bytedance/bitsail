@@ -19,7 +19,7 @@ package com.bytedance.bitsail.connector.elasticsearch.source.split;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchReaderOptions;
 import com.bytedance.bitsail.connector.elasticsearch.rest.source.EsSourceRequest;
-import com.bytedance.bitsail.connector.elasticsearch.utils.SplitStringUtils;
+import com.bytedance.bitsail.connector.elasticsearch.util.SplitStringUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -48,7 +48,7 @@ public class ElasticsearchSplitByIndexStrategy implements ElasticsearchSplitStra
     String indices = jobConf.getNecessaryOption(ElasticsearchReaderOptions.ES_INDEX, REQUIRED_VALUE);
     EsSourceRequest esSourceRequest = new EsSourceRequest(restHighLevelClient);
 
-    String[] splitIndices = SplitStringUtils.splitString(indices);
+    String[] splitIndices = SplitStringUtil.splitString(indices);
     int idx = 0;
     for (String index : splitIndices) {
       if (check(index, esSourceRequest)) {
@@ -73,7 +73,7 @@ public class ElasticsearchSplitByIndexStrategy implements ElasticsearchSplitStra
   @Override
   public int estimateSplitNum(BitSailConfiguration configuration) {
     String indices = configuration.getNecessaryOption(ElasticsearchReaderOptions.ES_INDEX, REQUIRED_VALUE);
-    int estimatedSplitNum = SplitStringUtils.splitString(indices).length;
+    int estimatedSplitNum = SplitStringUtil.splitString(indices).length;
     LOG.info("Estimated split num is: {}", estimatedSplitNum);
     return estimatedSplitNum;
   }

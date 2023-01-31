@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.elasticsearch.utils;
+package com.bytedance.bitsail.connector.elasticsearch.util;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.elasticsearch.rest.EsRestClientBuilder;
@@ -50,9 +50,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Builder
-public class SourceSetupUtils {
+public class SourceSetupUtil {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SourceSetupUtils.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SourceSetupUtil.class);
 
   private final String mappings = "{\n" +
       "  \"properties\": {\n" +

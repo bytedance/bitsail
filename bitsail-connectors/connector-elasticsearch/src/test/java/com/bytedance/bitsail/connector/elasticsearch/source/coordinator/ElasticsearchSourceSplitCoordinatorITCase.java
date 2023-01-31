@@ -22,7 +22,7 @@ import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchReaderOptions;
 import com.bytedance.bitsail.connector.elasticsearch.source.split.ElasticsearchSourceSplit;
-import com.bytedance.bitsail.connector.elasticsearch.utils.SourceSetupUtils;
+import com.bytedance.bitsail.connector.elasticsearch.util.SourceSetupUtil;
 import com.bytedance.bitsail.test.connector.test.testcontainers.elasticsearch.ElasticsearchCluster;
 
 import org.junit.After;
@@ -48,7 +48,7 @@ public class ElasticsearchSourceSplitCoordinatorITCase {
 
   private ElasticsearchCluster esCluster;
 
-  private SourceSetupUtils sourceEnv;
+  private SourceSetupUtil sourceEnv;
 
   private BitSailConfiguration jobConf;
 
@@ -66,7 +66,7 @@ public class ElasticsearchSourceSplitCoordinatorITCase {
     jobConf.set(ElasticsearchReaderOptions.SPLIT_STRATEGY, "round_robin");
 
     this.sourceEnv =
-        SourceSetupUtils.builder()
+        SourceSetupUtil.builder()
             .esCluster(esCluster)
             .jobConf(jobConf)
             .indices(Arrays.asList("test1", "test2", "test3"))

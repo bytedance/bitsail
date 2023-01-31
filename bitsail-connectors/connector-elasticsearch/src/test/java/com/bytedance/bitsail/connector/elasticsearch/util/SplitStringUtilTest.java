@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.elasticsearch.utils;
+package com.bytedance.bitsail.connector.elasticsearch.util;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,13 +23,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
-public class SplitStringUtilsTest {
+public class SplitStringUtilTest {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SplitStringUtilsTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SplitStringUtilTest.class);
 
   @Test
   public void testSplitString() {
-    String[] splitNames = SplitStringUtils.splitString(" test1,  test2, , test3 , test4  ");
+    String[] splitNames = SplitStringUtil.splitString(" test1,  test2, , test3 , test4  ");
     LOG.info("split names: {}", Arrays.toString(splitNames));
     Assert.assertEquals("Index names parse error.", 4, splitNames.length);
   }
