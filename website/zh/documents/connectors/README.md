@@ -30,3 +30,4 @@ dir:
 - [StreamingFile(流式HDFS)连接器](streamingfile/streamingfile.md)
 - [Fake连接器](fake/fake.md)
 - [Print连接器](print/print.md)
+- [SelectDB 连接器](selectdb/selectdb.md)
