@@ -64,7 +64,7 @@ public class ElasticsearchRowDeserializer implements DeserializationSchema<Map<S
     Row row = new Row(this.fieldSize);
     for (int i = 0; i < this.fieldSize; i++) {
       String fieldName = this.fieldNames[i];
-      Object value = message.getOrDefault(fieldName, null);
+      Object value = message.get(fieldName);
       if (Objects.nonNull(value)) {
         TypeInfo<?> typeInfo = this.typeInfos[i];
         try {
