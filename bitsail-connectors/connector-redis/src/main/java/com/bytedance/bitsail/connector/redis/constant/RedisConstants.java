@@ -21,9 +21,4 @@ public class RedisConstants {
    * connector name
    */
   public static final String REDIS_CONNECTOR_NAME = "redis";
-
-  /**
-   * column size in sorted_set or hash
-   */
-  public static final int SORTED_SET_OR_HASH_COLUMN_SIZE = 3;
 }
