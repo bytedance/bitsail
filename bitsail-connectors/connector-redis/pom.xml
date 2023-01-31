@@ -36,13 +36,6 @@
     <artifactId>connector-redis</artifactId>
     <dependencies>
         <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-redis</artifactId>
-            <version>${revision}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>${jedis.version}</version>
@@ -57,13 +50,6 @@
         </dependency>
 
         <!-- test -->
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-fake</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>connector-fake</artifactId>

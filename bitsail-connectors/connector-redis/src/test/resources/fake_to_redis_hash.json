@@ -7,7 +7,7 @@
       "user_name": "user"
     },
     "reader": {
-      "class": "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource",
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
       "total_count": 300,
       "rate": 100000,
       "random_null_rate": 0,
@@ -26,7 +26,7 @@
         {
           "index": 2,
           "name": "fake_hash_value",
-          "type": "string"
+          "type": "binary"
         }
       ]
     },
@@ -46,7 +46,7 @@
         },
         {
           "index": 2,
-          "type": "string"
+          "type": "binary"
         }
       ]
     }

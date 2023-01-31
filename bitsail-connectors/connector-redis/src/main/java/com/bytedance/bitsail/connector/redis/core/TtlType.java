@@ -29,7 +29,7 @@ public enum TtlType {
   SECOND(1);
 
   @Getter
-  int containSeconds;
+  final int containSeconds;
 
   TtlType(int containSeconds) {
     this.containSeconds = containSeconds;
