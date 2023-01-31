@@ -21,6 +21,8 @@ import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.nio.file.Paths;
+
 public class EntryTest {
 
   @Test
@@ -30,5 +32,14 @@ public class EntryTest {
     Assert.assertEquals(baseCommandArgs.getUnknownOptions().length, 1);
     Assert.assertEquals(baseCommandArgs.getEngineName(), "flink");
     Assert.assertEquals(baseCommandArgs.getMainAction(), "run");
+  }
+
+  @Test
+  public void testBuildFakeEngine() throws Exception {
+    String jobConfPath = Paths.get(
+        EntryTest.class.getResource("/test_job_conf.json").toURI()
+    ).toFile().getAbsolutePath();
+    String[] args = new String[] {"run", "--engine", "fake", "--conf", jobConfPath};
+    Entry.main(args);
   }
 }
