@@ -20,8 +20,8 @@ import com.bytedance.bitsail.common.catalog.table.CatalogTable;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableColumn;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableSchema;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.apache.commons.compress.utils.Lists;
 
 import java.io.Serializable;
 import java.util.List;

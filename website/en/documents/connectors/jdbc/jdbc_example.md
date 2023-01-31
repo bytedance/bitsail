@@ -8,7 +8,7 @@ Parent document: [JDBC connector](./jdbc.md)
 
 #### MySQL table sync
 
-``` Json
+```json
 {
     "job":{
         "reader":{
@@ -56,7 +56,7 @@ Parent document: [JDBC connector](./jdbc.md)
 
 #### MySQL SQL sync
 
-``` Json
+```json
 {
     "job":{
         "reader":{
@@ -106,7 +106,7 @@ Parent document: [JDBC connector](./jdbc.md)
 
 #### MySQL insert sync
 
-``` json
+```json
 {
     "job":{
         "writer":{
@@ -148,7 +148,7 @@ Parent document: [JDBC connector](./jdbc.md)
 
 #### MySQL overwrite sync
 
-``` json
+```json
 {
     "job":{
         "writer":{
@@ -191,7 +191,7 @@ Parent document: [JDBC connector](./jdbc.md)
 
 ### Oracle source
 
-``` Json
+```json
 {
     "job":{
         "reader":{
@@ -257,7 +257,7 @@ Parent document: [JDBC connector](./jdbc.md)
 
 ### Oracle sink
 
-``` Json
+```json
 {
     "job":{
         "writer": {
@@ -327,7 +327,7 @@ Parent document: [JDBC connector](./jdbc.md)
 
 ### PostgreSQL source
 
-``` Json
+```json
 {
     "job":{
         "reader":{
@@ -377,7 +377,7 @@ Parent document: [JDBC connector](./jdbc.md)
 
 ### PostgreSQL sink
 
-``` Json
+```json
 {
     "job":{
         "writer":{
@@ -425,7 +425,7 @@ Parent document: [JDBC connector](./jdbc.md)
 
 ### SqlServer source
 
-``` Json
+```json
 {
     "job":{
         "reader":{
@@ -471,7 +471,7 @@ Parent document: [JDBC connector](./jdbc.md)
 
 ### SqlServer sink
 
-``` Json
+```json
 {
     "job":{
         "writer":{

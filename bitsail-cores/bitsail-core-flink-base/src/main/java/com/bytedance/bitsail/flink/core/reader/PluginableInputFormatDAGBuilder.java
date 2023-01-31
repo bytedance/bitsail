@@ -115,7 +115,24 @@ public class PluginableInputFormatDAGBuilder<T extends Row, Split extends InputS
 
   @Override
   public BaseStatistics getStatistics(BaseStatistics baseStatistics) throws IOException {
-    return inputFormatPlugin.getStatistics(baseStatistics);
+    BaseStatistics statistics = inputFormatPlugin.getStatistics(baseStatistics);
+    return statistics != null ? statistics :
+        new BaseStatistics() {
+          @Override
+          public long getTotalInputSize() {
+            return SIZE_UNKNOWN;
+          }
+
+          @Override
+          public long getNumberOfRecords() {
+            return NUM_RECORDS_UNKNOWN;
+          }
+
+          @Override
+          public float getAverageRecordWidth() {
+            return AVG_RECORD_BYTES_UNKNOWN;
+          }
+        };
   }
 
   @Override

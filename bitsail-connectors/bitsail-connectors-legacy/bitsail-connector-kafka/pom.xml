@@ -27,9 +27,18 @@
     <artifactId>bitsail-connector-kafka</artifactId>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <kafka.clients.version>1.0.1</kafka.clients.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka.clients.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- Kafka -->
@@ -37,7 +46,6 @@
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
             <version>${kafka.clients.version}</version>
-            <scope>compile</scope>
         </dependency>
 
         <!-- flink connector -->

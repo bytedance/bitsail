@@ -30,6 +30,7 @@ import java.util.Collections;
 
 import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.SUCCESS_TAG;
 import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.UPLOAD;
+import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.UPLOAD_CHARSET;
 
 public class FtpHandlerITCase {
 
@@ -66,5 +67,18 @@ public class FtpHandlerITCase {
   public void getFilesSizeTest() {
     Assert.assertEquals(104L, ftpHandler.getFilesSize(UPLOAD));
     Assert.assertEquals(0L, ftpHandler.getFilesSize(UPLOAD + SUCCESS_TAG));
+  }
+
+  @Test
+  public void getFilesTestWithCharset() {
+    Assert.assertEquals(3, ftpHandler.getFiles(UPLOAD_CHARSET).size());
+    Assert.assertEquals(Collections.singletonList(UPLOAD_CHARSET + "test1.csv"), ftpHandler.getFiles(UPLOAD_CHARSET + "test1.csv"));
+    Assert.assertEquals(Collections.emptyList(), ftpHandler.getFiles(UPLOAD_CHARSET + "badname"));
+  }
+
+  @Test
+  public void getFilesSizeTestWithCharset() {
+    Assert.assertEquals(106L, ftpHandler.getFilesSize(UPLOAD_CHARSET));
+    Assert.assertEquals(0L, ftpHandler.getFilesSize(UPLOAD_CHARSET + SUCCESS_TAG));
   }
 }

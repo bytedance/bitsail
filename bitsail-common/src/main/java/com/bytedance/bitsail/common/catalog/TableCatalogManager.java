@@ -31,9 +31,9 @@ import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
+import com.google.common.collect.Lists;
 import lombok.Builder;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

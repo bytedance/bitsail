@@ -8,6 +8,7 @@ dir:
 
 **BitSail** 支持以下连接器用于不同数据源：
 
+- [Assert 连接器](assert/assert.md)
 - [ClickHouse 连接器](clickhouse/clickhouse.md)
 - [Doris 连接器](doris/doris.md)
 - [Druid 连接器](druid/druid.md)
@@ -27,3 +28,6 @@ dir:
 - [Redis-v1 连接器](redis/v1/redis-v1.md)
 - [RocketMQ 连接器](rocketmq/rocketmq.md)
 - [StreamingFile(流式HDFS)连接器](streamingfile/streamingfile.md)
+- [Fake连接器](fake/fake.md)
+- [Print连接器](print/print.md)
+- [SelectDB 连接器](selectdb/selectdb.md)

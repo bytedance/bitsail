@@ -32,7 +32,32 @@
         <parquet.version>1.12.2</parquet.version>
         <avro.version>1.10.0</avro.version>
         <junit.version>5.7.2</junit.version>
+        <hudi.version>0.11.1</hudi.version>
+        <kafka.clients.version>1.0.1</kafka.clients.version>
+        <orc.core.version>1.6.0</orc.core.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro</artifactId>
+                <version>${avro.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka.clients.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.orc</groupId>
+                <artifactId>orc-core</artifactId>
+                <version>${orc.core.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- Hoodie -->
@@ -101,6 +126,30 @@
                     <groupId>javax.annotation</groupId>
                     <artifactId>javax.annotation-api</artifactId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-annotations</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-auth</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs-client</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -151,96 +200,27 @@
             <version>2.9.1</version>
         </dependency>
 
-        <!-- Jetty for Embedded Server -->
-        <!--        <dependency>-->
-        <!--            <groupId>org.eclipse.jetty</groupId>-->
-        <!--            <artifactId>jetty-server</artifactId>-->
-        <!--            <version>9.4.15.v20190215</version>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.eclipse.jetty</groupId>-->
-        <!--            <artifactId>jetty-webapp</artifactId>-->
-        <!--            <version>9.4.15.v20190215</version>-->
-        <!--        </dependency>-->
-
         <!-- Hadoop -->
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-common</artifactId>
-            <version>${hadoop.version}</version>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-shaded-hadoop</artifactId>
+            <version>${revision}</version>
+            <scope>compile</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>org.apache.curator</groupId>
-                    <artifactId>curator-recipes</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-server</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-servlet</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-util</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.curator</groupId>
-                    <artifactId>curator-client</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.avro</groupId>
-                    <artifactId>avro</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.htrace</groupId>
                     <artifactId>htrace-core4</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.curator</groupId>
-                    <artifactId>curator-framework</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-webapp</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.apache.htrace</groupId>
                 </exclusion>
             </exclusions>
-            <scope>compile</scope>
         </dependency>
 
-        <!-- Flink -->
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-streaming-java_2.11</artifactId>
-            <version>${flink.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-clients_2.11</artifactId>
-            <version>${flink.version}</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.esotericsoftware.kryo</groupId>
-                    <artifactId>kryo</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.esotericsoftware.minlog</groupId>
-                    <artifactId>minlog</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+        <!-- Flink     -->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-hadoop-compatibility_2.11</artifactId>
             <version>${flink.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-parquet_2.11</artifactId>
@@ -259,38 +239,8 @@
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-common</artifactId>
-            <version>${flink.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-runtime_2.11</artifactId>
-            <version>${flink.version}</version>
-            <scope>provided</scope>
-        </dependency>
 
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-runtime-blink_2.11</artifactId>
-            <version>${flink.version}</version>
-            <scope>provided</scope>
-        </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.flink</groupId>-->
-<!--            <artifactId>${flink.table.planner.artifactId}</artifactId>-->
-<!--            <version>${flink.version}</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.flink</groupId>-->
-<!--            <artifactId>${flink.statebackend.rocksdb.artifactId}</artifactId>-->
-<!--            <version>${flink.version}</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-
+        <!-- Parquet -->
         <dependency>
             <groupId>org.apache.parquet</groupId>
             <artifactId>parquet-hadoop</artifactId>
@@ -304,10 +254,13 @@
                     <groupId>org.codehaus.jackson</groupId>
                     <artifactId>jackson-mapper-asl</artifactId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>commons-pool</artifactId>
+                    <groupId>commons-pool</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 
-        <!-- Parquet -->
         <dependency>
             <groupId>org.apache.parquet</groupId>
             <artifactId>parquet-avro</artifactId>
@@ -344,47 +297,6 @@
             </exclusions>
         </dependency>
 
-        <!-- Hadoop -->
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-mapreduce-client-core</artifactId>
-            <scope>compile</scope>
-            <version>${hadoop.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-util</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.inject</groupId>
-                    <artifactId>guice</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.codehaus.jackson</groupId>
-                    <artifactId>jackson-core-asl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.curator</groupId>
-                    <artifactId>curator-framework</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.inject.extensions</groupId>
-                    <artifactId>guice-servlet</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.avro</groupId>
-                    <artifactId>avro</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>com.twitter</groupId>
             <artifactId>bijection-avro_${scala.binary.version}</artifactId>
@@ -399,230 +311,25 @@
 
         <!-- Hive -->
         <dependency>
-            <groupId>org.apache.hive</groupId>
-            <artifactId>hive-exec</artifactId>
-            <version>${hive.version}</version>
-            <classifier>core</classifier>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-shaded-hive</artifactId>
+            <version>${revision}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.apache.curator</groupId>
-                    <artifactId>curator-recipes</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.mail</groupId>
-                    <artifactId>mail</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty.aggregate</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-server</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-util</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-util</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-servlet</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-client</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.orc</groupId>
-                    <artifactId>orc-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.mail</groupId>
-                    <artifactId>mail</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.arrow</groupId>
-                    <artifactId>arrow-vector</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty.aggregate</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>guava</artifactId>
-                    <groupId>com.google.guava</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>calcite-core</artifactId>
-                    <groupId>org.apache.calcite</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>calcite-avatica</artifactId>
-                    <groupId>org.apache.calcite</groupId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.xerial.snappy</groupId>
-                    <artifactId>snappy-java</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.antlr</groupId>
-                    <artifactId>antlr-runtime</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>apache-log4j-extras</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-slf4j-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.avro</groupId>
-                    <artifactId>avro</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.hive</groupId>
-                    <artifactId>hive-storage-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.curator</groupId>
-                    <artifactId>curator-framework</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-webapp</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.curator</groupId>
-                    <artifactId>curator-client</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.calcite</groupId>
-                    <artifactId>calcite-druid</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-http</artifactId>
-                </exclusion>
-                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
                     <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-yarn-registry</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>netty</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hive</groupId>
-            <artifactId>hive-metastore</artifactId>
-            <version>${hive.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.hbase</groupId>
-                    <artifactId>hbase-client</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.transaction</groupId>
-                    <artifactId>jta</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.transaction</groupId>
-                    <artifactId>javax.transaction-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.mail</groupId>
-                    <artifactId>mail</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty.aggregate</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>log4j</artifactId>
-                    <groupId>log4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-slf4j-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.servlet.jsp</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>guava</artifactId>
-                    <groupId>com.google.guava</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>datanucleus-api-jdo</artifactId>
-                    <groupId>org.datanucleus</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>datanucleus-core</artifactId>
-                    <groupId>org.datanucleus</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>datanucleus-rdbms</artifactId>
-                    <groupId>org.datanucleus</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>commons-pool</artifactId>
-                    <groupId>commons-pool</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>org.apache.hbase</artifactId>
-                    <groupId>hbase-client</groupId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.hive</groupId>
-                    <artifactId>hive-storage-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.inject</groupId>
-                    <artifactId>guice</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>it.unimi.dsi</groupId>
-                    <artifactId>fastutil</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.orc</groupId>
-                    <artifactId>orc-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.derby</groupId>
                     <artifactId>derby</artifactId>
+                    <groupId>org.apache.derby</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>avro</artifactId>
-                    <groupId>org.apache.avro</groupId>
+                    <artifactId>aircompressor</artifactId>
+                    <groupId>io.airlift</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>netty-common</artifactId>
-                    <groupId>io.netty</groupId>
+                    <artifactId>orc-shims</artifactId>
+                    <groupId>org.apache.orc</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -678,6 +385,10 @@
                 </exclusion>
                 <exclusion>
                     <artifactId>netty-buffer</artifactId>
+                    <groupId>io.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>netty-common</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>
             </exclusions>

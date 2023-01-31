@@ -38,18 +38,6 @@
             <artifactId>bitsail-component-security-kerberos</artifactId>
             <version>${revision}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-common</artifactId>
-            <version>${hadoop.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
     </dependencies>
 
     <build>
@@ -57,6 +45,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven.shade.plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>

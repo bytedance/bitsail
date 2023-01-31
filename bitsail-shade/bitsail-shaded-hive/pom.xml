@@ -26,12 +26,54 @@
 
     <artifactId>bitsail-shaded-hive</artifactId>
 
-    <dependencies>
+    <properties>
+        <guava.version>19.0</guava.version>
+        <thrift.version>0.9.3</thrift.version>
+        <hive.version>3.1.0</hive.version>
+        <derby.version>10.14.1.0</derby.version>
+    </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.thrift</groupId>
+                <artifactId>libthrift</artifactId>
+                <version>${thrift.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>${derby.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-common</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- hadoop -->
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-shaded-hadoop</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>hadoop-yarn-common</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Hive -->
@@ -40,6 +82,14 @@
             <artifactId>hive-common</artifactId>
             <version>${hive.version}</version>
             <exclusions>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-yarn-registry</artifactId>
+                </exclusion>
                 <exclusion>
                     <artifactId>log4j</artifactId>
                     <groupId>log4j</groupId>
@@ -116,13 +166,66 @@
                     <artifactId>jetty-webapp</artifactId>
                     <groupId>org.eclipse.jetty</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-hdfs</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-metastore</artifactId>
+            <version>${hive.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>hbase-client</artifactId>
+                    <groupId>org.apache.hbase</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>tephra-hbase-compat-1.0</artifactId>
+                    <groupId>co.cask.tephra</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hadoop-yarn-server-resourcemanager</artifactId>
+                    <groupId>org.apache.hadoop</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>zookeeper</artifactId>
+                    <groupId>org.apache.zookeeper</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>dropwizard-metrics-hadoop-metrics2-reporter</artifactId>
+                    <groupId>com.github.joshelser</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>tephra-core</artifactId>
+                    <groupId>co.cask.tephra</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>log4j-slf4j-impl</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.derby</groupId>
+                    <artifactId>derby</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-exec</artifactId>
+            <version>${hive.version}</version>
             <exclusions>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-yarn-registry</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>com.google.inject</groupId>
                     <artifactId>guice</artifactId>
@@ -221,12 +324,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <dependency>
-            <groupId>com.github.rholder</groupId>
-            <artifactId>guava-retrying</artifactId>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -234,7 +331,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.1</version>
+                <version>${maven.shade.plugin.version}</version>
                 <executions>
                     <!-- Run shade goal on package phase -->
                     <execution>

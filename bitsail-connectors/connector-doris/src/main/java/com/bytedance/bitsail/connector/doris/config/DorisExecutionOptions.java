@@ -32,16 +32,20 @@ import java.util.Properties;
 public class DorisExecutionOptions implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  public static final int DEFAULT_CHECK_INTERVAL = 10000;
-  public static final int DEFAULT_MAX_RETRY_TIMES = 1;
-  private static final int DEFAULT_BUFFER_SIZE = 1024 * 1024;
-  private static final int DEFAULT_BUFFER_COUNT = 3;
+
   private final int flushIntervalMs;
   private final int maxRetries;
   private final int bufferSize;
   private final int bufferCount;
+  private final int recordCount;
+  private final int recordSize;
   private final String labelPrefix;
   private final boolean isBatch;
+  private final boolean enable2PC;
+  private final int checkInterval;
+  private final int requestConnectTimeoutMs;
+  private final int requestReadTimeoutMs;
+  private final int requestRetries;
 
   /**
    * Properties for the StreamLoad.
@@ -53,7 +57,6 @@ public class DorisExecutionOptions implements Serializable {
   private final WRITE_MODE writerMode;
 
   public enum WRITE_MODE {
-    STREAMING_TWO_PC,
     STREAMING_UPSERT,
     BATCH_REPLACE,
     BATCH_UPSERT

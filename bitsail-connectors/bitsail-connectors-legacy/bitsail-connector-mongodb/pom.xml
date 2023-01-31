@@ -28,8 +28,7 @@
     <artifactId>bitsail-connector-mongodb</artifactId>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <mongo.version>3.11.0</mongo.version>
     </properties>
 
     <dependencies>

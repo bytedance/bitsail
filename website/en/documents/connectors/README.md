@@ -8,6 +8,7 @@ dir:
 
 **BitSail** supports the following connectors for different data sources:
 
+- [Assert connector](assert/assert.md)
 - [ClickHouse connector](clickhouse/clickhouse.md)
 - [Doris connector](doris/doris.md)
 - [Druid connector](druid/druid.md)
@@ -27,3 +28,6 @@ dir:
 - [Redis-v1 connector](redis/v1/redis-v1.md)
 - [RocketMQ connector](rocketmq/rocketmq.md)
 - [StreamingFile(HDFS streaming) connector](streamingfile/streamingfile.md)
+- [Fake connector](fake/fake.md)
+- [Print connector](print/print.md)
+- [SelectDB connector](selectdb/selectdb.md)

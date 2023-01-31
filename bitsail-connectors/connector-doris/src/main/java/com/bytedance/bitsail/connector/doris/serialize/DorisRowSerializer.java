@@ -52,7 +52,6 @@ public class DorisRowSerializer implements Serializable {
 
     /**
      * delete flag
-     *
      */
     DELETED_FLAG(String value) {
       this.value = value;
@@ -64,7 +63,8 @@ public class DorisRowSerializer implements Serializable {
   }
 
   @VisibleForTesting
-  public DorisRowSerializer() {}
+  public DorisRowSerializer() {
+  }
 
   public DorisRowSerializer(List<ColumnInfo> columnInfoList, DorisOptions.LOAD_CONTENT_TYPE type,
                             String fieldDelimiter, boolean enableDelete) {

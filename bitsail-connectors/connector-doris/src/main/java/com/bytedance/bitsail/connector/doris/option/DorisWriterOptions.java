@@ -66,7 +66,8 @@ public interface DorisWriterOptions extends WriterOptions.BaseWriterOptions {
 
   ConfigOption<List<Map<String, Object>>> PARTITIONS =
       key(WRITER_PREFIX + "partitions")
-          .onlyReference(new TypeReference<List<Map<String, Object>>>() {});
+          .onlyReference(new TypeReference<List<Map<String, Object>>>() {
+          });
 
   ConfigOption<Integer> SINK_FLUSH_INTERVAL_MS =
       key(WRITER_PREFIX + "sink_flush_interval_ms")
@@ -76,13 +77,21 @@ public interface DorisWriterOptions extends WriterOptions.BaseWriterOptions {
       key(WRITER_PREFIX + "sink_max_retries")
           .defaultValue(3);
 
+  ConfigOption<Integer> SINK_RECORD_SIZE =
+      key(WRITER_PREFIX + "sink_record_size")
+          .defaultValue(20 * 1024 * 1024);
+
+  ConfigOption<Integer> SINK_RECORD_COUNT =
+      key(WRITER_PREFIX + "sink_record_count")
+          .defaultValue(100000);
+
   ConfigOption<Integer> SINK_BUFFER_SIZE =
       key(WRITER_PREFIX + "sink_buffer_size")
-          .defaultValue(20 * 1024 * 1024);
+          .defaultValue(1024 * 1024);
 
   ConfigOption<Integer> SINK_BUFFER_COUNT =
       key(WRITER_PREFIX + "sink_buffer_count")
-          .defaultValue(100000);
+          .defaultValue(3);
 
   ConfigOption<String> SINK_LABEL_PREFIX =
       key(WRITER_PREFIX + "sink_label_prefix")
@@ -92,13 +101,30 @@ public interface DorisWriterOptions extends WriterOptions.BaseWriterOptions {
       key(WRITER_PREFIX + "sink_enable_delete")
           .defaultValue(false);
 
+  ConfigOption<Boolean> SINK_ENABLE_2PC =
+      key(WRITER_PREFIX + "sink_enable_2PC")
+          .defaultValue(true);
+
+  ConfigOption<Integer> REQUEST_CONNECT_TIMEOUTS =
+      key(WRITER_PREFIX + "request_connect_timeouts")
+          .defaultValue(30 * 1000);
+
+  ConfigOption<Integer> REQUEST_READ_TIMEOUTS =
+      key(WRITER_PREFIX + "request_read_timeouts")
+          .defaultValue(30 * 1000);
+
+  ConfigOption<Integer> REQUEST_RETRIES =
+      key(WRITER_PREFIX + "request_retries")
+          .defaultValue(3);
+
   ConfigOption<String> SINK_WRITE_MODE =
       key(WRITER_PREFIX + "sink_write_mode")
           .defaultValue("BATCH_UPSERT");
 
   ConfigOption<Map<String, String>> STREAM_LOAD_PROPERTIES =
       key(WRITER_PREFIX + "stream_load_properties")
-          .onlyReference(new TypeReference<Map<String, String>>(){});
+          .onlyReference(new TypeReference<Map<String, String>>() {
+          });
 
   ConfigOption<String> LOAD_CONTEND_TYPE =
       key(WRITER_PREFIX + "load_contend_type")

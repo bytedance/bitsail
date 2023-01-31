@@ -212,22 +212,22 @@ SqlServer 支持以下数据类型：
 
 通用参数
 
-| 参数名称  | 参数默认值 | 参数是否必须 | 参数类型           | 建议值 or 示例值                                                            | 参数含义                                    |
-|---------|-------|--------|--------------------------|---------------------------------------------------------------------------|-------------------------------------------|
+| 参数名称    | 参数默认值 | 参数是否必须 | 参数类型                     | 建议值 or 示例值                                                               | 参数含义                                    |
+|---------|-------|--------|--------------------------|--------------------------------------------------------------------------|-----------------------------------------|
 | class   | -     | 是      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.JDBCInputFormat       | Mysql 读取 connector class 名称             |
 | class   | -     | 是      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.OracleInputFormat     | Oracle 读取 connector class 名称            |
 | class   | -     | 是      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.PostgresqlInputFormat | Pgsql 读取 connector class 名称             |
 | class   | -     | 是      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.SqlServerInputFormat  | SqlServer 读取 connector class 名称         |
-| columns | -     | 是      | list<map<string,string>> | "[ { "name":"id", "type":"int" }, { "name":"name", "type":"varchar" } ]  | Jdbc 读取的列信息。需要和writer的指定的columns数量保持一致。 |
+| columns | -     | 否      | list<map<string,string>> | "[ { "name":"id", "type":"int" }, { "name":"name", "type":"varchar" } ]  | Jdbc 读取的列信息。需要和writer的指定的columns数量保持一致。 |
 
 数据库连接配置
 
-| 参数名称                  | 参数默认值 | 参数是否必须 | 参数类型   | 建议值 or 示例值                                                                                                                                                                                                                                                                               | 参数含义               |
-|-----------------------|-------|--------|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
-| user_name             | -     | 是      | string | abc                                                                                                                                                                                                                                                                                      | Jdbc 连接用户名         |
-| password              | -     | 是      | string | password                                                                                                                                                                                                                                                                                 | Jdbc 连接密码          |
-| query_timeout_seconds | 300   | 否      | int    | 300                                                                                                                                                                                                                                                                                      | 连接 jdbc timeout 时间 |
-| query_retry_times     | 3     | 否      | int    | 3                                                                                                                                                                                                                                                                                        | Jdbc 重试次数          |
+| 参数名称                  | 参数默认值 | 参数是否必须 | 参数类型   | 建议值 or 示例值                                                                                                                                                                                                                                                                             | 参数含义               |
+|-----------------------|-------|--------|--------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
+| user_name             | -     | 是      | string | abc                                                                                                                                                                                                                                                                                    | Jdbc 连接用户名         |
+| password              | -     | 是      | string | password                                                                                                                                                                                                                                                                               | Jdbc 连接密码          |
+| query_timeout_seconds | 300   | 否      | int    | 300                                                                                                                                                                                                                                                                                    | 连接 jdbc timeout 时间 |
+| query_retry_times     | 3     | 否      | int    | 3                                                                                                                                                                                                                                                                                      | Jdbc 重试次数          |
 | connections           | -     | 是      |        | [ { "slaves": [ {"db_url": "jdbc:mysql://address=(protocol=tcp)(host=192.168.1.202)(port=3306)/test?permitMysqlScheme&rewriteBatchedStatements=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false"} ]} ] | 连接 Jdbc 的信息        |
 
 表同步配置参数
@@ -250,8 +250,8 @@ SQL 同步配置参数
 
 其他配置
 
-| 参数名称   | 参数默认值 | 参数是否必须 | 参数类型   | 建议值 or 示例值 | 参数含义      |
-|--------|-------|--------|--------|------------|-----------|
+| 参数名称   | 参数默认值 | 参数是否必须 | 参数类型   | 建议值 or 示例值 | 参数含义                           |
+|--------|-------|--------|--------|------------|--------------------------------|
 | filter | -     | 否      | string | id>100     | 读取数据时过滤信息，会通过 where 语句放置在查询语句后 |
 
 ## Jdbc Sink
@@ -269,8 +269,8 @@ SQL 同步配置参数
 
 通用参数
 
-| 参数名称  | 参数默认值 | 参数是否必须 | 参数类型            | 建议值 or 示例值                                                            | 参数含义                                    |
-|---------|-------|--------|--------------------------|---------------------------------------------------------------------------|--------------------------------------------|
+| 参数名称    | 参数默认值 | 参数是否必须 | 参数类型                     | 建议值 or 示例值                                                                | 参数含义                                    |
+|---------|-------|--------|--------------------------|---------------------------------------------------------------------------|-----------------------------------------|
 | class   | -     | 是      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.JDBCOutputFormat       | Mysql 写入 connector class 名称             |
 | class   | -     | 是      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.OracleOutputFormat     | Oracle 写入 connector class 名称            |
 | class   | -     | 是      | string                   | com.bytedance.bitsail.connector.legacy.jdbc.source.PostgresqlOutputFormat | Pgsql 写入 connector class 名称             |
@@ -292,19 +292,19 @@ SQL 同步配置参数
 
 | 参数名称       | 参数默认值  | 参数是否必须 | 参数类型   | 建议值 or 示例值 | 参数含义                                                                                                         |
 |------------|--------|--------|--------|------------|--------------------------------------------------------------------------------------------------------------|
-| write_mode | insert | 否      | string | insert    | Insert 写入模式。为了保证重复执行结果的一致性。写入前会根据分区列清除数据。最终生成的写入语句类似INSERT INTO xx (xx) VALUES (xx)                          |
+| write_mode | insert | 否      | string | insert     | Insert 写入模式。为了保证重复执行结果的一致性。写入前会根据分区列清除数据。最终生成的写入语句类似INSERT INTO xx (xx) VALUES (xx)                          |
 | write_mode |        |        |        | overwrite  | Overwrite 写入模式。写入前不会清除数据。最终生成的写入语句类似 INSERT INTO xx (xx) VALUES (xx) ON DUPLICATE KEY UPDATE (xx) VALUES(xx) |
 
 Insert 模式下会根据 partition 信息进行数据删除，下面的参数针对 insert 模式：
 
-| 参数名称                     | 参数默认值 | 参数是否必须 | 参数类型   | 建议值 or 示例值         | 参数含义                                                                                                                                              |
-|--------------------------|-------|--------|--------|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| partition_name           | -     | 是      | string | date               | 分区名称，这是一个逻辑概念，写入数据前会根据该字段删除partition value的数据                                                                                                              |
-| partition_value          | -     | 是      | string | 20220727           | 分区值                                                                                                                                               |
-| partition_pattern_format | -     | 否      | string | yyyyMMdd/yyyy-MM-dd | 分区字段模式                                                                                                                                              |
-| mysql_data_ttl           | 0     | 否      | int    | 0                  | 数据库数据保存的天数。会根据配置的ddl 和 partition_name 字段的值进行删除操作。比如 ttl 设置为3，partition name 为 date，partition value 设置为 20220727，则会将数据库中所有 date<=20220724 的数据删除 |
-| delete_threshold         | 10000 | 否      | int    | 10000              | 删除时，每次删除数据的条数                                                                                                                                         |
-| delete_interval_ms       | 100   | 否      | int    | 100                | 两次删除之间的间隔                                                                                                                                         |
+| 参数名称                     | 参数默认值 | 参数是否必须 | 参数类型   | 建议值 or 示例值          | 参数含义                                                                                                                                           |
+|--------------------------|-------|--------|--------|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| partition_name           | -     | 是      | string | date                | 分区名称，这是一个逻辑概念，写入数据前会根据该字段删除partition value的数据                                                                                                  |
+| partition_value          | -     | 是      | string | 20220727            | 分区值                                                                                                                                            |
+| partition_pattern_format | -     | 否      | string | yyyyMMdd/yyyy-MM-dd | 分区字段模式                                                                                                                                         |
+| mysql_data_ttl           | 0     | 否      | int    | 0                   | 数据库数据保存的天数。会根据配置的ddl 和 partition_name 字段的值进行删除操作。比如 ttl 设置为3，partition name 为 date，partition value 设置为 20220727，则会将数据库中所有 date<=20220724 的数据删除 |
+| delete_threshold         | 10000 | 否      | int    | 10000               | 删除时，每次删除数据的条数                                                                                                                                  |
+| delete_interval_ms       | 100   | 否      | int    | 100                 | 两次删除之间的间隔                                                                                                                                      |
 写入配置信息
 
 | 参数名称                   | 参数默认值 | 参数是否必须 | 参数类型 | 建议值 or 示例值 | 参数含义       |
@@ -332,12 +332,12 @@ PgSql 写入的定制参数
 
 Oracle 写入的定制参数
 
-| 参数名称                     | 参数默认值 | 参数是否必须 | 参数类型   | 建议值 or 示例值 | 参数含义                                                 |
-|--------------------------|-------|--------|--------|------------|------------------------------------------------------|
-| primary_key              | -     | 是 (Sink)   | string（区分大小写）   | ID         | 表的主键，Oracle 删除时如果需要限制速率需要利用主键值使用 select limit语句限制删除速率 |
-| partition_name           | -     | 是     | string (区分大小写)   | DATETIME   | 跟通用参数相同，除了数值必須区分大小写 |
-| db_name                  | -     | 是     | string (区分大小写)   | DB         | 跟通用参数相同，除了数值必須区分大小写 |
-| columns.name             | -     | 否     | string (区分大小写)   | COLUMN     |  跟通用参数相同，除了数值必須区分大小写 |
+| 参数名称           | 参数默认值 | 参数是否必须   | 参数类型           | 建议值 or 示例值 | 参数含义                                                  |
+|----------------|-------|----------|----------------|------------|-------------------------------------------------------|
+| primary_key    | -     | 是 (Sink) | string（区分大小写）  | ID         | 表的主键，Oracle 删除时如果需要限制速率需要利用主键值使用 select limit语句限制删除速率 |
+| partition_name | -     | 是        | string (区分大小写) | DATETIME   | 跟通用参数相同，除了数值必須区分大小写                                   |
+| db_name        | -     | 是        | string (区分大小写) | DB         | 跟通用参数相同，除了数值必須区分大小写                                   |
+| columns.name   | -     | 否        | string (区分大小写) | COLUMN     | 跟通用参数相同，除了数值必須区分大小写                                   |
 
 ## 相关文档
 
