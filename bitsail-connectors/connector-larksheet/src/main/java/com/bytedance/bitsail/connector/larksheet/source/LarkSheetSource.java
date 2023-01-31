@@ -31,9 +31,9 @@ import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.connector.larksheet.constant.LarkSheetConstant;
 import com.bytedance.bitsail.connector.larksheet.error.LarkSheetFormatErrorCode;
 import com.bytedance.bitsail.connector.larksheet.option.LarkSheetReaderOptions;
+import com.bytedance.bitsail.connector.larksheet.source.coordinate.LarkSheetSourceSplitCoordinator;
 import com.bytedance.bitsail.connector.larksheet.source.reader.LarkSheetReader;
 import com.bytedance.bitsail.connector.larksheet.source.split.LarkSheetSplit;
-import com.bytedance.bitsail.connector.larksheet.source.coordinate.LarkSheetSourceSplitCoordinator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

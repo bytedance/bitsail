@@ -87,7 +87,6 @@ public class LarkSheetReader implements SourceReader<Row, LarkSheetSplit> {
    */
   private List<Object> curRecord;
 
-
   public LarkSheetReader(BitSailConfiguration jobConf, Context readerContext) {
     this.jobConf = jobConf;
     this.readerContext = readerContext;
