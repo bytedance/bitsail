@@ -26,9 +26,6 @@
 
     <artifactId>bitsail-connector-hadoop</artifactId>
 
-    <properties>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
