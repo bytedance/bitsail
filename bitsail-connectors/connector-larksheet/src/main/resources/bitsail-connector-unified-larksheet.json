@@ -1,0 +1,9 @@
+{
+  "name": "bitsail-connector-unified-larksheet",
+  "classes": [
+    "com.bytedance.bitsail.connector.larksheet.source.LarkSheetSource"
+  ],
+  "libs": [
+    "connector-larksheet-${version}.jar"
+  ]
+}
