@@ -19,17 +19,19 @@ package com.bytedance.bitsail.test.e2e.datasource;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ReaderOptions;
+import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfoUtils;
 import com.bytedance.bitsail.common.util.JsonSerializer;
 import com.bytedance.bitsail.connector.rocketmq.option.RocketMQSourceOptions;
 import com.bytedance.bitsail.connector.rocketmq.source.RocketMQSource;
+import com.bytedance.bitsail.test.e2e.datasource.util.RowGenerator;
 
 import com.alibaba.dcm.DnsCacheManipulator;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.common.message.Message;
 import org.slf4j.Logger;
@@ -47,6 +49,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -65,7 +68,8 @@ public class RocketMQDataSource extends AbstractDataSource {
   private GenericContainer<?> nameServ;
   private GenericContainer<?> brokerServ;
 
-  private TypeInfo<?>[] producerTypes;
+  private List<ColumnInfo> columnInfos;
+  private RowGenerator rowGenerator;
 
   @Override
   public String getContainerName() {
@@ -80,9 +84,12 @@ public class RocketMQDataSource extends AbstractDataSource {
   @Override
   public void configure(BitSailConfiguration dataSourceConf) {
     RocketMQSource rocketMQSource = new RocketMQSource();
-    this.producerTypes = TypeInfoUtils.getTypeInfos(
+    this.columnInfos = dataSourceConf.get(ReaderOptions.BaseReaderOptions.COLUMNS);
+    TypeInfo<?>[] producerTypes = TypeInfoUtils.getTypeInfos(
         rocketMQSource.createTypeInfoConverter(),
-        dataSourceConf.get(ReaderOptions.BaseReaderOptions.COLUMNS));
+        columnInfos);
+    this.rowGenerator = new RowGenerator(producerTypes);
+    rowGenerator.init();
   }
 
   @Override
@@ -172,7 +179,7 @@ public class RocketMQDataSource extends AbstractDataSource {
     for (int batchCount = 0; batchCount < 10; ++batchCount) {
       List<Message> messages = Lists.newArrayList();
       for (int i = 0; i < 100; ++i) {
-        messages.add(new Message(TOPIC_NAME, fakeJsonObject(i, producerTypes)));
+        messages.add(new Message(TOPIC_NAME, fakeJsonObject()));
       }
       try {
         producer.send(messages);
@@ -203,10 +210,16 @@ public class RocketMQDataSource extends AbstractDataSource {
     super.close();
   }
 
-  // todo: support other types
-  private static byte[] fakeJsonObject(int index, TypeInfo<?>[] typeInfos) {
-    Map<Object, Object> demo = Maps.newHashMap();
-    demo.put("id", index);
-    return JsonSerializer.serialize(demo).getBytes();
+  private byte[] fakeJsonObject() {
+    Row row = rowGenerator.next();
+
+    Map<String, Object> content = new HashMap<>();
+    for (int i = 0; i < columnInfos.size(); ++i) {
+      String name = columnInfos.get(i).getName();
+      Object value = row.getField(i);
+      content.put(name, value);
+    }
+
+    return JsonSerializer.serialize(content).getBytes();
   }
 }

@@ -13,7 +13,16 @@
       "columns": [
         {
           "name": "id",
-          "type": "long"
+          "type": "long",
+          "properties": "unique"
+        },
+        {
+          "name": "random_string",
+          "type": "string"
+        },
+        {
+          "name": "random_double",
+          "type": "double"
         }
       ],
       "format_type": "json",
@@ -28,6 +37,14 @@
         {
           "name": "id",
           "type": "long"
+        },
+        {
+          "name": "random_string",
+          "type": "string"
+        },
+        {
+          "name": "random_double",
+          "type": "double"
         }
       ],
       "writer_parallelism_num": 1
