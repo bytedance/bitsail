@@ -25,6 +25,7 @@ import com.bytedance.bitsail.test.e2e.datasource.DataSourceFactory;
 import com.bytedance.bitsail.test.e2e.datasource.EmptyDataSource;
 import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 import com.bytedance.bitsail.test.e2e.executor.flink.Flink11Executor;
+import com.bytedance.bitsail.test.e2e.option.EndToEndOptions;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -94,11 +95,27 @@ public class TestJob implements AutoCloseable {
    */
   protected AbstractDataSource prepareSource(BitSailConfiguration jobConf,
                                              Network executorNetwork) {
-    AbstractDataSource dataSource;
-    try {
-      dataSource = DataSourceFactory.getAsSource(jobConf);
-    } catch (BitSailException e) {
-      dataSource = new EmptyDataSource();
+    AbstractDataSource dataSource = null;
+    String dataSourceClass = jobConf.get(EndToEndOptions.E2E_READER_DATA_SOURCE_CLASS);
+
+    if (dataSourceClass != null) {
+      try {
+        LOG.info("Reader data source class name: [{}]", dataSourceClass);
+        Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(dataSourceClass);
+        dataSource = (AbstractDataSource) clazz.newInstance();
+      } catch (Exception e) {
+        LOG.error("Failed to create data source [{}], will try using class name.", dataSourceClass, e);
+        dataSource = null;
+      }
+    }
+
+    if (dataSource == null) {
+      try {
+        dataSource = DataSourceFactory.getAsSource(jobConf);
+      } catch (BitSailException e) {
+        LOG.error("Failed create data source from factory, will use empty source.", e);
+        dataSource = new EmptyDataSource();
+      }
     }
     dataSource.configure(jobConf);
     dataSource.initNetwork(executorNetwork);
@@ -114,11 +131,27 @@ public class TestJob implements AutoCloseable {
    */
   protected AbstractDataSource prepareSink(BitSailConfiguration jobConf,
                                            Network executorNetwork) {
-    AbstractDataSource dataSource;
-    try {
-      dataSource = DataSourceFactory.getAsSink(jobConf);
-    } catch (BitSailException e) {
-      dataSource = new EmptyDataSource();
+    AbstractDataSource dataSource = null;
+    String dataSourceClass = jobConf.get(EndToEndOptions.E2E_WRITER_DATA_SOURCE_CLASS);
+
+    if (dataSourceClass != null) {
+      try {
+        LOG.info("Writer data source class name: [{}]", dataSourceClass);
+        Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(dataSourceClass);
+        dataSource = (AbstractDataSource) clazz.newInstance();
+      } catch (Exception e) {
+        LOG.error("Failed to create data source [{}], will try using class name.", dataSourceClass, e);
+        dataSource = null;
+      }
+    }
+
+    if (dataSource == null) {
+      try {
+        dataSource = DataSourceFactory.getAsSink(jobConf);
+      } catch (BitSailException e) {
+        LOG.error("Failed create data source from factory, will use empty source.", e);
+        dataSource = new EmptyDataSource();
+      }
     }
     dataSource.configure(jobConf);
     dataSource.initNetwork(executorNetwork);
