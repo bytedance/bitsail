@@ -15,7 +15,7 @@
       "columns": [
         {
           "name": "fake_key",
-          "type": "string",
+          "type": "long",
           "properties": "unique"
         },
         {
