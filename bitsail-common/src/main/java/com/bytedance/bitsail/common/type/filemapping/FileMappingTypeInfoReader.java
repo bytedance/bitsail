@@ -16,6 +16,8 @@
 
 package com.bytedance.bitsail.common.type.filemapping;
 
+import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.type.BitSailTypeParser;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
@@ -31,6 +33,7 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -45,12 +48,19 @@ public class FileMappingTypeInfoReader implements Serializable {
   private static final String ENGINE_TO_CUSTOM_KEY = "engine.type.to.bitsail.type.converter";
   private static final String CUSTOM_TO_ENGINE_KEY = "bitsail.type.to.engine.type.converter";
 
+  private static final String ENGINE_TO_CUSTOM_COMPLEX_KEY = "engine.type.to.bitsail.complex.converter";
+  private static final String CUSTOM_TO_ENGINE_COMPLEX_KEY = "bitsail.type.to.engine.complex.converter";
+
   private final String converterFileName;
 
   @Getter
   protected Map<String, TypeInfo<?>> toTypeInformation = Maps.newHashMap();
   @Getter
   protected Map<TypeInfo<?>, String> fromTypeInformation = Maps.newHashMap();
+  @Getter
+  protected Map<String, String> engineToCustomTypeStringMap = Maps.newHashMap();
+  @Getter
+  protected Map<String, String> customToEngineTypeStringMap = Maps.newHashMap();
 
   public FileMappingTypeInfoReader(String engine) {
     LOG.info("File mapping reader from engine = {}.", engine);
@@ -99,6 +109,13 @@ public class FileMappingTypeInfoReader implements Serializable {
     readerOption(converterConf, ENGINE_TO_CUSTOM_KEY, tmpToTypeInformation);
     readerOption(converterConf, CUSTOM_TO_ENGINE_KEY, tmpFromTypeInformation);
 
+    readerOption(converterConf, ENGINE_TO_CUSTOM_COMPLEX_KEY, engineToCustomTypeStringMap);
+    readerOption(converterConf, CUSTOM_TO_ENGINE_COMPLEX_KEY, customToEngineTypeStringMap);
+    this.customTypeStringCaseCheck(engineToCustomTypeStringMap.values());
+    this.customTypeStringCaseCheck(customToEngineTypeStringMap.keySet());
+    engineToCustomTypeStringMap.putAll(tmpToTypeInformation);
+    customToEngineTypeStringMap.putAll(tmpFromTypeInformation);
+
     handleEngineTypeToCustom(tmpToTypeInformation);
     handleCustomToEngineType(tmpFromTypeInformation);
   }
@@ -128,4 +145,14 @@ public class FileMappingTypeInfoReader implements Serializable {
       fromTypeInformation.put(typeInfo, entry.getValue());
     }
   }
+
+  private void customTypeStringCaseCheck(Collection<String> customTypeStrings) {
+    for (String typeStr : customTypeStrings) {
+      if (!typeStr.equals(typeStr.toLowerCase())) {
+        throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,
+          String.format("custom type string must be lowercase:%s", typeStr));
+      }
+    }
+  }
+
 }

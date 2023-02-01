@@ -17,8 +17,8 @@ engine.type.to.bitsail.type.converter:
   - source.type: double
     target.type: double
 
-  - source.type: int
-    target.type: long
+  - source.type: Int32
+    target.type: int
 
   - source.type: bigint
     target.type: long
@@ -26,7 +26,7 @@ engine.type.to.bitsail.type.converter:
 
 bitsail.type.to.engine.type.converter:
   - source.type: long
-    target.type: long
+    target.type: bigint
 
   - source.type: double
     target.type: double
@@ -42,3 +42,34 @@ bitsail.type.to.engine.type.converter:
 
   - source.type: bytes
     target.type: bytes
+
+  - source.type: int
+    target.type: Int32
+
+
+engine.type.to.bitsail.complex.converter:
+  - source.type: Array
+    target.type: list
+
+  - source.type: Map
+    target.type: map
+
+  - source.type: (
+    target.type: <
+
+  - source.type: )
+    target.type: '>'
+
+bitsail.type.to.engine.complex.converter:
+  - source.type: list
+    target.type: Array
+
+  - source.type: map
+    target.type: Map
+
+  - source.type: <
+    target.type: (
+
+  - source.type: '>'
+    target.type: )
+
