@@ -100,9 +100,6 @@ public class TestJob implements AutoCloseable {
     } catch (BitSailException e) {
       dataSource = new EmptyDataSource();
     }
-    if (dataSource == null) {
-      dataSource = new EmptyDataSource();
-    }
     dataSource.configure(jobConf);
     dataSource.initNetwork(executorNetwork);
     dataSource.start();
@@ -121,9 +118,6 @@ public class TestJob implements AutoCloseable {
     try {
       dataSource = DataSourceFactory.getAsSink(jobConf);
     } catch (BitSailException e) {
-      dataSource = new EmptyDataSource();
-    }
-    if (dataSource == null) {
       dataSource = new EmptyDataSource();
     }
     dataSource.configure(jobConf);

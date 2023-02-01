@@ -106,7 +106,7 @@ public abstract class AbstractExecutor extends AbstractContainer {
     this.executorRootDir = BITSAIL_E2E_EXECUTOR_ROOT_DIR;
 
     try {
-      initBitsailLibs();
+      addBitsailLibs();
     } catch (URISyntaxException e) {
       throw new RuntimeException("Failed to load bitsail libs into executor.", e);
     }
@@ -171,7 +171,7 @@ public abstract class AbstractExecutor extends AbstractContainer {
   /**
    * List bitsail libs and binary files.
    */
-  protected void initBitsailLibs() throws URISyntaxException {
+  protected void addBitsailLibs() throws URISyntaxException {
     String buildVersion = VersionHolder.getHolder().getBuildVersion();
 
     // bin/bitsail
