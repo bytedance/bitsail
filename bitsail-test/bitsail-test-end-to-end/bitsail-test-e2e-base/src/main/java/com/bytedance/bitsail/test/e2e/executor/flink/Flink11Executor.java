@@ -16,7 +16,6 @@
 
 package com.bytedance.bitsail.test.e2e.executor.flink;
 
-import com.bytedance.bitsail.base.version.VersionHolder;
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
 
 import com.google.common.collect.Lists;
@@ -60,9 +59,7 @@ public class Flink11Executor extends AbstractFlinkExecutor {
   }
 
   @Override
-  protected void addEngineLibs() {
-    String buildVersion = VersionHolder.getHolder().getBuildVersion();
-
+  protected void addEngineLibs(String buildVersion) {
     // libs/engines/bitsail-engine-flink-{revision}.jar
     String flinkEngineFile = "bitsail-engine-flink-" + buildVersion + ".jar";
     String flinkEngine = Paths.get(localRootDir,

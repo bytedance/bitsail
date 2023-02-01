@@ -135,7 +135,7 @@ public abstract class AbstractExecutor extends AbstractContainer {
   /**
    * Add engine and corresponding client entry into transferable files.
    */
-  protected abstract void addEngineLibs();
+  protected abstract void addEngineLibs(String buildVersion);
 
   /**
    * Add connector libs into transferable files.
@@ -231,7 +231,7 @@ public abstract class AbstractExecutor extends AbstractContainer {
 
     // libs/engines
     // libs/clients/bitsail-client-entry-{engine}-{revision}.jar
-    addEngineLibs();
+    addEngineLibs(buildVersion);
   }
 
   /**
