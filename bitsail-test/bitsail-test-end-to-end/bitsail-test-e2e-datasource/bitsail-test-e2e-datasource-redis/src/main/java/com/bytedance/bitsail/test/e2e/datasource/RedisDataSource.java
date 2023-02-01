@@ -18,7 +18,7 @@ package com.bytedance.bitsail.test.e2e.datasource;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.WriterOptions;
-import com.bytedance.bitsail.connector.legacy.redis.option.RedisWriterOptions;
+import com.bytedance.bitsail.connector.redis.option.RedisWriterOptions;
 import com.bytedance.bitsail.connector.redis.sink.RedisSink;
 
 import io.lettuce.core.RedisClient;
