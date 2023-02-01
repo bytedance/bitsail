@@ -41,7 +41,7 @@ public class RedisPipelineProcessor extends AbstractPipelineProcessor {
                                 long processorId,
                                 int logSampleInterval,
                                 boolean complexTypeWithTtl,
-                                int maxAttemptCount) throws ExecutionException, RetryException {
+                                int maxAttemptCount) {
     super(jedisPool, jedisFetcher, commandSize, processorId, logSampleInterval, complexTypeWithTtl, maxAttemptCount);
 
     this.failureHandler = new FailureHandler() {
