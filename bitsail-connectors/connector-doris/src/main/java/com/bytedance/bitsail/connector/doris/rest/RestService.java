@@ -17,15 +17,20 @@
 package com.bytedance.bitsail.connector.doris.rest;
 
 import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.connector.doris.config.DorisExecutionOptions;
 import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 import com.bytedance.bitsail.connector.doris.error.DorisErrorCode;
 import com.bytedance.bitsail.connector.doris.rest.model.Backend;
 import com.bytedance.bitsail.connector.doris.rest.model.Backend.BackendRow;
+import com.bytedance.bitsail.connector.doris.rest.model.PartitionDefinition;
+import com.bytedance.bitsail.connector.doris.rest.model.QueryPlan;
+import com.bytedance.bitsail.connector.doris.rest.model.Tablet;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.annotation.VisibleForTesting;
@@ -34,6 +39,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.StringEntity;
 import org.slf4j.Logger;
 
 import java.io.BufferedReader;
@@ -44,18 +50,27 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.apache.http.HttpStatus.SC_OK;
 
 public class RestService {
 
   private static final String BACKENDS = "/api/backends?is_alive=true";
   private static List<Backend.BackendRow> backendRows;
   private static long pos;
+  private static final String QUERY_PLAN = "_query_plan";
+  private static final String API_PREFIX = "/api";
 
   public static String getBackend(DorisOptions options, DorisExecutionOptions executionOptions, Logger logger) {
     try {
@@ -269,6 +284,213 @@ public class RestService {
       in.close();
     }
     return result;
+  }
+
+  /**
+   * find Doris partitions from Doris FE.
+   */
+  public static List<PartitionDefinition> findPartitions(DorisOptions dorisOptions, DorisExecutionOptions executionOptions, Logger logger) {
+    String database = dorisOptions.getDatabaseName();
+    String table = dorisOptions.getTableName();
+    String readFields = constructReadFields(dorisOptions.getColumnInfos());
+
+    String sql = "select " + readFields + " from `" + database + "`.`" + table + "`";
+
+    if (!StringUtils.isEmpty(executionOptions.getSqlFilter())) {
+      sql += " where " + executionOptions.getSqlFilter();
+    }
+    logger.debug("Query SQL Sending to Doris FE is: '{}'.", sql);
+
+    HttpPost httpPost = new HttpPost(getUriStr(dorisOptions, logger) + QUERY_PLAN);
+    String entity = "{\"sql\": \"" + sql + "\"}";
+    logger.debug("Post body Sending to Doris FE is: '{}'.", entity);
+    StringEntity stringEntity = new StringEntity(entity, StandardCharsets.UTF_8);
+    stringEntity.setContentEncoding("UTF-8");
+    stringEntity.setContentType("application/json");
+    httpPost.setEntity(stringEntity);
+
+    String resStr = send(dorisOptions, executionOptions, httpPost, logger);
+    logger.debug("Find partition response is '{}'.", resStr);
+    QueryPlan queryPlan = getQueryPlan(resStr, logger);
+    Map<String, List<Long>> be2Tablets = selectBeForTablet(queryPlan, logger);
+
+    return tabletsMapToPartition(executionOptions, be2Tablets, queryPlan.getOpaquedQueryPlan(), database, table, logger);
+  }
+
+  private static String constructReadFields(List<ColumnInfo> columnInfos) {
+    StringBuilder readFields = new StringBuilder();
+    if (CollectionUtils.isNotEmpty(columnInfos)) {
+      for (int i = 0; i < columnInfos.size(); i++) {
+        readFields.append(columnInfos.get(i).getName());
+        if (i != columnInfos.size() - 1) {
+          readFields.append(",");
+        }
+      }
+    } else {
+      readFields.append("*");
+    }
+    return readFields.toString();
+  }
+
+  /**
+   * translate Doris FE response string to inner {@link QueryPlan} struct.
+   *
+   * @param response Doris FE response string
+   * @param logger {@link Logger}
+   * @return inner {@link QueryPlan} struct
+   */
+  @VisibleForTesting
+  static QueryPlan getQueryPlan(String response, Logger logger) {
+    ObjectMapper mapper = new ObjectMapper();
+    QueryPlan queryPlan;
+    try {
+      queryPlan = mapper.readValue(response, QueryPlan.class);
+    } catch (JsonParseException e) {
+      String errMsg = "Doris FE's response is not a json. res: " + response;
+      logger.error(errMsg, e);
+      throw BitSailException.asBitSailException(DorisErrorCode.FAILED_PARSE, errMsg, e);
+    } catch (JsonMappingException e) {
+      String errMsg = "Doris FE's response cannot map to schema. res: " + response;
+      logger.error(errMsg, e);
+      throw BitSailException.asBitSailException(DorisErrorCode.FAILED_PARSE, errMsg, e);
+    } catch (IOException e) {
+      String errMsg = "Parse Doris FE's response to json failed. res: " + response;
+      logger.error(errMsg, e);
+      throw BitSailException.asBitSailException(DorisErrorCode.FAILED_PARSE, errMsg, e);
+    }
+
+    if (Objects.isNull(queryPlan)) {
+      String errMsg = "can not get query plan";
+      logger.error(errMsg);
+      throw new RuntimeException(errMsg);
+    }
+
+    if (queryPlan.getStatus() != SC_OK) {
+      String errMsg = "Doris FE's response is not OK, status is " + queryPlan.getStatus();
+      logger.error(errMsg);
+      throw new RuntimeException(errMsg);
+    }
+    logger.debug("Parsing partition result is '{}'.", queryPlan);
+    return queryPlan;
+  }
+
+  /**
+   * translate BE tablets map to Doris RDD partition.
+   *
+   * @param executionOptions execution Options
+   * @param be2Tablets BE to tablets {@link Map}
+   * @param opaquedQueryPlan Doris BE execute plan getting from Doris FE
+   * @param database database name of Doris table
+   * @param table table name of Doris table
+   * @param logger {@link Logger}
+   * @return Doris RDD partition {@link List}
+   * @throws IllegalArgumentException throw when translate failed
+   */
+  @VisibleForTesting
+  static List<PartitionDefinition> tabletsMapToPartition(DorisExecutionOptions executionOptions, Map<String, List<Long>> be2Tablets,
+      String opaquedQueryPlan, String database, String table, Logger logger)
+      throws IllegalArgumentException {
+    int tabletsSize = executionOptions.getRequestTabletSize();
+    List<PartitionDefinition> partitions = new ArrayList<>();
+    for (Map.Entry<String, List<Long>> beInfo : be2Tablets.entrySet()) {
+      logger.debug("Generate partition with beInfo: '{}'.", beInfo);
+      HashSet<Long> tabletSet = new HashSet<>(beInfo.getValue());
+      beInfo.getValue().clear();
+      beInfo.getValue().addAll(tabletSet);
+      int first = 0;
+      while (first < beInfo.getValue().size()) {
+        Set<Long> partitionTablets = new HashSet<>(beInfo.getValue()
+            .subList(first, Math.min(beInfo.getValue().size(), first + tabletsSize)));
+        first = first + tabletsSize;
+        PartitionDefinition partitionDefinition = new PartitionDefinition(database, table, beInfo.getKey(), partitionTablets, opaquedQueryPlan);
+        logger.debug("Generate one PartitionDefinition '{}'.", partitionDefinition);
+        partitions.add(partitionDefinition);
+      }
+    }
+    return partitions;
+  }
+
+  /**
+   * get a valid URI to connect Doris FE.
+   *
+   * @param dorisOptions configuration of request
+   * @param logger {@link Logger}
+   * @return uri string
+   * @throws IllegalArgumentException throw when configuration is illegal
+   */
+  @VisibleForTesting
+  static String getUriStr(DorisOptions dorisOptions, Logger logger) throws IllegalArgumentException {
+    return "http://" + randomEndpoint(dorisOptions.getFeNodes(), logger) + API_PREFIX +
+        "/" + dorisOptions.getDatabaseName() +
+        "/" + dorisOptions.getTableName() +
+        "/";
+  }
+
+  /**
+   * choice a Doris FE node to request.
+   *
+   * @param feNodes Doris FE node list, separate be comma
+   * @param logger slf4j logger
+   * @return the chosen one Doris FE node
+   * @throws IllegalArgumentException fe nodes is illegal
+   */
+  @VisibleForTesting
+  static String randomEndpoint(String feNodes, Logger logger) throws IllegalArgumentException {
+    logger.trace("Parse fenodes '{}'.", feNodes);
+    List<String> nodes = Arrays.asList(feNodes.split(","));
+    Collections.shuffle(nodes);
+    return nodes.get(0).trim();
+  }
+
+  /**
+   * select which Doris BE to get tablet data.
+   *
+   * @param queryPlan {@link QueryPlan} translated from Doris FE response
+   * @param logger {@link Logger}
+   * @return BE to tablets {@link Map}
+   */
+  @VisibleForTesting
+  static Map<String, List<Long>> selectBeForTablet(QueryPlan queryPlan, Logger logger) {
+    Map<String, List<Long>> be2Tablets = new HashMap<>();
+    for (Map.Entry<String, Tablet> part : queryPlan.getPartitions().entrySet()) {
+      logger.debug("Parse tablet info: '{}'.", part);
+      long tabletId;
+      try {
+        tabletId = Long.parseLong(part.getKey());
+      } catch (NumberFormatException e) {
+        String errMsg = "Parse tablet id '" + part.getKey() + "' to long failed.";
+        logger.error(errMsg, e);
+        throw new BitSailException(DorisErrorCode.FAILED_PARSE, errMsg);
+      }
+      String target = null;
+      int tabletCount = Integer.MAX_VALUE;
+      for (String candidate : part.getValue().getRoutings()) {
+        logger.trace("Evaluate Doris BE '{}' to tablet '{}'.", candidate, tabletId);
+        if (!be2Tablets.containsKey(candidate)) {
+          logger.debug("Choice a new Doris BE '{}' for tablet '{}'.", candidate, tabletId);
+          List<Long> tablets = new ArrayList<>();
+          be2Tablets.put(candidate, tablets);
+          target = candidate;
+          break;
+        } else {
+          if (be2Tablets.get(candidate).size() < tabletCount) {
+            target = candidate;
+            tabletCount = be2Tablets.get(candidate).size();
+            logger.debug("Current candidate Doris BE to tablet '{}' is '{}' with tablet count {}.",
+                tabletId, target, tabletCount);
+          }
+        }
+      }
+      if (Objects.isNull(target)) {
+        String errMsg = "Cannot choice Doris BE for tablet " + tabletId;
+        logger.error(errMsg);
+        throw new RuntimeException(errMsg);
+      }
+
+      logger.debug("Choice Doris BE '{}' for tablet '{}'.", target, tabletId);
+      be2Tablets.get(target).add(tabletId);
+    }
+    return be2Tablets;
   }
 
 }

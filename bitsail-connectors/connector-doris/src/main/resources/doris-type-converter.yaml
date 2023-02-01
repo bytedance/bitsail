@@ -36,13 +36,13 @@ engine.type.to.bitsail.type.converter:
     target.type: short
 
   - source.type: int
-    target.type: long
+    target.type: int
 
   - source.type: smallint
-    target.type: long
+    target.type: int
 
   - source.type: integer
-    target.type: long
+    target.type: int
 
   - source.type: bigint
     target.type: bigint

@@ -43,9 +43,16 @@ public class DorisExecutionOptions implements Serializable {
   private final boolean isBatch;
   private final boolean enable2PC;
   private final int checkInterval;
+
   private final int requestConnectTimeoutMs;
   private final int requestReadTimeoutMs;
   private final int requestRetries;
+  private final Integer requestTabletSize;
+  private final Integer requestQueryTimeoutS;
+  private final Integer requestBatchSize;
+
+  private final String sqlFilter;
+  private final Long execMemLimit;
 
   /**
    * Properties for the StreamLoad.

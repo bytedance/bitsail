@@ -19,6 +19,10 @@ package com.bytedance.bitsail.connector.doris.error;
 import com.bytedance.bitsail.common.exception.ErrorCode;
 
 public enum DorisErrorCode implements ErrorCode {
+
+  /**
+   * Doris Writer
+   */
   // Failed to init write proxy
   PROXY_INIT_FAILED("DorisWriter-01", "Failed to init write proxy"),
   REQUIRED_VALUE("DorisWriter-02", "You missed parameter which is required, please check your configuration."),
@@ -30,6 +34,16 @@ public enum DorisErrorCode implements ErrorCode {
   PARSE_FAILED("DorisWriter-09", "Failed parse response"),
   ABORT_FAILED("DorisWriter-10", "Fail to abort transaction"),
   LABEL_ALREADY_EXIST("DorisWriter-11", "Label already exist"),
+
+
+  /**
+   * Doris Reader
+   */
+  CONNECT_FAILED_MESSAGE("DorisReader-50", "Failed to connect message"),
+  INTERNAL_FAIL_MESSAGE("DorisReader-51", "Doris Internal error"),
+  FAILED_LOAD_DATA("DorisReader-52", "Failed to load doris data"),
+  FAILED_PARSE("DorisReader-53", "Failed parse"),
+  READER_REQUIRED_VALUE("DorisReader-53", "You missed parameter which is required, please check your configuration."),
   ;
 
   private final String code;

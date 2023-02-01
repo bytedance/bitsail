@@ -17,6 +17,67 @@ Parent document: [Connectors](../README.md)
 </dependency>
 ```
 
+## Doris Reader
+### Supported data types
+Doris read connector parses according to the data segment mapping and supports the following data types:
+
+- CHAR
+- VARCHAR
+- BOOLEAN
+- BINARY
+- VARBINARY
+- INT
+- TINYINT
+- SMALLINT
+- INTEGER
+- BIGINT
+- FLOAT
+- DOUBLE
+
+### Parameters
+The following mentioned parameters should be added to `job.reader` block when using, for example:
+```json
+{
+  "job": {
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.doris.source.DorisSource",
+      "fe_hosts": "127.0.0.1:8030",
+      "mysql_hosts": "127.0.0.1:9030",
+      "user": "root",
+      "password": "",
+      "db_name": "test",
+      "table_name": "test_doris_table"
+    }
+  }
+}
+```
+
+#### Necessary parameters
+| Param name      | Required | Default Value | Description                                                                         |
+|:----------------|:---------|:--------------|:------------------------------------------------------------------------------------|
+| class           | yes  | --            | Doris writer class name, `com.bytedance.bitsail.connector.doris.source.DorisSource` |
+| fe_hosts        | yes  | --            | Doris FE address, multi addresses separated by comma                                |
+| mysql_hosts     | yes  | --            | Doris jdbc query address , multi addresses separated by comma                       |
+| user            | yes  | --            | Doris account user                                                                  |
+| password        | yes  | --            | Doris account password, can be empty                                                |
+| db_name         | yes  | --            | database to read                                                                    |
+| table_name      | yes  | --            | table to read                                                                       |
+| columns         | yes  | --            | The name and type of columns to read                                                | 
+
+#### Optional parameters
+| Param name                    | Required | Default Value     | Description                                                                                                                                                                                                                                         |
+|:------------------------------|:---------|:------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| reader_parallelism_num        | no       | 1                 | reader parallelism                                                                                                                                                                                                                                  |
+| sql_filter                    | no       | --                | Column value conditions that need to be queried and filtered                                                                                                                                                                                        |
+| tablet_size                   | no       | Integer.MAX_VALUE | The number of Doris Tablets corresponding to an Partition. The smaller this value is set, the more partitions will be generated. This will increase the parallelism on the bitSail side, but at the same time will cause greater pressure on Doris. |
+| exec_mem_limit                | no       | 2147483648        | Memory limit for a single query. The default is 2GB, in bytes.                                                                                                                                                                                      |
+| request_query_timeout_s       | no       | 3600              | Query the timeout time of doris, the default is 1 hour, -1 means no timeout limit                                                                                                                                                                   |
+| request_batch_size            | no       | 1024              | The maximum number of rows to read data from BE at one time. Increasing this value can reduce the number of connections between bitSail and Doris. Thereby reducing the extra time overhead caused by network delay.                                |
+| request_connect_timeouts      | no       | 30 * 1000         | Connection timeout for sending requests to Doris                                                                                                                                                                                                    |
+| request_read_timeouts         | no       | 30 * 1000         | Read timeout for sending request to Doris                                                                                                                                                                                                           |
+| request_retries               | no       | 3                 | Number of retries to send requests to Doris                                                                                                                                                                                                         |
+
+
 ## Doris Writer
 
 ### Supported data type
