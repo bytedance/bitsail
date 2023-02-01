@@ -92,14 +92,6 @@ public class RocketMQSource
   public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConfiguration,
                                                 BitSailConfiguration rocketmqConfiguration,
                                                 ParallelismAdvice upstreamAdvice) throws Exception {
-    if (rocketmqConfiguration.fieldExists(ReaderOptions.BaseReaderOptions.READER_PARALLELISM_NUM)) {
-      int readerParallelismNum = rocketmqConfiguration.get(
-          ReaderOptions.BaseReaderOptions.READER_PARALLELISM_NUM);
-      return ParallelismAdvice.builder()
-          .adviceParallelism(readerParallelismNum)
-          .enforceDownStreamChain(true)
-          .build();
-    }
 
     String cluster = rocketmqConfiguration.get(RocketMQSourceOptions.CLUSTER);
     String topic = rocketmqConfiguration.get(RocketMQSourceOptions.TOPIC);
@@ -110,17 +102,29 @@ public class RocketMQSource
         consumerGroup,
         UUID.randomUUID()
     ));
+
+    int messageQueueCount;
     try {
       consumer.start();
       Collection<MessageQueue> messageQueues = consumer.fetchMessageQueues(topic);
-      int adviceParallelism = Math.max(CollectionUtils.size(messageQueues) / DEFAULT_ROCKETMQ_PARALLELISM_THRESHOLD, 1);
-
-      return ParallelismAdvice.builder()
-          .adviceParallelism(adviceParallelism)
-          .enforceDownStreamChain(true)
-          .build();
+      messageQueueCount = CollectionUtils.size(messageQueues);
     } finally {
       consumer.shutdown();
     }
+
+    int adviceParallelism = -1;
+    if (rocketmqConfiguration.fieldExists(ReaderOptions.BaseReaderOptions.READER_PARALLELISM_NUM)) {
+      adviceParallelism = rocketmqConfiguration.get(ReaderOptions.BaseReaderOptions.READER_PARALLELISM_NUM);
+      adviceParallelism = Math.min(adviceParallelism, messageQueueCount);
+    }
+
+    if (adviceParallelism <= 0) {
+      adviceParallelism = Math.max(messageQueueCount / DEFAULT_ROCKETMQ_PARALLELISM_THRESHOLD, 1);
+    }
+
+    return ParallelismAdvice.builder()
+        .adviceParallelism(adviceParallelism)
+        .enforceDownStreamChain(true)
+        .build();
   }
 }

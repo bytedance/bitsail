@@ -75,7 +75,7 @@ public abstract class AbstractE2ETest {
 
       testJob.validate(validation);
     } catch (Throwable t) {
-      t.printStackTrace();
+      LOG.error("Job failed.", t);
       throw t;
     }
   }
