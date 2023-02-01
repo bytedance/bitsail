@@ -35,7 +35,6 @@ public enum JedisDataType {
 
   /**
    * Set multiple field-value (domain-value) pairs to the hash table key at the same time.
-   *
    */
   MHASH,
 

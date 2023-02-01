@@ -22,7 +22,7 @@ import com.bytedance.bitsail.connector.redis.core.api.FailureHandler;
 import com.bytedance.bitsail.connector.redis.core.api.PipelineProcessor;
 import com.bytedance.bitsail.connector.redis.core.api.SplitPolicy;
 import com.bytedance.bitsail.connector.redis.core.jedis.JedisCommand;
-import com.bytedance.bitsail.connector.redis.core.jedis.JedisPluginErrorCode;
+import com.bytedance.bitsail.connector.redis.error.JedisPluginErrorCode;
 import com.bytedance.bitsail.connector.redis.error.RedisUnexpectedException;
 
 import com.github.rholder.retry.RetryException;
