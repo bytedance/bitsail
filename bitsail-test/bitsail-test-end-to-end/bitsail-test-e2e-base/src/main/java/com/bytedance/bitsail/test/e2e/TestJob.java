@@ -172,7 +172,7 @@ public class TestJob implements AutoCloseable {
         throw te;
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error("Failed to execute job.", e);
       throw e;
     }
   }
