@@ -97,9 +97,8 @@ jobs:
           sonatypeSnapshots: true
           oracleRepo: true
       - name: Setup Apache Thrift Compiler
-        run: | 
-          wget http://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.exe
-          mv thrift-0.13.0.exe thrift
+        run: |
+          powershell (new-object System.Net.WebClient).DownloadFile('http://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.exe','thrift')
           thrift --version
 
       - name: Maven Verify Unit Test
