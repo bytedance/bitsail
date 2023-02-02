@@ -93,7 +93,7 @@ yarn --version
 2. Generate test homepage locally
 
 ```bash
-# install dependency
+# install dependencies
 yarn install
 
 # generate homepage
