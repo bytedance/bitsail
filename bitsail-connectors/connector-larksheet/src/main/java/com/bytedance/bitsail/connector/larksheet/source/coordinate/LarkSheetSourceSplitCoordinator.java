@@ -92,9 +92,6 @@ public class LarkSheetSourceSplitCoordinator implements SourceSplitCoordinator<L
     // Initialize open api related configuration
     this.larkSheetConfig = new SheetConfig().configure(this.jobConf);
 
-    // Initialize token
-    TokenHolder.init(SheetConfig.PRE_DEFINED_SHEET_TOKEN);
-
     // Parse sheet url
     String sheetUrlList = this.jobConf.getNecessaryOption(LarkSheetReaderOptions.SHEET_URL,
         LarkSheetFormatErrorCode.REQUIRED_VALUE);

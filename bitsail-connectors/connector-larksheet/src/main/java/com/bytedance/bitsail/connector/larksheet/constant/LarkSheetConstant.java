@@ -25,4 +25,6 @@ public class LarkSheetConstant {
   public static final String SPLIT_COMMA = ",";
 
   public static final String SPLIT_COLON = ":";
+
+  public static final int DEFAULT_PARALLELISM = 1;
 }

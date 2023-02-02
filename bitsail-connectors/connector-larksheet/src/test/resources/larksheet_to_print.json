@@ -11,6 +11,9 @@
     "reader": {
       "class": "com.bytedance.bitsail.connector.larksheet.source.LarkSheetSource",
       "sheet_urls": "https://e4163pj5kq.feishu.cn/sheets/shtcnQmZNlZ9PjZUJKT5oU3Sjjg?sheet=ZbzDHq,https://e4163pj5kq.feishu.cn/sheets/shtcnQmZNlZ9PjZUJKT5oU3Sjjg?sheet=FJhAlN",
+      "batch_size": 2000,
+      "reader_parallelism_num": 10,
+      "skip_nums": [11, 22],
       "columns": [
         {
           "name": "id",
@@ -36,8 +39,8 @@
     },
     "writer": {
       "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
-      "sample_write": true,
       "batch_size": 10,
+      "sample_write": true,
       "sample_limit": 10,
       "columns": [
         {

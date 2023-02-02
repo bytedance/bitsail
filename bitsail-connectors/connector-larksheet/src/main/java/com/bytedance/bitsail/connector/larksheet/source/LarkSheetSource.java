@@ -28,20 +28,27 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.connector.larksheet.api.SheetConfig;
+import com.bytedance.bitsail.connector.larksheet.api.TokenHolder;
 import com.bytedance.bitsail.connector.larksheet.constant.LarkSheetConstant;
 import com.bytedance.bitsail.connector.larksheet.error.LarkSheetFormatErrorCode;
+import com.bytedance.bitsail.connector.larksheet.meta.SheetInfo;
 import com.bytedance.bitsail.connector.larksheet.option.LarkSheetReaderOptions;
 import com.bytedance.bitsail.connector.larksheet.source.coordinate.LarkSheetSourceSplitCoordinator;
 import com.bytedance.bitsail.connector.larksheet.source.reader.LarkSheetReader;
 import com.bytedance.bitsail.connector.larksheet.source.split.LarkSheetSplit;
+import com.bytedance.bitsail.connector.larksheet.source.split.strategy.SimpleDivideSplitConstructor;
+import com.bytedance.bitsail.connector.larksheet.util.LarkSheetUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.bytedance.bitsail.connector.larksheet.constant.LarkSheetConstant.DEFAULT_PARALLELISM;
 import static com.bytedance.bitsail.connector.larksheet.constant.LarkSheetConstant.SPLIT_COMMA;
 
 public class LarkSheetSource implements Source<Row, LarkSheetSplit, EmptyState>, ParallelismComputable {
@@ -82,15 +89,35 @@ public class LarkSheetSource implements Source<Row, LarkSheetSplit, EmptyState>,
 
   @Override
   public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConf, BitSailConfiguration selfConf, ParallelismAdvice upstreamAdvice) throws Exception {
-    int parallelism;
+
+    int batchSize = this.jobConf.get(LarkSheetReaderOptions.BATCH_SIZE);
+    List<Integer> skipNums = this.jobConf.getUnNecessaryOption(LarkSheetReaderOptions.SKIP_NUMS, new ArrayList<>());
+
+    new SheetConfig().configure(this.jobConf);
+    TokenHolder.init(SheetConfig.PRE_DEFINED_SHEET_TOKEN);
+    String sheetUrlList = this.jobConf.getNecessaryOption(LarkSheetReaderOptions.SHEET_URL,
+        LarkSheetFormatErrorCode.REQUIRED_VALUE);
+    List<String> sheetUrls = Arrays.asList(sheetUrlList.split(SPLIT_COMMA));
+    List<SheetInfo> sheetInfoList = LarkSheetUtil.resolveSheetUrls(sheetUrls);
+
+    SimpleDivideSplitConstructor splitConstructor = new SimpleDivideSplitConstructor(sheetInfoList, batchSize, skipNums);
+    List<LarkSheetSplit> sheetSplits = splitConstructor.construct();
+    LOG.info("Construct sheet splits number is {}.", sheetSplits.size());
+
+    int adviceParallelism = DEFAULT_PARALLELISM;
     if (selfConf.fieldExists(LarkSheetReaderOptions.READER_PARALLELISM_NUM)) {
-      parallelism = selfConf.get(LarkSheetReaderOptions.READER_PARALLELISM_NUM);
-    } else {
-      String sheetUrlList = this.jobConf.getNecessaryOption(LarkSheetReaderOptions.SHEET_URL,
-          LarkSheetFormatErrorCode.REQUIRED_VALUE);
-      List<String> sheetUrls = Arrays.asList(sheetUrlList.split(SPLIT_COMMA));
-      parallelism = sheetUrls.size();
+      adviceParallelism = selfConf.get(LarkSheetReaderOptions.READER_PARALLELISM_NUM);
+      adviceParallelism = Math.min(adviceParallelism, sheetSplits.size());
     }
-    return new ParallelismAdvice(false, parallelism);
+
+    if (adviceParallelism <= 0) {
+      adviceParallelism = Math.max(sheetSplits.size(), DEFAULT_PARALLELISM);
+    }
+
+    LOG.info("Finally advice parallelism is {}.", adviceParallelism);
+    return ParallelismAdvice.builder()
+        .enforceDownStreamChain(true)
+        .adviceParallelism(adviceParallelism)
+        .build();
   }
 }
