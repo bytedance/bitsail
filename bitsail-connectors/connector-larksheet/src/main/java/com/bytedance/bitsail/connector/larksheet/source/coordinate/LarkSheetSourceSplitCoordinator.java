@@ -20,7 +20,6 @@ import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.larksheet.api.SheetConfig;
-import com.bytedance.bitsail.connector.larksheet.api.TokenHolder;
 import com.bytedance.bitsail.connector.larksheet.error.LarkSheetFormatErrorCode;
 import com.bytedance.bitsail.connector.larksheet.meta.SheetInfo;
 import com.bytedance.bitsail.connector.larksheet.option.LarkSheetReaderOptions;
