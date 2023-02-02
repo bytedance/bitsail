@@ -96,6 +96,10 @@ jobs:
           apacheSnapshots: true
           sonatypeSnapshots: true
           oracleRepo: true
+      - name: Setup Apache Thrift Compiler
+        uses: dodopizza/setup-thrift@v1
+        with:
+          version: 0.13.0
 
       - name: Maven Verify Unit Test
         run:
@@ -125,6 +129,10 @@ jobs:
           apacheSnapshots: true
           sonatypeSnapshots: true
           oracleRepo: true
+      - name: Setup Apache Thrift Compiler
+        uses: dodopizza/setup-thrift@v1
+        with:
+          version: 0.13.0
 
       - name: Maven Verify Integration Test
         run:
