@@ -97,18 +97,18 @@ jobs:
           sonatypeSnapshots: true
           oracleRepo: true
       - name: Setup Apache Thrift Compiler
-        run: |
-          if ( os == 'windows-latest' ) {
-            wget http://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.exe
-            mv thrift-0.13.0.exe thrift
-          } else {
+        run: | 
+          if [[ os == 'ubuntu-latest' ]]; then
             wget https://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.tar.gz
             tar zxvf thrift-0.13.0.tar.gz
             cd thrift-0.13.0
             ./configure --without-tests
             make
             make install
-          }
+          else
+            wget http://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.exe
+            mv thrift-0.13.0.exe thrift
+          fi
           thrift --version
 
       - name: Maven Verify Unit Test
