@@ -102,9 +102,8 @@ jobs:
             wget http://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.exe
             mv thrift-0.13.0.exe thrift
           else
-            uses: dodopizza/setup-thrift@v1
-            with:
-              version: 0.13.0
+            sudo apt-get update
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y thrift-compiler=0.13.0-2build2
           fi
           
           thrift --version
