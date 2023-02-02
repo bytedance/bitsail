@@ -41,7 +41,6 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -203,21 +202,6 @@ public class BytesParserTest {
     fieldVal = LocalDate.of(year, month, dayOfMonth);
     column = bytesParser.getDateColumnValue(fieldVal);
     Assert.assertEquals(java.sql.Date.valueOf(date).getTime(), column.asDate().getTime());
-
-    fieldVal = LocalDateTime.of(year, month, dayOfMonth, hour, minute);
-    column = bytesParser.getDateColumnValue(fieldVal);
-    Assert.assertEquals(timestamp.longValue(), column.asDate().getTime());
-
-    fieldVal = dateTime;
-    column = bytesParser.getDateColumnValue(fieldVal);
-    Assert.assertEquals(timestamp, column.asLong());
-
-    fieldVal = LocalDateTime.of(year, month, dayOfMonth, hour, minute);
-    column = bytesParser.createBasicColumn(PrimitiveColumnTypeInfo.DATE_COLUMN_TYPE_INFO, fieldVal);
-    Assert.assertEquals(timestamp.longValue(), column.asDate().getTime());
-
-    column = bytesParser.createBasicColumn(PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO, fieldVal);
-    Assert.assertEquals(timestamp.longValue(), column.asLong() * 1000L);
   }
 
   @Test

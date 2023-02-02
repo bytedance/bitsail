@@ -56,17 +56,6 @@ public class RowBytesParserTest {
 
   @Test
   public void testParseBitsailRow() {
-//    TypeInformation<?>[] typeInfos = {
-//        PrimitiveColumnTypeInfo.STRING_COLUMN_TYPE_INFO,
-//        PrimitiveColumnTypeInfo.BOOL_COLUMN_TYPE_INFO,
-//        PrimitiveColumnTypeInfo.BYTES_COLUMN_TYPE_INFO,
-//        PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO,
-//        PrimitiveColumnTypeInfo.DATE_COLUMN_TYPE_INFO,
-//        PrimitiveColumnTypeInfo.DOUBLE_COLUMN_TYPE_INFO,
-//        new ListColumnTypeInfo<>(PrimitiveColumnTypeInfo.STRING_COLUMN_TYPE_INFO),
-//        new MapColumnTypeInfo<>(PrimitiveColumnTypeInfo.STRING_COLUMN_TYPE_INFO,
-//            PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO)
-//    };
     TypeInformation<?>[] typeInfos = {
         TypeInformation.of(String.class),   // 0
         TypeInformation.of(Boolean.class),
