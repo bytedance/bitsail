@@ -22,8 +22,6 @@ import com.bytedance.bitsail.connector.doris.partition.DorisPartition;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NonNull;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
 import java.util.List;
