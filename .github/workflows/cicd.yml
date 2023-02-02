@@ -137,6 +137,8 @@ jobs:
         uses: dodopizza/setup-thrift@v1
         with:
           version: 0.13.0
+        run:
+          thrift --version
 
       - name: Maven Verify Unit Test
         run:
