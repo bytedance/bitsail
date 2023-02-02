@@ -57,6 +57,8 @@ public class LarkSheetReader implements SourceReader<Row, LarkSheetSplit> {
 
   private final SourceReader.Context readerContext;
 
+  private final TypeInfo<?>[] typeInfos;
+
   /**
    * Sheet header info.
    */
@@ -90,6 +92,7 @@ public class LarkSheetReader implements SourceReader<Row, LarkSheetSplit> {
   public LarkSheetReader(BitSailConfiguration jobConf, Context readerContext) {
     this.jobConf = jobConf;
     this.readerContext = readerContext;
+    this.typeInfos = readerContext.getTypeInfos();
 
     // Sheet configurations for request
     SheetConfig larkSheetConfig = new SheetConfig().configure(this.jobConf);
@@ -142,9 +145,8 @@ public class LarkSheetReader implements SourceReader<Row, LarkSheetSplit> {
     if (curRecord == null) {
       throw new BitSailException(LarkSheetFormatErrorCode.INVALID_ROW, "row is null");
     }
-    TypeInfo<?>[] typeInfos = this.readerContext.getTypeInfos();
-    Row row = new Row(typeInfos.length);
-    for (int i = 0; i < typeInfos.length; i++) {
+    Row row = new Row(this.typeInfos.length);
+    for (int i = 0; i < this.typeInfos.length; i++) {
       Object fieldVal = curRecord.get(i);
       row.setField(i, Objects.isNull(fieldVal) ? null : String.valueOf(fieldVal));
     }
