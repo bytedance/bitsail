@@ -97,9 +97,17 @@ jobs:
           sonatypeSnapshots: true
           oracleRepo: true
       - name: Setup Apache Thrift Compiler
-        uses: dodopizza/setup-thrift@v1
-        with:
-          version: 0.13.0
+        run: |
+          if [ os == 'windows-latest' ]; then
+            wget http://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.exe
+            mv thrift-0.13.0.exe thrift
+          else
+            uses: dodopizza/setup-thrift@v1
+            with:
+              version: 0.13.0
+          fi
+          
+          thrift --version
 
       - name: Maven Verify Unit Test
         run:
