@@ -23,6 +23,7 @@ dir:
 - [Kafka 连接器](kafka/kafka.md)
 - [Kudu 连接器](kudu/kudu.md)
 - [LarkSheet(飞书表格)连接器](larksheet/larksheet.md)
+- [LarkSheet(飞书表格)-v1 连接器](larksheet/v1/larksheet-v1.md)
 - [MongoDB 连接器](mongodb/mongodb.md)
 - [Redis 连接器](redis/redis.md)
 - [Redis-v1 连接器](redis/v1/redis-v1.md)

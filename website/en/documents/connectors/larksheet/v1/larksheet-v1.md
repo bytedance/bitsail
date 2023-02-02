@@ -1,6 +1,6 @@
-# LarkSheet connector
+# LarkSheet connector-v1
 
-Parent document: [Connectors](../README.md)
+Parent document: [Connectors](../../README.md)
 
 The **BitSail** LarkSheet connector supports reading lark sheets.
 The main function points are as follows:
@@ -15,7 +15,7 @@ The main function points are as follows:
 ```xml
 <dependency>
    <groupId>com.bytedance.bitsail</groupId>
-   <artifactId>bitsail-connector-larksheet</artifactId>
+   <artifactId>connector-larksheet</artifactId>
    <version>${revision}</version>
 </dependency>
 ```

@@ -1,6 +1,6 @@
-# LarkSheet(飞书表格) 连接器
+# LarkSheet(飞书表格)-v1 连接器
 
-上级文档：[连接器](../README.md)
+上级文档：[连接器](../../README.md)
 
 **BitSail** 飞书表格连接器可用于支持读取飞书表格，主要功能如下:
 
@@ -8,13 +8,12 @@
  - 支持token和 [application](https://open.feishu.cn/document/ukTMukTMukTM/uYTM5UjL2ETO14iNxkTN/terminology?lang=en-US) 两种鉴权方式
  - 支持读取表格中的部分列
 
-
 ## 依赖引入
 
 ```xml
 <dependency>
    <groupId>com.bytedance.bitsail</groupId>
-   <artifactId>bitsail-connector-larksheet</artifactId>
+   <artifactId>connector-larksheet</artifactId>
    <version>${revision}</version>
 </dependency>
 ```
@@ -24,6 +23,7 @@
 ### 支持数据类型
 
 飞书表格连接器以 `string` 格式读取所有数据。
+
 
 ### 参数
 
@@ -58,7 +58,8 @@
 | sheet_urls | 是    |       | 要读取的飞书表格列表。多个表格链接用英文逗号分隔。                                                                 | 
 | columns    | 是    |       | 描述字段名称和字段类型。字段名称与飞书表格中的header相关（header即为第一行）。                                             |
 
-下面的参数用于鉴权，用户至少需要设置 (`sheet_token`) 或者 (`app_id` and `app_secret`)其中一种。                                        |
+下面的参数用于鉴权，用户至少需要设置 (`sheet_token`) 或者 (`app_id` and `app_secret`)其中一种。
+
 
 <table>
     <tr>

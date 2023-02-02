@@ -1,6 +1,6 @@
-# LarkSheet(飞书表格) 连接器示例
+# LarkSheet(飞书表格)-v1 连接器示例
 
-父目录：[LarkSheet(飞书表格)连接器](./larksheet.md)
+父目录：[LarkSheet(飞书表格)-v1 连接器](./larksheet-v1.md)
 
 ## 飞书表格读连接器
 
