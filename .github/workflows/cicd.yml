@@ -98,7 +98,7 @@ jobs:
           oracleRepo: true
       - name: Setup Apache Thrift Compiler
         run: |
-          if [[ os == 'windows-latest' ]]; then
+          if ( os == 'windows-latest' ); then
             wget http://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.exe
             mv thrift-0.13.0.exe thrift
           else
@@ -109,7 +109,6 @@ jobs:
             make
             make install
           fi
-          
           thrift --version
 
       - name: Maven Verify Unit Test
