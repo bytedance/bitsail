@@ -18,11 +18,14 @@ package com.bytedance.bitsail.client.entry;
 
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 
+import com.github.stefanbirkner.systemlambda.SystemLambda;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.nio.file.Paths;
 
+@Slf4j
 public class EntryTest {
 
   @Test
@@ -40,6 +43,9 @@ public class EntryTest {
         EntryTest.class.getResource("/test_job_conf.json").toURI()
     ).toFile().getAbsolutePath();
     String[] args = new String[] {"run", "--engine", "fake", "--conf", jobConfPath};
-    Entry.main(args);
+
+    int exitCode = SystemLambda.catchSystemExit(() -> Entry.main(args));
+    log.info("Exit with code {}.", exitCode);
+    Assert.assertEquals(0, exitCode);
   }
 }

@@ -52,8 +52,8 @@ public class FlinkSourceDAGBuilderTest {
   BitSailConfiguration commonConf;
   BitSailConfiguration readerConf;
 
-  Source<?,?,?> source;
-  FlinkSourceDAGBuilder<?,?,?> flinkSourceDAGBuilder;
+  Source<?, ?, ?> source;
+  FlinkSourceDAGBuilder<?, ?, ?> flinkSourceDAGBuilder;
 
   @Before
   public void init() {
@@ -66,7 +66,7 @@ public class FlinkSourceDAGBuilderTest {
 
     readerConf = BitSailConfiguration.newDefault();
     readerConf.set(ReaderOptions.BaseReaderOptions.COLUMNS, ImmutableList.of(
-       new ColumnInfo("id", "long"),
+        new ColumnInfo("id", "long"),
         new ColumnInfo("value", "string")
     ));
 

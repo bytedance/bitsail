@@ -46,7 +46,6 @@ public class UnifiedProgramTest {
     Assert.assertTrue(program.validate());
   }
 
-
   static class FakeProgram extends UnifiedProgram {
     @Override
     public String getComponentName() {
@@ -57,12 +56,16 @@ public class UnifiedProgramTest {
     public ProgramDAGBuilderFactory createProgramBuilderFactory() {
       return new ProgramDAGBuilderFactory() {
         @Override
-        public List<DataReaderDAGBuilder> getDataReaderDAGBuilders(Mode mode, List<BitSailConfiguration> readerConfigurations, PluginFinder pluginFinder) {
+        public List<DataReaderDAGBuilder> getDataReaderDAGBuilders(Mode mode,
+                                                                   List<BitSailConfiguration> readerConfigurations,
+                                                                   PluginFinder pluginFinder) {
           return Lists.newArrayList((DataReaderDAGBuilder) () -> "fake-data-reader");
         }
 
         @Override
-        public List<DataWriterDAGBuilder> getDataWriterDAGBuilders(Mode mode, List<BitSailConfiguration> writerConfigurations, PluginFinder pluginFinder) {
+        public List<DataWriterDAGBuilder> getDataWriterDAGBuilders(Mode mode,
+                                                                   List<BitSailConfiguration> writerConfigurations,
+                                                                   PluginFinder pluginFinder) {
           return Lists.newArrayList((DataWriterDAGBuilder) () -> "fake-data-writer");
         }
       };
@@ -78,7 +81,9 @@ public class UnifiedProgramTest {
     private static final Logger LOG = LoggerFactory.getLogger(FakeExecutionEnviron.class);
 
     @Override
-    public void beforeExecution(List<DataReaderDAGBuilder> readerBuilders, List<DataTransformDAGBuilder> transformDAGBuilders, List<DataWriterDAGBuilder> writerBuilders) {
+    public void beforeExecution(List<DataReaderDAGBuilder> readerBuilders,
+                                List<DataTransformDAGBuilder> transformDAGBuilders,
+                                List<DataWriterDAGBuilder> writerBuilders) {
       LOG.info("Reach 'before execution' phase");
     }
 

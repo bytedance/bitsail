@@ -309,13 +309,13 @@ public class BytesParserTest {
 
   @Test
   public void testCreateMapColumn() {
-    MapColumnTypeInfo<?,?> typeInfo = new MapColumnTypeInfo<>(LongColumn.class, StringColumn.class);
+    MapColumnTypeInfo<?, ?> typeInfo = new MapColumnTypeInfo<>(LongColumn.class, StringColumn.class);
     Map<Long, String> fieldVal = ImmutableMap.of(
         1L, "val_1",
         2L, "val_2",
         3L, "val_3"
     );
-    MapColumn<?,?> column = bytesParser.createMapColumn(typeInfo, fieldVal);
+    MapColumn<?, ?> column = bytesParser.createMapColumn(typeInfo, fieldVal);
     Map<?, ?> actualMap = column.getRawData();
     for (long i = 0; i < 3; ++i) {
       Assert.assertEquals(fieldVal.get(i), actualMap.get(BigInteger.valueOf(i)));

@@ -58,8 +58,8 @@ public class NativeFlinkTypeInfoUtilTest {
     Assert.assertSame(String.class, ((ListTypeInfo<?>) bitsailList).getElementTypeInfo().getTypeClass());
 
     Assert.assertTrue(bitsailMap instanceof MapTypeInfo);
-    Assert.assertSame(String.class, ((MapTypeInfo<?,?>) bitsailMap).getKeyTypeInfo().getTypeClass());
-    Assert.assertSame(Double.class, ((MapTypeInfo<?,?>) bitsailMap).getValueTypeInfo().getTypeClass());
+    Assert.assertSame(String.class, ((MapTypeInfo<?, ?>) bitsailMap).getKeyTypeInfo().getTypeClass());
+    Assert.assertSame(Double.class, ((MapTypeInfo<?, ?>) bitsailMap).getValueTypeInfo().getTypeClass());
   }
 
   @Test
@@ -86,11 +86,11 @@ public class NativeFlinkTypeInfoUtilTest {
     Assert.assertTrue(mapTypeInfo instanceof org.apache.flink.api.java.typeutils.MapTypeInfo);
     Assert.assertEquals(
         org.apache.flink.api.common.typeinfo.BasicTypeInfo.STRING_TYPE_INFO,
-        ((org.apache.flink.api.java.typeutils.MapTypeInfo<?,?>) mapTypeInfo).getKeyTypeInfo()
+        ((org.apache.flink.api.java.typeutils.MapTypeInfo<?, ?>) mapTypeInfo).getKeyTypeInfo()
     );
     Assert.assertEquals(
         org.apache.flink.api.common.typeinfo.BasicTypeInfo.DOUBLE_TYPE_INFO,
-        ((org.apache.flink.api.java.typeutils.MapTypeInfo<?,?>) mapTypeInfo).getValueTypeInfo()
+        ((org.apache.flink.api.java.typeutils.MapTypeInfo<?, ?>) mapTypeInfo).getValueTypeInfo()
     );
   }
 
@@ -118,11 +118,11 @@ public class NativeFlinkTypeInfoUtilTest {
     Assert.assertTrue(mapTypeInfo instanceof org.apache.flink.api.java.typeutils.MapTypeInfo);
     Assert.assertEquals(
         org.apache.flink.api.common.typeinfo.BasicTypeInfo.STRING_TYPE_INFO,
-        ((org.apache.flink.api.java.typeutils.MapTypeInfo<?,?>) mapTypeInfo).getKeyTypeInfo()
+        ((org.apache.flink.api.java.typeutils.MapTypeInfo<?, ?>) mapTypeInfo).getKeyTypeInfo()
     );
     Assert.assertEquals(
         org.apache.flink.api.common.typeinfo.BasicTypeInfo.DOUBLE_TYPE_INFO,
-        ((org.apache.flink.api.java.typeutils.MapTypeInfo<?,?>) mapTypeInfo).getValueTypeInfo()
+        ((org.apache.flink.api.java.typeutils.MapTypeInfo<?, ?>) mapTypeInfo).getValueTypeInfo()
     );
   }
 }

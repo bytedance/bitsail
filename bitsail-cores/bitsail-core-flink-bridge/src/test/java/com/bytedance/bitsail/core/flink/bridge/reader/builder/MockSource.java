@@ -36,7 +36,6 @@ import java.util.List;
 
 public class MockSource implements Source<Void, MockSource.MockSourceSplit, String>, ParallelismComputable {
 
-
   @Override
   public void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration) {
 

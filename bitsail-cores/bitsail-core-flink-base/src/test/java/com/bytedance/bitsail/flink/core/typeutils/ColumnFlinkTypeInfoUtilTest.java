@@ -34,13 +34,13 @@ public class ColumnFlinkTypeInfoUtilTest {
   public void testGetRowTypeInformation() {
     TypeInfoConverter converter = new BitSailTypeInfoConverter();
     List<ColumnInfo> columnInfos = ImmutableList.of(
-      new ColumnInfo("type_int", "short"),
-      new ColumnInfo("type_string", "string"),
-      new ColumnInfo("type_double", "double"),
-      new ColumnInfo("type_date", "date"),
-      new ColumnInfo("type_binary", "binary"),
-      new ColumnInfo("type_list", "list<string>"),
-      new ColumnInfo("type_map", "map<string,string>")
+        new ColumnInfo("type_int", "short"),
+        new ColumnInfo("type_string", "string"),
+        new ColumnInfo("type_double", "double"),
+        new ColumnInfo("type_date", "date"),
+        new ColumnInfo("type_binary", "binary"),
+        new ColumnInfo("type_list", "list<string>"),
+        new ColumnInfo("type_map", "map<string,string>")
     );
     RowTypeInfo rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(converter, columnInfos);
 

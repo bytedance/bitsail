@@ -77,7 +77,7 @@ public class FlinkBatchDirtyConnectorTest {
   @Test
   public void testCollectDirty() throws IOException {
     FlinkBatchDirtyCollector collector = new FlinkBatchDirtyCollector(commonConf, context);
-    for (String dirtyRecord :dirtyRecords) {
+    for (String dirtyRecord : dirtyRecords) {
       collector.collect(dirtyRecord, new Throwable(dirtyRecord), System.currentTimeMillis());
     }
 
@@ -116,7 +116,7 @@ public class FlinkBatchDirtyConnectorTest {
   @After
   public void destroy() {
     runtimeContext = null;
-    if (realAccumulators != null ) {
+    if (realAccumulators != null) {
       realAccumulators.clear();
       realAccumulators = null;
     }
