@@ -78,8 +78,8 @@ BitSail的文档保存在项目的`website`目录下，包含中英两个版本�
 
 BitSail主页通过 [VuePress](https://vuepress-theme-hope.github.io/v2/) 框架构建，在本地完成markdown文档修改后，可以通过如下步骤测试主页效果:
 
- 1. 安装 [yarn](https://yarnpkg.com/) （yarn是一款JS包管理工具）
- 
+1. 安装 [yarn](https://yarnpkg.com/) （yarn是一款JS包管理工具）
+
 ```bash
 # 安装yarn
 npm install -g yarn
@@ -88,10 +88,11 @@ npm install -g yarn
 yarn --version
 ```
 
- 1. 本地生成网页
+2. 本地生成网页
+
 ```bash
-# 安装vuepress
-yarn add -D vuepress@next
+# 安装依赖
+yarn install
 
 # 本地起测试网页
 yarn docs:dev
