@@ -44,10 +44,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.httpclient.HttpStatus.SC_OK;
 
@@ -82,8 +80,7 @@ public class SelectdbUploadLoad {
     this.httpClient = new HttpUtil().getHttpClient();
     this.recordStream = new RecordStream(this.executionOptions.getBufferSize(), this.executionOptions.getBufferCount());
     loadBatchFirstRecord = true;
-    this.executorService = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
-        new BasicThreadFactory.Builder().namingPattern("stream-load").daemon(true).build());
+    this.executorService = Executors.newSingleThreadExecutor(new BasicThreadFactory.Builder().namingPattern("stream-load").daemon(true).build());
   }
 
   public void writeRecord(byte[] record) throws IOException {

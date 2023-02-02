@@ -4,7 +4,8 @@
       "job_id": 313,
       "instance_id": 3123,
       "job_name": "bitsail_hadoop_to_print_test",
-      "user_name": "root"
+      "user_name": "root",
+      "metrics_reporter_type": "prometheus_pushgateway"
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.hadoop.source.HadoopInputFormat",
