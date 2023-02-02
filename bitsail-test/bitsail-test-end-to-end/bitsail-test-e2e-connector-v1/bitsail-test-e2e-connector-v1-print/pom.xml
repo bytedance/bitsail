@@ -14,43 +14,33 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>bitsail-test</artifactId>
+        <artifactId>bitsail-test-e2e-connector-v1</artifactId>
         <groupId>com.bytedance.bitsail</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitsail-test-end-to-end</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>bitsail-test-e2e-base</module>
-        <module>bitsail-test-e2e-datasource</module>
-        <module>bitsail-test-e2e-connector-v1</module>
-    </modules>
-
-    <properties>
-        <test.container.version>1.17.3</test.container.version>
-    </properties>
+    <artifactId>bitsail-test-e2e-connector-v1-print</artifactId>
 
     <dependencies>
-        <!-- bitsail framework -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-base</artifactId>
+            <artifactId>connector-fake</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
         </dependency>
 
-        <!-- test -->
         <dependency>
-            <groupId>com.github.stefanbirkner</groupId>
-            <artifactId>system-rules</artifactId>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-print</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
+
 </project>

@@ -19,32 +19,25 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>bitsail-test-e2e-connector-v2</artifactId>
+        <artifactId>bitsail-test-e2e-connector-v1</artifactId>
         <groupId>com.bytedance.bitsail</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitsail-test-e2e-connector-v2-clickhouse</artifactId>
+    <artifactId>bitsail-test-e2e-connector-v1-elasticsearch</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>connector-clickhouse</artifactId>
+            <artifactId>connector-elasticsearch</artifactId>
             <version>${revision}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>connector-print</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-test-e2e-datasource-clickhouse</artifactId>
+            <artifactId>bitsail-test-e2e-datasource-elasticsearch</artifactId>
             <version>${revision}</version>
             <scope>test</scope>
         </dependency>

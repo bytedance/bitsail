@@ -14,7 +14,7 @@ Connectors under `bitsail-connectors-legacy` cannot be test.
 
 
 - Supported data sources: `bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-datasource`
-- Supported test cases: `bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-connector-v2`
+- Supported test cases: `bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-connector-v1`
 
 
 ## 2. How to run E2E test
@@ -26,7 +26,7 @@ You can directly run E2E test in local IDE. You may need to run `build.sh` befor
 You can use `test-e2e.sh` script to test specific case, for example:
 
 ```bash
-bash test-e2e.sh bitsail-test-e2e-connector-v2-clickhouse
+bash test-e2e.sh bitsail-test-e2e-connector-v1-clickhouse
 ```
 
 

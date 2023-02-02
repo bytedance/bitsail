@@ -8,12 +8,12 @@ E2E框架使用Docker构建测试数据源 & 测试容器，所以需要先在�
 
 ## 1. 当前支持测试哪些connector和数据源。
 
-目前的E2E框架针对 V2 版本的connector进行设计，比如 `connector-redis`, `connector-rocketmq`。
+目前的E2E框架针对 V1 版本的connector进行设计，比如 `connector-redis`, `connector-rocketmq`。
 但对于`bitsail-connectors-legacy`下的connector不支持测试。
 
 
  - 支持的测试数据源统一在 `bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-datasource` 模块中进行管理。
- - 支持的测试样例统一在 `bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-connector-v2` 模块中进行管理。
+ - 支持的测试样例统一在 `bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-connector-v1` 模块中进行管理。
 
 
 ## 2. 如何进行测试
@@ -24,7 +24,7 @@ E2E框架使用Docker构建测试数据源 & 测试容器，所以需要先在�
 ### 2. 命令行运行单个测试样例
 可以通过脚本 `test-e2e.sh` 运行指定测试样例，例如:
 
-`bash test-e2e.sh bitsail-test-e2e-connector-v2-clickhouse`
+`bash test-e2e.sh bitsail-test-e2e-connector-v1-clickhouse`
     
 ### 3. 命令行运行所有测试样例 
 通过maven命令进行测试: 

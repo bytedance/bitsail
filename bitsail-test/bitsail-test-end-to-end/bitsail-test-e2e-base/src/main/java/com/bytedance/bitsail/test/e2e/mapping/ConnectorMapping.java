@@ -68,13 +68,13 @@ public class ConnectorMapping {
 
   private ConnectorMapping() {
     connectorInfoList = new ArrayList<>();
-    addConnectorV2();
+    addConnectorV1();
   }
 
   /**
-   * Read all connector-v2 mapping files.
+   * Read all connector-v1 mapping files.
    */
-  public void addConnectorV2() {
+  public void addConnectorV1() {
     String localDir = AbstractExecutor.getLocalRootDir();
 
     Path connectorsPath = Paths.get(localDir, "bitsail-connectors");
