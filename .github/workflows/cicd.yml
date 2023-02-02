@@ -103,7 +103,6 @@ jobs:
             mv thrift-0.13.0.exe thrift
           else
             wget https://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.tar.gz
-            yum install -y autoconf automake libtool cmake ncurses-devel openssl-devel lzo-devel zlib-devel gcc gcc-c++
             tar zxvf thrift-0.13.0.tar.gz
             cd thrift-0.13.0
             ./configure --without-tests
