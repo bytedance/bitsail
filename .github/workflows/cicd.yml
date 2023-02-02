@@ -99,6 +99,7 @@ jobs:
       - name: Setup Apache Thrift Compiler
         run: |
           certutil -urlcache -split -f http://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.exe thrift.exe
+          ren thrift-0.13.0.exe thrift.exe
           thrift --version
 
       - name: Maven Verify Unit Test
