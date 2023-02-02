@@ -97,28 +97,19 @@ jobs:
           sonatypeSnapshots: true
           oracleRepo: true
       - name: Setup Apache Thrift Compiler
-        ${{ if eq( os, 'windows-latest') }}:
-          run: |
+        run: |
+          if ( os == 'windows-latest' ) {
             wget http://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.exe
             mv thrift-0.13.0.exe thrift
-        ${{ elseif eq( os, 'ubuntu-latest' ) }}:
-          uses: dodopizza/setup-thrift@v1
-          with:
-            version: 0.13.0
-
-      #        run: |
-#          if ( os == 'windows-latest' ); then
-#            wget http://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.exe
-#            mv thrift-0.13.0.exe thrift
-#          else
-#            wget https://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.tar.gz
-#            tar zxvf thrift-0.13.0.tar.gz
-#            cd thrift-0.13.0
-#            ./configure --without-tests
-#            make
-#            make install
-#          fi
-#          thrift --version
+          } else {
+            wget https://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.tar.gz
+            tar zxvf thrift-0.13.0.tar.gz
+            cd thrift-0.13.0
+            ./configure --without-tests
+            make
+            make install
+          }
+          thrift --version
 
       - name: Maven Verify Unit Test
         run:
