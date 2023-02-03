@@ -38,6 +38,7 @@ import com.bytedance.bitsail.conversion.hive.option.HiveConversionOptions;
 
 import com.bytedance.bitsail.shaded.hive.client.HiveMetaClientUtil;
 
+import com.google.common.collect.Lists;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -403,7 +404,12 @@ public class HiveOutputFormat<E extends Row> extends FileOutputFormatPlugin<E> {
       columnMapping = HiveMetaClientUtil.getColumnMapping(hiveTableSchema);
       LOG.info("fetch column mapping from hive metastore:\n {}", columnMapping);
       if (Objects.isNull(columns)) {
-        columns = HiveMetaClientUtil.getColumnInfo(hiveConf, db, table);
+        columns = Lists.newArrayList();
+        String[] fieldNames = hiveTableSchema.getFirst().split(",");
+        String[] fieldTypes = hiveTableSchema.getSecond().split(":");
+        for (int i = 0; i < fieldNames.length; i++) {
+          columns.add(new ColumnInfo(fieldNames[i], fieldTypes[i]));
+        }
         LOG.info("Use columns from hive metadata: {}.", columns);
       }
     } catch (TException e) {
