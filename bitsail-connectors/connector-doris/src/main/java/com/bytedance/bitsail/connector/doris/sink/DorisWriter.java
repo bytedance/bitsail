@@ -45,14 +45,7 @@ public class DorisWriter<InputT extends Row> implements Writer<InputT, DorisComm
 
   public DorisWriter(BitSailConfiguration writerConfiguration, DorisOptions dorisOptions, DorisExecutionOptions dorisExecutionOptions) {
     this.writerConfiguration = writerConfiguration;
-    if (dorisOptions.getTableModel() != DorisOptions.TableModel.UNIQUE) {
-      // pipelined validate the options
-      // 1. we only support UNIQUE table now.
-      throw BitSailException.asBitSailException(DorisErrorCode.UNSUPPORTED_TABLE_MODEL,
-          String.format("Unsupported table model: [%s]," + " Currently we only support [UNIQUE] table writing",
-              dorisOptions.getTableModel())
-      );
-    }
+
     switch (dorisExecutionOptions.getWriterMode()) {
       case STREAMING_UPSERT:
       case BATCH_UPSERT:
