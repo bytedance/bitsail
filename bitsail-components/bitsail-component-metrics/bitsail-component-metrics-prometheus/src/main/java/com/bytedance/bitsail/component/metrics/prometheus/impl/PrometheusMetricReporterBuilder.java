@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.base.metrics.reporter.impl.option;
+package com.bytedance.bitsail.component.metrics.prometheus.impl;
 
-import com.bytedance.bitsail.common.option.ConfigOption;
-import com.bytedance.bitsail.common.option.WriterOptions;
+import com.bytedance.bitsail.base.metrics.MetricReporter;
+import com.bytedance.bitsail.base.metrics.reporter.MetricReporterBuilder;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
-import static com.bytedance.bitsail.common.option.CommonOptions.COMMON_PREFIX;
-import static com.bytedance.bitsail.common.option.ConfigOptions.key;
+public class PrometheusMetricReporterBuilder implements MetricReporterBuilder {
+  @Override
+  public String getComponentName() {
+    return "prometheus";
+  }
 
-public interface PrometheusOptions extends WriterOptions.BaseWriterOptions {
-  String PROMETHEUS_PREFIX = COMMON_PREFIX + "prometheus";
-  /**
-   * Prometheus port
-   */
-  ConfigOption<Integer> PROMETHEUS_PORT_NUM =
-      key(PROMETHEUS_PREFIX + ".port")
-          .defaultValue(51111);;
+  @Override
+  public MetricReporter createReporter(BitSailConfiguration commonConfiguration) {
+    return new PrometheusMetricReporter();
+  }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.base.metrics.reporter.impl;
+package com.bytedance.bitsail.component.metrics.prometheus.impl;
 
 import com.bytedance.bitsail.base.metrics.MetricReporter;
 import com.bytedance.bitsail.base.metrics.reporter.MetricReporterBuilder;

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.base.metrics.reporter.impl;
+package com.bytedance.bitsail.component.metrics.prometheus.impl;
 
 import com.bytedance.bitsail.base.metrics.Scheduled;
-import com.bytedance.bitsail.base.metrics.reporter.AbstractPrometheusReporter;
-import com.bytedance.bitsail.base.metrics.reporter.impl.option.PrometheusPushGatewayOptions;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.component.metrics.prometheus.AbstractPrometheusReporter;
+import com.bytedance.bitsail.component.metrics.prometheus.option.PrometheusPushGatewayOptions;
 
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.dropwizard.DropwizardExports;

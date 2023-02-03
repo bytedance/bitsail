@@ -14,34 +14,33 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.base.metrics.reporter.impl.option;
+package com.bytedance.bitsail.component.metrics.prometheus.option;
 
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ConfigOption;
+import com.bytedance.bitsail.common.option.ConfigOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
 
-import static com.bytedance.bitsail.common.option.CommonOptions.COMMON_PREFIX;
-import static com.bytedance.bitsail.common.option.ConfigOptions.key;
-
 public interface PrometheusPushGatewayOptions extends WriterOptions.BaseWriterOptions {
-  String PUSHGATEWAY_PREFIX = COMMON_PREFIX + "prometheus.pushgateway";
+  String PUSHGATEWAY_PREFIX = CommonOptions.COMMON_PREFIX + "prometheus.pushgateway";
 
   ConfigOption<String> PUSHGATEWAY_HOST_NAME =
-      key(PUSHGATEWAY_PREFIX + ".host")
+      ConfigOptions.key(PUSHGATEWAY_PREFIX + ".host")
           .defaultValue("localhost");
 
   ConfigOption<Integer> PUSHGATEWAY_PORT_NUM =
-      key(PUSHGATEWAY_PREFIX + ".port")
+      ConfigOptions.key(PUSHGATEWAY_PREFIX + ".port")
           .defaultValue(9091);
 
   ConfigOption<Integer> PUSHGATEWAY_REPORT_PERIOD_IN_SECONDS =
-      key(PUSHGATEWAY_PREFIX + ".report.period.seconds")
+      ConfigOptions.key(PUSHGATEWAY_PREFIX + ".report.period.seconds")
           .defaultValue(1);
 
   ConfigOption<Boolean> PUSHGATEWAY_DELETE_ON_SHUTDOWN_ENABLE =
-      key(PUSHGATEWAY_PREFIX + ".delete.on.shutdown")
+      ConfigOptions.key(PUSHGATEWAY_PREFIX + ".delete.on.shutdown")
           .defaultValue(true);
 
   ConfigOption<String> PUSHGATEWAY_JOBNAME =
-      key(PUSHGATEWAY_PREFIX + ".job.name")
+      ConfigOptions.key(PUSHGATEWAY_PREFIX + ".job.name")
           .defaultValue("default");
 }

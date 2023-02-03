@@ -16,5 +16,3 @@
 
 com.bytedance.bitsail.base.metrics.reporter.impl.LogMetricReporterBuilder
 com.bytedance.bitsail.base.metrics.reporter.impl.NopMetricReporterBuilder
-com.bytedance.bitsail.base.metrics.reporter.impl.PrometheusMetricReporterBuilder
-com.bytedance.bitsail.base.metrics.reporter.impl.PrometheusPushGatewayMetricReporterBuilder
