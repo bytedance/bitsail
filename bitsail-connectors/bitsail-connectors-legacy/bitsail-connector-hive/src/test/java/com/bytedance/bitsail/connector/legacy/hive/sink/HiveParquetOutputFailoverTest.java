@@ -76,17 +76,16 @@ public class HiveParquetOutputFailoverTest {
 
   static {
     try {
-      DEFAULT_CONF =
-        BitSailConfiguration.from(
-          new File(
-            Paths.get(
-              HiveParquetOutputFailoverTest.class.getClassLoader()
-                .getResource("hive/hive_writer.json").toURI()).toString()));
+      DEFAULT_CONF = BitSailConfiguration.from(
+        new File(
+          Paths.get(
+            HiveParquetOutputFailoverTest.class.getClassLoader()
+              .getResource("hive/hive_writer.json").toURI()).toString()));
 
       CONF_WITHOUT_COLUMNS = BitSailConfiguration.from(
         new File(Paths.get(
           HiveParquetOutputFailoverTest.class.getClassLoader()
-           .getResource("hive/hive_writer_without_columns.json").toURI()).toString()));
+            .getResource("hive/hive_writer_without_columns.json").toURI()).toString()));
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
@@ -175,7 +174,7 @@ public class HiveParquetOutputFailoverTest {
   private void commonOutputWithFailOver(BitSailConfiguration conf) throws Exception {
     int parallelism = 2;
     HiveOutputFormat<Row> outputFormat = new HiveOutputFormat();
-    outputFormat.initFromConf(getCommonConf(), DEFAULT_CONF);
+    outputFormat.initFromConf(getCommonConf(), conf);
     outputFormat.setEmptyMessenger();
     outputFormat.setDirtyCollector(new NoOpDirtyCollector());
     MockStreamingRuntimeContextForTest runtimeContext = new MockStreamingRuntimeContextForTest();
