@@ -14,18 +14,30 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.connector.test.utils;
+package com.bytedance.bitsail.core;
 
-import java.io.IOException;
-import java.net.ServerSocket;
+import com.bytedance.bitsail.base.packages.PluginFinder;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
-public class NetworkTestUtils {
+public class FakePluginFinder implements PluginFinder {
 
-  public static int nextFreePort() {
-    try (ServerSocket socket = new ServerSocket(0)) {
-      return socket.getLocalPort();
-    } catch (IOException e) {
-      throw new RuntimeException();
-    }
+  @Override
+  public String getComponentName() {
+    return "fake-plugin-finder";
+  }
+
+  @Override
+  public void configure(BitSailConfiguration commonConfiguration) {
+    // do nothing
+  }
+
+  @Override
+  public <T> T findPluginInstance(String clazz, Object... parameters) {
+    return null;
+  }
+
+  @Override
+  public void loadPlugin(String plugin) {
+    // do nothing
   }
 }

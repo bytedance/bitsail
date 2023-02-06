@@ -14,35 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.redis.config;
+package com.bytedance.bitsail.connector.larksheet.constant;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+public class LarkSheetConstant {
 
-import java.io.Serializable;
+  public static final String LARK_SHEET_CONNECTOR_NAME = "larksheet";
 
-@Builder
-@AllArgsConstructor
-@Data
-public class JedisPoolOptions implements Serializable {
-  /**
-   * Jedis pool max total connection
-   */
-  private int maxTotalConnection;
+  public static final String SOURCE_SPLIT_PREFIX = "larksheet_source_split_";
 
-  /**
-   * Jedis pool max idle connection
-   */
-  private int maxIdleConnection;
+  public static final String SPLIT_COMMA = ",";
 
-  /**
-   * Jedis pool min idle connection
-   */
-  private int minIdleConnection;
+  public static final String SPLIT_COLON = ":";
 
-  /**
-   * Jedis pool max wait time in millis
-   */
-  private int maxWaitTimeInMillis;
+  public static final int DEFAULT_PARALLELISM = 1;
 }
