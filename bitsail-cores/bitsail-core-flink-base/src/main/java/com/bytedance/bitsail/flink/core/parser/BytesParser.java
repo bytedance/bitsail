@@ -184,7 +184,7 @@ public abstract class BytesParser implements Serializable {
     }
   }
 
-  private StringColumn getStringColumnValue(Object fieldVal) {
+  protected StringColumn getStringColumnValue(Object fieldVal) {
     if (fieldVal == null) {
       return new StringColumn();
     }
