@@ -201,3 +201,23 @@ bash bin/bitsail run \
   --conf examples/Fake_Hive_Example.json
   ```
 
+#### 运行hadoop相关任务
+
+如果读或者写数据源与hadoop相关，例如`hive_to_print`任务，那么需要向本体的flink mini cluster提供hadoop lib。
+下面介绍两种提供hadoop lib的方法:
+
+1. 如果你的环境已经部署了hadoop，那么直接通过`$HADOOP_HOME`环境变量指向本地的hadoop目录即可，例如:
+
+```bash
+export HADOOP_HOME=/usr/local/hadoop-3.1.1
+```
+
+2. 如果本地没有hadoop环境，可以通过`flink-shaded-hadoop-uber` jar包提供hadoop lib。例如，假设flink的目录为 `/opt/flink`，那么可以通过如下命令添加`flink-shaded-hadoop-uber`包:
+
+```bash
+# download flink-shaded-hadoop-uber jar
+wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-shaded-hadoop-2-uber/2.7.5-10.0/flink-shaded-hadoop-2-uber-2.7.5-10.0.jar
+
+# move to flink libs
+mv flink-shaded-hadoop-2-uber-2.7.5-10.0.jar /opt/flink/lib/flink-shaded-hadoop-uber.jar
+```

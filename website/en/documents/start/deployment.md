@@ -1,3 +1,4 @@
+
 # Deployment Guide
 English | [简体中文](../../../zh/documents/start/deployment.md)
 
@@ -196,3 +197,25 @@ bash bin/bitsail run \
   --deployment-mode local \
   --conf examples/Fake_Hive_Example.json
   ```
+
+#### Run hadoop related job
+
+When any of the reader or writer data source is relate to hadoop, _e.g._, `hive_to_print` job, the hadoop libs are needed.
+There are two ways to offer hadoop libs for local minicluster:
+
+ 1. If you already have local hadoop environment, then you can directly set `$HADOOP_HOME` to the folder of your hadoop libs. For example:
+
+```bash
+export HADOOP_HOME=/usr/local/hadoop-3.1.1
+```
+
+ 2. If there is no hadoop environment, you can use `flink-shaded-hadoop`. Remember moving the uber jar to your flink lib dir.
+  For example, suppose the flink root dir is `/opt/flink`:
+
+```bash
+# download flink-shaded-hadoop-uber jar
+wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-shaded-hadoop-2-uber/2.7.5-10.0/flink-shaded-hadoop-2-uber-2.7.5-10.0.jar
+
+# move to flink libs
+mv flink-shaded-hadoop-2-uber-2.7.5-10.0.jar /opt/flink/lib/flink-shaded-hadoop-uber.jar
+```
