@@ -142,9 +142,10 @@ public class DelegateFlinkSourceSplitEnumerator<SplitT extends SourceSplit,
     if (sourceEvent instanceof DelegateSourceEvent) {
       coordinator.handleSourceEvent(subtaskId,
           ((DelegateSourceEvent) sourceEvent).getSourceEvent());
+      return;
     }
     throw BitSailException.asBitSailException(CommonErrorCode.RUNTIME_ERROR,
-        "Source event in not instanceof delegate source event, it's always runtime bug.");
+         "Source event in not instanceof delegate source event, it's always runtime bug.");
   }
 
   @Override

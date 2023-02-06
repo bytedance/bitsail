@@ -49,7 +49,6 @@ public class DorisSinkITCase {
     jobConf.set(DorisWriterOptions.PASSWORD, "password");
     jobConf.set(DorisWriterOptions.DB_NAME, "test_db");
     jobConf.set(DorisWriterOptions.TABLE_NAME, "test_table");
-    jobConf.set(DorisWriterOptions.TABLE_MODEL, "unique");
     jobConf.set(CommonOptions.CheckPointOptions.CHECKPOINT_ENABLE, true);
     jobConf.set(CommonOptions.CheckPointOptions.CHECKPOINT_INTERVAL, 5000L);
     jobConf.set(DorisWriterOptions.SINK_ENABLE_2PC, false);

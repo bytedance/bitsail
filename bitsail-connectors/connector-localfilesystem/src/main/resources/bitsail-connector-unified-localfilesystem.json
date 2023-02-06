@@ -1,0 +1,9 @@
+{
+  "name": "bitsail-connector-unified-localfilesystem",
+  "classes": [
+    "com.bytedance.bitsail.connector.localfilesystem.source.LocalFileSystemSource"
+  ],
+  "libs": [
+    "connector-localfilesystem-${version}.jar"
+  ]
+}
