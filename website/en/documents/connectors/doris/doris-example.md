@@ -58,7 +58,6 @@ You can use the following configuration to write data into `p20221010` partition
        "password": "1234567",
        "db_name": "test_db",
        "table_name": "test_doris_table",
-       "table_model": "unique",
        "partitions": [
          {
            "name": "p20221010",

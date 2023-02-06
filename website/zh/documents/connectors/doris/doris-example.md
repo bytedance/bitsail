@@ -58,7 +58,6 @@ PROPERTIES
        "password": "1234567",
        "db_name": "test_db",
        "table_name": "test_doris_table",
-       "table_model": "unique",
        "partitions": [
          {
            "name": "p20221010",
