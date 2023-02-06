@@ -14,40 +14,17 @@
  * limitations under the License.
  */
 
-import { defineUserConfig } from "vuepress";
-import theme from "./theme.js";
+package com.bytedance.bitsail.connector.larksheet.constant;
 
-export default defineUserConfig({
+public class LarkSheetConstant {
 
-  base: "/bitsail/",
+  public static final String LARK_SHEET_CONNECTOR_NAME = "larksheet";
 
-  title: "BitSail",
-  description: "BitSail Document",
+  public static final String SOURCE_SPLIT_PREFIX = "larksheet_source_split_";
 
-  head: [
-    [
-      "link",
-      {
-        rel: "icon",
-        href: "/bitsail/logo.jpg",
-      },
-    ]
-  ],
+  public static final String SPLIT_COMMA = ",";
 
-  locales: {
-    "/": {
-      lang: "en-US",
-      title: "BitSail",
-      description: "BitSail",
-    },
-    "/zh/": {
-      lang: "zh-CN",
-      title: "BitSail",
-      description: "BitSail",
-    },
-  },
+  public static final String SPLIT_COLON = ":";
 
-  theme,
-
-  shouldPrefetch: false,
-});
+  public static final int DEFAULT_PARALLELISM = 1;
+}

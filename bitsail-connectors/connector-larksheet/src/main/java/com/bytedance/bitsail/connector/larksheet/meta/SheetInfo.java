@@ -14,40 +14,21 @@
  * limitations under the License.
  */
 
-import { defineUserConfig } from "vuepress";
-import theme from "./theme.js";
+package com.bytedance.bitsail.connector.larksheet.meta;
 
-export default defineUserConfig({
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.ToString;
 
-  base: "/bitsail/",
+import java.io.Serializable;
 
-  title: "BitSail",
-  description: "BitSail Document",
+@Data
+@ToString
+@AllArgsConstructor
+public class SheetInfo implements Serializable {
+  SheetMeta sheetMeta;
 
-  head: [
-    [
-      "link",
-      {
-        rel: "icon",
-        href: "/bitsail/logo.jpg",
-      },
-    ]
-  ],
+  String sheetId;
 
-  locales: {
-    "/": {
-      lang: "en-US",
-      title: "BitSail",
-      description: "BitSail",
-    },
-    "/zh/": {
-      lang: "zh-CN",
-      title: "BitSail",
-      description: "BitSail",
-    },
-  },
-
-  theme,
-
-  shouldPrefetch: false,
-});
+  String sheetToken;
+}

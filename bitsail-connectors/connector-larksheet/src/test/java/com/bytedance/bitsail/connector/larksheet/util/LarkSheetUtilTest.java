@@ -14,40 +14,19 @@
  * limitations under the License.
  */
 
-import { defineUserConfig } from "vuepress";
-import theme from "./theme.js";
+package com.bytedance.bitsail.connector.larksheet.util;
 
-export default defineUserConfig({
+import org.junit.Assert;
+import org.junit.Test;
 
-  base: "/bitsail/",
+public class LarkSheetUtilTest {
 
-  title: "BitSail",
-  description: "BitSail Document",
+  @Test
+  public void testNumberToSequence() {
+    String seq = LarkSheetUtil.numberToSequence(28);
+    Assert.assertEquals("AB", seq);
 
-  head: [
-    [
-      "link",
-      {
-        rel: "icon",
-        href: "/bitsail/logo.jpg",
-      },
-    ]
-  ],
-
-  locales: {
-    "/": {
-      lang: "en-US",
-      title: "BitSail",
-      description: "BitSail",
-    },
-    "/zh/": {
-      lang: "zh-CN",
-      title: "BitSail",
-      description: "BitSail",
-    },
-  },
-
-  theme,
-
-  shouldPrefetch: false,
-});
+    seq = LarkSheetUtil.numberToSequence(26);
+    Assert.assertEquals("Z", seq);
+  }
+}

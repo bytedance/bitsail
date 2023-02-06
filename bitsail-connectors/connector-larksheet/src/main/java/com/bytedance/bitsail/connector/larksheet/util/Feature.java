@@ -14,40 +14,24 @@
  * limitations under the License.
  */
 
-import { defineUserConfig } from "vuepress";
-import theme from "./theme.js";
+package com.bytedance.bitsail.connector.larksheet.util;
 
-export default defineUserConfig({
+import java.io.Serializable;
 
-  base: "/bitsail/",
+/**
+ * Some features when transforming data.<br/>
+ * Ref: <a href="https://open.feishu.cn/document/ukTMukTMukTM/ugTMzUjL4EzM14COxMTN">Read a single range</a>
+ */
+public enum Feature implements Serializable {
 
-  title: "BitSail",
-  description: "BitSail Document",
+  FORMULA_VALUE_RENDER("valueRenderOption", "ToString"),
+  DATE_TIME_RENDER("dateTimeRenderOption", "FormattedString");
 
-  head: [
-    [
-      "link",
-      {
-        rel: "icon",
-        href: "/bitsail/logo.jpg",
-      },
-    ]
-  ],
+  final String key;
+  final String value;
 
-  locales: {
-    "/": {
-      lang: "en-US",
-      title: "BitSail",
-      description: "BitSail",
-    },
-    "/zh/": {
-      lang: "zh-CN",
-      title: "BitSail",
-      description: "BitSail",
-    },
-  },
-
-  theme,
-
-  shouldPrefetch: false,
-});
+  Feature(String defaultKey, String defaultValue) {
+    this.key = defaultKey;
+    this.value = defaultValue;
+  }
+}

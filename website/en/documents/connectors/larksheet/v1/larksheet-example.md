@@ -1,15 +1,15 @@
-# LarkSheet(飞书表格) 连接器示例
+# LarkSheet connector-v1 example
 
-父目录：[LarkSheet(飞书表格)连接器](./larksheet.md)
+Parent document: [LarkSheet connector v1](./larksheet-v1.md)
 
-## 飞书表格读连接器
+## Reader example
 
-要读的表格如下
+The sheets to be read are:
 
-- [test_sheet_1](https://e4163pj5kq.feishu.cn/sheets/shtcnQmZNlZ9PjZUJKT5oU3Sjjg?sheet=ZbzDHq)
-- [test_sheet_2](https://e4163pj5kq.feishu.cn/sheets/shtcnQmZNlZ9PjZUJKT5oU3Sjjg?sheet=FJhAlN)
+ - [test_sheet_1](https://e4163pj5kq.feishu.cn/sheets/shtcnQmZNlZ9PjZUJKT5oU3Sjjg?sheet=ZbzDHq)
+ - [test_sheet_2](https://e4163pj5kq.feishu.cn/sheets/shtcnQmZNlZ9PjZUJKT5oU3Sjjg?sheet=FJhAlN)
 
-示例任务配置如下:
+Here is the example job configuration:
 
 ```json
 {

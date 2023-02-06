@@ -14,40 +14,34 @@
  * limitations under the License.
  */
 
-import { defineUserConfig } from "vuepress";
-import theme from "./theme.js";
+package com.bytedance.bitsail.connector.larksheet.api.response;
 
-export default defineUserConfig({
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-  base: "/bitsail/",
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class AppAccessTokenResponse extends OpenApiBaseResponse {
 
-  title: "BitSail",
-  description: "BitSail Document",
+  /**
+   * app_access_token
+   */
+  private String appAccessToken;
 
-  head: [
-    [
-      "link",
-      {
-        rel: "icon",
-        href: "/bitsail/logo.jpg",
-      },
-    ]
-  ],
+  /**
+   * expire time in seconds
+   */
+  private int expire;
 
-  locales: {
-    "/": {
-      lang: "en-US",
-      title: "BitSail",
-      description: "BitSail",
-    },
-    "/zh/": {
-      lang: "zh-CN",
-      title: "BitSail",
-      description: "BitSail",
-    },
-  },
+  /**
+   * tenant_access_token
+   */
+  private String tenantAccessToken;
 
-  theme,
-
-  shouldPrefetch: false,
-});
+}

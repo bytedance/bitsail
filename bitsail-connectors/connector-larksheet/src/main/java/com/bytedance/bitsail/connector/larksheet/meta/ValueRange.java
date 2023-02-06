@@ -14,40 +14,35 @@
  * limitations under the License.
  */
 
-import { defineUserConfig } from "vuepress";
-import theme from "./theme.js";
+package com.bytedance.bitsail.connector.larksheet.meta;
 
-export default defineUserConfig({
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-  base: "/bitsail/",
+import java.util.List;
 
-  title: "BitSail",
-  description: "BitSail Document",
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class ValueRange {
 
-  head: [
-    [
-      "link",
-      {
-        rel: "icon",
-        href: "/bitsail/logo.jpg",
-      },
-    ]
-  ],
+  private String majorDimension;
 
-  locales: {
-    "/": {
-      lang: "en-US",
-      title: "BitSail",
-      description: "BitSail",
-    },
-    "/zh/": {
-      lang: "zh-CN",
-      title: "BitSail",
-      description: "BitSail",
-    },
-  },
+  /**
+   * Value range.<br/>
+   * <i>e.g.</i> sheetId!A20:F20.
+   */
+  private String range;
 
-  theme,
+  /**
+   * Revision.
+   */
+  private int revision;
 
-  shouldPrefetch: false,
-});
+  /**
+   * Two-dimensional array.
+   * From left to right and top to bottom, each element represents a data in a cell.
+   */
+  private List<List<Object>> values;
+}
