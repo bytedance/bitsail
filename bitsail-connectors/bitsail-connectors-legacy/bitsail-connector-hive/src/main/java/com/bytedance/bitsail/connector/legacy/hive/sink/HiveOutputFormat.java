@@ -402,12 +402,7 @@ public class HiveOutputFormat<E extends Row> extends FileOutputFormatPlugin<E> {
             HiveWriterOptions.COLUMNS, FrameworkErrorCode.REQUIRED_VALUE);
         LOG.info("Use columns from configuration: {}.", columns);
       } else {
-        columns = Lists.newArrayList();
-        String[] fieldNames = hiveTableSchema.getFirst().split(",");
-        String[] fieldTypes = hiveTableSchema.getSecond().split(":");
-        for (int i = 0; i < fieldNames.length; i++) {
-          columns.add(new ColumnInfo(fieldNames[i], fieldTypes[i]));
-        }
+        columns = HiveMetaClientUtil.getColumnInfo(hiveConf, db, table);
         LOG.info("Use columns from hive metadata: {}.", columns);
       }
     } catch (TException e) {
