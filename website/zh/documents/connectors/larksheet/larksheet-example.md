@@ -1,4 +1,4 @@
-# LarkSheet(飞书表格)连接器示例
+# LarkSheet(飞书表格) 连接器示例
 
 父目录：[LarkSheet(飞书表格)连接器](./larksheet.md)
 

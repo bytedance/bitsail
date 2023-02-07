@@ -17,67 +17,94 @@
 package com.bytedance.bitsail.connector.print.sink;
 
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.util.Preconditions;
+import com.bytedance.bitsail.connector.print.sink.option.PrintWriterOptions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class PrintWriter implements Writer<Row, String, Integer> {
   private static final Logger LOG = LoggerFactory.getLogger(PrintWriter.class);
 
+  private final int subTaskId;
+
   private final int batchSize;
   private final List<String> fieldNames;
+  private final boolean sampleWrite;
+  private final int sampleLimit;
 
-  private final List<String> writeBuffer;
-  private final List<String> commitBuffer;
-
+  private final AtomicInteger samplePrintCount;
   private final AtomicInteger printCount;
+  private final List<String> commitPrint;
 
-  public PrintWriter(int batchSize, List<String> fieldNames) {
-    this(batchSize, fieldNames, 0);
+  private transient PrintStream stream = System.out;
+
+  public PrintWriter(BitSailConfiguration writerConfiguration, Writer.Context<Integer> context) {
+    this(writerConfiguration, context, 0);
   }
 
-  public PrintWriter(int batchSize, List<String> fieldNames, int alreadyPrintCount) {
-    Preconditions.checkState(batchSize > 0, "batch size must be larger than 0");
-    this.batchSize = batchSize;
-    this.fieldNames = fieldNames;
-    this.writeBuffer = new ArrayList<>(batchSize);
-    this.commitBuffer = new ArrayList<>(batchSize);
+  public PrintWriter(BitSailConfiguration writerConfiguration, Writer.Context<Integer> context, int alreadyPrintCount) {
+    this.batchSize = writerConfiguration.getNecessaryOption(PrintWriterOptions.BATCH_SIZE,
+      PrintErrorCode.REQUIRED_VALUE);
+    Preconditions.checkState(this.batchSize > 0, "batch size must be larger than 0");
+
+    this.sampleWrite = writerConfiguration.get(PrintWriterOptions.SAMPLE_WRITE);
+    this.sampleLimit = writerConfiguration.get(PrintWriterOptions.SAMPLE_LIMIT);
+    this.fieldNames = writerConfiguration.get(WriterOptions.BaseWriterOptions.COLUMNS)
+      .stream()
+      .map(ColumnInfo::getName)
+      .collect(Collectors.toList());
+
     printCount = new AtomicInteger(alreadyPrintCount);
+    samplePrintCount = new AtomicInteger(0);
+    this.commitPrint = new ArrayList<>();
+
+    this.subTaskId = context.getIndexOfSubTaskId();
+    LOG.info("Print sink writer {} is initialized.", subTaskId);
   }
 
   @Override
   public void write(Row element) {
-    String[] fields = new String[element.getFields().length];
-    for (int i = 0; i < element.getFields().length; ++i) {
-      fields[i] = String.format("\"%s\":\"%s\"", fieldNames.get(i), element.getField(i).toString());
-    }
-
-    writeBuffer.add("[" + String.join(",", fields) + "]");
-    if (writeBuffer.size() == batchSize) {
-      this.flush(false);
+    if (!this.sampleWrite) {
+      this.stream.println(stringByRow(element));
+    } else if (printCount.get() % this.sampleLimit == 0) {
+      this.stream.println(stringByRow(element));
+      samplePrintCount.incrementAndGet();
     }
     printCount.incrementAndGet();
   }
 
-  @Override
-  public void flush(boolean endOfInput) {
-    commitBuffer.addAll(writeBuffer);
-    writeBuffer.clear();
-    if (endOfInput) {
-      LOG.info("all records are sent to commit buffer.");
+  private String stringByRow(Row element) {
+    String[] fields = new String[element.getFields().length];
+    for (int i = 0; i < element.getFields().length; ++i) {
+      fields[i] = String.format("\"%s\":\"%s\"", fieldNames.get(i), element.getField(i).toString());
     }
+    return String.format("[%s]", String.join(",", fields));
   }
 
   @Override
+  public void flush(boolean endOfInput) {}
+
+  @Override
   public List<String> prepareCommit() {
-    return commitBuffer;
+    if (this.sampleWrite) {
+      this.commitPrint.add(String.format("PrintSink-%d Input number records:%d, sample print %d records",
+          this.subTaskId, this.printCount.get(), this.samplePrintCount.get()));
+    } else {
+      this.commitPrint.add(String.format("PrintSink-%d print %d records", this.subTaskId, this.printCount.get()));
+    }
+    return this.commitPrint;
   }
 
   @Override

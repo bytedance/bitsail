@@ -18,7 +18,21 @@ import { defineUserConfig } from "vuepress";
 import theme from "./theme.js";
 
 export default defineUserConfig({
+
   base: "/bitsail/",
+
+  title: "BitSail",
+  description: "BitSail Document",
+
+  head: [
+    [
+      "link",
+      {
+        rel: "icon",
+        href: "/bitsail/logo.jpg",
+      },
+    ]
+  ],
 
   locales: {
     "/": {

@@ -98,6 +98,12 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
     <th>Writer</th>
   </tr>
   <tr>
+    <td>Assert</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
     <td>ClickHouse</td>
     <td>-</td>
     <td>✅</td>
@@ -210,6 +216,12 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
   </tr>
   <tr>
     <td>RocketMQ</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>SelectDB</td>
     <td>-</td>
     <td> </td>
     <td>✅</td>

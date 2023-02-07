@@ -26,7 +26,6 @@
     },
     "writer": {
       "class": "com.bytedance.bitsail.connector.assertion.sink.AssertSink",
-      "content_type": "json",
       "columns": [
         {
           "name": "name",

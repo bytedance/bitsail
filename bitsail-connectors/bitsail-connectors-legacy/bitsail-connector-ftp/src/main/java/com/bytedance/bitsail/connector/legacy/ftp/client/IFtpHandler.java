@@ -62,7 +62,7 @@ public interface IFtpHandler {
   boolean isPathExist(String path);
 
   /**
-   * get file input strem
+   * get file input stream
    *
    * @param filePath file path
    * @return InputStream
@@ -80,7 +80,7 @@ public interface IFtpHandler {
   /**
    * find total sizes of file under the path
    *
-   * @param path
+   * @param path path
    * @return total sizes of files
    */
   long getFilesSize(String path);

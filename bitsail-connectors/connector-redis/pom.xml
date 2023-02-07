@@ -30,17 +30,11 @@
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <commons.pool2.version>2.11.1</commons.pool2.version>
+        <jedis.version>4.2.2</jedis.version>
     </properties>
 
     <artifactId>connector-redis</artifactId>
     <dependencies>
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-redis</artifactId>
-            <version>${revision}</version>
-            <scope>compile</scope>
-        </dependency>
-
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
@@ -56,13 +50,6 @@
         </dependency>
 
         <!-- test -->
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-fake</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>connector-fake</artifactId>

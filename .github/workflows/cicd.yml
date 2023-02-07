@@ -12,6 +12,7 @@ on:
       - 'NOTICE'
       - 'package.json'
       - 'yarn.lock'
+      - 'tools/release'
 
   pull_request:
     branches: [ "master" ]
@@ -22,6 +23,7 @@ on:
       - 'NOTICE'
       - 'package.json'
       - 'yarn.lock'
+      - 'tools/release'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -59,10 +61,16 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
           architecture: x64
+      - name: Setting Maven Repository
+        uses: s4u/maven-settings-action@v2.8.0
+        with:
+          apacheSnapshots: true
+          sonatypeSnapshots: true
+          oracleRepo: true
 
       - name: Maven Verify Unit Test
         run:
-          mvn clean verify -pl bitsail-dist -am -U -DskipUT=false -DskipITCase=true
+          mvn clean verify -pl bitsail-dist -am -U -DskipUT=false -DskipITCase=true -P _maven.oracle.com_
 
     # This workflow contains a single job called "integration-tests"
   integration-tests:
@@ -82,7 +90,13 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
           architecture: x64
+      - name: Setting Maven Repository
+        uses: s4u/maven-settings-action@v2.8.0
+        with:
+          apacheSnapshots: true
+          sonatypeSnapshots: true
+          oracleRepo: true
 
       - name: Maven Verify Integration Test
         run:
-          mvn clean verify -pl bitsail-dist -am -U -DskipUT=true -DskipITCase=false
+          mvn clean verify -pl bitsail-dist -am -U -DskipUT=true -DskipITCase=false -P _maven.oracle.com_

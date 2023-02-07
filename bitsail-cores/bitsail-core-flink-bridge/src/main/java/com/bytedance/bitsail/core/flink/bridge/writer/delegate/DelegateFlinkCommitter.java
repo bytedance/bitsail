@@ -16,10 +16,10 @@
 
 package com.bytedance.bitsail.core.flink.bridge.writer.delegate;
 
+import com.bytedance.bitsail.base.connector.writer.v1.Sink;
 import com.bytedance.bitsail.base.connector.writer.v1.WriterCommitter;
 import com.bytedance.bitsail.base.connector.writer.v1.comittable.CommittableMessage;
 import com.bytedance.bitsail.base.connector.writer.v1.comittable.CommittableState;
-import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.core.flink.bridge.serializer.CommittableStateSerializer;
 import com.bytedance.bitsail.core.flink.bridge.serializer.DelegateSimpleVersionedSerializer;
 
@@ -39,6 +39,7 @@ import org.apache.flink.streaming.api.operators.util.SimpleVersionedListState;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -49,7 +50,7 @@ import java.util.TreeMap;
 /**
  * Created 2022/6/16
  */
-public class DelegateFlinkCommitter<CommitT> extends AbstractStreamOperator<CommittableMessage<CommitT>>
+public class DelegateFlinkCommitter<CommitT extends Serializable> extends AbstractStreamOperator<CommittableMessage<CommitT>>
     implements OneInputStreamOperator<CommittableMessage<CommitT>, CommittableMessage<CommitT>>, BoundedOneInput {
 
   private static final ListStateDescriptor<byte[]> PENDING_COMMIT_STATES =
@@ -60,35 +61,23 @@ public class DelegateFlinkCommitter<CommitT> extends AbstractStreamOperator<Comm
       new ListStateDescriptor<Long>(
           "checkpoint-id-states", LongSerializer.INSTANCE);
 
-  private final DelegateSimpleVersionedSerializer<CommitT> commitStateSerializer;
   private final NavigableMap<Long, List<CommitT>> committablesPerCheckpoint;
-
-  private final WriterCommitter<CommitT> writerCommitter;
+  private final Sink<?, CommitT, ?> sink;
   private final boolean isBatchMode;
   private final boolean isCheckpointingEnabled;
+
+  private transient WriterCommitter<CommitT> writerCommitter;
   private transient ListState<CommittableState<CommitT>> pendingCommitStates;
   private transient ListState<Long> lastCompletelyCheckpointStates;
   private long lastCompletedCheckpointId = -1;
 
-  private DelegateFlinkCommitter(WriterCommitter<CommitT> writerCommitter,
-                                 BinarySerializer<CommitT> committerSerializer,
+  public DelegateFlinkCommitter(Sink<?, CommitT, ?> sink,
                                  boolean isBatchMode,
                                  boolean isCheckpointEnabled) {
     this.isBatchMode = isBatchMode;
     this.isCheckpointingEnabled = isCheckpointEnabled;
-    this.writerCommitter = Preconditions.checkNotNull(writerCommitter);
+    this.sink = Preconditions.checkNotNull(sink);
     this.committablesPerCheckpoint = new TreeMap<>();
-    this.commitStateSerializer = DelegateSimpleVersionedSerializer.delegate(committerSerializer);
-  }
-
-  public static <CommitT> DelegateFlinkCommitter<CommitT> of(WriterCommitter<CommitT> writerCommitter,
-                                                             BinarySerializer<CommitT> committerSerializer,
-                                                             boolean isBatchMode,
-                                                             boolean isCheckpointingEnabled) {
-    return new DelegateFlinkCommitter<>(writerCommitter,
-        committerSerializer,
-        isBatchMode,
-        isCheckpointingEnabled);
   }
 
   public static long restoreMinCheckpointId(ListState<Long> checkpoints) throws Exception {
@@ -111,23 +100,25 @@ public class DelegateFlinkCommitter<CommitT> extends AbstractStreamOperator<Comm
   @Override
   public void initializeState(StateInitializationContext context) throws Exception {
     super.initializeState(context);
+
+    writerCommitter = sink.createCommitter().get();
     if (!isCheckpointingEnabled) {
       return;
     }
-    ListState<byte[]> pendingCommitStates = context
+    ListState<byte[]> binaryPendingCommitStates = context
         .getOperatorStateStore()
         .getListState(PENDING_COMMIT_STATES);
 
-    this.pendingCommitStates = new SimpleVersionedListState<CommittableState<CommitT>>(pendingCommitStates,
-        new CommittableStateSerializer<>(commitStateSerializer));
-
+    pendingCommitStates = new SimpleVersionedListState<>(binaryPendingCommitStates,
+        new CommittableStateSerializer<>(DelegateSimpleVersionedSerializer
+            .delegate(sink.getCommittableSerializer())));
     lastCompletelyCheckpointStates = context
         .getOperatorStateStore()
         .getUnionListState(PENDING_COMMIT_CHECKPOINT_STATES);
 
     if (context.isRestored()) {
       lastCompletedCheckpointId = restoreMinCheckpointId(lastCompletelyCheckpointStates);
-      committablesPerCheckpoint.putAll(restoreCommittableState(this.pendingCommitStates));
+      committablesPerCheckpoint.putAll(restoreCommittableState(pendingCommitStates));
       commitAndEmitCheckpoints(lastCompletedCheckpointId);
     }
   }

@@ -20,7 +20,8 @@ import com.bytedance.bitsail.base.extension.SecurityModule;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.component.format.security.kerberos.option.KerberosOptions;
 
-import org.apache.hadoop.security.authentication.util.KerberosName;
+import lombok.SneakyThrows;
+import org.apache.hadoop.security.authentication.util.KerberosUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.security.krb5.Config;
@@ -45,13 +46,13 @@ public abstract class KerberosAbstractSecurityModule implements SecurityModule {
     LOG.info("Kerberos security module initialized.");
   }
 
+  @SneakyThrows
   protected void refreshConfig() {
     try {
       Config.refresh();
-      KerberosName.resetDefaultRealm();
     } catch (KrbException e) {
       LOG.warn("Failed to refresh krb5 config or reset default realm, current default realm {} will be used.",
-          KerberosName.getDefaultRealm(), e);
+          KerberosUtil.getDefaultRealm(), e);
     }
   }
 }

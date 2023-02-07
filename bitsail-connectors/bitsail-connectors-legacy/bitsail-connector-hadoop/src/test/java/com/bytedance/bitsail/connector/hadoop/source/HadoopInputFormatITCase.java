@@ -19,47 +19,58 @@ package com.bytedance.bitsail.connector.hadoop.source;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.hadoop.option.HadoopReaderOptions;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.minicluster.MiniClusterUtil;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.LocalFileSystem;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class HadoopInputFormatITCase {
   private static final Logger LOG = LoggerFactory.getLogger(HadoopInputFormatITCase.class);
-  private static FileSystem fs;
+
+  @ClassRule
+  public static final TemporaryFolder TEMP_FOLDER = new TemporaryFolder(new File("/tmp"));
+
+  private static FileSystem FILESYSTEM;
 
   @Before
   public void setUp() throws IOException, InterruptedException {
-    MiniClusterUtil.setUp();
-    fs = MiniClusterUtil.fileSystem;
+    FILESYSTEM = LocalFileSystem.getLocal(new Configuration());
   }
 
   @After
   public void close() {
-    MiniClusterUtil.shutdown();
-    fs = null;
+    FILESYSTEM = null;
   }
 
   @Test
-  public void testHadoopToPrintJson() throws Exception {
-    String localJsonFile = "source/test.json";
-    String remoteJsonFile = "/test_namespace/source/test.json";
-    Configuration conf = fs.getConf();
+  public void testJsonFormatHadoopInput() throws Exception {
+    Path source = Paths.get(HadoopInputFormatITCase.class.getClassLoader()
+        .getResource("source/test.json")
+        .toURI()
+        .getPath());
+
+    File folder = TEMP_FOLDER.newFolder();
+    Path target = Paths.get(folder.getAbsolutePath(), source.getFileName().toString());
+    Files.copy(source, target);
+    Configuration conf = FILESYSTEM.getConf();
     String defaultFS = conf.get("fs.defaultFS");
     LOG.info("fs.defaultFS: {}", defaultFS);
-    ClassLoader classLoader = JobConfUtils.class.getClassLoader();
-    fs.copyFromLocalFile(new Path(classLoader.getResource(localJsonFile).getPath()), new Path(remoteJsonFile));
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("hadoop_to_print.json");
-    jobConf.set(HadoopReaderOptions.PATH_LIST, defaultFS + remoteJsonFile);
+    jobConf.set(HadoopReaderOptions.PATH_LIST, defaultFS + target);
     EmbeddedFlinkCluster.submitJob(jobConf);
   }
 }

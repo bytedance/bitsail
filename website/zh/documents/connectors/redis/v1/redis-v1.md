@@ -65,26 +65,26 @@
 | class      | 是       |            | Redis写连接器类型, `com.bytedance.bitsail.connector.legacy.redis.sink.RedisOutputFormat` |
 | redis_host | 是       |            | Redis连接地址                                                |
 | redis_port | 是       |            | Redis连接端口                                                |
-| columns    | 是       |            | 写入列数据字段，类型均为string                               |
+| columns    | 是       |            | 写入列数据字段，字段的类型可以是`binary`、`string`或者其他基本格式，`binary`类型指代的是`byte[]`格式。 |
 
 
 
 #### 可选参数
 
-| 参数名称                         | 是否必填 | 参数枚举值                                     | 参数含义                          |
-| :------------------------------- | :------- | :--------------------------------------------- | :-------------------------------- |
-| writer_parallelism_num           | 否       |                                                | 指定redis写并发                   |
-| client_timeout_ms                | 否       |                                                | Redis的连接/请求超时, 默认60000ms |
-| ttl                              | 否       |                                                | 写入数据的ttl, 默认-1表示不设置   |
-| ttl_type                         | 否       | "DAY", "HOUR", "MINUTE", "SECOND"              | 上面指定的ttl单位, 默认"DAY"      |
-| write_batch_interval             | 否       |                                                | Redis指令攒批写入的大小, 默认50   |
-| redis_data_type                  | 否       | "string"<br/>"set"<br/>"hash"<br/>"sorted_set" | 写入Redis的数据格式, 默认 string  |
-| password                         | 否       |                                                | Redis连接密码                     |
-| connection_pool_max_total        | 否       |                                                | 连接池最大可分配实例              |
-| connection_pool_max_idle         | 否       |                                                | 连接池最大空闲实例                |
-| connection_pool_min_idle         | 否       |                                                | 连接池最小空闲实例                |
-| connection_pool_max_wait_time_ms | 否       |                                                | 连接池最大等待时间                |
-| max_attempt_count                | 否       |                                                | 重试器最大重试次数                |
+| 参数名称                         | 是否必填 | 参数枚举值                                                 | 参数含义                          |
+| :------------------------------- | :------- | :--------------------------------------------------------- | :-------------------------------- |
+| writer_parallelism_num           | 否       |                                                            | 指定redis写并发                   |
+| client_timeout_ms                | 否       |                                                            | Redis的连接/请求超时, 默认60000ms |
+| ttl                              | 否       |                                                            | 写入数据的ttl, 默认-1表示不设置   |
+| ttl_type                         | 否       | "DAY", "HOUR", "MINUTE", "SECOND"                          | 上面指定的ttl单位, 默认"DAY"      |
+| write_batch_interval             | 否       |                                                            | Redis指令攒批写入的大小, 默认50   |
+| redis_data_type                  | 否       | "string"<br/>"set"<br/>"hash"<br/>"sorted_set"<br/>"mhash" | 写入Redis的数据格式, 默认 string  |
+| password                         | 否       |                                                            | Redis连接密码                     |
+| connection_pool_max_total        | 否       |                                                            | 连接池最大可分配实例              |
+| connection_pool_max_idle         | 否       |                                                            | 连接池最大空闲实例                |
+| connection_pool_min_idle         | 否       |                                                            | 连接池最小空闲实例                |
+| connection_pool_max_wait_time_ms | 否       |                                                            | 连接池最大等待时间                |
+| max_attempt_count                | 否       |                                                            | 重试器最大重试次数                |
 
 ## 相关文档
 

@@ -21,17 +21,24 @@ import com.bytedance.bitsail.base.execution.ProcessResult;
 import com.bytedance.bitsail.base.extension.GlobalCommittable;
 import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.flink.core.constants.TypeSystem;
 import com.bytedance.bitsail.flink.core.legacy.connector.OutputFormatPlugin;
 import com.bytedance.bitsail.flink.core.option.FlinkCommonOptions;
 import com.bytedance.bitsail.flink.core.plugins.OutputAdapter;
+import com.bytedance.bitsail.flink.core.typeinfo.ListColumnTypeInfo;
+import com.bytedance.bitsail.flink.core.typeinfo.MapColumnTypeInfo;
+import com.bytedance.bitsail.flink.core.typeinfo.PrimitiveColumnTypeInfo;
 
 import com.google.common.annotations.VisibleForTesting;
 import lombok.Getter;
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.typeutils.GenericTypeInfo;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -77,7 +84,12 @@ public class PluginableOutputFormatDAGBuilder<OUT extends Row> extends FlinkData
   @Override
   @SuppressWarnings("unchecked")
   public void addWriter(DataStream<OUT> source, int writerParallelism) throws Exception {
-    if (TypeSystem.FLINK.equals(outputFormatPlugin.getTypeSystem())) {
+    TypeSystem upstreamTypeSystem = extractUpstreamTypeSystem(source);
+    TypeSystem writerTypeSystem = outputFormatPlugin.getTypeSystem();
+    LOG.info("Upstream type system: {}, writer type system: {}.", upstreamTypeSystem, writerTypeSystem);
+
+    if (!upstreamTypeSystem.equals(writerTypeSystem) &&
+        TypeSystem.FLINK.equals(writerTypeSystem)) {
       BitSailConfiguration outputAdapterConfiguration = outputFormatPlugin.getAdapterConf();
       RowTypeInfo rowTypeInfo = (RowTypeInfo) ((ResultTypeQueryable) outputFormatPlugin).getProducedType();
 
@@ -93,6 +105,27 @@ public class PluginableOutputFormatDAGBuilder<OUT extends Row> extends FlinkData
     source.writeUsingOutputFormat(outputFormatPlugin)
         .name(getWriterName())
         .setParallelism(writerParallelism);
+  }
+
+  private static <OUT> TypeSystem extractUpstreamTypeSystem(DataStream<OUT> parent) {
+    TypeInformation<OUT> typeInformation = parent.getType();
+    if (typeInformation instanceof GenericTypeInfo) {
+      return TypeSystem.FLINK;
+    }
+
+    if ((!(typeInformation instanceof RowTypeInfo))) {
+      throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,
+          "TypeInformation should be row type info.");
+    }
+    RowTypeInfo rowTypeInfo = (RowTypeInfo) typeInformation;
+    for (TypeInformation<?> element : rowTypeInfo.getFieldTypes()) {
+      if (element instanceof PrimitiveColumnTypeInfo
+          || element instanceof ListColumnTypeInfo
+          || element instanceof MapColumnTypeInfo) {
+        return TypeSystem.BitSail;
+      }
+    }
+    return TypeSystem.FLINK;
   }
 
   @Override

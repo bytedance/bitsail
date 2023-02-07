@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -68,7 +69,7 @@ public class HadoopSecurityModule extends KerberosAbstractSecurityModule {
     kerberosHadoopConf.forEach(configuration::set);
     configuration.set(KerberosConstants.HADOOP_AUTH_KEY, "Kerberos");
 
-    UserGroupInformation.reset();
+    reset();
     UserGroupInformation.setConfiguration(configuration);
 
     userGroupInformation = UserGroupInformation.loginUserFromKeytabAndReturnUGI(principal, keytabPath);
@@ -77,6 +78,16 @@ public class HadoopSecurityModule extends KerberosAbstractSecurityModule {
 
   @Override
   public void logout() {
-    UserGroupInformation.reset();
+    reset();
+  }
+
+  private static void reset() {
+    try {
+      Method reset = UserGroupInformation.class.getDeclaredMethod("reset");
+      reset.setAccessible(true);
+      reset.invoke(null);
+    } catch (Exception e) {
+      LOG.error("Invoke reset.", e);
+    }
   }
 }

@@ -17,7 +17,6 @@
 package com.bytedance.bitsail.connector.redis.core;
 
 import com.bytedance.bitsail.connector.redis.core.jedis.JedisCommand;
-import com.bytedance.bitsail.connector.redis.core.jedis.JedisCommandDescription;
 
 import com.alibaba.fastjson.JSON;
 import lombok.Data;
@@ -35,28 +34,28 @@ public class Command {
   private Map<byte[], byte[]> hash;
   private int ttlInSeconds;
 
-  public Command(JedisCommandDescription commandDescription, byte[] key, byte[] hashField, byte[] value) {
-    this(commandDescription, key, value);
+  public Command(JedisCommand jedisCommand, byte[] key, byte[] hashField, byte[] value, Integer additionalTTL) {
+    this(jedisCommand, key, value, additionalTTL);
     this.hashField = hashField;
   }
 
-  public Command(JedisCommandDescription commandDescription, byte[] key, Map<byte[], byte[]> hash) {
-    this.jedisCommand = commandDescription.getJedisCommand();
+  public Command(JedisCommand jedisCommand, byte[] key, Map<byte[], byte[]> hash, Integer additionalTTL) {
+    this.jedisCommand = jedisCommand;
     this.key = key;
     this.hash = hash;
-    this.ttlInSeconds = commandDescription.getAdditionalTTL() == null ? 0 : commandDescription.getAdditionalTTL();
+    this.ttlInSeconds = additionalTTL == null ? 0 : additionalTTL;
   }
 
-  public Command(JedisCommandDescription commandDescription, byte[] key, double score, byte[] value) {
-    this(commandDescription, key, value);
+  public Command(JedisCommand jedisCommand, byte[] key, double score, byte[] value, Integer additionalTTL) {
+    this(jedisCommand, key, value, additionalTTL);
     this.score = score;
   }
 
-  public Command(JedisCommandDescription commandDescription, byte[] key, byte[] value) {
-    this.jedisCommand = commandDescription.getJedisCommand();
+  public Command(JedisCommand jedisCommand, byte[] key, byte[] value, Integer additionalTTL) {
+    this.jedisCommand = jedisCommand;
     this.key = key;
     this.value = value;
-    this.ttlInSeconds = commandDescription.getAdditionalTTL() == null ? 0 : commandDescription.getAdditionalTTL();
+    this.ttlInSeconds = additionalTTL == null ? 0 : additionalTTL;
   }
 
   public String print() {

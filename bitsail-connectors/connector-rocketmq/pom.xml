@@ -28,7 +28,7 @@
     <artifactId>connector-rocketmq</artifactId>
 
     <properties>
-        <rocketmq.version>4.9.4</rocketmq.version>
+        <rocketmq.version>4.9.2</rocketmq.version>
     </properties>
 
     <dependencyManagement>
