@@ -130,6 +130,10 @@
             <version>${revision}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-core-flink-base</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
