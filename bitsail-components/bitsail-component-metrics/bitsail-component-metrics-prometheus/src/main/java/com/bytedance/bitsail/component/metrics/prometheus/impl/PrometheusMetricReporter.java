@@ -16,33 +16,38 @@
 
 package com.bytedance.bitsail.component.metrics.prometheus.impl;
 
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.component.metrics.prometheus.AbstractPrometheusReporter;
+import com.bytedance.bitsail.component.metrics.prometheus.error.PrometheusErrorCode;
 import com.bytedance.bitsail.component.metrics.prometheus.option.PrometheusOptions;
 
-import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.dropwizard.DropwizardExports;
 import io.prometheus.client.exporter.HTTPServer;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
-@Slf4j
 public class PrometheusMetricReporter extends AbstractPrometheusReporter {
+  private static final Logger LOG = LoggerFactory.getLogger(PrometheusMetricReporter.class);
   private HTTPServer httpServer;
   private DropwizardExports metricExports;
   @Override
   public void open(BitSailConfiguration configuration) {
     int serverPort = configuration.get(PrometheusOptions.PROMETHEUS_PORT_NUM);
     metricExports = new DropwizardExports(metricRegistry);
-    metricExports.register(CollectorRegistry.defaultRegistry);
+    metricExports.register(defaultRegistry);
     try {
-      this.httpServer = new HTTPServer(new InetSocketAddress(serverPort), CollectorRegistry.defaultRegistry);
-      log.info("Started PrometheusReporter HTTP server on port {}.", serverPort);
+      this.httpServer = new HTTPServer(new InetSocketAddress(serverPort), defaultRegistry);
+      LOG.info("Started PrometheusReporter HTTP server on port {}.", serverPort);
     } catch (IOException ioe) {
       // assume port conflict
-      log.debug("Could not start PrometheusReporter HTTP server on port {}.", serverPort, ioe);
+      throw BitSailException.asBitSailException(
+          PrometheusErrorCode.PORT_ERROR,
+          "Could not start PrometheusReporter HTTP server on port: " + serverPort,
+          ioe);
     }
   }
 

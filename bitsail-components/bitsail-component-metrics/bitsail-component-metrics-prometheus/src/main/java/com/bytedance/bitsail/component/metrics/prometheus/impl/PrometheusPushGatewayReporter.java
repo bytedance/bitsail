@@ -17,48 +17,64 @@
 package com.bytedance.bitsail.component.metrics.prometheus.impl;
 
 import com.bytedance.bitsail.base.metrics.Scheduled;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.component.metrics.prometheus.AbstractPrometheusReporter;
+import com.bytedance.bitsail.component.metrics.prometheus.constant.PrometheusConstants;
+import com.bytedance.bitsail.component.metrics.prometheus.error.PrometheusPushGatewayErrorCode;
 import com.bytedance.bitsail.component.metrics.prometheus.option.PrometheusPushGatewayOptions;
 
-import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.dropwizard.DropwizardExports;
 import io.prometheus.client.exporter.PushGateway;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
 public class PrometheusPushGatewayReporter extends AbstractPrometheusReporter implements Scheduled {
+  private static final Logger LOG = LoggerFactory.getLogger(PrometheusPushGatewayReporter.class);
   private int periodSeconds;
   private PushGateway pushGateway;
   private String jobName;
   private boolean deleteOnShutdown;
   DropwizardExports dropwizardExports;
+  Map<String, String> groupingKey;
 
   @Override
   public void open(BitSailConfiguration configuration) {
     String serverHost = configuration.get(PrometheusPushGatewayOptions.PUSHGATEWAY_HOST_NAME);
     int serverPort = configuration.get(PrometheusPushGatewayOptions.PUSHGATEWAY_PORT_NUM);
     periodSeconds = configuration.get(PrometheusPushGatewayOptions.PUSHGATEWAY_REPORT_PERIOD_IN_SECONDS);
-    jobName = configuration.get(PrometheusPushGatewayOptions.PUSHGATEWAY_JOBNAME);
+
     deleteOnShutdown = configuration.get(PrometheusPushGatewayOptions.PUSHGATEWAY_DELETE_ON_SHUTDOWN_ENABLE);
+    if (configuration.fieldExists(PrometheusPushGatewayOptions.PUSHGATEWAY_JOBNAME)) {
+      jobName = configuration.get(PrometheusPushGatewayOptions.PUSHGATEWAY_JOBNAME);
+    } else {
+      jobName = configuration.get(CommonOptions.JOB_NAME) + PrometheusConstants.jobNameSuffix;
+    }
     pushGateway = createPushGatewayClient(serverHost, serverPort);
     dropwizardExports = new DropwizardExports(metricRegistry);
-    dropwizardExports.register(CollectorRegistry.defaultRegistry);
+    dropwizardExports.register(defaultRegistry);
+
+    groupingKey = new HashMap<>();
+    groupingKey.put("instance", String.valueOf(configuration.get(CommonOptions.INSTANCE_ID)));
   }
 
-  @SuppressWarnings("checkstyle:MagicNumber")
   private PushGateway createPushGatewayClient(String serverHost, int serverPort) {
-    if (serverPort == 443) {
+    if (serverPort == PrometheusConstants.HTTPS_SERVER_PORT) {
       try {
         return new PushGateway(new URL("https://" + serverHost + ":" + serverPort));
       } catch (MalformedURLException e) {
-        e.printStackTrace();
-        throw new IllegalArgumentException("Malformed pushgateway host: " + serverHost);
+        throw BitSailException.asBitSailException(
+            PrometheusPushGatewayErrorCode.CLIENT_ERROR,
+            "Malformed pushgateway host: " + serverHost + ":" + serverPort,
+            e);
       }
     }
     return new PushGateway(serverHost + ":" + serverPort);
@@ -68,11 +84,12 @@ public class PrometheusPushGatewayReporter extends AbstractPrometheusReporter im
   public void close() {
     if (deleteOnShutdown && pushGateway != null) {
       try {
-        pushGateway.delete(jobName);
+        pushGateway.delete(jobName, groupingKey);
       } catch (IOException e) {
-        log.warn(
-            "Failed to delete metrics from PushGateway with jobName {}.",
+        LOG.warn(
+            "Failed to delete metrics from PushGateway with jobName {}, groupingKey {}.",
             jobName,
+            groupingKey,
             e);
       }
     }
@@ -82,11 +99,12 @@ public class PrometheusPushGatewayReporter extends AbstractPrometheusReporter im
   @Override
   public void report() {
     try {
-      pushGateway.pushAdd(CollectorRegistry.defaultRegistry, jobName);
+      pushGateway.pushAdd(defaultRegistry, jobName, groupingKey);
     } catch (Exception e) {
-      log.warn(
-          "Failed to push metrics to PushGateway with jobName {}.",
+      LOG.warn(
+          "Failed to push metrics to PushGateway with jobName {}, groupingKey {}.",
           jobName,
+          groupingKey,
           e);
     }
   }

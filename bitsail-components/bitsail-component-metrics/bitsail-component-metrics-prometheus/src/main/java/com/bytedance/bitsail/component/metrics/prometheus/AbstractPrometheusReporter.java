@@ -21,38 +21,51 @@ import com.bytedance.bitsail.base.metrics.MetricReporter;
 
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.annotations.VisibleForTesting;
 import io.prometheus.client.CollectorRegistry;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Slf4j
 public abstract class AbstractPrometheusReporter implements MetricReporter {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractPrometheusReporter.class);
   private static final Pattern UNALLOWED_CHAR_PATTERN = Pattern.compile("[^a-zA-Z0-9:_]");
 
+  // A separate registry is used, as the default registry may contain other metrics such as those from the Process Collector.
+  public final CollectorRegistry defaultRegistry = new CollectorRegistry(true);
   public final MetricRegistry metricRegistry = new MetricRegistry();
 
   @Override
   public void notifyOfAddedMetric(Metric metric, String metricName, MetricManager group) {
-    String metricInfo = replaceInvalidChars(metricName);
-    metricRegistry.register(metricInfo, metric);
+    String validMetricName = validateMetricName(metricName);
+    metricRegistry.register(validMetricName, metric);
   }
 
   @Override
   public void notifyOfRemovedMetric(Metric metric, String metricName, MetricManager group) {
-    String metricInfo = replaceInvalidChars(metricName);
-    metricRegistry.remove(metricInfo);
+    String validMetricName = validateMetricName(metricName);
+    metricRegistry.remove(validMetricName);
   }
 
   @Override
   public void close() {
-    CollectorRegistry.defaultRegistry.clear();
+    defaultRegistry.clear();
   }
 
-  String replaceInvalidChars(final String input) {
-    // https://prometheus.io/docs/instrumenting/writing_exporters/
-    // Only [a-zA-Z0-9:_] are valid in metric names, any other characters should be sanitized to
-    // an underscore.
-    return UNALLOWED_CHAR_PATTERN.matcher(input).replaceAll("_");
+  @VisibleForTesting
+  public String validateMetricName(final String metricName) {
+    // refer to https://prometheus.io/docs/instrumenting/writing_exporters/
+    // Only [a-zA-Z0-9:_] are valid in metric names, any other characters should be sanitized to an underscore.
+    Matcher matcher = UNALLOWED_CHAR_PATTERN.matcher(metricName);
+    if (matcher.find()) {
+      String validMetricName = matcher.replaceAll("_");
+      LOG.warn("Only [a-zA-Z0-9:_] are valid in prometheus metric names, " +
+          "any other characters should be sanitized to an underscore. " +
+              "The original name {} will be replaced by {}.", metricName, validMetricName);
+      return validMetricName;
+    }
+    return metricName;
   }
 }

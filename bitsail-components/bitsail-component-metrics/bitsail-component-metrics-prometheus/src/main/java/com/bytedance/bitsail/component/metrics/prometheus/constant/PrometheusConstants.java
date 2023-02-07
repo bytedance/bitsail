@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.component.metrics.prometheus.option;
+package com.bytedance.bitsail.component.metrics.prometheus.constant;
 
-import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.common.option.ConfigOption;
-import com.bytedance.bitsail.common.option.ConfigOptions;
-import com.bytedance.bitsail.common.option.WriterOptions;
-
-public interface PrometheusOptions extends WriterOptions.BaseWriterOptions {
-  String PROMETHEUS_PREFIX = CommonOptions.COMMON_PREFIX + "prometheus-";
+public class PrometheusConstants {
   /**
-   * Prometheus port
+   * connector name
    */
-  ConfigOption<Integer> PROMETHEUS_PORT_NUM =
-      ConfigOptions.key(PROMETHEUS_PREFIX + "port")
-          .defaultValue(51111);;
+  public static final int HTTPS_SERVER_PORT = 443;
+  public static String jobNameSuffix = "_metric";
 }
