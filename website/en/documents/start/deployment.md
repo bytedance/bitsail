@@ -1,23 +1,26 @@
 # Deployment Guide
 English | [简体中文](../../../zh/documents/start/deployment.md)
 
-> At present, ***BitSail*** only supports flink deployment on Yarn.<br>
-Other platforms like `native kubernetes` will be release recently.
+> At present, ***BitSail*** supports flink deployment on Yarn and native Kubernetes.<br>
 
 Here are the contents of this part:
 
-- [Pre Configuration](#jump_pre_configure)
-    - [Configure Hadoop Environment](#jump_configure_hadoop)
-    - [Configure Flink Cluster](#jump_configure_flink)
-- [Submit to Yarn](#jump_submit_to_yarn)
-    - [Submit an example job](#jump_submit_example)
-    - [Log for Debugging](#jump_log)
-- [Submit to Local Flink Session](#jump_submit_local)
-
-Below is a step-by-step guide to help you effectively deploy it on Yarn.
+- [Yarn Deployment](#yarn_deployment)
+  - [Pre Configuration](#jump_pre_configure)
+      - [Configure Hadoop Environment](#jump_configure_hadoop)
+      - [Configure Flink Cluster](#jump_configure_flink)
+  - [Submit to Yarn](#jump_submit_to_yarn)
+      - [Submit an example job](#jump_submit_example)
+      - [Log for Debugging](#jump_log)
+  - [Submit to Local Flink Session](#jump_submit_local)
+- [Native Kubernetes Deployment](#native_kubernetes_deployment)
+  - [Prerequisites](#jump_prerequisites_k8s)
+  - [Pre Configuration](#jump_pre_configuration_k8s)
 
 -----
+# <span id="yarn_deployment">Yarn Deployment</span>
 
+Below is a step-by-step guide to help you effectively deploy it on Yarn.
 ## <span id="jump_pre_configure">Pre configuration</span>
 
 ### <span id="jump_configure_hadoop">Configure Hadoop Environment</span>
@@ -79,8 +82,6 @@ Here are some frequently-used options in the configuration file:
 -----
 
 ## <span id="jump_submit_to_yarn">Submit to Yarn</span>
-
-> ***BitSail*** only support resource provider `yarn's yarn-per-job` mode until now, others like `native kubernetes` will be release recently.
 
 You can use the startup script `bin/bitsail` to submit flink jobs to yarn.
 
@@ -173,3 +174,66 @@ bash bin/bitsail run \
   --conf examples/Fake_Hive_Example.json \
   --jm-address <job-manager-address>
   ```
+
+
+-----
+# <span id="native_kubernetes_deployment">Native Kubernetes Deployment</span>
+
+> At present, ***BitSail*** supports native Kubernetes via Flink 1.11 engine.<br>
+> 
+Below is a step-by-step guide to help you effectively deploy it on native Kubernetes. Currently, BitSail support Application deployment mode: Allows users to create a single image containing their Job and the Flink runtime, which will automatically create and destroy cluster components as needed.
+
+## <span id="jump_prerequisites_k8s">Prerequisites</span>
+1. Kubernetes >= 1.9
+2. KubeConfig, which has access to list, create, delete pods and services, configurable via `~/.kube/config`. You can verify permissions by running `kubectl auth can-i <list|create|edit|delete> pods` 
+3. Enabled Kubernetes DNS
+
+If you have problems setting up a Kubernetes cluster, then take a look at [how to setup a Kubernetes cluster](https://kubernetes.io/docs/setup/).
+
+## <span id="jump_pre_configuration_k8s">Pre Configuration</span>
+
+### <span id="jump_configure_RBAC">Setup [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)</span>
+Role-based access control ([RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)) is a method of regulating access to compute or network resources based on the roles of individual users within an enterprise. Users can configure RBAC roles and service accounts used by JobManager to access the Kubernetes API server within the Kubernetes cluster.
+
+Every namespace has a default service account. However, the `default` service account may not have the permission to create or delete pods within the Kubernetes cluster. Users can instead use the following command to create a new service account `<self-defined-service-account>` and set the role binding. Then use the config option `kubernetes.service-account=<self-defined-service-account>` to make the JobManager pod use the `<self-defined-service-account>` service account to create/delete TaskManager pods and leader ConfigMaps. Also this will allow the TaskManager to watch leader ConfigMaps to retrieve the address of JobManager and ResourceManager.
+
+```bash
+$ kubectl create serviceaccount <self-defined-service-account> # Please replace <self-defined-service-account> with a custom name
+$ kubectl create clusterrolebinding <self-defined-cluster-role-binding> --clusterrole=edit --serviceaccount=default:<self-defined-service-account> # Please replace <self-defined-service-account> and <self-defined-cluster-role-binding> with custom names
+```
+
+### <span id="jump_configure_enable_logs">Enable cluster logs</span>
+By default, the JobManager and TaskManager only store logs under `/opt/flink/log` in each pod. If you want to use `kubectl logs <PodName>` to view the logs, you must perform the following:
+1. Add a new appender to the `log4j.properties` in `${BITSAIL_HOME}/bitsail-dist/target`.
+2. Add the following ‘appenderRef’ the rootLogger in log4j.properties rootLogger.appenderRef.console.ref = ConsoleAppender.
+3. Remove the redirect args by adding config option -Dkubernetes.container-start-command-template="%java% %classpath% %jvmmem% %jvmopts% %logging% %class% %args%".
+
+## <span id="jump_application_mode"> Application Mode</span>
+Application mode allows users to create a single image containing their Job and the Flink runtime, which will automatically create and destroy cluster components as needed. The Flink community provides base docker images [customized](https://nightlies.apache.org/flink/flink-docs-release-1.11/ops/deployment/docker.html#customize-flink-image) for any use case.
+### <span id="jump_build_custom_flink_image">[First Time or Per BitSail JAR Executable Update] Build Custom Flink Image</span>
+
+Dockerfile example
+```dockerfile
+FROM flink:1.11.3-scala_2.11-java8
+ENV USERLIB=$FLINK_HOME/usrlib
+RUN mkdir -p $USERLIB
+COPY libs/ $USERLIB/
+```
+
+Path tree
+```
+.
+├── Dockerfile
+└── libs
+    ├── bitsail-core.jar
+    ├── clients/*
+    ├── connectors/*
+    └── engines/*
+```
+
+### <span id="jump_start_application">Start Application</span>
+```bash
+
+```
+
+### <span id="jump_stop_application">Stop Application</span>

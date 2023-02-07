@@ -44,7 +44,7 @@ EMBEDDED_FLINK_DIR=${BITSAIL_DIR}embedded/flink
 
 
 echo -e "\nStart running minikube environment. It may run in several miniutes at the first time to pull down minikube image in Docker'"
-minikube start
+# minikube start
 
 
 echo -e "\nChecking if current user can do everything on kubernetes pods."

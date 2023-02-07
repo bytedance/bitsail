@@ -114,14 +114,7 @@ public class FlinkEngineRunner implements EngineRunner {
   ProcessBuilder getRunProcBuilder(BitSailConfiguration jobConfiguration,
                                    BaseCommandArgs baseCommandArgs) throws IOException {
     FlinkRunCommandArgs flinkCommandArgs = new FlinkRunCommandArgs();
-    for (String option : baseCommandArgs.getUnknownOptions().clone()) {
-      LOG.info("!!! get " + option);
-    }
-
     CommandArgsParser.parseArguments(baseCommandArgs.getUnknownOptions(), flinkCommandArgs);
-    LOG.info("??? get Job CPU " + flinkCommandArgs.getKubernetesJobManagerCpu());
-    LOG.info("??? get Task CPU " + flinkCommandArgs.getKubernetesTaskManagerCpu());
-
     DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(flinkCommandArgs,
         jobConfiguration);
 

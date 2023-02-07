@@ -24,7 +24,9 @@ import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
 
 import java.util.List;
 
-import static com.bytedance.bitsail.entry.flink.command.FlinkKubernetesCommandArgs.*;
+import static com.bytedance.bitsail.entry.flink.command.FlinkKubernetesCommandArgs.KUBERNETES_CONTAINER_IMAGE;
+import static com.bytedance.bitsail.entry.flink.command.FlinkKubernetesCommandArgs.KUBERNETES_JOBMANAGER_CPU;
+import static com.bytedance.bitsail.entry.flink.command.FlinkKubernetesCommandArgs.KUBERNETES_TASKMANAGER_CPU;
 import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_KUBERNETES_APPLICATION;
 import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_KUBERNETES_SESSION;
 
