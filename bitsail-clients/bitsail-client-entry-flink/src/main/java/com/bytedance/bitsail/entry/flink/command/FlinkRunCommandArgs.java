@@ -28,6 +28,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FlinkRunCommandArgs implements CommandArgs {
+  public static final String KUBERNETES_CONTAINER_IMAGE = "kubernetes.container.image";
+  public static final String KUBERNETES_JOBMANAGER_CPU = "kubernetes.jobmanager.cpu";
+  public static final String KUBERNETES_TASKMANAGER_CPU = "kubernetes.taskmanager.cpu";
+
 
   @Parameter(names = "--execution-mode",
       required = true,
@@ -57,4 +61,14 @@ public class FlinkRunCommandArgs implements CommandArgs {
   @Parameter(names = "--jm-address",
       description = "Specify the job manager to use, eg: localhost:8081.")
   private String jobManagerAddress;
+  @SuppressWarnings("checkstyle:MagicNumber")
+  @Parameter(names = "--" + KUBERNETES_JOBMANAGER_CPU,
+          description = "The number (Double) of cpu used by job manager")
+  private double kubernetesJobManagerCpu = 0.5;
+
+  @SuppressWarnings("checkstyle:MagicNumber")
+  @Parameter(names = "--" + KUBERNETES_TASKMANAGER_CPU,
+          description = "The number (Double) of cpu used by task manager. By default, " +
+                  "the cpu is set to the number of slots per TaskManager")
+  private double kubernetesTaskManagerCpu = 0.5;
 }
