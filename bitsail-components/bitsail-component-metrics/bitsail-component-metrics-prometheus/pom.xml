@@ -72,6 +72,13 @@
             <artifactId>simpleclient_pushgateway</artifactId>
             <version>${prometheus.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
     </dependencies>
 
     <build>

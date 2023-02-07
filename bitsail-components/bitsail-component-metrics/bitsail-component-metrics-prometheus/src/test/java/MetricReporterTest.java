@@ -26,13 +26,16 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.SlidingWindowReservoir;
 import com.codahale.metrics.Timer;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.utility.DockerImageName;
+import testcontainer.PushGatewayContainer;
 
 public class MetricReporterTest {
-
   private final Gauge<Integer> mockedGauge = Mockito.spy(new TestGauge());
   private final Counter mockedCounter = Mockito.spy(new Counter());
   private final Histogram mockedHistogram = Mockito.spy(new Histogram(new SlidingWindowReservoir(10)));
@@ -41,9 +44,15 @@ public class MetricReporterTest {
 
   private AbstractPrometheusReporter reporter;
   private BitSailMetricManager metricManager;
+  private PushGatewayContainer pushGatewayContainer;
+  private static final DockerImageName PUSH_GATEWAY_DOCKER_IMAGE = DockerImageName.parse("prom/pushgateway:latest");
 
   @Before
-  public void init() {
+  public void init() throws Exception {
+    pushGatewayContainer = new PushGatewayContainer(PUSH_GATEWAY_DOCKER_IMAGE);
+    pushGatewayContainer.start();
+    pushGatewayContainer.waitingFor(Wait.defaultWaitStrategy());
+
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
     jobConf.set(CommonOptions.JOB_ID, -1L);
     jobConf.set(CommonOptions.METRICS_REPORTER_TYPE, "nop");
@@ -57,6 +66,11 @@ public class MetricReporterTest {
     reporter.notifyOfAddedMetric(mockedHistogram, "histogram", metricManager);
     reporter.notifyOfAddedMetric(mockedMeter, "meter", metricManager);
     reporter.notifyOfAddedMetric(mockedTimer, "timer", metricManager);
+  }
+
+  @After
+  public void close() throws Exception {
+    pushGatewayContainer.close();
   }
 
   @Test
