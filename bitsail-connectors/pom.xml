@@ -46,6 +46,8 @@
         <module>connector-druid</module>
         <module>connector-assert</module>
         <module>connector-selectdb</module>
+        <module>connector-localfilesystem</module>
+        <module>connector-larksheet</module>
     </modules>
 
     <dependencyManagement>
