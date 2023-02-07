@@ -134,7 +134,7 @@ appender.console.layout.pattern = %d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m
 
 
 echo -e "\nStart running bitsail command line on job '${CONF_PATH}':"
-cd ${BITSAIL_DIR}
+cd ${BITSAIL_DIR} || exit
 ./bin/bitsail run \
    --engine flink \
    -t kubernetes-application \
@@ -144,7 +144,7 @@ cd ${BITSAIL_DIR}
    --kubernetes.container.image ${BITSAIL_IMAGE_REPOSITORY}:${BITSAIL_IMAGE_TAG} \
    --kubernetes.jobmanager.cpu 0.25 \
    --kubernetes.taskmanager.cpu 0.5
-cd ${ABSOLUTE_PATH}
+cd ${ABSOLUTE_PATH} || exit
 
 
 echo -e "\nRevert log4j.properties change"
