@@ -38,7 +38,6 @@ import com.bytedance.bitsail.conversion.hive.option.HiveConversionOptions;
 
 import com.bytedance.bitsail.shaded.hive.client.HiveMetaClientUtil;
 
-import com.google.common.collect.Lists;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
