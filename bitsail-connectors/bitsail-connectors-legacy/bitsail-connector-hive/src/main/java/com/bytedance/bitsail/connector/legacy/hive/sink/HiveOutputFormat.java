@@ -162,12 +162,6 @@ public class HiveOutputFormat<E extends Row> extends FileOutputFormatPlugin<E> {
         HiveWritableExtractorType.valueOf(outputSliceConfig.get(HiveConversionOptions.WRITABLE_EXTRACTOR_TYPE).toUpperCase());
     partition = outputSliceConfig.getNecessaryOption(HiveWriterOptions.PARTITION, HiveParqueFormatErrorCode.REQUIRED_VALUE);
 
-    if (outputSliceConfig.fieldExists(HiveWriterOptions.COLUMNS)) {
-      columns = outputSliceConfig.getNecessaryOption(
-          HiveWriterOptions.COLUMNS, FrameworkErrorCode.REQUIRED_VALUE);
-      LOG.info("Use columns from configuration: {}.", columns);
-    }
-
     boolean dateTypeToStringAsLong = outputSliceConfig.get(HiveWriterOptions.DATE_TO_STRING_AS_LONG);
 
     boolean nullStringAsNull = outputSliceConfig.get(HiveConversionOptions.NULL_STRING_AS_NULL);
@@ -403,7 +397,11 @@ public class HiveOutputFormat<E extends Row> extends FileOutputFormatPlugin<E> {
       hiveSerdeParameter = HiveMetaClientUtil.getSerdeParameters(hiveConf, db, table);
       columnMapping = HiveMetaClientUtil.getColumnMapping(hiveTableSchema);
       LOG.info("fetch column mapping from hive metastore:\n {}", columnMapping);
-      if (Objects.isNull(columns)) {
+      if (outputSliceConfig.fieldExists(HiveWriterOptions.COLUMNS)) {
+        columns = outputSliceConfig.getNecessaryOption(
+            HiveWriterOptions.COLUMNS, FrameworkErrorCode.REQUIRED_VALUE);
+        LOG.info("Use columns from configuration: {}.", columns);
+      } else {
         columns = Lists.newArrayList();
         String[] fieldNames = hiveTableSchema.getFirst().split(",");
         String[] fieldTypes = hiveTableSchema.getSecond().split(":");
