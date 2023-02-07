@@ -145,7 +145,7 @@ public class DelegateFlinkSourceSplitEnumerator<SplitT extends SourceSplit,
       return;
     }
     throw BitSailException.asBitSailException(CommonErrorCode.RUNTIME_ERROR,
-        "Source event in not instanceof delegate source event, it's always runtime bug.");
+         "Source event in not instanceof delegate source event, it's always runtime bug.");
   }
 
   @Override

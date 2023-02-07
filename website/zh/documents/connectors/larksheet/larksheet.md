@@ -1,4 +1,4 @@
-# LarkSheet(飞书表格)连接器
+# LarkSheet(飞书表格) 连接器
 
 上级文档：[连接器](../README.md)
 
@@ -24,7 +24,6 @@
 ### 支持数据类型
 
 飞书表格连接器以 `string` 格式读取所有数据。
-
 
 ### 参数
 
@@ -53,14 +52,13 @@
 
 #### 必需参数
 
-| 参数名称                  | 是否必须 | 参数枚举值 | 参数描述                                                                                                    |
-|:-----------------------------|:---------|:---------------|:---------------------------------------------------------------------------------------------------------------|
-| class                        | 是      |                | 飞书表格读连接器名, `com.bytedance.bitsail.connector.legacy.larksheet.source.LarkSheetInputFormat` |
-|sheet_urls | 是 |  | 要读取的飞书表格列表。多个列表链接用英文逗号分隔| 
-| columns | 是 | | 描述字段名称和字段类型。字段名称与飞书表格中的header相关（header即为第一行）。|
+| 参数名称       | 是否必须 | 参数枚举值 | 参数描述                                                                                      |
+|:-----------|:-----|:------|:------------------------------------------------------------------------------------------|
+| class      | 是    |       | 飞书表格读连接器名, `com.bytedance.bitsail.connector.legacy.larksheet.source.LarkSheetInputFormat` |
+| sheet_urls | 是    |       | 要读取的飞书表格列表。多个表格链接用英文逗号分隔。                                                                 | 
+| columns    | 是    |       | 描述字段名称和字段类型。字段名称与飞书表格中的header相关（header即为第一行）。                                             |
 
-下面的参数用于鉴权，用户至少需要设置 (`sheet_token`) 或者 (`app_id` and `app_secret`)其中一个。
-
+下面的参数用于鉴权，用户至少需要设置 (`sheet_token`) 或者 (`app_id` and `app_secret`)其中一种。                                        |
 
 <table>
     <tr>
@@ -71,14 +69,14 @@
     </tr>
     <tr>
         <td>sheet_token</td>
-        <td rowspan="3">至少设置下述一项:<br/>1. `sheet_token`<br/>2. `app_id` and `app_secret`</td>
+        <td rowspan="3">至少设置下述一项:<br/>1. sheet_token<br/> 2. app_id 和 app_secret</td>
         <td></td>
         <td>用于<a href="https://open.feishu.cn/document/ukTMukTMukTM/ugTMzUjL4EzM14COxMTN">飞书 open api</a>鉴权的token.</td>
     </tr>
     <tr>
         <td>app_id</td>
         <td></td>
-        <td rowspan="2">使用`app_id` 和 `app_secret` 来生成用于<a href="https://open.feishu.cn/document/ukTMukTMukTM/ugTMzUjL4EzM14COxMTN">飞书 open api</a>鉴权的token.</td>
+        <td rowspan="2">使用 app_id 和 app_secret 来生成用于<a href="https://open.feishu.cn/document/ukTMukTMukTM/ugTMzUjL4EzM14COxMTN">飞书 open api</a>鉴权的token.</td>
     </tr>
     <tr>
         <td>app_secret</td>
@@ -92,11 +90,11 @@
 
 #### 可选参数
 
-| 参数名称                  | 是否必须 | 参数枚举值 | 参数描述                                                                                                    |
-|:-----------------------------|:---------|:---------------|:---------------------------------------------------------------------------------------------------------------|
-| reader_parallelism_num | 否       |                | 读并发                                               |
-| batch_size | 否 | | 从open api一次拉取的数据行数|
-|skip_nums| 否 | | 对于每个表格可指定跳过开头的行数。用list表示|
+| 参数名称                   | 是否必须 | 参数枚举值 | 参数描述                     |
+|:-----------------------|:-----|:------|:-------------------------|
+| reader_parallelism_num | 否    |       | 读并发                      |
+| batch_size             | 否    |       | 从open api一次拉取的数据行数       |
+| skip_nums              | 否    |       | 对于每个表格可指定跳过开头的行数。用list表示 |
 
 ## 相关文档
 

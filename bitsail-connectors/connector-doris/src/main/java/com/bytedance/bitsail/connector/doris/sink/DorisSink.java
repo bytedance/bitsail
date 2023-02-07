@@ -123,7 +123,6 @@ public class DorisSink<InputT> implements Sink<InputT, DorisCommittable, DorisWr
         .fieldDelimiter(writerConfiguration.get(DorisWriterOptions.CSV_FIELD_DELIMITER))
         .lineDelimiter(writerConfiguration.get(DorisWriterOptions.CSV_LINE_DELIMITER))
         .tableHasPartitions(writerConfiguration.get(DorisWriterOptions.TABLE_HAS_PARTITION))
-        .tableModel(DorisOptions.TableModel.valueOf(writerConfiguration.get(DorisWriterOptions.TABLE_MODEL).toUpperCase().trim()))
         .loadDataFormat(DorisOptions.LOAD_CONTENT_TYPE.valueOf(writerConfiguration.get(DorisWriterOptions.LOAD_CONTEND_TYPE).toUpperCase()));
 
     if (this.writeMode.name().startsWith("STREAM")) {

@@ -75,7 +75,6 @@
 | table_name| 是 | | 要写入的doris表 |
 | partitions | 分区表必需 | | 要写入的分区 |
 | table_has_partition | 非分区表必需 | | 非分区表填写true |
-| table_model | 是 | UNIQUE | 要写入表的模型,目前仅支持unique表写入 | 
 
 
 <!--AGGREGATE<br/>DUPLICATE-->

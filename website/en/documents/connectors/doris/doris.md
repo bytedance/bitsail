@@ -74,7 +74,6 @@ The following mentioned parameters should be added to `job.writer` block when us
 | table_name          | yes  |  | table to write |
 | partitions          | Yes if target table has partition | | target partition to write |
 | table_has_partition | Yes if target table does not have partition | | True if target table does not have partition  |
-| table_model         | yes  | UNIQUE | Table model of target table. Currently only support unique table. | 
 
 <!--AGGREGATE<br/>DUPLICATE-->
 

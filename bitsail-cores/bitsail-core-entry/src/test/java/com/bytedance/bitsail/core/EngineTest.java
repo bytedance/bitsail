@@ -16,7 +16,14 @@
 
 package com.bytedance.bitsail.core;
 
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
+import com.bytedance.bitsail.core.program.FakeProgram;
+
+import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -26,6 +33,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class EngineTest {
+  private static final Logger LOG = LoggerFactory.getLogger(EngineTest.class);
+
   @Test
   public void testBase64ArgsToConfig() {
     String jobConf = "{\n" +
@@ -48,5 +57,28 @@ public class EngineTest {
         });
     assertTrue(engine.getConfiguration().fieldExists("key"));
     assertFalse(engine.getConfiguration().fieldExists("key1"));
+  }
+
+  @Test
+  public void testRunEngine() {
+    BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
+    jobConf.set(CommonOptions.JOB_ID, 123L);
+    jobConf.set(CommonOptions.USER_NAME, "test_user");
+    jobConf.set(CommonOptions.PLUGIN_FINDER_NAME, new FakePluginFinder().getComponentName());
+    String base64JobConf = Base64.getEncoder().encodeToString(jobConf.toString().getBytes());
+
+    Throwable caught = null;
+    try {
+      Engine.main(new String[] {
+          "-xjob_conf_in_base64", base64JobConf,
+          "--engine", new FakeProgram().getComponentName()
+      });
+    } catch (Throwable t) {
+      caught = t;
+      LOG.error("Catch throwable when run ening.", t);
+      t.printStackTrace();
+    }
+
+    Assert.assertNull(caught);
   }
 }

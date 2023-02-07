@@ -56,10 +56,6 @@ public interface DorisWriterOptions extends WriterOptions.BaseWriterOptions {
       key(WRITER_PREFIX + "table_name")
           .noDefaultValue(String.class);
 
-  ConfigOption<String> TABLE_MODEL =
-      key(WRITER_PREFIX + "table_model")
-          .defaultValue("AGGREGATE");
-
   ConfigOption<Boolean> TABLE_HAS_PARTITION =
       key(WRITER_PREFIX + "table_has_partition")
           .defaultValue(true);
