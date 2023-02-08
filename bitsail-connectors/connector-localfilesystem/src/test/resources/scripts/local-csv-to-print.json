@@ -1,0 +1,41 @@
+{
+  "job": {
+    "common": {
+      "job_id": -255,
+      "instance_id": -2035,
+      "job_name": "bitsail_local_csv_to_print_test",
+      "user_name": "test"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.localfilesystem.source.LocalFileSystemSource",
+      "file_path": "src/test/resources/data/csv/test.csv",
+      "content_type": "csv",
+      "columns": [
+        {
+          "name": "id",
+          "type": "long"
+        },
+        {
+          "name": "date",
+          "type": "date"
+        },
+        {
+          "name": "localdatetime_value",
+          "type": "timestamp"
+        },
+        {
+          "name": "last_name",
+          "type": "string"
+        },
+        {
+          "name": "bool_value",
+          "type": "boolean"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink",
+      "writer_parallelism_num": 2
+    }
+  }
+}

@@ -134,3 +134,11 @@ dir:
 27. **How do incremental updates work?**
 
 > There is a set of CDC mechanism in Byte, which sends all the full data and incremental data into the Message Queue, and the BitSail engine directly connects to the Message Queue to combine the full data and the incremental data.
+
+28. **How to deploy bitsail in hive2.x or hive3.x?**
+
+> BitSail uses a shaded module, namely bitsail-shaded-hive, to import hive dependencies.
+> By default, BitSail uses **3.1.0** as hive version.
+> Therefore, if you want to deploy BitSail in different hive environment, you can modify the `hive.version` property in [bitsail-shaded-hive](https://github.com/bytedance/bitsail/blob/master/bitsail-shade/bitsail-shaded-hive/pom.xml).
+> 
+> ![](../../../images/change-hive-version.png)

@@ -23,6 +23,7 @@ dir:
 - [Kafka connector](kafka/kafka.md)
 - [Kudu connector](kudu/kudu.md)
 - [LarkSheet connector](larksheet/larksheet.md)
+- [LarkSheet-v1 connector](larksheet/v1/larksheet-v1.md)
 - [MongoDB connector](mongodb/mongodb.md)
 - [Redis connector](redis/redis.md)
 - [Redis-v1 connector](redis/v1/redis-v1.md)
@@ -30,3 +31,4 @@ dir:
 - [StreamingFile(HDFS streaming) connector](streamingfile/streamingfile.md)
 - [Fake connector](fake/fake.md)
 - [Print connector](print/print.md)
+- [SelectDB connector](selectdb/selectdb.md)
