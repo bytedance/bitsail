@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.bytedance.bitsail.connector.elasticsearch.source.split;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplit;
