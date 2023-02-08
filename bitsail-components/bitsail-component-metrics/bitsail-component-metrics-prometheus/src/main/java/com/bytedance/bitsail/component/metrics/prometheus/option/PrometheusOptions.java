@@ -21,7 +21,7 @@ import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.ConfigOptions;
 
 public interface PrometheusOptions extends CommonOptions {
-  String PROMETHEUS_PREFIX = CommonOptions.COMMON_PREFIX + "metric-prometheus-";
+  String PROMETHEUS_PREFIX = CommonOptions.COMMON_PREFIX + "metric.prometheus_";
 
   /**
    * Prometheus port

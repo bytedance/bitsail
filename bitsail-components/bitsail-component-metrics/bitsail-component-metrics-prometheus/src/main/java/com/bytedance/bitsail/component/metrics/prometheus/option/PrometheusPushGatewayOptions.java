@@ -21,7 +21,7 @@ import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.ConfigOptions;
 
 public interface PrometheusPushGatewayOptions extends CommonOptions {
-  String PUSHGATEWAY_PREFIX = CommonOptions.COMMON_PREFIX + "metric-pushgateway-";
+  String PUSHGATEWAY_PREFIX = CommonOptions.COMMON_PREFIX + "metric.pushgateway_";
 
   ConfigOption<String> PUSHGATEWAY_HOST_NAME =
       ConfigOptions.key(PUSHGATEWAY_PREFIX + "host")
@@ -32,15 +32,15 @@ public interface PrometheusPushGatewayOptions extends CommonOptions {
           .defaultValue(9091);
 
   ConfigOption<Integer> PUSHGATEWAY_HTTPS_PORT =
-      ConfigOptions.key(PUSHGATEWAY_PREFIX + "https-port")
+      ConfigOptions.key(PUSHGATEWAY_PREFIX + "https_port")
           .defaultValue(443);
 
   ConfigOption<Integer> PUSHGATEWAY_REPORT_PERIOD_IN_SECONDS =
-      ConfigOptions.key(PUSHGATEWAY_PREFIX + "report-period-seconds")
+      ConfigOptions.key(PUSHGATEWAY_PREFIX + "report_period_seconds")
           .defaultValue(1);
 
   ConfigOption<Boolean> PUSHGATEWAY_DELETE_ON_SHUTDOWN_ENABLE =
-      ConfigOptions.key(PUSHGATEWAY_PREFIX + "delete-on-shutdown")
+      ConfigOptions.key(PUSHGATEWAY_PREFIX + "delete_on_shutdown")
           .defaultValue(true);
 
   ConfigOption<String> PUSHGATEWAY_JOBNAME =
@@ -48,6 +48,6 @@ public interface PrometheusPushGatewayOptions extends CommonOptions {
           .noDefaultValue(String.class);
 
   ConfigOption<String> PUSHGATEWAY_DEFAULT_JOBNAME_SUFFIX =
-      ConfigOptions.key(PUSHGATEWAY_PREFIX + "default-jobName-suffix")
+      ConfigOptions.key(PUSHGATEWAY_PREFIX + "default_jobName_suffix")
           .defaultValue("_metric");
 }
