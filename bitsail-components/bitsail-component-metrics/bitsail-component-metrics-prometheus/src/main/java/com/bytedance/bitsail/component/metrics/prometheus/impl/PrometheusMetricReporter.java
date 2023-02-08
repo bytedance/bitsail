@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class PrometheusMetricReporter extends AbstractPrometheusReporter {
   private DropwizardExports metricExports;
   @Override
   public void open(BitSailConfiguration configuration) {
-    int serverPort = configuration.get(PrometheusOptions.PROMETHEUS_PORT_NUM);
+    int serverPort = configuration.get(PrometheusOptions.PROMETHEUS_PORT);
     metricExports = new DropwizardExports(metricRegistry);
     metricExports.register(defaultRegistry);
     try {

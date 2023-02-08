@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.component.metrics.prometheus.AbstractPrometheusReporter;
-import com.bytedance.bitsail.component.metrics.prometheus.constant.PrometheusConstants;
 import com.bytedance.bitsail.component.metrics.prometheus.error.PrometheusPushGatewayErrorCode;
 import com.bytedance.bitsail.component.metrics.prometheus.option.PrometheusPushGatewayOptions;
 
@@ -43,21 +42,24 @@ public class PrometheusPushGatewayReporter extends AbstractPrometheusReporter im
   private PushGateway pushGateway;
   private String jobName;
   private boolean deleteOnShutdown;
-  DropwizardExports dropwizardExports;
-  Map<String, String> groupingKey;
+  private DropwizardExports dropwizardExports;
+  private Map<String, String> groupingKey;
+  private int httpsPort;
 
   @Override
   public void open(BitSailConfiguration configuration) {
     String serverHost = configuration.get(PrometheusPushGatewayOptions.PUSHGATEWAY_HOST_NAME);
-    int serverPort = configuration.get(PrometheusPushGatewayOptions.PUSHGATEWAY_PORT_NUM);
+    int serverPort = configuration.get(PrometheusPushGatewayOptions.PUSHGATEWAY_PORT);
     periodSeconds = configuration.get(PrometheusPushGatewayOptions.PUSHGATEWAY_REPORT_PERIOD_IN_SECONDS);
 
     deleteOnShutdown = configuration.get(PrometheusPushGatewayOptions.PUSHGATEWAY_DELETE_ON_SHUTDOWN_ENABLE);
     if (configuration.fieldExists(PrometheusPushGatewayOptions.PUSHGATEWAY_JOBNAME)) {
       jobName = configuration.get(PrometheusPushGatewayOptions.PUSHGATEWAY_JOBNAME);
     } else {
-      jobName = configuration.get(CommonOptions.JOB_NAME) + PrometheusConstants.jobNameSuffix;
+      jobName = configuration.get(CommonOptions.JOB_NAME) +
+          configuration.get(PrometheusPushGatewayOptions.PUSHGATEWAY_DEFAULT_JOBNAME_SUFFIX);
     }
+    httpsPort = configuration.get(PrometheusPushGatewayOptions.PUSHGATEWAY_HTTPS_PORT);
     pushGateway = createPushGatewayClient(serverHost, serverPort);
     dropwizardExports = new DropwizardExports(metricRegistry);
     dropwizardExports.register(defaultRegistry);
@@ -67,7 +69,7 @@ public class PrometheusPushGatewayReporter extends AbstractPrometheusReporter im
   }
 
   private PushGateway createPushGatewayClient(String serverHost, int serverPort) {
-    if (serverPort == PrometheusConstants.HTTPS_SERVER_PORT) {
+    if (serverPort == httpsPort) {
       try {
         return new PushGateway(new URL("https://" + serverHost + ":" + serverPort));
       } catch (MalformedURLException e) {

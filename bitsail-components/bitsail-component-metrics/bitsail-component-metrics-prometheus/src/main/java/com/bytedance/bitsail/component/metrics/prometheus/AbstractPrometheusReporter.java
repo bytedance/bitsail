@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,8 @@ public abstract class AbstractPrometheusReporter implements MetricReporter {
   @VisibleForTesting
   public String validateMetricName(final String metricName) {
     // refer to https://prometheus.io/docs/instrumenting/writing_exporters/
-    // Only [a-zA-Z0-9:_] are valid in metric names, any other characters should be sanitized to an underscore.
+    // Only [a-zA-Z0-9:_] are valid in prometheus metric names,
+    // any other characters should be sanitized to an underscore.
     Matcher matcher = UNALLOWED_CHAR_PATTERN.matcher(metricName);
     if (matcher.find()) {
       String validMetricName = matcher.replaceAll("_");

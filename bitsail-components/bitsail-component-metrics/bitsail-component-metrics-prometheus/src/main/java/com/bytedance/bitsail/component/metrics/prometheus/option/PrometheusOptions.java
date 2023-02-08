@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@ package com.bytedance.bitsail.component.metrics.prometheus.option;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.ConfigOptions;
-import com.bytedance.bitsail.common.option.WriterOptions;
 
-public interface PrometheusOptions extends WriterOptions.BaseWriterOptions {
-  String PROMETHEUS_PREFIX = CommonOptions.COMMON_PREFIX + "prometheus-";
+public interface PrometheusOptions extends CommonOptions {
+  String PROMETHEUS_PREFIX = CommonOptions.COMMON_PREFIX + "metric-prometheus-";
+
   /**
    * Prometheus port
    */
-  ConfigOption<Integer> PROMETHEUS_PORT_NUM =
+  ConfigOption<Integer> PROMETHEUS_PORT =
       ConfigOptions.key(PROMETHEUS_PREFIX + "port")
-          .defaultValue(51111);;
+          .defaultValue(9999);;
 }
