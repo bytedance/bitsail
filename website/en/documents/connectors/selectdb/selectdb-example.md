@@ -22,7 +22,7 @@ Target database and table:
 DDL statement is:
 
 ```sql
-CREATE TABLE `test_db.test_selectdb_table`
+CREATE TABLE `test_db`.`test_selectdb_table`
 (
     `id`             bigint(20) NULL,
     `bigint_type`    bigint(20) NULL,

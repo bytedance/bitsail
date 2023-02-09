@@ -102,6 +102,7 @@ public class DelegateFlinkCommitter<CommitT extends Serializable> extends Abstra
     super.initializeState(context);
 
     writerCommitter = sink.createCommitter().get();
+    writerCommitter.open();
     if (!isCheckpointingEnabled) {
       return;
     }

@@ -71,17 +71,15 @@ public class DorisCommitter implements WriterCommitter<DorisCommittable> {
   }
 
   @Override
+  public void open() {
+    httpClient = new HttpUtil().getHttpClient();
+  }
+
+  @Override
   public List<DorisCommittable> commit(List<DorisCommittable> committables) throws IOException {
     if (this.writeMode.equals(WRITE_MODE.BATCH_UPSERT) && executionOptions.isEnable2PC()) {
       for (DorisCommittable committable : committables) {
-        try {
-          // TODO add a open method init it
-          this.httpClient = new HttpUtil().getHttpClient();
-
-          commitTransaction(committable);
-        } finally {
-          close();
-        }
+        commitTransaction(committable);
       }
     } else if (this.writeMode.equals(WRITE_MODE.BATCH_REPLACE)) {
       replacePartOrTab(committables);
@@ -129,7 +127,9 @@ public class DorisCommitter implements WriterCommitter<DorisCommittable> {
   private void commitTransaction(DorisCommittable committable) throws IOException {
     int retry = 0;
     String hostPort = committable.getHostPort();
-    CloseableHttpResponse response = null;
+    int statusCode = -1;
+    String reasonPhrase = null;
+    String loadResult = null;
     while (retry++ <= maxRetry) {
       HttpPutBuilder putBuilder = new HttpPutBuilder();
       putBuilder.setUrl(String.format(COMMIT_PATTERN, hostPort, committable.getDb()))
@@ -139,36 +139,34 @@ public class DorisCommitter implements WriterCommitter<DorisCommittable> {
           .setEmptyEntity()
           .commit();
 
-      try {
-        response = httpClient.execute(putBuilder.build());
+      try (CloseableHttpResponse response = httpClient.execute(putBuilder.build())) {
+        statusCode = response.getStatusLine().getStatusCode();
+        reasonPhrase = response.getStatusLine().getReasonPhrase();
+        loadResult  = EntityUtils.toString(response.getEntity());
       } catch (IOException e) {
         LOG.error("commit transaction failed: ", e);
         hostPort = RestService.getBackend(dorisOptions, executionOptions, LOG);
         continue;
       }
-      if (response.getStatusLine().getStatusCode() == SC_OK) {
+      if (statusCode == SC_OK) {
         break;
       }
-      LOG.warn("commit failed with {}, reason {}", hostPort, response.getStatusLine().getReasonPhrase());
+      LOG.warn("commit failed with {}, reason {}", hostPort, reasonPhrase);
       hostPort = RestService.getBackend(dorisOptions, executionOptions, LOG);
     }
 
-    assert response != null;
-    if (response.getStatusLine().getStatusCode() != SC_OK) {
-      LOG.warn("stream load error, reason={}", response.getStatusLine().getReasonPhrase());
-      throw new BitSailException(DorisErrorCode.LOAD_FAILED, "stream load error: " + response.getStatusLine().getReasonPhrase());
+    if (statusCode != SC_OK) {
+      LOG.warn("stream load error, reason={}", reasonPhrase);
+      throw new BitSailException(DorisErrorCode.LOAD_FAILED, "stream load error: " + reasonPhrase);
     }
 
     ObjectMapper mapper = new ObjectMapper();
-    if (response.getEntity() != null) {
-      String loadResult = EntityUtils.toString(response.getEntity());
-      Map<String, String> res = mapper.readValue(loadResult, new TypeReference<HashMap<String, String>>() {
-      });
-      if (res.get("status").equals(FAIL) && !ResponseUtil.isCommitted(res.get("msg"))) {
-        throw new BitSailException(DorisErrorCode.COMMIT_FAILED, "Commit failed " + loadResult);
-      }
-      LOG.info("load result {}", loadResult);
+    Map<String, String> res = mapper.readValue(loadResult, new TypeReference<HashMap<String, String>>() {
+    });
+    if (res.get("status").equals(FAIL) && !ResponseUtil.isCommitted(res.get("msg"))) {
+      throw new BitSailException(DorisErrorCode.COMMIT_FAILED, "Commit failed " + loadResult);
     }
+    LOG.info("load result {}", loadResult);
   }
 
   public void close() throws IOException {

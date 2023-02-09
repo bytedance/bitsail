@@ -26,6 +26,11 @@ import java.util.List;
 public interface WriterCommitter<CommT> extends Serializable {
 
   /**
+   * open WriterCommitter for write
+   */
+  void open();
+
+  /**
    * Commit the in-progress actions.
    * Streaming mode: will invoke in notifyCheckpointComplete.
    * Batch mode: will invoke in task.

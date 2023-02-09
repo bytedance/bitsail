@@ -28,6 +28,11 @@ public class PrintWriterCommitter implements WriterCommitter<String> {
   private static Logger LOG = LoggerFactory.getLogger(PrintWriterCommitter.class);
 
   @Override
+  public void open() {
+
+  }
+
+  @Override
   public List<String> commit(List<String> committables) {
     committables.forEach(LOG::info);
     return Collections.emptyList();

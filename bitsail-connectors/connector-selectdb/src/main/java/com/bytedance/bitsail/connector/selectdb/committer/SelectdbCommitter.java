@@ -43,7 +43,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.bytedance.bitsail.connector.selectdb.sink.uploadload.LoadStatus.FAIL;
 import static com.bytedance.bitsail.connector.selectdb.sink.uploadload.LoadStatus.SUCCESS;
@@ -64,16 +63,14 @@ public class SelectdbCommitter implements WriterCommitter<SelectdbCommittable> {
   }
 
   @Override
+  public void open() {
+    this.httpClient = new HttpUtil().getHttpClient();
+  }
+
+  @Override
   public List<SelectdbCommittable> commit(List<SelectdbCommittable> committables) throws IOException {
     for (SelectdbCommittable committable : committables) {
-      try {
-        // TODO add a open method init it
-        this.httpClient = new HttpUtil().getHttpClient();
-
-        commitTransaction(committable);
-      } finally {
-        close();
-      }
+      commitTransaction(committable);
     }
     return Collections.emptyList();
   }
@@ -86,7 +83,6 @@ public class SelectdbCommitter implements WriterCommitter<SelectdbCommittable> {
     LOG.info("commit to cluster {} with copy sql: {}", clusterName, copySQL);
 
     int retry = 0;
-    CloseableHttpResponse response = null;
     String loadResult = "";
     boolean success = false;
     String reasonPhrase = null;
@@ -98,17 +94,16 @@ public class SelectdbCommitter implements WriterCommitter<SelectdbCommittable> {
           .baseAuth(selectdbOptions.getUsername(), selectdbOptions.getPassword())
           .setEntity(new StringEntity(getHttpEntity(clusterName, copySQL)));
 
-      try {
-        response = httpClient.execute(postBuilder.build());
+      try (CloseableHttpResponse response = httpClient.execute(postBuilder.build())) {
+        statusCode = response.getStatusLine().getStatusCode();
+        reasonPhrase = response.getStatusLine().getReasonPhrase();
+        loadResult = EntityUtils.toString(response.getEntity());
       } catch (IOException e) {
         LOG.error("commit error : ", e);
         continue;
       }
-      statusCode = response.getStatusLine().getStatusCode();
-      reasonPhrase = response.getStatusLine().getReasonPhrase();
 
-      if (response.getStatusLine().getStatusCode() == SC_OK && Objects.nonNull(response.getEntity())) {
-        loadResult = EntityUtils.toString(response.getEntity());
+      if (statusCode == SC_OK) {
         success = handleCommitResponse(loadResult);
         if (success) {
           LOG.info("commit success cost {}ms, response is {}", System.currentTimeMillis() - start, loadResult);

@@ -30,6 +30,11 @@ public class AssertWriterCommitter implements WriterCommitter<String> {
   private static final Logger LOG = LoggerFactory.getLogger(AssertWriterCommitter.class);
 
   @Override
+  public void open() {
+
+  }
+
+  @Override
   public List<String> commit(List<String> committables) throws IOException {
     return Collections.emptyList();
   }

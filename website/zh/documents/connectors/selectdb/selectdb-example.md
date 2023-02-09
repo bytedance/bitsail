@@ -22,7 +22,7 @@
 该表的建表语句为:
 
 ```sql
-CREATE TABLE `test_db.test_selectdb_table`
+CREATE TABLE `test_db`.`test_selectdb_table`
 (
     `id`             bigint(20) NULL,
     `bigint_type`    bigint(20) NULL,
