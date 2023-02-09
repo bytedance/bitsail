@@ -50,6 +50,8 @@ import static com.bytedance.bitsail.common.typeinfo.TypeInfos.STRING_TYPE_INFO;
  */
 public class FlinkRowConvertSerializer implements RowSerializer<Row> {
 
+  private static final int VERSION = 1;
+
   private final List<ColumnInfo> columns;
 
   private final TypeInfo<?>[] typeInfos;
@@ -62,6 +64,11 @@ public class FlinkRowConvertSerializer implements RowSerializer<Row> {
     this.columns = columns;
     this.typeInfos = typeInfos;
     this.commonConfiguration = commonConfiguration;
+  }
+
+  @Override
+  public int getVersion() {
+    return VERSION;
   }
 
   @Override
@@ -130,8 +137,12 @@ public class FlinkRowConvertSerializer implements RowSerializer<Row> {
     return value.getClass().isAssignableFrom(typeInfo.getTypeClass());
   }
 
-  @Override
   public com.bytedance.bitsail.common.row.Row deserialize(Row serialized) throws IOException {
+    return deserialize(VERSION, serialized);
+  }
+
+  @Override
+  public com.bytedance.bitsail.common.row.Row deserialize(int version, Row serialized) throws IOException {
     int arity = serialized.getArity();
     Object[] fields = new Object[arity];
     for (int index = 0; index < arity; index++) {

@@ -24,7 +24,9 @@ import java.io.Serializable;
  */
 public interface Serializer<SerializeT, DeserializeT> extends Serializable {
 
+  int getVersion();
+
   DeserializeT serialize(SerializeT obj) throws IOException;
 
-  SerializeT deserialize(DeserializeT serialized) throws IOException;
+  SerializeT deserialize(int version, DeserializeT serialized) throws IOException;
 }

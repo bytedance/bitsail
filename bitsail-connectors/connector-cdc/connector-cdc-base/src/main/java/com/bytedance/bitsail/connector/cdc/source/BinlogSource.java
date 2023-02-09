@@ -24,7 +24,7 @@ import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.extension.ParallelismComputable;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
-import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
+import com.bytedance.bitsail.base.serializer.SimpleVersionedBinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
@@ -64,12 +64,12 @@ public abstract class BinlogSource implements Source<Row, BinlogSplit, BinlogOff
 
   @Override
   public BinarySerializer<BinlogSplit> getSplitSerializer() {
-    return new SimpleBinarySerializer<>();
+    return new SimpleVersionedBinarySerializer<>();
   }
 
   @Override
   public BinarySerializer<BinlogOffsetState> getSplitCoordinatorCheckpointSerializer() {
-    return new SimpleBinarySerializer<>();
+    return new SimpleVersionedBinarySerializer<>();
   }
 
   @Override

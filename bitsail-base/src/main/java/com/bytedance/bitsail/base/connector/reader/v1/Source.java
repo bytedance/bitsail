@@ -19,7 +19,7 @@ package com.bytedance.bitsail.base.connector.reader.v1;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
-import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
+import com.bytedance.bitsail.base.serializer.SimpleVersionedBinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
@@ -54,14 +54,14 @@ public interface Source<T, SplitT extends SourceSplit, StateT extends Serializab
    * Get Split serializer for the framework,{@link SplitT}should implement from {@link  Serializable}
    */
   default BinarySerializer<SplitT> getSplitSerializer() {
-    return new SimpleBinarySerializer<>();
+    return new SimpleVersionedBinarySerializer<>();
   }
 
   /**
    * Get State serializer for the framework, {@link StateT}should implement from {@link  Serializable}
    */
   default BinarySerializer<StateT> getSplitCoordinatorCheckpointSerializer() {
-    return new SimpleBinarySerializer<>();
+    return new SimpleVersionedBinarySerializer<>();
   }
 
   /**

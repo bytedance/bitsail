@@ -20,7 +20,7 @@ import com.bytedance.bitsail.base.connector.writer.v1.Sink;
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.base.connector.writer.v1.WriterCommitter;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
-import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
+import com.bytedance.bitsail.base.serializer.SimpleVersionedBinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
@@ -83,7 +83,7 @@ public class SelectdbSink<InputT> implements Sink<InputT, SelectdbCommittable, S
 
   @Override
   public BinarySerializer<SelectdbWriterState> getWriteStateSerializer() {
-    return new SimpleBinarySerializer<SelectdbWriterState>();
+    return new SimpleVersionedBinarySerializer<SelectdbWriterState>();
   }
 
   private void initSelectdbOptions(BitSailConfiguration writerConfiguration) {

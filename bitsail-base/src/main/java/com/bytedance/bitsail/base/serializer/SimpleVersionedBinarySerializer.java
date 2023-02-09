@@ -25,7 +25,14 @@ import java.util.Objects;
 /**
  * Created 2022/6/14
  */
-public class SimpleBinarySerializer<T extends Serializable> implements BinarySerializer<T> {
+public class SimpleVersionedBinarySerializer<T extends Serializable> implements BinarySerializer<T> {
+
+  private static final int VERSION = 1;
+
+  @Override
+  public int getVersion() {
+    return VERSION;
+  }
 
   @Override
   public byte[] serialize(T obj) throws IOException {
@@ -36,10 +43,15 @@ public class SimpleBinarySerializer<T extends Serializable> implements BinarySer
   }
 
   @Override
-  public T deserialize(byte[] serialized) throws IOException {
+  public T deserialize(int version, byte[] serialized) throws IOException {
     if (Objects.isNull(serialized)) {
       return null;
     }
-    return SerializationUtils.deserialize(serialized);
+    switch (version) {
+      case 1:
+        return SerializationUtils.deserialize(serialized);
+      default:
+        throw new IOException("Invalid SimpleVersionedBinarySerializer version: " + version);
+    }
   }
 }
