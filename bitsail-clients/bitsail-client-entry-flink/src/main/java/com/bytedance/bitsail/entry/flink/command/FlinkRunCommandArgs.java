@@ -61,6 +61,11 @@ public class FlinkRunCommandArgs implements CommandArgs {
   @Parameter(names = "--jm-address",
       description = "Specify the job manager to use, eg: localhost:8081.")
   private String jobManagerAddress;
+
+  @Parameter(names = "--" + KUBERNETES_CONTAINER_IMAGE,
+          description = "The container image of kubernetes")
+  private String kubernetesContainerImage;
+
   @SuppressWarnings("checkstyle:MagicNumber")
   @Parameter(names = "--" + KUBERNETES_JOBMANAGER_CPU,
           description = "The number (Double) of cpu used by job manager")

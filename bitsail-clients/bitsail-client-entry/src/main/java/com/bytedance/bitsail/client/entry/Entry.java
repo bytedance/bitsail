@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URLClassLoader;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
@@ -121,8 +122,10 @@ public class Entry {
 
   private ProcessBuilder buildProcessBuilder(BitSailConfiguration sysConfiguration,
                                              BaseCommandArgs baseCommandArgs) throws IOException {
-    BitSailConfiguration jobConfiguration =
-        ConfigParser.fromRawConfPath(baseCommandArgs.getJobConf());
+    BitSailConfiguration jobConfiguration = StringUtils.isNotBlank(baseCommandArgs.getJobConf()) ?
+            ConfigParser.fromRawConfPath(baseCommandArgs.getJobConf()) :
+            BitSailConfiguration.from(
+                    new String(Base64.getDecoder().decode(baseCommandArgs.getJobConfInBase64())));
 
     String engineName = baseCommandArgs.getEngineName();
     LOG.info("Final engine: {}.", engineName);

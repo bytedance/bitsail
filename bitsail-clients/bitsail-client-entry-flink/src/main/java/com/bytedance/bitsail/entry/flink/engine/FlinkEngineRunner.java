@@ -21,7 +21,6 @@ import com.bytedance.bitsail.client.api.command.CommandAction;
 import com.bytedance.bitsail.client.api.command.CommandArgsParser;
 import com.bytedance.bitsail.client.api.engine.EngineRunner;
 import com.bytedance.bitsail.client.api.utils.PackageResolver;
-import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
 import com.bytedance.bitsail.entry.flink.configuration.FlinkRunnerConfigOptions;
@@ -37,7 +36,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -157,26 +155,24 @@ public class FlinkEngineRunner implements EngineRunner {
     }
 
     /**
-     * Customize path of BitSail JAR file and JobConf file for Kubernetes application mode, because Kubernetes
-     * application mode bundles BitSail JAR file and JobConf file together with the Flink image and runs the user
+     * Customize path of BitSail JAR file for Kubernetes application mode, because Kubernetes
+     * application mode bundles BitSail JAR file together with the custom image and runs the user
      * code's main() method on the cluster. Programmed path for
      * BitSail JAR: local:///opt/flink/usrlibs/bitsail-core.jar
-     * JobConf file: /opt/flink/usrconf/<JSON file>
      */
     if (DEPLOYMENT_KUBERNETES_APPLICATION.equalsIgnoreCase(flinkCommandArgs.getDeploymentMode())) {
-      final File jobConfFile = new File(baseCommandArgs.getJobConf());
-      if (!jobConfFile.exists()) {
-        throw new BitSailException(CONFIG_ERROR, baseCommandArgs.getJobConf() + "doesn't exist.");
-      }
       flinkCommands.add("local:///opt/flink/usrlibs/" + ENTRY_JAR_NAME);
-      flinkCommands.add("-xjob_conf");
-      flinkCommands.add("/opt/flink/usrconf/" + jobConfFile.getName());
     } else {
       flinkCommands.add(PackageResolver.getLibraryDir().resolve(ENTRY_JAR_NAME).toString());
+    }
+    if (StringUtils.isNotBlank(baseCommandArgs.getJobConf())) {
       flinkCommands.add("-xjob_conf");
       flinkCommands.add(baseCommandArgs.getJobConf());
     }
-
+    if (StringUtils.isNotBlank(baseCommandArgs.getJobConfInBase64())) {
+      flinkCommands.add("-xjob_conf_in_base64");
+      flinkCommands.add(baseCommandArgs.getJobConfInBase64());
+    }
     flinkProcBuilder.command(flinkCommands);
 
     FlinkSecurityHandler.processSecurity(sysConfiguration, flinkProcBuilder, flinkDir);

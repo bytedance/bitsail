@@ -26,8 +26,6 @@ import java.util.List;
 import static com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs.KUBERNETES_CONTAINER_IMAGE;
 import static com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs.KUBERNETES_JOBMANAGER_CPU;
 import static com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs.KUBERNETES_TASKMANAGER_CPU;
-import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_KUBERNETES_APPLICATION;
-import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_KUBERNETES_SESSION;
 
 /**
  * Created 2022/12/23
@@ -48,26 +46,12 @@ public class KubernetesDeploymentSupplier implements DeploymentSupplier {
     flinkCommands.add("-t");
     flinkCommands.add(deploymentMode);
 
-    baseCommandArgs.getProperties().put(KUBERNETES_CONTAINER_IMAGE, "bitsail-core:" + getDeploymentImageTag());
+    baseCommandArgs.getProperties().put(KUBERNETES_CONTAINER_IMAGE, flinkRunCommandArgs.getKubernetesContainerImage());
 
     baseCommandArgs.getProperties().put(KUBERNETES_JOBMANAGER_CPU,
             String.valueOf(flinkRunCommandArgs.getKubernetesJobManagerCpu()));
 
     baseCommandArgs.getProperties().put(KUBERNETES_TASKMANAGER_CPU,
             String.valueOf(flinkRunCommandArgs.getKubernetesTaskManagerCpu()));
-  }
-
-  private String getDeploymentImageTag() {
-    final String imageTag;
-    switch (deploymentMode) {
-      case DEPLOYMENT_KUBERNETES_SESSION:
-        imageTag = "sessionmode";
-        break;
-      case DEPLOYMENT_KUBERNETES_APPLICATION:
-      default:
-        imageTag = "appmode";
-        break;
-    }
-    return imageTag;
   }
 }

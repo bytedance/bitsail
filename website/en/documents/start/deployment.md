@@ -106,7 +106,7 @@ Parameter description
 ### <span id="jump_submit_example">Submit an example job</span>
 Submit a fake source to print sink test to yarn.
 ``` bash
-bash ./bin/bitsail run --engine flink --conf ~/bitsail-archive-0.1.0-SNAPSHOT/examples/Fake_Print_Example.json --execution-mode run -p 1=1  --deployment-mode yarn-per-job  --queue default
+bash ./bin/bitsail run --engine flink --conf ~/bitsail-archive-0.2.0-SNAPSHOT/examples/Fake_Print_Example.json --execution-mode run -p 1=1  --deployment-mode yarn-per-job  --queue default
 ```
 
 ### <span id="jump_log">Log for Debugging</span>
@@ -125,7 +125,7 @@ Suppose that BitSail install path is: `${BITSAIL_HOME}`.
 
 After building BitSail, we can enter the following path and find runnable jars and example job configuration files:
 ```shell
-cd ${BITSAIL_HOME}/bitsail-dist/target/bitsail-dist-0.1.0-SNAPSHOT-bin/bitsail-archive-0.1.0-SNAPSHOT/
+cd ${BITSAIL_HOME}/bitsail-dist/target/bitsail-dist-0.2.0-SNAPSHOT-bin/bitsail-archive-0.2.0-SNAPSHOT/
 ```
 
 ### Run Fake_to_Print example
@@ -186,7 +186,7 @@ Below is a step-by-step guide to help you effectively deploy it on native Kubern
 ## <span id="jump_prerequisites_k8s">Prerequisites</span>
 1. Kubernetes >= 1.9
 2. KubeConfig, which has access to list, create, delete pods and services, configurable via `~/.kube/config`. You can verify permissions by running `kubectl auth can-i <list|create|edit|delete> pods` 
-3. Enabled Kubernetes DNS
+3. Kubernetes DNS enabled
 
 If you have problems setting up a Kubernetes cluster, then take a look at [how to setup a Kubernetes cluster](https://kubernetes.io/docs/setup/).
 
@@ -204,23 +204,29 @@ $ kubectl create clusterrolebinding <self-defined-cluster-role-binding> --cluste
 
 ### <span id="jump_configure_enable_logs">Enable cluster logs</span>
 By default, the JobManager and TaskManager only store logs under `/opt/flink/log` in each pod. If you want to use `kubectl logs <PodName>` to view the logs, you must perform the following:
-1. Add a new appender to the `log4j.properties` in `${BITSAIL_HOME}/bitsail-dist/target`.
-2. Add the following ‘appenderRef’ the rootLogger in log4j.properties rootLogger.appenderRef.console.ref = ConsoleAppender.
-3. Remove the redirect args by adding config option -Dkubernetes.container-start-command-template="%java% %classpath% %jvmmem% %jvmopts% %logging% %class% %args%".
+1. Add a new appender to the `log4j.properties` in `${FLINK_HOME}/conf`.
+2. Add the following ‘appenderRef’ the rootLogger in `log4j.properties` `rootLogger.appenderRef.console.ref = ConsoleAppender`.
+```bash
+# Log all infos to the console
+appender.console.name = ConsoleAppender
+appender.console.type = CONSOLE
+appender.console.layout.type = PatternLayout
+appender.console.layout.pattern = %d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
+```
 
 ## <span id="jump_application_mode"> Application Mode</span>
 Application mode allows users to create a single image containing their Job and the Flink runtime, which will automatically create and destroy cluster components as needed. The Flink community provides base docker images [customized](https://nightlies.apache.org/flink/flink-docs-release-1.11/ops/deployment/docker.html#customize-flink-image) for any use case.
 ### <span id="jump_build_custom_flink_image">[First Time or Per BitSail JAR Executable Update] Build Custom Flink Image</span>
 
-Dockerfile example
+Build your `<CustomImage>` using below [`Dockerfile`](https://docs.docker.com/engine/reference/builder/):
 ```dockerfile
-FROM flink:1.11.3-scala_2.11-java8
-ENV USERLIB=$FLINK_HOME/usrlib
+FROM flink:1.11.6-scala_2.11-java8
+ENV USERLIB=/opt/flink/usrlib
 RUN mkdir -p $USERLIB
 COPY libs/ $USERLIB/
 ```
 
-Path tree
+Path tree:
 ```
 .
 ├── Dockerfile
@@ -230,10 +236,36 @@ Path tree
     ├── connectors/*
     └── engines/*
 ```
+The content of `libs` can be copied from `${BITSAIL_HOME}/bitsail-dist/target/bitsail-dist-0.2.0-SNAPSHOT-bin/bitsail-archive-0.2.0-SNAPSHOT/libs/`
+
+Publish your `<CustomImage>` onto Dockerhub so that Kubernetes cluster can download.
 
 ### <span id="jump_start_application">Start Application</span>
 ```bash
-
+bash ./bin/bitsail run \
+   --engine flink \
+   -t kubernetes-application \
+   --deployment-mode kubernetes-application \
+   --execution-mode run-application \
+   --kubernetes.container.image <CustomImage> \
+   --kubernetes.jobmanager.cpu 0.25 \
+   --kubernetes.taskmanager.cpu 0.5 \
+   --conf-in-base64 <base64 conf>
 ```
 
 ### <span id="jump_stop_application">Stop Application</span>
+```bash
+bash ./bin/bitsail run \
+   --engine flink \
+   -t kubernetes-application \
+   --deployment-mode kubernetes-application \
+   --execution-mode cancel
+```
+
+### <span id="jump_kubernetes_logs">Kubernetes Logs</span>
+There are three types of logs:
+1. BitSail client log: `${FLINK_HOME}/log/flink-xxx.log` on client end
+2. BitSail JobManager log: `/opt/flink/log/jobmanager.log` on Kubernetes JobManager pod
+3. BitSail TaskManager log: `/opt/flink/log/taskmanager.log` on Kubernetes TaskManager pod
+
+User can also dump JobManager/TaskManager logs on client end by 

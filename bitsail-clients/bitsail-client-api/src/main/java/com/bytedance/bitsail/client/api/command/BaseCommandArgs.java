@@ -46,6 +46,9 @@ public class BaseCommandArgs implements CommandArgs {
   @Parameter(names = {"--conf"})
   private String jobConf;
 
+  @Parameter(names = {"--conf-in-base64"})
+  private String jobConfInBase64;
+
   @Parameter(names = {"--enable-kerberos"})
   private boolean enableKerberos = false;
 
