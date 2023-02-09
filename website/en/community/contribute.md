@@ -80,7 +80,7 @@ When any document update is merged into master branch, a GitHub action is trigge
 
 The BitSail homepage is built through the [VuePress](https://vuepress-theme-hope.github.io/v2/) framework. After the markdown document is modified, you can try generating a test homepage through the following steps:
 
- 1. Install [yarn](https://yarnpkg.com/) (A JS package manager)
+1. Install [yarn](https://yarnpkg.com/) (A JS package manager)
 
 ```bash
 # install yarn
@@ -90,10 +90,11 @@ npm install -g yarn
 yarn --version
 ```
 
- 2. Generate test homepage locally
+2. Generate test homepage locally
+
 ```bash
-# install vuepress
-yarn add -D vuepress@next
+# install dependencies
+yarn install
 
 # generate homepage
 yarn docs:dev

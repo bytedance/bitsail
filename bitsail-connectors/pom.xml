@@ -49,6 +49,7 @@
         <module>connector-localfilesystem</module>
         <module>connector-larksheet</module>
         <module>connector-hbase</module>
+        <module>connector-cdc</module>
     </modules>
 
     <dependencyManagement>

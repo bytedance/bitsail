@@ -79,7 +79,7 @@ export const enFooter = `
       </div>
     </div>
     <div style="padding: 20px; color: white;">
-      Apache LICENSE 2.0 Licensed, Copyright 2018-2023 BitSail All Rights Reserved
+    Apache LICENSE 2.0 Licensed, Copyright 2022-2023 BitSail All Rights Reserved
     </div>
   </div>
 `;

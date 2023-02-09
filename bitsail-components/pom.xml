@@ -35,6 +35,7 @@
         <module>bitsail-component-formats-flink</module>
         <module>bitsail-component-security</module>
         <module>bitsail-component-formats</module>
+        <module>bitsail-component-metrics</module>
     </modules>
 
     <dependencies>

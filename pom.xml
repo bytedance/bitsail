@@ -51,6 +51,8 @@
         <maven.jacoco.plugin.version>0.8.1</maven.jacoco.plugin.version>
         <maven.flatten.plugin.version>1.2.7</maven.flatten.plugin.version>
         <maven.enforcer.plugin.version>3.0.0-M2</maven.enforcer.plugin.version>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.source.encoding>UTF-8</project.source.encoding>
         <project.build.source.encoding>UTF-8</project.build.source.encoding>
