@@ -19,6 +19,6 @@ package com.bytedance.bitsail.base.serializer;
 /**
  * Created 2022/6/21
  */
-public interface BinarySerializer<T> extends Serializer<T, byte[]> {
+public interface BinarySerializer<T> extends VersionedSerializer<T, byte[]> {
 
 }
