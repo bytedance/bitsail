@@ -1,3 +1,7 @@
+---
+order: 4
+---
+
 # BitSail实机演示
 
 [English](../../../en/documents/start/quick_guide.md) | 简体中文

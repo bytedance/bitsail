@@ -1,6 +1,10 @@
+---
+order: 4
+---
+
 # BitSail Release Guide
 
-English | [简体中文](../../../zh/documents/start/release_guide.md)
+English | [简体中文](../../zh/community/release_guide.md)
 
 -----
 
@@ -32,7 +36,7 @@ SOP to submit a new commit
 
 ## Procedure to release
 
-![img](website/images/documents/start/release_guide/release_procedure.png)
+![img](../../images/community/release_guide/release_procedure.png)
 
 ### 1. Decide to release
 
@@ -40,7 +44,7 @@ Because we don't have many users subscribed to the mailing list for now. Using G
 
 We could start a new discussion on Github with topics like
 
-0.1.0 Release Discussion
+`0.1.0` Release Discussion
 
 Deciding to release and selecting a Release Manager is the first step of the release process. This is a consensus-based decision of the entire community.
 
@@ -86,9 +90,9 @@ Once all issues have been resolved, you should go back and build a new release c
 
 Once the release candidate passes the voting, we could finalize the release.
 
-A. Change the release branch version from x.x.x-rc1 to x.x.x. e.g. 0.1.0-rc1 to 0.1.0
+A. Change the release branch version from `x.x.x-rc1` to `x.x.x`. e.g. `0.1.0-rc1` to `0.1.0`
 
-B. git commit -am "[MINOR] Update release version to reflect published version  ${RELEASE_VERSION}"
+B. `git commit -am "[MINOR] Update release version to reflect published version  ${RELEASE_VERSION}"`
 
 C. Push to the release branch
 
@@ -104,4 +108,4 @@ E. Create a new Github release, off the release version tag, you pushed before
 
 Flink release guide: [Creating a Flink Release](https://cwiki.apache.org/confluence/display/FLINK/Creating+a+Flink+Release)
 
-Hudi release guide: [Apache Hudi Release Guide](https://cwiki.apache.org/confluence/display/HUDI/Apache+Hudi+-+Release+Guide) 
+Hudi release guide: [Apache Hudi Release Guide](https://cwiki.apache.org/confluence/display/HUDI/Apache+Hudi+-+Release+Guide)

@@ -1,12 +1,16 @@
+---
+order: 8
+---
+
 # Source Connector Details
 
-English | [简体中文](../../../zh/documents/start/source_connector_detail.md)
+English | [简体中文](../../zh/community/source_connector_detail.md)
 
 -----
 
 ## Introduction
 
-![](../../../images/documents/start/connector_dev_guide/bitsail_model.png)
+![](../../images/community/connector_quick_start/bitsail_model.png)
 
 - Source: The life cycle management component of the data reading component is mainly responsible for interacting with the framework, structuring the job, and not participating in the actual execution of the job.
 - SourceSplit:  Source data split, the core purpose of the big data processing framework is to split large-scale data into multiple reasonable Splits
@@ -20,7 +24,7 @@ The life cycle management of the data reading component is mainly responsible fo
 
 Take RocketMQSource as an example: the Source method needs to implement the Source and ParallelismComputable interfaces.
 
-![](../../../images/documents/start/source_connector/source_diagram.png)
+![](../../images/community/source_connector/source_diagram.png)
 
 ### Source Interface
 
@@ -214,7 +218,7 @@ The role of this file is to analyze the `columns` in the `reader `part of the jo
 },
 ```
 
-![](../../../images/documents/start/source_connector/file_mapping_converter.png)
+![](../../images/community/source_connector/file_mapping_converter.png)
 
 This method is not only applicable to databases, but also applicable to all scenarios that require type mapping between the engine side and the BitSail side during type conversion.
 
@@ -269,7 +273,7 @@ Take Hadoop as an example:
 }
 ```
 
-![](../../../images/documents/start/source_connector/bitsail_converter.png)
+![](../../images/community/source_connector/bitsail_converter.png)
 
 #### createSourceReader method
 
@@ -372,7 +376,7 @@ public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConfigu
 
 The data fragmentation format of the data source requires us to implement the SourceSplit interface.
 
-![](../../../images/documents/start/source_connector/source_split_diagram.png)
+![](../../images/community/source_connector/source_split_diagram.png)
 
 ### SourceSplit Interface
 
@@ -630,7 +634,7 @@ public class EmptyState implements Serializable {
 
 The core purpose of the big data processing framework is to split large-scale data into multiple reasonable Splits, and the SplitCoordinator assumes the role of creating and managing Splits.
 
-![](../../../images/documents/start/source_connector/source_split_coordinator_diagram.png)
+![](../../images/community/source_connector/source_split_coordinator_diagram.png)
 
 ### SourceSplitCoordinator Interface
 
@@ -1031,7 +1035,7 @@ public void close() {
 
 Each SourceReader is executed in an independent thread. As long as we ensure that the slices assigned by SourceSplitCoordinator to different SourceReaders have no intersection, we can ignore any concurrency details during the execution cycle of SourceReader.
 
-![](../../../images/documents/start/source_connector/source_reader_diagram.png)
+![](../../images/community/source_connector/source_reader_diagram.png)
 
 ### SourceReader Interface
 
@@ -1364,7 +1368,7 @@ public class ClickhouseRowDeserializer {
 
 Compared with implementing `RowDeserializer`, we hope that you can implement an implementation class that inherits the `DeserializationSchema` interface, and convert data in a certain format, such as `JSON` and `CSV`, into `BitSail Row type`.
 
-![](../../../images/documents/start/source_connector/deserialization_schema_diagram.png)
+![](../../images/community/source_connector/deserialization_schema_diagram.png)
 
 In specific applications, we can use a unified interface to create corresponding implementation classes.
 

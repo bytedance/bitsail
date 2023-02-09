@@ -1,3 +1,7 @@
+---
+order: 1
+---
+
 # 部署指南
 
 [English](../../../en/documents/start/deployment.md) | 简体中文

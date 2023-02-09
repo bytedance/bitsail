@@ -1,28 +1,32 @@
+---
+order: 9
+---
+
 # Sink Connector Details
 
-[English](../../../en/documents/start/sink_connector_detail.md) | 简体中文
+English | [简体中文](../../zh/community/sink_connector_detail.md)
 
 -----
 
-## BitSail Sink Connector交互流程介绍
+## Introduction
 
-![](../../../images/documents/start/connector_dev_guide/sink_connector.png)
+![](../../images/community/connector_quick_start/sink_connector.png)
 
-- Sink：数据写入组件的生命周期管理，主要负责和框架的交互，构架作业，它不参与作业真正的执行。
-- Writer：负责将接收到的数据写到外部存储。
-- WriterCommitter(可选)：对数据进行提交操作，来完成两阶段提交的操作；实现exactly-once的语义。
+- Sink: life cycle management of data writing components, mainly responsible for interaction with the framework, framing jobs, it does not participate in the actual execution of jobs.
+- Writer: responsible for writing the received data to external storage.
+- WriterCommitter (optional): Commit the data to complete the two-phase commit operation; realize the semantics of exactly-once.
 
-开发者首先需要创建`Sink`类，实现`Sink`接口，主要负责数据写入组件的生命周期管理，构架作业。通过`configure`方法定义`writerConfiguration`的配置，通过`createTypeInfoConverter`方法来进行数据类型转换，将内部类型进行转换写到外部系统，同`Source`部分。之后我们再定义`Writer`类实现具体的数据写入逻辑，在`write`方法调用时将`BitSail Row`类型把数据写到缓存队列中，在`flush`方法调用时将缓存队列中的数据刷写到目标数据源中。
+Developers first need to create a `Sink` class and implement the `Sink interface`, which is mainly responsible for the life cycle management of the data writing component and the construction of the job. Define the configuration of `writerConfiguration` through the configure method, perform data type conversion through the `createTypeInfoConverter` method, and `write` the internal type conversion to the external system, the same as the `Source` part. Then we define the `Writer` class to implement the specific data writing logic. When the `write` method is called, the `BitSail Row` type writes the data into the cache queue, and when the `flush` method is called, the data in the cache queue is flushed to the target data source.
 
 ## Sink
 
-数据写入组件的生命周期管理，主要负责和框架的交互，构架作业，它不参与作业真正的执行。
+The life cycle management of the data writing component is mainly responsible for the interaction with the framework and the construction of the job. It does not participate in the actual execution of the job.
 
-对于每一个Sink任务，我们要实现一个继承Sink接口的类。
+For each Sink task, we need to implement a class that inherits the Sink interface.
 
-![](../../../images/documents/start/sink_connector/sink_diagram.png)
+![](../../images/community/sink_connector/sink_diagram.png)
 
-### Sink接口
+### Sink Interface
 
 ```Java
 public interface Sink<InputT, CommitT extends Serializable, WriterStateT extends Serializable> extends Serializable {
@@ -78,13 +82,13 @@ public interface Sink<InputT, CommitT extends Serializable, WriterStateT extends
 }
 ```
 
-### configure方法
+### configure method
 
-负责configuration的初始化，通过commonConfiguration中的配置区分流式任务或者批式任务，向Writer类传递writerConfiguration。
+Responsible for configuration initialization, usually extracting necessary configuration from commonConfiguration and writerConfiguration.
 
-#### 示例
+#### example
 
-ElasticsearchSink：
+ElasticsearchSink:
 
 ```Java
 public void configure(BitSailConfiguration commonConfiguration, BitSailConfiguration writerConfiguration) {
@@ -92,25 +96,32 @@ public void configure(BitSailConfiguration commonConfiguration, BitSailConfigura
 }
 ```
 
-### createWriter方法
+### createWriter method
 
-负责生成一个继承自Writer接口的connector Writer类。
+Responsible for generating a connector Writer class inherited from the Writer interface. Pass in construction configuration parameters as needed, and note that the passed in parameters must be serializable.
 
-### createTypeInfoConverter方法
+```Java
+@Override
+public Writer<Row, CommitT, EmptyState> createWriter(Writer.Context<EmptyState> context) {
+  return new RedisWriter<>(redisOptions, jedisPoolOptions);
+}
+```
 
-类型转换，将内部类型进行转换写到外部系统，同Source部分。
+### createTypeInfoConverter method
 
-### createCommitter方法
+Type conversion, convert the internal type and write it to the external system, same as the Source part.
 
-可选方法，书写具体数据提交逻辑，一般用于想要保证数据exactly-once语义的场景，writer在完成数据写入后，committer来完成提交，进而实现二阶段提交，详细可以参考Doris Connector的实现。
+### createCommitter method
+
+The optional method is to write the specific data submission logic, which is generally used in scenarios where the data exactly-once semantics needs to be guaranteed. After the writer completes the data writing, the committer completes the submission, and then realizes the two-phase submission. For details, please refer to the implementation of Doris Connector.
 
 ## Writer
 
-具体的数据写入逻辑
+specific data write logic
 
-![](../../../images/documents/start/sink_connector/writer_diagram.png)
+![](../../images/community/sink_connector/writer_diagram.png)
 
-### Writer接口
+### Writer Interface
 
 ```Java
 public interface Writer<InputT, CommT, WriterStateT> extends Serializable, Closeable {
@@ -170,11 +181,11 @@ public interface Writer<InputT, CommT, WriterStateT> extends Serializable, Close
 }
 ```
 
-### 构造方法
+### Construction method
 
-根据writerConfiguration配置初始化数据源的连接对象。
+Initialize the connection object of the data source according to the configuration, and establish a connection with the target data source.
 
-#### 示例
+#### example
 
 ```Java
 public RedisWriter(BitSailConfiguration writerConfiguration) {
@@ -237,13 +248,13 @@ public RedisWriter(BitSailConfiguration writerConfiguration) {
 }
 ```
 
-### write方法
+### write method
 
-该方法调用时会将BitSail Row类型把数据写到缓存队列中，也可以在这里对Row类型数据进行各种格式预处理。直接存储到缓存队列中，或者进行加工处理。如果这里设定了缓存队列的大小，那么在缓存队列写满后要调用flush进行刷写。
+When this method is called, the BitSail Row type data will be written to the cache queue, and various formats of Row type data can also be preprocessed here. If the size of the cache queue is set here, then flush is called after the cache queue is full.
 
-#### 示例
+#### example
 
-redis：将BitSail Row格式的数据直接存储到一定大小的缓存队列中
+redis：Store data in `BitSail Row` format directly in a cache queue of a certain size
 
 ```Java
 public void write(Row record) throws IOException {
@@ -255,7 +266,7 @@ public void write(Row record) throws IOException {
 }
 ```
 
-Druid：将BitSail Row格式的数据做格式预处理，转化到StringBuffer中储存起来。
+Druid：Preprocess the data in `BitSail Row` format and convert it into `StringBuffer` for storage.
 
 ```Java
 @Override
@@ -275,13 +286,13 @@ public void write(final Row element) {
 }
 ```
 
-### flush方法
+### flush method
 
-该方法中主要实现将write方法的缓存中的数据刷写到目标数据源中。
+This method mainly implements flushing the data in the cache of the `write` method to the target data source.
 
-#### 示例
+#### example
 
-redis：将缓存队列中的BitSail Row格式的数据刷写到目标数据源中。
+redis: flush the BitSail Row format data in the cache queue to the target data source.
 
 ```Java
 public void flush(boolean endOfInput) throws IOException {
@@ -339,7 +350,7 @@ public void flush(boolean endOfInput) throws IOException {
 }
 ```
 
-Druid：使用HTTP post方式提交sink作业给数据源。
+Druid: Submit the sink job to the data source using HTTP post.
 
 ```Java
 private HttpURLConnection provideHttpURLConnection(final String coordinatorURL) throws IOException {
@@ -372,11 +383,11 @@ private HttpURLConnection provideHttpURLConnection(final String coordinatorURL) 
   }
 ```
 
-### close方法
+### close method
 
-关闭之前创建的各种目标数据源连接对象。
+Closes any previously created target data source connection objects.
 
-#### 示例
+#### example
 
 ```Java
 public void close() throws IOException {

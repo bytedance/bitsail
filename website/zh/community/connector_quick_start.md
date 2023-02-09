@@ -1,6 +1,10 @@
-# 如何快速实现BitSail Connector
+---
+order: 7
+---
 
-[English](../../../en/documents/start/connector_dev_guide.md) | 简体中文
+# Connector开发指南
+
+[English](../../en/community/connector_quick_start.md) | 简体中文
 
 -----
 
@@ -10,20 +14,20 @@
 
 ## 目录结构
 
-首先开发者需要通过git下载最新代码到本地，并导入到IDE中。同时创建自己的工作分支，使用该分支开发自己的Connector。项目地址：https://github.com/bytedance/bitsail.git。
+首先开发者需要fork BitSail仓库，详情参考[Fork BitSail Repo](https://docs.github.com/en/get-started/quickstart/fork-a-repo)，之后通过git clone仓库到本地，并导入到IDE中。同时创建自己的工作分支，使用该分支开发自己的Connector。项目地址：https://github.com/bytedance/bitsail.git。
 
 项目结构如下：
 
-![](../../../images/documents/start/connector_dev_guide/code_structure_zh.png)
+![](../../images/community/connector_quick_start/code_structure_zh.png)
 
 ## 开发流程
 
 BitSail 是一款基于分布式架构的数据集成引擎，Connector会并发执行。并由BitSail 框架来负责任务的调度、并发执行、脏数据处理等，开发者只需要实现对应接口即可，具体开发流程如下：
 
 - 工程配置，开发者需要在`bitsail/bitsail-connectors/pom.xml`模块中注册自己的Connector，同时在`bitsail/bitsail-dist/pom.xml`增加自己的Connector模块，同时为你的连接器注册配置文件，来使得框架可以在运行时动态发现它。
-  - ![](../../../images/documents/start/connector_dev_guide/connector_pom.png)
+  - ![](../../images/community/connector_quick_start/connector_pom.png)
 
-  - ![](../../../images/documents/start/connector_dev_guide/dist_pom.png)
+  - ![](../../images/community/connector_quick_start/dist_pom.png)
 - Connector开发，实现Source、Sink提供的抽象方法，具体细节参考后续介绍。
 - 数据输出类型，目前支持的数据类型为BitSail Row类型，无论是Source在Reader中传递给下游的数据类型，还是Sink从上游消费的数据类型，都应该是BitSail Row类型。
 
@@ -49,7 +53,7 @@ BitSail 是一款基于分布式架构的数据集成引擎，Connector会并发
 
 ### BitSail Model
 
-![](../../../images/documents/start/connector_dev_guide/bitsail_model.png)
+![](../../images/community/connector_quick_start/bitsail_model.png)
 
 - `createSplits`：BitSail通过`SplitCoordinator`模块划分`rangeSplits`，在流式作业中的生命周期中`createSplits`会周期性执行，而在批式作业中仅仅会执行一次。
 - `runWithSplit`: 在执行节点节点执行，BitSail中执行节点包括`Reader`和`Writer`模块，中心节点会向可执行节点发送`rangeSplit`，然后在可执行节点本地进行执行；执行完成后会将处理完的`splits`数据向下游发送。
@@ -57,7 +61,7 @@ BitSail 是一款基于分布式架构的数据集成引擎，Connector会并发
 
 ## Source Connector
 
-![](../../../images/documents/start/connector_dev_guide/source_connector.png)
+![](../../images/community/connector_quick_start/source_connector.png)
 
 - Source: 数据读取组件的生命周期管理，主要负责和框架的交互，构架作业，不参与作业真正的执行
 - SourceSplit:  数据读取分片；大数据处理框架的核心目的就是将大规模的数据拆分成为多个合理的Split
@@ -118,7 +122,7 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
 
 ## Sink Connector
 
-![](../../../images/documents/start/connector_dev_guide/sink_connector.png)
+![](../../images/community/connector_quick_start/sink_connector.png)
 
 - Sink：数据写入组件的生命周期管理，主要负责和框架的交互，构架作业，它不参与作业真正的执行。
 - Writer：负责将接收到的数据写到外部存储。
@@ -213,7 +217,7 @@ public class PrintWriter implements Writer<Row, String, Integer> {
 
 - 通过test container来启动相应的组件
 
-![](../../../images/documents/start/connector_dev_guide/test_container.png)
+![](../../images/community/connector_quick_start/test_container.png)
 
 - 编写相应的配置文件
 

@@ -1,3 +1,7 @@
+---
+order: 4
+---
+
 # BitSail Guide Video
 
 English | [简体中文](../../../zh/documents/start/quick_guide.md)

@@ -1,3 +1,7 @@
+---
+order: 3
+---
+
 # 任务配置说明
 
 [English](../../../en/documents/start/deployment.md) | 简体中文

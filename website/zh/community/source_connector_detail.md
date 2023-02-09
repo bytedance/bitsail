@@ -1,12 +1,16 @@
-# Source Connector Details
+---
+order: 8
+---
 
-[English](../../../en/documents/start/source_connector_detail.md) | 简体中文
+# Source Connector 详解
+
+[English](../../en/community/source_connector_detail.md) | 简体中文
 
 -----
 
 ## BitSail Source Connector交互流程介绍
 
-![](../../../images/documents/start/connector_dev_guide/bitsail_model.png)
+![](../../images/community/connector_quick_start/bitsail_model.png)
 
 - Source: 参与数据读取组件的生命周期管理，主要负责和框架的交互，构架作业，不参与作业真正的执行。
 - SourceSplit:  数据读取分片，大数据处理框架的核心目的就是将大规模的数据拆分成为多个合理的Split并行处理。
@@ -20,7 +24,7 @@
 
 以RocketMQSource为例：Source方法需要实现Source和ParallelismComputable接口。
 
-![](../../../images/documents/start/source_connector/source_diagram.png)
+![](../../images/community/source_connector/source_diagram.png)
 
 ### Source接口
 
@@ -219,7 +223,7 @@ bitsail.type.to.engine.type.converter:
 },
 ```
 
-![](../../../images/documents/start/source_connector/file_mapping_converter.png)
+![](../../images/community/source_connector/file_mapping_converter.png)
 
 这种方式不仅仅适用于数据库，也适用于所有需要在类型转换中需要引擎侧和BitSail侧进行类型映射的场景。
 
@@ -263,7 +267,7 @@ public TypeInfoConverter createTypeInfoConverter() {
 }
 ```
 
-![](../../../images/documents/start/source_connector/bitsail_converter.png)
+![](../../images/community/source_connector/bitsail_converter.png)
 
 #### createSourceReader方法
 
@@ -367,7 +371,7 @@ public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConfigu
 
 数据源的数据分片格式，需要我们实现SourceSplit接口。
 
-![](../../../images/documents/start/source_connector/source_split_diagram.png)
+![](../../images/community/source_connector/source_split_diagram.png)
 
 ### SourceSplit接口
 
@@ -625,7 +629,7 @@ public class EmptyState implements Serializable {
 
 大数据处理框架的核心目的就是将大规模的数据拆分成为多个合理的Split，SplitCoordinator承担这个创建、管理Split的角色。
 
-![](../../../images/documents/start/source_connector/source_split_coordinator_diagram.png)
+![](../../images/community/source_connector/source_split_coordinator_diagram.png)
 
 ### SourceSplitCoordinator接口
 
@@ -1026,7 +1030,7 @@ public void close() {
 
 每个SourceReader都在独立的线程中执行，只要我们保证SourceSplitCoordinator分配给不同SourceReader的切片没有交集，在SourceReader的执行周期中，我们就可以不考虑任何有关并发的细节。
 
-![](../../../images/documents/start/source_connector/source_reader_diagram.png)
+![](../../images/community/source_connector/source_reader_diagram.png)
 
 ### SourceReader接口
 
@@ -1359,7 +1363,7 @@ public class ClickhouseRowDeserializer {
 
 相对于实现RowDeserializer，我们更希望大家去实现一个继承DeserializationSchema接口的实现类，将一定类型格式的数据对数据比如JSON、CSV转换为BitSail Row类型。
 
-![](../../../images/documents/start/source_connector/deserialization_schema_diagram.png)
+![](../../images/community/source_connector/deserialization_schema_diagram.png)
 
 在具体的应用时，我们可以使用统一的接口创建相应的实现类
 

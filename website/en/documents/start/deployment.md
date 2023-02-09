@@ -1,3 +1,7 @@
+---
+order: 1
+---
+
 # Deployment Guide
 
 English | [简体中文](../../../zh/documents/start/config.md)

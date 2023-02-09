@@ -1,29 +1,33 @@
-# How to Implement Your Connector
+---
+order: 7
+---
 
-English | [简体中文](../../../zh/documents/start/connector_dev_guide.md)
+# Connector Quick Start
+
+English | [简体中文](../../zh/community/connector_quick_start.md)
 
 -----
 
-# Introduction
+## Introduction
 
 This article is aimed at BitSail's Connector developers. It comprehensively explains the whole process of developing a complete Connector from the developer's perspective, and quickly gets started with Connector development.
 
 ## contents
 
-First, the developer needs to download the latest code to the local through git and import it into the IDE. At the same time, create your own working branch and use this branch to develop your own Connector. project address: https://github.com/bytedance/bitsail.git.
+First, the developer needs to fork the BitSail repository. For more details, refer to [Fork BitSail Repo](https://docs.github.com/en/get-started/quickstart/fork-a-repo). And then use git clone the repository to the local, and import it into the IDE. At the same time, create your own working branch and use this branch to develop your own Connector. project address: https://github.com/bytedance/bitsail.git.
 
 The project structure is as follows:
 
-![](../../../images/documents/start/connector_dev_guide/code_structure_en.png)
+![](../../images/community/connector_quick_start/code_structure_en.png)
 
 ## Development Process
 
 BitSail is a data integration engine based on a distributed architecture, and Connectors will execute concurrently. And the BitSail framework is responsible for task scheduling, concurrent execution, dirty data processing, etc. Developers only need to implement the corresponding interface. The specific development process is as follows:
 
 - Project configuration, developers need to register their own Connector in the `bitsail/bitsail-connectors/pom.xml` module, add their own Connector module in `bitsail/bitsail-dist/pom.xml`, and register configuration files for your connector , so that the framework can dynamically discover it at runtime
-  - ![](../../../images/documents/start/connector_dev_guide/connector_pom.png)
+  - ![](../../images/community/connector_quick_start/connector_pom.png)
 
-  - ![](../../../images/documents/start/connector_dev_guide/dist_pom.png)
+  - ![](../../images/community/connector_quick_start/dist_pom.png)
 - Connector development, implement the abstract methods provided by Source and Sink, refer to the follow-up introduction for details
 - Data output type, the currently supported data type is the BitSail Row type, whether it is the data type that the Source passes to the downstream in the Reader, or the data type that the Sink consumes from the upstream, it should be the BitSail Row type
 
@@ -49,7 +53,7 @@ In traditional streaming scenarios, data reading is generally divided into the f
 
 ## BitSail Model
 
-![](../../../images/documents/start/connector_dev_guide/bitsail_model.png)
+![](../../images/community/connector_quick_start/bitsail_model.png)
 
 - `createSplits`: BitSail divides rangeSplits through the `SplitCoordinator` module. `createSplits` will be executed periodically in the life cycle of streaming jobs, but only once in batch jobs.
 - `runWithSplit`: Execute on the execution node. The execution node in BitSail includes `Reader` and `Writer` modules. The central node will send `rangeSplit` to the executable node, and then execute locally on the executable node; after the execution is completed, the processed `splits` data will be sent downstream.
@@ -59,7 +63,7 @@ In traditional streaming scenarios, data reading is generally divided into the f
 
 ## Introduction
 
-![](../../../images/documents/start/connector_dev_guide/source_connector.png)
+![](../../images/community/connector_quick_start/source_connector.png)
 
 - Source: The life cycle management component of the data reading component is mainly responsible for interacting with the framework, structuring the job, and not participating in the actual execution of the job.
 - SourceSplit:  Source data split. The core purpose of the big data processing framework is to split large-scale data into multiple reasonable Splits
@@ -116,7 +120,7 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
 
 ## Introduction
 
-![](../../../images/documents/start/connector_dev_guide/sink_connector.png)
+![](../../images/community/connector_quick_start/sink_connector.png)
 
 - Sink: life cycle management of data writing components, mainly responsible for interaction with the framework, framing jobs, it does not participate in the actual execution of jobs.
 - Writer: responsible for writing the received data to external storage.
@@ -211,7 +215,7 @@ In the module where the Source or Sink connector is located, add an ITCase test 
 
 - Start data source through the test container
 
-![](../../../images/documents/start/connector_dev_guide/test_container.png)
+![](../../images/community/connector_quick_start/test_container.png)
 
 - Write the corresponding configuration file
 

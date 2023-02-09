@@ -1,52 +1,56 @@
-# How to submit a PR
+---
+order: 3
+---
 
-English | [简体中文](../../../zh/documents/start/pr_submit.md)
+# PR发布指南
+
+[English](../../en/community/pr_guide.md) | 简体中文
 
 -----
 
-![](../../../images/documents/start/pr_submit/repository_structure.png)
+![](../../images/community/pr_guide/repository_structure.png)
 
-##  Fork BitSail to your repository
+## Fork BitSail 到自己的仓库
 
-![](../../../images/documents/start/pr_submit/repository_fork.png)
+![](../../images/community/pr_guide/repository_fork.png)
 
-##  Git account configuration
+## Git的账户配置
 
- The role of user name and email address: User name and email address are variables of the local git client. Each commit will be recorded with the user name and email address. Github's contribution statistics are based on email addresses.
+用户名和邮箱地址的作用：用户名和邮箱地址是本地git客户端的一个变量，每次commit都会用用户名和邮箱纪录，Github的contributions统计就是按邮箱来统计的。
 
- Check your account and email address:
+查看自己的账户和邮箱地址：
 
 ```Bash
 $ git config user.name
 $ git config user.email
 ```
 
- If you are using git for the first time, or need to modify account, execute the following command, replacing the username and email address with your own.
+如果是第一次使用，或者需要对其进行修改，执行以下命令，将用户名和邮箱地址替换为你自己的即可。
 
 ```Bash
 $ git config --global user.name "username"
 $ git config --global user.email "your_email@example.com"
 ```
 
-##  Clone the Fork repository to local
+## 将Fork仓库克隆到本地
 
- You can choose HTTPS or SSH mode, and the following operations will use SSH mode as an example. If you use HTTPS mode, you only need to replace all the SSH url in the command with HTTPS url.
+可选HTTPS或者SSH方式，之后的操作会以SSH方式示例，如果采用HTTPS方式，只需要将命令中的SSH地址全部替换为HTTPS地址即可。
 
-###  HTTPS
+### HTTPS
 
 ```Bash
 $ git clone git@github.com:{your_github_id}/bitsail.git
 ```
 
-###  SSH
+### SSH
 
 ```Bash
 $ git clone https://github.com/{your_github_id}/bitsail.git
 ```
 
-![](../../../images/documents/start/pr_submit/git_clone_example.png)
+![](../../images/community/pr_guide/git_clone_example.png)
 
-##  Set origin and upstream
+## 设置origin和upstream
 
 ```Bash
 $ git remote add origin git@github.com:{your_github_id}/bitsail.git
@@ -58,47 +62,50 @@ upstream        git@github.com:bytedance/bitsail.git (fetch)
 upstream        git@github.com:bytedance/bitsail.git (push)
 ```
 
- If the `origin` setting of `git` is wrong, you can execute `git `*`remote`*` rm `*`origin`* to clear and reset it.
+如果`git`的`origin`设置错误，可以执行`git `*`remote`*` rm `*`origin`**清除后重新设置*
 
- The `upstream` is the same, setting errors can be cleared by `git `*`remote`*` rm `*`upstream`* and reset.
+`upstream`同理，设置错误可以通过`git `*`remote`*` rm `*`upstream`*清除后重新设置
 
-##  Create your working branch
+## 创建自己的工作分支
 
 ```Bash
-// view all branches
+查看所有分支
 $ git branch -a
-// Create a new loacl branch 
+在本地新建一个分支
 $ git branch {your_branch_name}
-// switch to new branch
+切换到我的新分支
 $ git checkout {your_branch_name}
-// Push the local branch to the fork repository
-$ git push -u origin
+将本地分支推送到fork仓库
+$ git push -u origin {your_branch_name}
 ```
 
- Branch name example: add-sink-connector-redis
+分支名称示例：add-sink-connector-redis
 
- After that, you can write and test the code in your own working branch, and synchronize it to your personal branch in time.
+之后就可以在自己的工作分支进行代码的编写，测试，并及时同步到你的个人分支。
 
 ```Bash
+编辑区添加到暂存区
 $ git add .
+暂存区提交到分支
 $ git commit -m "[BitSail] Message"
-$ git push -u origin <branch name>
+同步Fork仓库
+$ git push -u origin <分支名>
 ```
 
-##  Synchronize source code
+## 同步代码
 
- BitSail will carefully consider the update and iteration of the interface or version. If the developer has a short development cycle, he can do a synchronization with the original warehouse before submitting the code. However, if unfortunately encountering a major version change, the developer can follow up at any time Changes to the original repository.
+BitSail对接口或者版本的更新迭代会谨慎的考量，如果开发者开发周期短，可以在提交代码前对原始仓库做一次同步即可，但是如果不幸遇到了大的版本变更，开发者可以随时跟进对原始仓库的变更。
 
- Here, in order to ensure the cleanness of the code branch, it is recommended to use the rebase method for merging.
+这里为了保证代码分支的干净，推荐采用rebase的方式进行合并。
 
 ```Bash
 $ git fetch upstream
 $ git rebase upstream/master
 ```
 
- During the rebase process, file conflicts may be reported
+在rebase过程中，有可能会报告文件的冲突
 
- For example, in the following situation, we need to manually merge the conflicting files: `bitsail-connectors/pom.xml`
+例如如下情况，我们要去手动合并产生冲突的文件`bitsail-connectors/pom.xml`
 
 ```Bash
 $ git rebase upstream/master
@@ -113,7 +120,7 @@ To abort and get back to the state before "git rebase", run "git rebase --abort"
 Could not apply 054a4d3... [BitSail] Migrate hadoop source&sink to v1 interface
 ```
 
- The conflicting parts are shown below, bounded by `=======`, decide whether you want to keep only the changes of the branch, only the changes of the other branch, or make completely new changes (possibly containing changes of both branches). Remove the conflict markers `<<<<<<<`, `=======`, `>>>>>>>` and make the desired changes in the final merge.
+产生冲突的部分如下所示，`=======`为界， 决定您是否想只保持分支的更改、只保持其他分支的更改，还是进行全新的更改（可能包含两个分支的更改）。 删除冲突标记` <<<<<<<`、`=======`、`>>>>>>>`，并在最终合并中进行所需的更改。
 
 ```Plain
 <modules>
@@ -135,7 +142,7 @@ Could not apply 054a4d3... [BitSail] Migrate hadoop source&sink to v1 interface
 </modules>
 ```
 
- After combine:
+处理完成的示例：
 
 ```Plain
 <modules>
@@ -154,18 +161,18 @@ Could not apply 054a4d3... [BitSail] Migrate hadoop source&sink to v1 interface
 </modules>
 ```
 
- Execute `git add <conflicted_files>` after combine:
+处理完成之后执行`git add <conflicted_files>`，比如该例中执行：
 
 ```Bash
 $ git add bitsail-connectors/pom.xml
 $ git rebase --continue
 ```
 
- Afterwards, the following window will appear. This is the Vim editing interface. The editing mode can be done according to Vim. Usually we only need to edit the Commit information on the first line, or not. After completion, follow the exit method of Vim, and press`: w q ↵`。
+之后会出现如下窗口，这个是Vim编辑界面，编辑模式按照Vim的进行即可，通常我们只需要对第一行进行Commit信息进行编辑，也可以不修改，完成后按照Vim的退出方式，依次按`: w q 回车`即可。
 
-![](../../../images/documents/start/pr_submit/git_rebase_example.png)
+![](../../images/community/pr_guide/git_rebase_example.png)
 
- After that, the following appears to indicate that the rebase is successful.
+之后出现如下表示rebase成功。
 
 ```Bash
 $ git rebase --continue
@@ -187,11 +194,11 @@ $ git rebase --continue
 Successfully rebased and updated refs/heads/add-v1-connector-hadoop.
 ```
 
- At this point, we can see that our `commit` has been mentioned on the front:
+此时可以看到我们的`commit`已经被提到了最前面：
 
-![](../../../images/documents/start/pr_submit/commit_info.png)
+![](../../images/community/pr_guide/commit_info.png)
 
- The code may not be pushed normally after rebase:
+rebase之后代码可能无法正常推送
 
 ```Bash
 $ git push
@@ -204,10 +211,10 @@ hint: 'git pull ...') before pushing again.
 hint: See the 'Note about fast-forwards' in 'git push --help' for details.
 ```
 
- At this time, `git push -f` is required to force the push. Forced push is a risky operation. Please check carefully before the operation to avoid the problem that irrelevant code is forcibly overwritten.
+此时需要`git push -f` 强制推送，强制推送是一个有风险的操作，操作前请仔细检查以避免出现无关代码被强制覆盖的问题。
 
 ```Bash
-git push -f
+$ git push -f
 Enumerating objects: 177, done.
 Counting objects: 100% (177/177), done.
 Delta compression using up to 12 threads
@@ -219,53 +226,53 @@ To github.com:love-star/bitsail.git
  + adb90f4...b72d931 add-v1-connector-hadoop -> add-v1-connector-hadoop (forced update)
 ```
 
- At this point, the branch has been synchronized with the upstream repository, and subsequent code writing will be based on the latest.
+此时分支已经和原始仓库同步，之后的代码编写都会建立在最新的基础上。
 
-##  Submit your code
+## 提交代码
 
- When the developer completes the development, he first needs to complete a `rebase` of the warehouse. For details, refer to the scenario of `synchronizing source code`. After rebase, git's history looks like this:
+当开发者开发完毕，首先需要完成一次仓库的rebase，具体参考同步代码的场景。rebase之后，git的历史如下所示：
 
-![](../../../images/documents/start/pr_submit/git_history.png)
+![](../../images/community/pr_guide/git_history.png)
 
- As shown on Github
+在Github界面如图所示
 
-![](../../../images/documents/start/pr_submit/github_status.png)
+![](../../images/community/pr_guide/github_status.png)
 
- We hope to keep only one Commit for each PR to ensure the cleanness of the branch. If there are multiple commits, they can be merged into one commit in the end. The specific operation is as follows:
+我们希望在提交PR前仅仅保留一个Commit以保证分支的干净，如果有多次提交，最后可以合并为一个提交。具体操作如下：
 
 ```Bash
-git reset --soft HEAD~N(N is the reset submit number)
-git add .
-git commit -m "[BitSail] Message"
-git push -f
+$ git reset --soft HEAD~N(N为需要合并的提交次数)
+$ git add .
+$ git commit -m "[BitSail] Message"
+$ git push -f
 ```
 
- example:
+比如此例中，执行
 
 ```Bash
 $ git reset --soft HEAD~4
 $ git add .
-$ git commit -m "[BitSail] Migrate hadoop source&sink to v1 interface"
+$ git commit -m "[BitSail#106][Connector] Migrate hadoop source connector to v1 interface"
 $ git push -f
 ```
 
- After the reset:
+合并后：
 
-![](../../../images/documents/start/pr_submit/after_git_reset.png)
+![](../../images/community/pr_guide/after_git_reset.png)
 
-##  Submit your PR
+## 提交PR
 
-![](../../../images/documents/start/pr_submit/github_pr.png)
+![](../../images/community/pr_guide/github_pr.png)
 
- When submitting PR, you should pay attention to the specifications of Commit message and PR message:
+提交PR时，应注意Commit message和PR message的规范：
 
-![](../../../images/documents/start/pr_submit/create_pr.png)
+![](../../images/community/pr_guide/create_pr.png)
 
-###  Commit message specification
+### Commit message 规范
 
-1. Create a Github issue or claim an existing issue
-2. Describe what you would like to do in the issue description. 
-3. Include the issue number in the commit message. The format follows below.
+1. 创建一个新的Github issue或者关联一个已经存在的 issue
+2. 在issue description中描述你想要进行的工作. 
+3. 在commit message关联你的issue，格式如下：
 
 ```Plain
 [BitSail#${IssueNumber}][${Module}] Description
@@ -275,7 +282,7 @@ $ git push -f
 [Minor] Description
 ```
 
-1. List of module. Chose the most related one if your changes affect multiple modules. e.g. If you are adding a feature to the kafka connector and end up modifying code in common, components and cores, you should still use the [Connector] as module name.
+1. commit message的module格式列表如下，如果开发者的工作关联了多个module，选择最相关的module即可，例如：如果你在 kafka connector添加了新的feature，并且改变了common、components和cores中的代码，这时commit message应该绑定的module格式为[Connector]。
 
 ```Plain
 [Common] bitsail-common
@@ -285,6 +292,12 @@ $ git push -f
 [Build] build, dependency changes
 ```
 
-###  PR message specification
+注意
 
- The PR message should summarize the cause and effect of the problem clearly. If there is a corresponding issue, the issue address should be attached to ensure that the problem is traceable.
+- commit 需遵循规范，给维护者减少维护成本及工作量，对于不符合规范的commit，我们不予合并。
+- 对于解决同一个Issue的PR，只能存在一个commit message，如果出现多次提交的message，我们希望你能将commit message 压缩成一个。
+- message 尽量保持清晰简洁，但是也千万不要因为过度追求简洁导致描述不清楚，如果有必要，我们也不介意message过长，前提是，能够把解决方案、修复内容描述清楚。
+
+### PR message规范
+
+PR message应概括清楚问题的前因后果，如果存在对应issue要附加issue地址，保证问题是可追溯的。

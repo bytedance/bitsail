@@ -1,3 +1,7 @@
+---
+order: 3
+---
+
 # Job Configuration Guide
 
 English | [简体中文](../../../zh/documents/start/config.md)

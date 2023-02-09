@@ -1,3 +1,7 @@
+---
+order: 2
+---
+
 # 开发环境配置
 
 [English](../../../en/documents/start/env_setup.md) | 简体中文

@@ -1,6 +1,10 @@
-# BitSail Release指南
+---
+order: 4
+---
 
-[English](../../../en/documents/start/release_guide.md) | 简体中文
+# BitSail 发版指南
+
+[English](../../en/community/release_guide.md) | 简体中文
 
 -----
 
@@ -32,7 +36,7 @@
 
 ## release 流程
 
-![img](https://bytedance.feishu.cn/space/api/box/stream/download/asynccode/?code=MWIyYjFkNjBlZmY4NTJmZWYyZmU1N2MzNzA4ZGZhZmRfS0c5eEVXTkZmYkZJRDNkeElVZWxRRDhWdnNvMWFaOUdfVG9rZW46Ym94Y25VR3RRYTBhT1FLN0tvTnNyeHNzd21mXzE2NzMyNTE5MDQ6MTY3MzI1NTUwNF9WNA)
+![img](../../images/community/release_guide/release_procedure.png)
 
 ### 1. release 决议阶段
 
@@ -40,7 +44,7 @@
 
 我们可以在 Github 上开始一个新的讨论，主题如下
 
-0.1.0 发布讨论
+`0.1.0` 发布讨论
 
 决定发布和选择Release Manager是发布过程的第一步。 这是整个社区基于共识的决定。
 
@@ -86,9 +90,9 @@ B. 发布在Github上供公众下载
 
 一旦release candidate通过投票，我们就可以最终确定release。
 
-A. 将release分支版本从 x.x.x-rc1 更改为 x.x.x。 例如 0.1.0-rc1 到 0.1.0
+A. 将release分支版本从 `x.x.x-rc1` 更改为 `x.x.x`。 例如 `0.1.0-rc1` 到 `0.1.0`
 
-B. git commit -am “[MINOR] 更新release版本以反映release版本 ${RELEASE_VERSION}”
+B. `git commit -am “[MINOR] 更新release版本以反映release版本 ${RELEASE_VERSION}”`
 
 C.推送到release分支
 
@@ -104,4 +108,4 @@ E. 创建一个新的 Github release，去掉之前推送的 release version 标
 
 Flink release 指南: [Creating a Flink Release](https://cwiki.apache.org/confluence/display/FLINK/Creating+a+Flink+Release)
 
-Hudi release 指南: [Apache Hudi Release Guide](https://cwiki.apache.org/confluence/display/HUDI/Apache+Hudi+-+Release+Guide) 
+Hudi release 指南: [Apache Hudi Release Guide](https://cwiki.apache.org/confluence/display/HUDI/Apache+Hudi+-+Release+Guide)
