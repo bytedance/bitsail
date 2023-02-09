@@ -19,7 +19,6 @@ package com.bytedance.bitsail.connector.hbase.sink;
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.BitSailException;
-import com.bytedance.bitsail.common.column.Column;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
@@ -198,8 +197,7 @@ public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
                 "[columnFamily:columnName]. Wrong column is: " + name);
           }
         }
-        byte[] columnBytes = getColumnByte(type, (Column) element.getField(i));
-        // skip null column
+        byte[] columnBytes = getColumnByte(element.getField(i));
         if (null != columnBytes) {
           put.addColumn(
               cfAndQualifierBytes[0],
@@ -343,7 +341,7 @@ public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   private byte[] getRowkey(Row record) throws Exception {
     Map<String, Object> nameValueMap = new HashMap<>((rowKeyColumnIndex.size() << 2) / ROW_KEY_SIZE_DIV);
     for (Integer keyColumnIndex : rowKeyColumnIndex) {
-      nameValueMap.put(columnNames.get(keyColumnIndex), ((Column) record.getField(keyColumnIndex)).asString());
+      nameValueMap.put(columnNames.get(keyColumnIndex), record.getField(keyColumnIndex));
     }
     String rowKeyStr = functionTree.evaluate(nameValueMap);
     return rowKeyStr.getBytes(StandardCharsets.UTF_8);
@@ -364,52 +362,15 @@ public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
       if (record.getField(index) == null) {
         throw new IllegalArgumentException("null verison column!");
       }
-      Column col = (Column) record.getField(index);
-      timestamp = col.asLong();
+      timestamp = (long)record.getField(index);
     }
     return timestamp;
   }
 
-  public byte[] getColumnByte(String columnType, Column column) {
+  public byte[] getColumnByte(Object column) {
     byte[] bytes;
-    if (column != null && column.getRawData() != null) {
-      switch (columnType) {
-        case "int":
-          bytes = Bytes.toBytes((int) (long) column.asLong());
-          break;
-        case "long":
-        case "bigint":
-          bytes = Bytes.toBytes(column.asLong());
-          break;
-        case "date":
-        case "timestamp":
-          bytes = Bytes.toBytes(column.asLong());
-          break;
-        case "double":
-          bytes = Bytes.toBytes(column.asDouble());
-          break;
-        case "float":
-          bytes = Bytes.toBytes((float) (double) column.asDouble());
-          break;
-        case "decimal":
-          bytes = Bytes.toBytes(column.asBigDecimal());
-          break;
-        case "short":
-          bytes = Bytes.toBytes((short) (long) column.asLong());
-          break;
-        case "boolean":
-          bytes = Bytes.toBytes(column.asBoolean());
-          break;
-        case "varchar":
-        case "string":
-          bytes = Bytes.toBytes(column.asString());
-          break;
-        case "binary":
-          bytes = column.asBytes();
-          break;
-        default:
-          throw new IllegalArgumentException("Unsupported column type: " + columnType);
-      }
+    if (column != null) {
+      bytes = Bytes.toBytes(column.toString());
     } else {
       switch (nullMode) {
         case SKIP:
@@ -424,4 +385,5 @@ public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     }
     return bytes;
   }
+
 }
