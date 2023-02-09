@@ -137,6 +137,6 @@ dir:
 28. **How to deploy bitsail in hive2.x or hive3.x?**
 
 > BitSail使用`bitsail-shaded-hive`模块来管理hive依赖，在其中使用**3.1.0**作为默认hive版本。
-> 因此，用户如果想在其他版本的hive环境中部署和使用BitSail，需要先修改 [bitsail-shaded-hive](https://github.com/bytedance/bitsail/blob/master/bitsail-shade/bitsail-shaded-hive/pom.xml) 中的hive版本信息（如下图所示）。
+> 因此，用户如果想在其他版本的hive环境中部署和使用BitSail，需要先修改 [bitsail-shaded-hive](https://github.com/bytedance/bitsail/blob/master/bitsail-shade/bitsail-shaded-hive/pom.xml) 中的hive版本信息（如图所示）。
 >
 > ![](../../../images/change-hive-version.png)

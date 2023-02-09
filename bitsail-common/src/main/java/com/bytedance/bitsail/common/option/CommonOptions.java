@@ -19,7 +19,7 @@ package com.bytedance.bitsail.common.option;
 import com.bytedance.bitsail.common.annotation.Essential;
 
 import com.alibaba.fastjson.TypeReference;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import java.util.List;
 import java.util.Map;
@@ -276,7 +276,7 @@ public interface CommonOptions {
         .defaultValue("HH:mm:ss");
 
     ConfigOption<List<String>> EXTRA_FORMATS = key(COMMON_PREFIX + "column.extraFormats")
-        .defaultValue(ImmutableList.of("yyyyMMdd HH:mm:ss",
+        .defaultValue(Lists.newArrayList("yyyyMMdd HH:mm:ss",
             "yyyyMMdd"));
 
     ConfigOption<String> TIME_ZONE = key(COMMON_PREFIX + "column.timeZone")
