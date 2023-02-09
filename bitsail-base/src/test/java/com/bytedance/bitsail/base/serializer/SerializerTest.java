@@ -23,8 +23,8 @@ public class SerializerTest {
 
   @Test
   public void testBinarySerializer() throws Exception {
-    BinarySerializer<String> serializer = new SimpleBinarySerializer<>();
+    BinarySerializer<String> serializer = new SimpleVersionedBinarySerializer<>();
     String test = "testSerializer";
-    Assert.assertEquals(test, serializer.deserialize(serializer.serialize(test)));
+    Assert.assertEquals(test, serializer.deserialize(serializer.getVersion(), serializer.serialize(test)));
   }
 }
