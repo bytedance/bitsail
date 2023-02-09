@@ -37,7 +37,7 @@ public class HBaseSink<CommitT extends Serializable> implements Sink<Row, Commit
 
   @Override
   public String getWriterName() {
-    return "druid";
+    return "hbase";
   }
 
   @Override
