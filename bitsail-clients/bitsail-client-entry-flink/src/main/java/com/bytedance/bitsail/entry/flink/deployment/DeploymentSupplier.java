@@ -24,7 +24,9 @@ import java.util.List;
  * Created 2022/8/8
  */
 public interface DeploymentSupplier {
+  void addDeploymentMode(List<String> flinkCommands);
 
-  void addDeploymentCommands(BaseCommandArgs baseCommandArgs, List<String> flinkCommands);
+  void addRunDeploymentCommands(BaseCommandArgs baseCommandArgs);
 
+  void addStopDeploymentCommands(BaseCommandArgs baseCommandArgs);
 }

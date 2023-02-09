@@ -43,18 +43,25 @@ public class YarnDeploymentSupplier implements DeploymentSupplier {
   }
 
   @Override
-  public void addDeploymentCommands(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
+  public void addDeploymentMode(List<String> flinkCommands) {
     flinkCommands.add("-t");
     flinkCommands.add(deploymentMode);
+  }
+
+  @Override
+  public void addRunDeploymentCommands(BaseCommandArgs baseCommandArgs) {
+    baseCommandArgs.getProperties()
+            .put("yarn.application.name", jobConfiguration.getNecessaryOption(
+                    CommonOptions.JOB_NAME, CommonErrorCode.CONFIG_ERROR));
 
     baseCommandArgs.getProperties()
-        .put("yarn.application.name", jobConfiguration.getNecessaryOption(
-            CommonOptions.JOB_NAME, CommonErrorCode.CONFIG_ERROR));
+            .put("yarn.application.queue", flinkCommandArgs.getQueue());
 
     baseCommandArgs.getProperties()
-        .put("yarn.application.queue", flinkCommandArgs.getQueue());
+            .put("yarn.application.priority", String.valueOf(flinkCommandArgs.getPriority()));
+  }
 
-    baseCommandArgs.getProperties()
-        .put("yarn.application.priority", String.valueOf(flinkCommandArgs.getPriority()));
+  @Override
+  public void addStopDeploymentCommands(BaseCommandArgs baseCommandArgs) {
   }
 }

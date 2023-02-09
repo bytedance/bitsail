@@ -85,7 +85,7 @@ public class FlinkEngineRunnerTest {
   public void testGetCancelFlinkProcBuilder() throws IOException {
     baseCommandArgs = new BaseCommandArgs();
     baseCommandArgs.setMainAction("stop");
-    String[] flinkRunCommandArgs = new String[] {"--execution-mode", "cancel", "--deployment-mode", DEPLOYMENT_KUBERNETES_APPLICATION};
+    String[] flinkRunCommandArgs = new String[] {"--execution-mode", "cancel", "--deployment-mode", DEPLOYMENT_KUBERNETES_APPLICATION, "--job-id", "test-jobId"};
     baseCommandArgs.setUnknownOptions(flinkRunCommandArgs);
     BitSailConfiguration sysConfiguration = BitSailSystemConfiguration.loadSysConfiguration();
     FlinkEngineRunner flinkEngineRunner = new FlinkEngineRunner();
@@ -94,7 +94,7 @@ public class FlinkEngineRunnerTest {
             .getProcBuilder(baseCommandArgs);
 
     List<String> command = runProcBuilder.command();
-    Assert.assertEquals(12, command.size());
+    Assert.assertEquals(6, command.size());
   }
 
   @Test

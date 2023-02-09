@@ -27,13 +27,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_YARN_PER_JOB;
 import static org.junit.Assert.assertEquals;
 
 public class YarnDeploymentSupplierTest {
 
   @Test
   public void testAddDeploymentCommands() {
-    String deploymentMode = "yarn-per-job";
+    String deploymentMode = DEPLOYMENT_YARN_PER_JOB;
     FlinkRunCommandArgs flinkRunCommandArgs = new FlinkRunCommandArgs();
     flinkRunCommandArgs.setQueue("test");
     flinkRunCommandArgs.setDeploymentMode(deploymentMode);
@@ -44,7 +45,8 @@ public class YarnDeploymentSupplierTest {
     YarnDeploymentSupplier deploymentSupplier = new YarnDeploymentSupplier(flinkRunCommandArgs, conf);
     BaseCommandArgs baseCommandArgs = new BaseCommandArgs();
     List<String> flinkCommands = new ArrayList<>();
-    deploymentSupplier.addDeploymentCommands(baseCommandArgs, flinkCommands);
+    deploymentSupplier.addDeploymentMode(flinkCommands);
+    deploymentSupplier.addRunDeploymentCommands(baseCommandArgs);
     assertEquals(flinkCommands.size(), 2);
     assertEquals(flinkCommands.get(1), deploymentMode);
 

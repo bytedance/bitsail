@@ -42,10 +42,13 @@ public class KubernetesDeploymentSupplier implements DeploymentSupplier {
   }
 
   @Override
-  public void addDeploymentCommands(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
+  public void addDeploymentMode(List<String> flinkCommands) {
     flinkCommands.add("-t");
     flinkCommands.add(deploymentMode);
+  }
 
+  @Override
+  public void addRunDeploymentCommands(BaseCommandArgs baseCommandArgs) {
     baseCommandArgs.getProperties().put(KUBERNETES_CLUSTER_ID, flinkRunCommandArgs.getKubernetesClusterId());
 
     baseCommandArgs.getProperties().put(KUBERNETES_CONTAINER_IMAGE, flinkRunCommandArgs.getKubernetesContainerImage());
@@ -55,5 +58,12 @@ public class KubernetesDeploymentSupplier implements DeploymentSupplier {
 
     baseCommandArgs.getProperties().put(KUBERNETES_TASKMANAGER_CPU,
             String.valueOf(flinkRunCommandArgs.getKubernetesTaskManagerCpu()));
+  }
+
+  @Override
+  public void addStopDeploymentCommands(BaseCommandArgs baseCommandArgs) {
+    baseCommandArgs.getProperties().put(KUBERNETES_CLUSTER_ID,
+            flinkRunCommandArgs.getKubernetesClusterId() + " " +
+            flinkRunCommandArgs.getJobId());
   }
 }

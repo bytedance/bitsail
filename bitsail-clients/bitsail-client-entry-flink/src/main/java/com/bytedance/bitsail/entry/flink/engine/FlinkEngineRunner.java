@@ -127,7 +127,8 @@ public class FlinkEngineRunner implements EngineRunner {
 
     flinkCommands.add(flinkDir + "/bin/flink");
     flinkCommands.add(flinkCommandArgs.getExecutionMode());
-    deploymentSupplier.addDeploymentCommands(baseCommandArgs, flinkCommands);
+    deploymentSupplier.addDeploymentMode(flinkCommands);
+    deploymentSupplier.addRunDeploymentCommands(baseCommandArgs);
 
     FlinkRunnerSavepointLoader.loadSavepointPath(sysConfiguration,
         jobConfiguration,
@@ -195,7 +196,8 @@ public class FlinkEngineRunner implements EngineRunner {
 
     flinkCommands.add(flinkDir + "/bin/flink");
     flinkCommands.add(flinkCommandArgs.getExecutionMode());
-    deploymentSupplier.addDeploymentCommands(baseCommandArgs, flinkCommands);
+    deploymentSupplier.addDeploymentMode(flinkCommands);
+    deploymentSupplier.addStopDeploymentCommands(baseCommandArgs);
 
     for (Map.Entry<String, String> property : baseCommandArgs.getProperties().entrySet()) {
       LOG.info("Add Users property {} = {}.", property.getKey(), property.getValue());

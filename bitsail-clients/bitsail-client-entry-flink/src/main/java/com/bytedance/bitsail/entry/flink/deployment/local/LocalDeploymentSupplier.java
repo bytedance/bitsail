@@ -36,7 +36,7 @@ public class LocalDeploymentSupplier implements DeploymentSupplier {
   }
 
   @Override
-  public void addDeploymentCommands(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
+  public void addDeploymentMode(List<String> flinkCommands) {
     String jobManagerAddress = flinkCommandArgs.getJobManagerAddress();
     if (StringUtils.isNotEmpty(jobManagerAddress)) {
       flinkCommands.add("-m");
@@ -44,5 +44,13 @@ public class LocalDeploymentSupplier implements DeploymentSupplier {
     } else {
       LOG.info("Job manager is not specified. Job will be submit to default job manager.");
     }
+  }
+
+  @Override
+  public void addRunDeploymentCommands(BaseCommandArgs baseCommandArgs) {
+  }
+
+  @Override
+  public void addStopDeploymentCommands(BaseCommandArgs baseCommandArgs) {
   }
 }
