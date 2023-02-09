@@ -17,12 +17,12 @@
 package com.bytedance.bitsail.entry.flink.deployment.kubernetes;
 
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
-import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
 
 import java.util.List;
 
+import static com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs.KUBERNETES_CLUSTER_ID;
 import static com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs.KUBERNETES_CONTAINER_IMAGE;
 import static com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs.KUBERNETES_JOBMANAGER_CPU;
 import static com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs.KUBERNETES_TASKMANAGER_CPU;
@@ -36,7 +36,7 @@ public class KubernetesDeploymentSupplier implements DeploymentSupplier {
 
   private String deploymentMode;
 
-  public KubernetesDeploymentSupplier(FlinkRunCommandArgs flinkRunCommandArgs, BitSailConfiguration jobConfiguration) {
+  public KubernetesDeploymentSupplier(FlinkRunCommandArgs flinkRunCommandArgs) {
     this.flinkRunCommandArgs = flinkRunCommandArgs;
     this.deploymentMode = flinkRunCommandArgs.getDeploymentMode();
   }
@@ -45,6 +45,8 @@ public class KubernetesDeploymentSupplier implements DeploymentSupplier {
   public void addDeploymentCommands(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
     flinkCommands.add("-t");
     flinkCommands.add(deploymentMode);
+
+    baseCommandArgs.getProperties().put(KUBERNETES_CLUSTER_ID, flinkRunCommandArgs.getKubernetesClusterId());
 
     baseCommandArgs.getProperties().put(KUBERNETES_CONTAINER_IMAGE, flinkRunCommandArgs.getKubernetesContainerImage());
 

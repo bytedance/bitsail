@@ -22,6 +22,7 @@ import com.bytedance.bitsail.client.api.command.CommandArgsParser;
 import com.bytedance.bitsail.client.api.engine.EngineRunner;
 import com.bytedance.bitsail.client.api.utils.PackageResolver;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.configuration.ConfigParser;
 import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
 import com.bytedance.bitsail.entry.flink.configuration.FlinkRunnerConfigOptions;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
@@ -43,6 +44,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -97,22 +99,26 @@ public class FlinkEngineRunner implements EngineRunner {
   }
 
   @Override
-  public ProcessBuilder getProcBuilder(BitSailConfiguration jobConfiguration,
-                                       BaseCommandArgs baseCommandArgs) throws IOException {
+  public ProcessBuilder getProcBuilder(BaseCommandArgs baseCommandArgs) throws IOException {
     String argsMainAction = baseCommandArgs.getMainAction();
 
     switch (argsMainAction) {
       case CommandAction.RUN_COMMAND:
-        return getRunProcBuilder(jobConfiguration, baseCommandArgs);
+        return getRunProcBuilder(baseCommandArgs);
+      case CommandAction.STOP_COMMAND:
+        return getStopProcBuilder(baseCommandArgs);
       default:
         throw new UnsupportedOperationException(String.format("Main action %s not support in flink engine.", argsMainAction));
     }
   }
 
-  ProcessBuilder getRunProcBuilder(BitSailConfiguration jobConfiguration,
-                                   BaseCommandArgs baseCommandArgs) throws IOException {
+  private ProcessBuilder getRunProcBuilder(BaseCommandArgs baseCommandArgs) throws IOException {
     FlinkRunCommandArgs flinkCommandArgs = new FlinkRunCommandArgs();
     CommandArgsParser.parseArguments(baseCommandArgs.getUnknownOptions(), flinkCommandArgs);
+    BitSailConfiguration jobConfiguration = StringUtils.isNotBlank(baseCommandArgs.getJobConf()) ?
+            ConfigParser.fromRawConfPath(baseCommandArgs.getJobConf()) :
+            BitSailConfiguration.from(
+                    new String(Base64.getDecoder().decode(baseCommandArgs.getJobConfInBase64())));
     DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(flinkCommandArgs,
         jobConfiguration);
 
@@ -176,6 +182,28 @@ public class FlinkEngineRunner implements EngineRunner {
     flinkProcBuilder.command(flinkCommands);
 
     FlinkSecurityHandler.processSecurity(sysConfiguration, flinkProcBuilder, flinkDir);
+    return flinkProcBuilder;
+  }
+
+  private ProcessBuilder getStopProcBuilder(BaseCommandArgs baseCommandArgs) {
+    FlinkRunCommandArgs flinkCommandArgs = new FlinkRunCommandArgs();
+    CommandArgsParser.parseArguments(baseCommandArgs.getUnknownOptions(), flinkCommandArgs);
+    DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(flinkCommandArgs, null);
+
+    ProcessBuilder flinkProcBuilder = new ProcessBuilder();
+    List<String> flinkCommands = Lists.newArrayList();
+
+    flinkCommands.add(flinkDir + "/bin/flink");
+    flinkCommands.add(flinkCommandArgs.getExecutionMode());
+    deploymentSupplier.addDeploymentCommands(baseCommandArgs, flinkCommands);
+
+    for (Map.Entry<String, String> property : baseCommandArgs.getProperties().entrySet()) {
+      LOG.info("Add Users property {} = {}.", property.getKey(), property.getValue());
+      flinkCommands.add("-D");
+      flinkCommands.add(StringUtils.trim(property.getKey()) + "=" + StringUtils.trim(property.getValue()));
+    }
+
+    flinkProcBuilder.command(flinkCommands);
     return flinkProcBuilder;
   }
 

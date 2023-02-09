@@ -28,6 +28,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FlinkRunCommandArgs implements CommandArgs {
+
+  public static final String KUBERNETES_CLUSTER_ID = "kubernetes.cluster-id";
   public static final String KUBERNETES_CONTAINER_IMAGE = "kubernetes.container.image";
   public static final String KUBERNETES_JOBMANAGER_CPU = "kubernetes.jobmanager.cpu";
   public static final String KUBERNETES_TASKMANAGER_CPU = "kubernetes.taskmanager.cpu";
@@ -61,6 +63,10 @@ public class FlinkRunCommandArgs implements CommandArgs {
   @Parameter(names = "--jm-address",
       description = "Specify the job manager to use, eg: localhost:8081.")
   private String jobManagerAddress;
+
+  @Parameter(names = "--" + KUBERNETES_CLUSTER_ID,
+          description = "The cluster-id of kubernetes")
+  private String kubernetesClusterId = "bitsail-job";
 
   @Parameter(names = "--" + KUBERNETES_CONTAINER_IMAGE,
           description = "The container image of kubernetes")

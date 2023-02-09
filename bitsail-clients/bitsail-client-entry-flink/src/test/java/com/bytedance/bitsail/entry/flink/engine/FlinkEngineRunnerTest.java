@@ -39,6 +39,9 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_KUBERNETES_APPLICATION;
+import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_YARN_PER_JOB;
+
 /**
  * Created 2022/8/5
  */
@@ -53,32 +56,45 @@ public class FlinkEngineRunnerTest {
   @Before
   public void before() throws URISyntaxException, IOException {
     variables.set("BITSAIL_CONF_DIR", Paths.get(FlinkEngineRunnerTest.class.getClassLoader().getResource("").toURI()).toString());
+    File file = new File("/tmp/embedded/flink/bin/flink");
+    Files.createParentDirs(file);
+  }
 
+  @Test
+  public void testGetRunFlinkProcBuilder() throws IOException, URISyntaxException {
     baseCommandArgs = new BaseCommandArgs();
     baseCommandArgs.setMainAction("run");
     baseCommandArgs.setJobConf(Paths.get(FlinkEngineRunnerTest.class.getClassLoader().getResource("examples/Fake_Print_Example.json").toURI()).toString());
     HashMap<String, String> properties = Maps.newHashMap();
     properties.put("blob.fetch.num-concurrent", "32");
     baseCommandArgs.setProperties(properties);
-
     jobConfiguration = ConfigParser.fromRawConfPath(baseCommandArgs.getJobConf());
-
-    File file = new File("/tmp/embedded/flink/bin/flink");
-    Files.createParentDirs(file);
-  }
-
-  @Test
-  public void testGetFlinkProcBuilder() throws IOException {
-    String[] flinkRunCommandArgs = new String[] {"--execution-mode", "run", "--queue", "default", "--deployment-mode", "yarn-per-job"};
+    String[] flinkRunCommandArgs = new String[] {"--execution-mode", "run", "--queue", "default", "--deployment-mode", DEPLOYMENT_YARN_PER_JOB};
     baseCommandArgs.setUnknownOptions(flinkRunCommandArgs);
     BitSailConfiguration sysConfiguration = BitSailSystemConfiguration.loadSysConfiguration();
     FlinkEngineRunner flinkEngineRunner = new FlinkEngineRunner();
     flinkEngineRunner.initializeEngine(sysConfiguration);
     ProcessBuilder runProcBuilder = flinkEngineRunner
-        .getRunProcBuilder(jobConfiguration, baseCommandArgs);
+        .getProcBuilder(baseCommandArgs);
 
     List<String> command = runProcBuilder.command();
     Assert.assertEquals(62, command.size());
+  }
+
+  @Test
+  public void testGetCancelFlinkProcBuilder() throws IOException {
+    baseCommandArgs = new BaseCommandArgs();
+    baseCommandArgs.setMainAction("stop");
+    String[] flinkRunCommandArgs = new String[] {"--execution-mode", "cancel", "--deployment-mode", DEPLOYMENT_KUBERNETES_APPLICATION};
+    baseCommandArgs.setUnknownOptions(flinkRunCommandArgs);
+    BitSailConfiguration sysConfiguration = BitSailSystemConfiguration.loadSysConfiguration();
+    FlinkEngineRunner flinkEngineRunner = new FlinkEngineRunner();
+    flinkEngineRunner.initializeEngine(sysConfiguration);
+    ProcessBuilder runProcBuilder = flinkEngineRunner
+            .getProcBuilder(baseCommandArgs);
+
+    List<String> command = runProcBuilder.command();
+    Assert.assertEquals(12, command.size());
   }
 
   @Test

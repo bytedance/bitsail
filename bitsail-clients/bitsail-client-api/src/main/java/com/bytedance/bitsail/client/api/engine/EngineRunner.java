@@ -33,8 +33,7 @@ public interface EngineRunner extends Serializable {
 
   void initializeEngine(BitSailConfiguration sysConfiguration);
 
-  ProcessBuilder getProcBuilder(BitSailConfiguration jobConfiguration,
-                                BaseCommandArgs baseCommandArgs) throws IOException;
+  ProcessBuilder getProcBuilder(BaseCommandArgs baseCommandArgs) throws IOException;
 
   String engineName();
 }

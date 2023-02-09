@@ -31,7 +31,7 @@ public class FakeEngine implements EngineRunner {
   }
 
   @Override
-  public ProcessBuilder getProcBuilder(BitSailConfiguration jobConfiguration, BaseCommandArgs baseCommandArgs) {
+  public ProcessBuilder getProcBuilder(BaseCommandArgs baseCommandArgs) {
     return new ProcessBuilder("bash", "-c", "echo fake-engine!");
   }
 
