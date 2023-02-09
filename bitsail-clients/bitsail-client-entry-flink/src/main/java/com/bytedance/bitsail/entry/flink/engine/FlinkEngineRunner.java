@@ -204,6 +204,7 @@ public class FlinkEngineRunner implements EngineRunner {
       flinkCommands.add("-D");
       flinkCommands.add(StringUtils.trim(property.getKey()) + "=" + StringUtils.trim(property.getValue()));
     }
+    flinkCommands.add(flinkCommandArgs.getJobId());
 
     flinkProcBuilder.command(flinkCommands);
     return flinkProcBuilder;

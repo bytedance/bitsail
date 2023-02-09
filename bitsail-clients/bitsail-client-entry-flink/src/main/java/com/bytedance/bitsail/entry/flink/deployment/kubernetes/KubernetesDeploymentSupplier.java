@@ -63,7 +63,6 @@ public class KubernetesDeploymentSupplier implements DeploymentSupplier {
   @Override
   public void addStopDeploymentCommands(BaseCommandArgs baseCommandArgs) {
     baseCommandArgs.getProperties().put(KUBERNETES_CLUSTER_ID,
-            flinkRunCommandArgs.getKubernetesClusterId() + " " +
-            flinkRunCommandArgs.getJobId());
+            flinkRunCommandArgs.getKubernetesClusterId());
   }
 }

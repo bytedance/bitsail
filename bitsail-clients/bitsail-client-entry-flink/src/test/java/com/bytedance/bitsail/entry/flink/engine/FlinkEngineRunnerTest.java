@@ -22,6 +22,7 @@ import com.bytedance.bitsail.common.configuration.BitSailSystemConfiguration;
 import com.bytedance.bitsail.common.configuration.ConfigParser;
 import com.bytedance.bitsail.entry.flink.configuration.FlinkRunnerConfigOptions;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import org.junit.Assert;
@@ -39,6 +40,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs.KUBERNETES_CLUSTER_ID;
 import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_KUBERNETES_APPLICATION;
 import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_YARN_PER_JOB;
 
@@ -94,7 +96,15 @@ public class FlinkEngineRunnerTest {
             .getProcBuilder(baseCommandArgs);
 
     List<String> command = runProcBuilder.command();
-    Assert.assertEquals(6, command.size());
+    List<String> expectedCommand = ImmutableList.of(
+            "/tmp/embedded/flink/bin/flink",
+            "cancel",
+            "-t",
+            DEPLOYMENT_KUBERNETES_APPLICATION,
+            "-D",
+            KUBERNETES_CLUSTER_ID + "=" + "bitsail-job",
+            "test-jobId");
+    Assert.assertEquals(expectedCommand, command);
   }
 
   @Test

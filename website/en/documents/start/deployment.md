@@ -244,7 +244,7 @@ Publish your `<CustomImage>` onto Dockerhub so that Kubernetes cluster can downl
 ```bash
 bash ./bin/bitsail run \
    --engine flink \
-   -t kubernetes-application \
+   --target kubernetes-application \
    --deployment-mode kubernetes-application \
    --execution-mode run-application \
    --kubernetes.container.image <CustomImage> \
@@ -255,11 +255,16 @@ bash ./bin/bitsail run \
 
 ### <span id="jump_stop_application">Stop Application</span>
 ```bash
-bash ./bin/bitsail run \
+bash ./bin/bitsail stop \
    --engine flink \
-   -t kubernetes-application \
+   --target kubernetes-application \
    --deployment-mode kubernetes-application \
-   --execution-mode cancel
+   --execution-mode cancel \
+   --job-id <jobId>
+```
+Alternatively, users can run `kubectl` commands to delete the whole deployment in order to stop the application
+```bash
+kubectl delete deployments bitsail-job
 ```
 
 ### <span id="jump_kubernetes_logs">Kubernetes Logs</span>
