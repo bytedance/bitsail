@@ -32,7 +32,6 @@ import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.connector.cdc.source.coordinator.CDCSourceSplitCoordinator;
 import com.bytedance.bitsail.connector.cdc.source.coordinator.state.BaseAssignmentState;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
-import com.bytedance.bitsail.connector.cdc.source.coordinator.state.BinlogAssignmentState;
 
 import java.io.IOException;
 

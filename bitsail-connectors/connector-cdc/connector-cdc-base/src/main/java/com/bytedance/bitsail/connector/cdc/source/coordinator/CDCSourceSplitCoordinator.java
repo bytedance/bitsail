@@ -19,16 +19,13 @@ package com.bytedance.bitsail.connector.cdc.source.coordinator;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceEvent;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.connector.cdc.source.BinlogSource;
 import com.bytedance.bitsail.connector.cdc.source.coordinator.state.BaseAssignmentState;
 import com.bytedance.bitsail.connector.cdc.source.coordinator.state.BinlogAssignmentState;
 import com.bytedance.bitsail.connector.cdc.source.event.BinlogCompleteAckEvent;
 import com.bytedance.bitsail.connector.cdc.source.event.BinlogCompleteEvent;
-import com.bytedance.bitsail.connector.cdc.source.event.BinlogStopReadEvent;
 import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 
-import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +33,6 @@ import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BinlogSplit, BaseAssignmentState> {
 

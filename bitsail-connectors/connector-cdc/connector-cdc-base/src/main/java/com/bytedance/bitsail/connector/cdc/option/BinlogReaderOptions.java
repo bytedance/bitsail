@@ -24,7 +24,6 @@ import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffsetType;
 import com.alibaba.fastjson.TypeReference;
 
 import java.util.List;
-import java.util.Locale;
 
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
