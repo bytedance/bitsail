@@ -24,6 +24,7 @@ import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 
 import com.google.common.collect.Lists;
+import org.junit.Test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -45,7 +46,7 @@ public class MysqlBinlogSplitReaderTest {
     statement.execute("SHOW DATABASES;");
   }
 
-  //@Test
+  @Test
   public void testReader() throws InterruptedException {
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
 

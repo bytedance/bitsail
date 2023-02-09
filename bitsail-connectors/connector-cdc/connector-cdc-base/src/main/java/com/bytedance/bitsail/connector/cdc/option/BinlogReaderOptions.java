@@ -19,10 +19,12 @@ package com.bytedance.bitsail.connector.cdc.option;
 import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.connector.cdc.model.ClusterInfo;
+import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffsetType;
 
 import com.alibaba.fastjson.TypeReference;
 
 import java.util.List;
+import java.util.Locale;
 
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
@@ -51,4 +53,12 @@ public interface BinlogReaderOptions extends ReaderOptions.BaseReaderOptions {
   ConfigOption<Integer> QUERY_RETRY_TIMES =
       key(READER_PREFIX + "query_retry_times")
           .defaultValue(3);
+
+  ConfigOption<String> INITIAL_OFFSET_TYPE =
+      key(READER_PREFIX + "initial_offset_type")
+          .defaultValue(String.valueOf(BinlogOffsetType.EARLIEST).toLowerCase());
+
+  ConfigOption<String> INITIAL_OFFSET_VALUE =
+      key(READER_PREFIX + "initial_offset_value")
+          .noDefaultValue(String.class);
 }

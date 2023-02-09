@@ -19,12 +19,14 @@ package com.bytedance.bitsail.connector.cdc.source.coordinator;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceEvent;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.connector.cdc.source.BinlogSource;
+import com.bytedance.bitsail.connector.cdc.source.coordinator.state.BaseAssignmentState;
+import com.bytedance.bitsail.connector.cdc.source.coordinator.state.BinlogAssignmentState;
 import com.bytedance.bitsail.connector.cdc.source.event.BinlogCompleteAckEvent;
 import com.bytedance.bitsail.connector.cdc.source.event.BinlogCompleteEvent;
 import com.bytedance.bitsail.connector.cdc.source.event.BinlogStopReadEvent;
 import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
-import com.bytedance.bitsail.connector.cdc.source.state.BinlogOffsetState;
 
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -37,42 +39,45 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BinlogSplit, BinlogOffsetState> {
+public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BinlogSplit, BaseAssignmentState> {
 
   private static final Logger LOG = LoggerFactory.getLogger(CDCSourceSplitCoordinator.class);
 
-  private final SourceSplitCoordinator.Context<BinlogSplit, BinlogOffsetState> context;
+  private final SourceSplitCoordinator.Context<BinlogSplit, BaseAssignmentState> context;
   private final BitSailConfiguration jobConf;
-  private final Map<Integer, Set<BinlogSplit>> splitAssignmentPlan;
+  private boolean isBinlogAssigned;
 
-  public CDCSourceSplitCoordinator(SourceSplitCoordinator.Context<BinlogSplit, BinlogOffsetState> context,
+  public CDCSourceSplitCoordinator(SourceSplitCoordinator.Context<BinlogSplit, BaseAssignmentState> context,
                                    BitSailConfiguration jobConf) {
     this.context = context;
     this.jobConf = jobConf;
-    this.splitAssignmentPlan = Maps.newConcurrentMap();
+    if (context.isRestored()) {
+      this.isBinlogAssigned = ((BinlogAssignmentState) context.getRestoreState()).isAssigned();
+    } else {
+      this.isBinlogAssigned = false;
+    }
   }
 
   @Override
   public void start() {
     int totalReader = this.context.registeredReaders().size();
     LOG.info("Total registered reader number: {}", totalReader);
-    // assign binlog split to reader
-    List<BinlogSplit> initialSplit = new ArrayList<>();
-    initialSplit.add(createSplit());
-    // test assign split to task0
-    this.context.assignSplit(0, initialSplit);
+    if (!this.isBinlogAssigned) {
+      List<BinlogSplit> initialSplit = new ArrayList<>();
+      initialSplit.add(createSplit());
+      this.context.assignSplit(0, initialSplit);
+      this.isBinlogAssigned = true;
+    }
   }
 
   @Override
   public void addReader(int subtaskId) {
     // do not support add reader during the job is running
-    context.sendEventToSourceReader(subtaskId, new BinlogStopReadEvent());
   }
 
   @Override
   public void addSplitsBack(List<BinlogSplit> splits, int subtaskId) {
-    LOG.info("Add split back to assignment plan: {}", splits);
-    splitAssignmentPlan.get(subtaskId).addAll(splits);
+    // do nothing
   }
 
   @Override
@@ -91,9 +96,9 @@ public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BinlogS
   }
 
   @Override
-  public BinlogOffsetState snapshotState() throws Exception {
+  public BinlogAssignmentState snapshotState() throws Exception {
     // currently store nothing in state
-    return new BinlogOffsetState();
+    return new BinlogAssignmentState(this.isBinlogAssigned);
   }
 
   @Override

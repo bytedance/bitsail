@@ -14,25 +14,11 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.cdc.source.state;
+package com.bytedance.bitsail.connector.cdc.source.coordinator.state;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import com.bytedance.bitsail.base.serializer.SimpleVersionedBinarySerializer;
 
-/**
- * Store mysql offset in Flink State.
- */
-public class BinlogOffsetState implements Serializable {
-  private static final long serialVersionUID = 1L;
+public class AssignmentStateSerializer extends SimpleVersionedBinarySerializer<BaseAssignmentState> {
 
-  Map<String, String> offsetStore;
 
-  public BinlogOffsetState() {
-    this.offsetStore = new HashMap<>();
-  }
-
-  public BinlogOffsetState(Map<String, String> offsetStore) {
-    this.offsetStore = offsetStore;
-  }
 }
