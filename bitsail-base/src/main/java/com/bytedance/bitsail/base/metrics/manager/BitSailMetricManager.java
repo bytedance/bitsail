@@ -78,7 +78,7 @@ public class BitSailMetricManager implements MetricManager {
   public BitSailMetricManager(BitSailConfiguration configuration,
                               String groupName,
                               boolean daemon) {
-    this(configuration, groupName, daemon, Collections.EMPTY_LIST);
+    this(configuration, groupName, daemon, Collections.emptyList());
   }
 
   public BitSailMetricManager(BitSailConfiguration metricConfiguration,

@@ -14,4 +14,5 @@
 # limitations under the License.
 #
 
-com.bytedance.bitsail.connector.legacy.hive.common.HiveTableCatalogFactory
+com.bytedance.bitsail.component.metrics.prometheus.impl.PrometheusMetricReporterBuilder
+com.bytedance.bitsail.component.metrics.prometheus.impl.PrometheusPushGatewayMetricReporterBuilder
