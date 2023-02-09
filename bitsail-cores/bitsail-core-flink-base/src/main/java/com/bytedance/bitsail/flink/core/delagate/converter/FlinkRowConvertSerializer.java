@@ -49,7 +49,6 @@ import static com.bytedance.bitsail.common.typeinfo.TypeInfos.STRING_TYPE_INFO;
  * Created 2022/6/21
  */
 public class FlinkRowConvertSerializer implements RowSerializer<Row> {
-
   private final List<ColumnInfo> columns;
 
   private final TypeInfo<?>[] typeInfos;
