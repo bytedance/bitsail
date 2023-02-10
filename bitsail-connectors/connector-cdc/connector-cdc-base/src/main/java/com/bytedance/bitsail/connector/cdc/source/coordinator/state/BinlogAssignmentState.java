@@ -16,12 +16,10 @@
 
 package com.bytedance.bitsail.connector.cdc.source.coordinator.state;
 
-import java.io.Serializable;
-
 /**
- * Store mysql offset in Flink State.
+ * State to store whether the binlog split was already assigned by coordinator.
  */
-public class BinlogAssignmentState extends BaseAssignmentState implements Serializable {
+public class BinlogAssignmentState extends BaseAssignmentState {
   private final boolean isAssigned;
 
   @Override

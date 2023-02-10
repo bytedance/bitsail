@@ -16,16 +16,17 @@
 
 package com.bytedance.bitsail.connector.cdc.source.coordinator.state;
 
-import javax.annotation.Nullable;
+/**
+ * Store the snapshot assignment status.
+ */
+public class SnapshotAssignmentState extends BaseAssignmentState {
 
-import java.io.Serializable;
+  public SnapshotAssignmentState() {
 
-public abstract class BaseAssignmentState implements Serializable {
+  }
 
-  private static final long serialVersionUID = 1L;
-
-  @Nullable
-  transient byte[] serializedCache;
-
-  public abstract int getType();
+  @Override
+  public int getType() {
+    return SplitType.SNAPSHOT_SPLIT_TYPE;
+  }
 }

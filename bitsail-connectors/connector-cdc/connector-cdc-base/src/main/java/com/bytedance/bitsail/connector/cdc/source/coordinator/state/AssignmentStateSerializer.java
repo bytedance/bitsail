@@ -20,5 +20,7 @@ import com.bytedance.bitsail.base.serializer.SimpleVersionedBinarySerializer;
 
 public class AssignmentStateSerializer extends SimpleVersionedBinarySerializer<BaseAssignmentState> {
 
+  public AssignmentStateSerializer() {
 
+  }
 }

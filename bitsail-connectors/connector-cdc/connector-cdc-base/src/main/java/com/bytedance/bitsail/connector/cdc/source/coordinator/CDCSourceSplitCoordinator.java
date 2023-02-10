@@ -47,7 +47,10 @@ public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BinlogS
     this.context = context;
     this.jobConf = jobConf;
     if (context.isRestored()) {
-      this.isBinlogAssigned = ((BinlogAssignmentState) context.getRestoreState()).isAssigned();
+      BaseAssignmentState restoredState = context.getRestoreState();
+      this.isBinlogAssigned = ((BinlogAssignmentState) restoredState).isAssigned();
+      LOG.info(String.format("Restore coordinator state, state type is: %s, binlog is assigned: %s",
+          restoredState.getType(), this.isBinlogAssigned));
     } else {
       this.isBinlogAssigned = false;
     }
@@ -58,9 +61,11 @@ public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BinlogS
     int totalReader = this.context.registeredReaders().size();
     LOG.info("Total registered reader number: {}", totalReader);
     if (!this.isBinlogAssigned) {
-      List<BinlogSplit> initialSplit = new ArrayList<>();
-      initialSplit.add(createSplit());
-      this.context.assignSplit(0, initialSplit);
+      List<BinlogSplit> splitList = new ArrayList<>();
+      BinlogSplit split = createSplit(this.jobConf);
+      splitList.add(split);
+      LOG.info("binlog is not assigned, assigning a new binlog split to reader: " + split.toString());
+      this.context.assignSplit(0, splitList);
       this.isBinlogAssigned = true;
     }
   }
@@ -91,7 +96,7 @@ public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BinlogS
   }
 
   @Override
-  public BinlogAssignmentState snapshotState() throws Exception {
+  public BaseAssignmentState snapshotState() {
     // currently store nothing in state
     return new BinlogAssignmentState(this.isBinlogAssigned);
   }
@@ -106,8 +111,8 @@ public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BinlogS
     LOG.info("Closing MysqlSourceSplitCoordinator");
   }
 
-  private BinlogSplit createSplit() {
-    BinlogOffset begin = BinlogOffset.earliest();
+  private BinlogSplit createSplit(BitSailConfiguration jobConf) {
+    BinlogOffset begin = BinlogOffset.createFromJobConf(jobConf);
 
     BinlogOffset end = BinlogOffset.boundless();
 
