@@ -67,7 +67,7 @@ jobs:
           apacheSnapshots: true
           sonatypeSnapshots: true
           oracleRepo: true
-      - name: Setup thrift
+      - name: Setup Apache Thrift Compiler
         run: |
           brew tap-new $USER/local-tap
           brew extract --version='0.13.0' thrift $USER/local-tap
