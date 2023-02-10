@@ -1,8 +1,12 @@
 ---
 order: 2
 ---
+
 # Contributor Guide
+
 English | [简体中文](../../zh/community/contribute.md)
+
+-----
 
 BitSail community welcomes contributions from anyone!
 
@@ -68,6 +72,7 @@ If it is the first time to submit a pull request, you can read this doc [About P
 - Commit changes to the branch and push to the fork repo
 - Create a pull request to the ***BitSail*** repo
 
+If you are a freshman to open source projects, you can read [How to submit a github pull request](pr_guide.md) for a more detailed guide.
 ## Ask for a code review
 After you have your pull request ready, with all the items from the pull request checklist being completed.
 Tag a committer to review you pull request.
