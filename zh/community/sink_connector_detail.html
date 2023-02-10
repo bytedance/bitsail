@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="VuePress 2.0.0-beta.53" />
+    <meta name="theme" content="VuePress Theme Hope" />
+    <link rel="icon" href="/bitsail/logo.jpg"><title>Sink Connector 详解 | BitSail</title><meta name="description" content="BitSail">
+    <style>
+      :root {
+        --bg-color: #fff;
+      }
+
+      html[data-theme="dark"] {
+        --bg-color: #1d2025;
+      }
+
+      html,
+      body {
+        background: var(--bg-color);
+      }
+    </style>
+    <script>
+      const userMode = localStorage.getItem("vuepress-theme-hope-scheme");
+      const systemDarkMode =
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+      if (userMode === "dark" || (userMode !== "light" && systemDarkMode)) {
+        document.querySelector("html").setAttribute("data-theme", "dark");
+      }
+    </script>
+    <link rel="preload" href="/bitsail/assets/style.8db8002d.css" as="style" /><link rel="stylesheet" href="/bitsail/assets/style.8db8002d.css" />
+    <link rel="modulepreload" href="/bitsail/assets/app.982a74e2.js"><link rel="modulepreload" href="/bitsail/assets/sink_connector_detail.html.92a0cee1.js"><link rel="modulepreload" href="/bitsail/assets/sink_connector.3fde728e.js"><link rel="modulepreload" href="/bitsail/assets/writer_diagram.6d20d83e.js"><link rel="modulepreload" href="/bitsail/assets/_plugin-vue_export-helper.cdc0426e.js"><link rel="modulepreload" href="/bitsail/assets/sink_connector_detail.html.5f186464.js">
+  </head>
+  <body>
+    <div id="app"><!--[--><!--[--><!--[--><span tabindex="-1"></span><a href="#main-content" class="skip-link sr-only">跳至主要內容</a><!--]--><div class="theme-container has-toc"><!--[--><!--[--><header class="navbar"><div class="navbar-left"><button class="toggle-sidebar-button" title="Toggle Sidebar"><span class="icon"></span></button><!--[--><!----><!--]--><a href="/bitsail/zh/" class="brand"><img class="logo" src="/bitsail/logo.jpg" alt="BitSail"><!----><span class="site-name hide-in-pad">BitSail</span></a><!--[--><!----><!--]--></div><div class="navbar-center"><!--[--><!----><!--]--><nav class="nav-links"><div class="nav-item hide-in-mobile"><a href="/bitsail/zh/" class="nav-link" aria-label="首页"><!---->首页<!----></a></div><div class="nav-item hide-in-mobile"><a href="/bitsail/zh/documents/introduce.html" class="nav-link" aria-label="文档"><!---->文档<!----></a></div><div class="nav-item hide-in-mobile"><a href="/bitsail/zh/community/community.html" class="nav-link active" aria-label="社区"><!---->社区<!----></a></div><div class="nav-item hide-in-mobile"><a href="/bitsail/zh/blog/blog.html" class="nav-link" aria-label="博客"><!---->博客<!----></a></div><div class="nav-item hide-in-mobile"><a href="https://github.com/bytedance/bitsail" rel="noopener noreferrer" target="_blank" aria-label="下载" class="nav-link"><!---->下载<span><svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a></div><div class="nav-item hide-in-mobile"><a href="https://github.com/bytedance/bitsail" rel="noopener noreferrer" target="_blank" aria-label="Github" class="nav-link"><!---->Github<span><svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a></div></nav><!--[--><!----><!--]--></div><div class="navbar-right"><!--[--><!----><!--]--><div class="nav-item"><div class="dropdown-wrapper i18n-dropdown"><button class="dropdown-title" type="button" aria-label="选择语言"><!--[--><svg xmlns="http://www.w3.org/2000/svg" class="icon i18n-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="i18n icon" style="width:1rem;height:1rem;vertical-align:middle;"><path d="M379.392 460.8 494.08 575.488l-42.496 102.4L307.2 532.48 138.24 701.44l-71.68-72.704L234.496 460.8l-45.056-45.056c-27.136-27.136-51.2-66.56-66.56-108.544h112.64c7.68 14.336 16.896 27.136 26.112 35.84l45.568 46.08 45.056-45.056C382.976 312.32 409.6 247.808 409.6 204.8H0V102.4h256V0h102.4v102.4h256v102.4H512c0 70.144-37.888 161.28-87.04 210.944L378.88 460.8zM576 870.4 512 1024H409.6l256-614.4H768l256 614.4H921.6l-64-153.6H576zM618.496 768h196.608L716.8 532.48 618.496 768z"></path></svg><!--]--><span class="arrow"></span><ul class="nav-dropdown"><li class="dropdown-item"><a href="/bitsail/" class="nav-link" aria-label="English"><!---->English<!----></a></li><li class="dropdown-item"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html" class="router-link-active router-link-exact-active nav-link active" aria-label="简体中文"><!---->简体中文<!----></a></li></ul></button></div></div><div class="nav-item"><a class="repo-link" href="https://github.com/bytedance/bitsail" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" class="icon github-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="github icon" style="width:1.25rem;height:1.25rem;vertical-align:middle;"><path d="M511.957 21.333C241.024 21.333 21.333 240.981 21.333 512c0 216.832 140.544 400.725 335.574 465.664 24.49 4.395 32.256-10.07 32.256-23.083 0-11.69.256-44.245 0-85.205-136.448 29.61-164.736-64.64-164.736-64.64-22.315-56.704-54.4-71.765-54.4-71.765-44.587-30.464 3.285-29.824 3.285-29.824 49.195 3.413 75.179 50.517 75.179 50.517 43.776 75.008 114.816 53.333 142.762 40.79 4.523-31.66 17.152-53.377 31.19-65.537-108.971-12.458-223.488-54.485-223.488-242.602 0-53.547 19.114-97.323 50.517-131.67-5.035-12.33-21.93-62.293 4.779-129.834 0 0 41.258-13.184 134.912 50.346a469.803 469.803 0 0 1 122.88-16.554c41.642.213 83.626 5.632 122.88 16.554 93.653-63.488 134.784-50.346 134.784-50.346 26.752 67.541 9.898 117.504 4.864 129.834 31.402 34.347 50.474 78.123 50.474 131.67 0 188.586-114.73 230.016-224.042 242.09 17.578 15.232 33.578 44.672 33.578 90.454v135.85c0 13.142 7.936 27.606 32.854 22.87C862.25 912.597 1002.667 728.747 1002.667 512c0-271.019-219.648-490.667-490.71-490.667z"></path></svg></a></div><div class="nav-item hide-in-mobile"><button id="appearance-switch"><svg xmlns="http://www.w3.org/2000/svg" class="icon auto-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="auto icon" style="display:block;"><path d="M512 992C246.92 992 32 777.08 32 512S246.92 32 512 32s480 214.92 480 480-214.92 480-480 480zm0-840c-198.78 0-360 161.22-360 360 0 198.84 161.22 360 360 360s360-161.16 360-360c0-198.78-161.22-360-360-360zm0 660V212c165.72 0 300 134.34 300 300 0 165.72-134.28 300-300 300z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="dark icon" style="display:none;"><path d="M524.8 938.667h-4.267a439.893 439.893 0 0 1-313.173-134.4 446.293 446.293 0 0 1-11.093-597.334A432.213 432.213 0 0 1 366.933 90.027a42.667 42.667 0 0 1 45.227 9.386 42.667 42.667 0 0 1 10.24 42.667 358.4 358.4 0 0 0 82.773 375.893 361.387 361.387 0 0 0 376.747 82.774 42.667 42.667 0 0 1 54.187 55.04 433.493 433.493 0 0 1-99.84 154.88 438.613 438.613 0 0 1-311.467 128z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="light icon" style="display:none;"><path d="M952 552h-80a40 40 0 0 1 0-80h80a40 40 0 0 1 0 80zM801.88 280.08a41 41 0 0 1-57.96-57.96l57.96-58a41.04 41.04 0 0 1 58 58l-58 57.96zM512 752a240 240 0 1 1 0-480 240 240 0 0 1 0 480zm0-560a40 40 0 0 1-40-40V72a40 40 0 0 1 80 0v80a40 40 0 0 1-40 40zm-289.88 88.08-58-57.96a41.04 41.04 0 0 1 58-58l57.96 58a41 41 0 0 1-57.96 57.96zM192 512a40 40 0 0 1-40 40H72a40 40 0 0 1 0-80h80a40 40 0 0 1 40 40zm30.12 231.92a41 41 0 0 1 57.96 57.96l-57.96 58a41.04 41.04 0 0 1-58-58l58-57.96zM512 832a40 40 0 0 1 40 40v80a40 40 0 0 1-80 0v-80a40 40 0 0 1 40-40zm289.88-88.08 58 57.96a41.04 41.04 0 0 1-58 58l-57.96-58a41 41 0 0 1 57.96-57.96z"></path></svg></button></div><!----><!--[--><!----><!--]--><button class="toggle-navbar-button" aria-label="Toggle Navbar" aria-expanded="false" aria-controls="nav-screen"><span class="button-container"><span class="button-top"></span><span class="button-middle"></span><span class="button-bottom"></span></span></button></div></header><!----><!--]--><!----><div class="toggle-sidebar-wrapper"><span class="arrow left"></span></div><aside class="sidebar"><!--[--><!----><!--]--><ul class="sidebar-links"><li><!--[--><a href="/bitsail/zh/community/community.html" class="nav-link sidebar-link sidebar-page" aria-label="社区"><!---->社区<!----></a><ul class="sidebar-sub-headers"></ul><!--]--></li><li><!--[--><a href="/bitsail/zh/community/contribute.html" class="nav-link sidebar-link sidebar-page" aria-label="贡献者指引"><!---->贡献者指引<!----></a><ul class="sidebar-sub-headers"></ul><!--]--></li><li><!--[--><a href="/bitsail/zh/community/pr_guide.html" class="nav-link sidebar-link sidebar-page" aria-label="PR发布指南"><!---->PR发布指南<!----></a><ul class="sidebar-sub-headers"></ul><!--]--></li><li><!--[--><a href="/bitsail/zh/community/release_guide.html" class="nav-link sidebar-link sidebar-page" aria-label="BitSail 发版指南"><!---->BitSail 发版指南<!----></a><ul class="sidebar-sub-headers"></ul><!--]--></li><li><!--[--><a href="/bitsail/zh/community/mailing.html" class="nav-link sidebar-link sidebar-page" aria-label="邮件列表"><!---->邮件列表<!----></a><ul class="sidebar-sub-headers"></ul><!--]--></li><li><!--[--><a href="/bitsail/zh/community/team.html" class="nav-link sidebar-link sidebar-page" aria-label="Team"><!---->Team<!----></a><ul class="sidebar-sub-headers"></ul><!--]--></li><li><!--[--><a href="/bitsail/zh/community/connector_quick_start.html" class="nav-link sidebar-link sidebar-page" aria-label="Connector开发指南"><!---->Connector开发指南<!----></a><ul class="sidebar-sub-headers"></ul><!--]--></li><li><!--[--><a href="/bitsail/zh/community/source_connector_detail.html" class="nav-link sidebar-link sidebar-page" aria-label="Source Connector 详解"><!---->Source Connector 详解<!----></a><ul class="sidebar-sub-headers"></ul><!--]--></li><li><!--[--><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html" class="router-link-active router-link-exact-active nav-link active sidebar-link sidebar-page active" aria-label="Sink Connector 详解"><!---->Sink Connector 详解<!----></a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#bitsail-sink-connector交互流程介绍" class="router-link-active router-link-exact-active nav-link sidebar-link heading" aria-label="BitSail Sink Connector交互流程介绍"><!---->BitSail Sink Connector交互流程介绍<!----></a><ul class="sidebar-sub-headers"></ul></li><li class="sidebar-sub-header"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#sink" class="router-link-active router-link-exact-active nav-link sidebar-link heading" aria-label="Sink"><!---->Sink<!----></a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#sink接口" class="router-link-active router-link-exact-active nav-link sidebar-link heading" aria-label="Sink接口"><!---->Sink接口<!----></a><ul class="sidebar-sub-headers"></ul></li><li class="sidebar-sub-header"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#configure方法" class="router-link-active router-link-exact-active nav-link sidebar-link heading" aria-label="configure方法"><!---->configure方法<!----></a><ul class="sidebar-sub-headers"></ul></li><li class="sidebar-sub-header"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#createwriter方法" class="router-link-active router-link-exact-active nav-link sidebar-link heading" aria-label="createWriter方法"><!---->createWriter方法<!----></a><ul class="sidebar-sub-headers"></ul></li><li class="sidebar-sub-header"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#createtypeinfoconverter方法" class="router-link-active router-link-exact-active nav-link sidebar-link heading" aria-label="createTypeInfoConverter方法"><!---->createTypeInfoConverter方法<!----></a><ul class="sidebar-sub-headers"></ul></li><li class="sidebar-sub-header"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#createcommitter方法" class="router-link-active router-link-exact-active nav-link sidebar-link heading" aria-label="createCommitter方法"><!---->createCommitter方法<!----></a><ul class="sidebar-sub-headers"></ul></li></ul></li><li class="sidebar-sub-header"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#writer" class="router-link-active router-link-exact-active nav-link sidebar-link heading" aria-label="Writer"><!---->Writer<!----></a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#writer接口" class="router-link-active router-link-exact-active nav-link sidebar-link heading" aria-label="Writer接口"><!---->Writer接口<!----></a><ul class="sidebar-sub-headers"></ul></li><li class="sidebar-sub-header"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#构造方法" class="router-link-active router-link-exact-active nav-link sidebar-link heading" aria-label="构造方法"><!---->构造方法<!----></a><ul class="sidebar-sub-headers"></ul></li><li class="sidebar-sub-header"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#write方法" class="router-link-active router-link-exact-active nav-link sidebar-link heading" aria-label="write方法"><!---->write方法<!----></a><ul class="sidebar-sub-headers"></ul></li><li class="sidebar-sub-header"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#flush方法" class="router-link-active router-link-exact-active nav-link sidebar-link heading" aria-label="flush方法"><!---->flush方法<!----></a><ul class="sidebar-sub-headers"></ul></li><li class="sidebar-sub-header"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#close方法" class="router-link-active router-link-exact-active nav-link sidebar-link heading" aria-label="close方法"><!---->close方法<!----></a><ul class="sidebar-sub-headers"></ul></li></ul></li></ul><!--]--></li></ul><!--[--><!----><!--]--></aside><!--[--><main class="page" id="main-content"><!--[--><!----><nav class="breadcrumb disable"></nav><div class="page-title"><h1><!---->Sink Connector 详解</h1><!----><hr></div><div class="toc-place-holder"><aside id="toc"><div class="toc-header">此页内容</div><div class="toc-wrapper"><ul class="toc-list"><!--[--><li class="toc-item"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#bitsail-sink-connector交互流程介绍" class="router-link-active router-link-exact-active toc-link level2">BitSail Sink Connector交互流程介绍</a></li><!----><!--]--><!--[--><li class="toc-item"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#sink" class="router-link-active router-link-exact-active toc-link level2">Sink</a></li><ul class="toc-list"><!--[--><li class="toc-item"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#sink接口" class="router-link-active router-link-exact-active toc-link level3">Sink接口</a></li><!----><!--]--><!--[--><li class="toc-item"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#configure方法" class="router-link-active router-link-exact-active toc-link level3">configure方法</a></li><!----><!--]--><!--[--><li class="toc-item"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#createwriter方法" class="router-link-active router-link-exact-active toc-link level3">createWriter方法</a></li><!----><!--]--><!--[--><li class="toc-item"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#createtypeinfoconverter方法" class="router-link-active router-link-exact-active toc-link level3">createTypeInfoConverter方法</a></li><!----><!--]--><!--[--><li class="toc-item"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#createcommitter方法" class="router-link-active router-link-exact-active toc-link level3">createCommitter方法</a></li><!----><!--]--></ul><!--]--><!--[--><li class="toc-item"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#writer" class="router-link-active router-link-exact-active toc-link level2">Writer</a></li><ul class="toc-list"><!--[--><li class="toc-item"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#writer接口" class="router-link-active router-link-exact-active toc-link level3">Writer接口</a></li><!----><!--]--><!--[--><li class="toc-item"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#构造方法" class="router-link-active router-link-exact-active toc-link level3">构造方法</a></li><!----><!--]--><!--[--><li class="toc-item"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#write方法" class="router-link-active router-link-exact-active toc-link level3">write方法</a></li><!----><!--]--><!--[--><li class="toc-item"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#flush方法" class="router-link-active router-link-exact-active toc-link level3">flush方法</a></li><!----><!--]--><!--[--><li class="toc-item"><a aria-current="page" href="/bitsail/zh/community/sink_connector_detail.html#close方法" class="router-link-active router-link-exact-active toc-link level3">close方法</a></li><!----><!--]--></ul><!--]--></ul></div></aside></div><!----><div class="theme-hope-content"><h1 id="sink-connector-详解" tabindex="-1"><a class="header-anchor" href="#sink-connector-详解" aria-hidden="true">#</a> Sink Connector 详解</h1><p><a href="/bitsail/en/community/sink_connector_detail.html" class="">English</a> | 简体中文</p><hr><h2 id="bitsail-sink-connector交互流程介绍" tabindex="-1"><a class="header-anchor" href="#bitsail-sink-connector交互流程介绍" aria-hidden="true">#</a> BitSail Sink Connector交互流程介绍</h2><p><img src="/bitsail/assets/sink_connector.7ef34259.png" alt="" loading="lazy"></p><ul><li>Sink：数据写入组件的生命周期管理，主要负责和框架的交互，构架作业，它不参与作业真正的执行。</li><li>Writer：负责将接收到的数据写到外部存储。</li><li>WriterCommitter(可选)：对数据进行提交操作，来完成两阶段提交的操作；实现exactly-once的语义。</li></ul><p>开发者首先需要创建<code>Sink</code>类，实现<code>Sink</code>接口，主要负责数据写入组件的生命周期管理，构架作业。通过<code>configure</code>方法定义<code>writerConfiguration</code>的配置，通过<code>createTypeInfoConverter</code>方法来进行数据类型转换，将内部类型进行转换写到外部系统，同<code>Source</code>部分。之后我们再定义<code>Writer</code>类实现具体的数据写入逻辑，在<code>write</code>方法调用时将<code>BitSail Row</code>类型把数据写到缓存队列中，在<code>flush</code>方法调用时将缓存队列中的数据刷写到目标数据源中。</p><h2 id="sink" tabindex="-1"><a class="header-anchor" href="#sink" aria-hidden="true">#</a> Sink</h2><p>数据写入组件的生命周期管理，主要负责和框架的交互，构架作业，它不参与作业真正的执行。</p><p>对于每一个Sink任务，我们要实现一个继承Sink接口的类。</p><p><img src="/bitsail/assets/sink_diagram.7330cd8d.png" alt="" loading="lazy"></p><h3 id="sink接口" tabindex="-1"><a class="header-anchor" href="#sink接口" aria-hidden="true">#</a> Sink接口</h3><div class="language-Java line-numbers-mode" data-ext="Java"><pre class="language-Java"><code>public interface Sink&lt;InputT, CommitT extends Serializable, WriterStateT extends Serializable&gt; extends Serializable {
+
+  /**
+   * @return The name of writer operation.
+   */
+  String getWriterName();
+
+  /**
+   * Configure writer with user defined options.
+   *
+   * @param commonConfiguration Common options.
+   * @param writerConfiguration Options for writer.
+   */
+  void configure(BitSailConfiguration commonConfiguration, BitSailConfiguration writerConfiguration) throws Exception;
+
+  /**
+   * Create a writer for processing elements.
+   *
+   * @return An initialized writer.
+   */
+  Writer&lt;InputT, CommitT, WriterStateT&gt; createWriter(Writer.Context&lt;WriterStateT&gt; context) throws IOException;
+
+  /**
+   * @return A converter which supports conversion from BitSail {@link TypeInfo}
+   * and external engine type.
+   */
+  default TypeInfoConverter createTypeInfoConverter() {
+    return new BitSailTypeInfoConverter();
+  }
+
+  /**
+   * @return A committer for commit committable objects.
+   */
+  default Optional&lt;WriterCommitter&lt;CommitT&gt;&gt; createCommitter() {
+    return Optional.empty();
+  }
+
+  /**
+   * @return A serializer which convert committable object to byte array.
+   */
+  default BinarySerializer&lt;CommitT&gt; getCommittableSerializer() {
+    return new SimpleBinarySerializer&lt;CommitT&gt;();
+  }
+
+  /**
+   * @return A serializer which convert state object to byte array.
+   */
+  default BinarySerializer&lt;WriterStateT&gt; getWriteStateSerializer() {
+    return new SimpleBinarySerializer&lt;WriterStateT&gt;();
+  }
+}
+</code></pre><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3 id="configure方法" tabindex="-1"><a class="header-anchor" href="#configure方法" aria-hidden="true">#</a> configure方法</h3><p>负责configuration的初始化，通过commonConfiguration中的配置区分流式任务或者批式任务，向Writer类传递writerConfiguration。</p><h4 id="示例" tabindex="-1"><a class="header-anchor" href="#示例" aria-hidden="true">#</a> 示例</h4><p>ElasticsearchSink：</p><div class="language-Java line-numbers-mode" data-ext="Java"><pre class="language-Java"><code>public void configure(BitSailConfiguration commonConfiguration, BitSailConfiguration writerConfiguration) {
+  writerConf = writerConfiguration;
+}
+</code></pre><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3 id="createwriter方法" tabindex="-1"><a class="header-anchor" href="#createwriter方法" aria-hidden="true">#</a> createWriter方法</h3><p>负责生成一个继承自Writer接口的connector Writer类。</p><h3 id="createtypeinfoconverter方法" tabindex="-1"><a class="header-anchor" href="#createtypeinfoconverter方法" aria-hidden="true">#</a> createTypeInfoConverter方法</h3><p>类型转换，将内部类型进行转换写到外部系统，同Source部分。</p><h3 id="createcommitter方法" tabindex="-1"><a class="header-anchor" href="#createcommitter方法" aria-hidden="true">#</a> createCommitter方法</h3><p>可选方法，书写具体数据提交逻辑，一般用于想要保证数据exactly-once语义的场景，writer在完成数据写入后，committer来完成提交，进而实现二阶段提交，详细可以参考Doris Connector的实现。</p><h2 id="writer" tabindex="-1"><a class="header-anchor" href="#writer" aria-hidden="true">#</a> Writer</h2><p>具体的数据写入逻辑</p><p><img src="/bitsail/assets/writer_diagram.24534c7f.png" alt="" loading="lazy"></p><h3 id="writer接口" tabindex="-1"><a class="header-anchor" href="#writer接口" aria-hidden="true">#</a> Writer接口</h3><div class="language-Java line-numbers-mode" data-ext="Java"><pre class="language-Java"><code>public interface Writer&lt;InputT, CommT, WriterStateT&gt; extends Serializable, Closeable {
+
+  /**
+   * Output an element to target source.
+   *
+   * @param element Input data from upstream.
+   */
+  void write(InputT element) throws IOException;
+
+  /**
+   * Flush buffered input data to target source.
+   *
+   * @param endOfInput Flag indicates if all input data are delivered.
+   */
+  void flush(boolean endOfInput) throws IOException;
+
+  /**
+   * Prepare commit information before snapshotting when checkpoint is triggerred.
+   *
+   * @return Information to commit in this checkpoint.
+   * @throws IOException Exceptions encountered when preparing committable information.
+   */
+  List&lt;CommT&gt; prepareCommit() throws IOException;
+
+  /**
+   * Do snapshot for at each checkpoint.
+   *
+   * @param checkpointId The id of checkpoint when snapshot triggered.
+   * @return The current state of writer.
+   * @throws IOException Exceptions encountered when snapshotting.
+   */
+  default List&lt;WriterStateT&gt; snapshotState(long checkpointId) throws IOException {
+    return Collections.emptyList();
+  }
+
+  /**
+   * Closing writer when operator is closed.
+   *
+   * @throws IOException Exception encountered when closing writer.
+   */
+  default void close() throws IOException {
+
+  }
+
+  interface Context&lt;WriterStateT&gt; extends Serializable {
+
+    TypeInfo&lt;?&gt;[] getTypeInfos();
+
+    int getIndexOfSubTaskId();
+
+    boolean isRestored();
+
+    List&lt;WriterStateT&gt; getRestoreStates();
+  }
+}
+</code></pre><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3 id="构造方法" tabindex="-1"><a class="header-anchor" href="#构造方法" aria-hidden="true">#</a> 构造方法</h3><p>根据writerConfiguration配置初始化数据源的连接对象。</p><h4 id="示例-1" tabindex="-1"><a class="header-anchor" href="#示例-1" aria-hidden="true">#</a> 示例</h4><div class="language-Java line-numbers-mode" data-ext="Java"><pre class="language-Java"><code>public RedisWriter(BitSailConfiguration writerConfiguration) {
+  // initialize ttl
+  int ttl = writerConfiguration.getUnNecessaryOption(RedisWriterOptions.TTL, -1);
+  TtlType ttlType;
+  try {
+    ttlType = TtlType.valueOf(StringUtils.upperCase(writerConfiguration.get(RedisWriterOptions.TTL_TYPE)));
+  } catch (IllegalArgumentException e) {
+    throw BitSailException.asBitSailException(RedisPluginErrorCode.ILLEGAL_VALUE,
+        String.format(&quot;unknown ttl type: %s&quot;, writerConfiguration.get(RedisWriterOptions.TTL_TYPE)));
+  }
+  int ttlInSeconds = ttl &lt; 0 ? -1 : ttl * ttlType.getContainSeconds();
+  log.info(&quot;ttl is {}(s)&quot;, ttlInSeconds);
+
+  // initialize commandDescription
+  String redisDataType = StringUtils.upperCase(writerConfiguration.get(RedisWriterOptions.REDIS_DATA_TYPE));
+  String additionalKey = writerConfiguration.getUnNecessaryOption(RedisWriterOptions.ADDITIONAL_KEY, &quot;default_redis_key&quot;);
+  this.commandDescription = initJedisCommandDescription(redisDataType, ttlInSeconds, additionalKey);
+  this.columnSize = writerConfiguration.get(RedisWriterOptions.COLUMNS).size();
+
+  // initialize jedis pool
+  JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
+  jedisPoolConfig.setMaxTotal(writerConfiguration.get(RedisWriterOptions.JEDIS_POOL_MAX_TOTAL_CONNECTIONS));
+  jedisPoolConfig.setMaxIdle(writerConfiguration.get(RedisWriterOptions.JEDIS_POOL_MAX_IDLE_CONNECTIONS));
+  jedisPoolConfig.setMinIdle(writerConfiguration.get(RedisWriterOptions.JEDIS_POOL_MIN_IDLE_CONNECTIONS));
+  jedisPoolConfig.setMaxWait(Duration.ofMillis(writerConfiguration.get(RedisWriterOptions.JEDIS_POOL_MAX_WAIT_TIME_IN_MILLIS)));
+
+  String redisHost = writerConfiguration.getNecessaryOption(RedisWriterOptions.HOST, RedisPluginErrorCode.REQUIRED_VALUE);
+  int redisPort = writerConfiguration.getNecessaryOption(RedisWriterOptions.PORT, RedisPluginErrorCode.REQUIRED_VALUE);
+  String redisPassword = writerConfiguration.get(RedisWriterOptions.PASSWORD);
+  int timeout = writerConfiguration.get(RedisWriterOptions.CLIENT_TIMEOUT_MS);
+
+  if (StringUtils.isEmpty(redisPassword)) {
+    this.jedisPool = new JedisPool(jedisPoolConfig, redisHost, redisPort, timeout);
+  } else {
+    this.jedisPool = new JedisPool(jedisPoolConfig, redisHost, redisPort, timeout, redisPassword);
+  }
+
+  // initialize record queue
+  int batchSize = writerConfiguration.get(RedisWriterOptions.WRITE_BATCH_INTERVAL);
+  this.recordQueue = new CircularFifoQueue&lt;&gt;(batchSize);
+
+  this.logSampleInterval = writerConfiguration.get(RedisWriterOptions.LOG_SAMPLE_INTERVAL);
+  this.jedisFetcher = RetryerBuilder.&lt;Jedis&gt;newBuilder()
+      .retryIfResult(Objects::isNull)
+      .retryIfRuntimeException()
+      .withStopStrategy(StopStrategies.stopAfterAttempt(3))
+      .withWaitStrategy(WaitStrategies.exponentialWait(100, 5, TimeUnit.MINUTES))
+      .build()
+      .wrap(jedisPool::getResource);
+
+  this.maxAttemptCount = writerConfiguration.get(RedisWriterOptions.MAX_ATTEMPT_COUNT);
+  this.retryer = RetryerBuilder.&lt;Boolean&gt;newBuilder()
+      .retryIfResult(needRetry -&gt; Objects.equals(needRetry, true))
+      .retryIfException(e -&gt; !(e instanceof BitSailException))
+      .withWaitStrategy(WaitStrategies.fixedWait(3, TimeUnit.SECONDS))
+      .withStopStrategy(StopStrategies.stopAfterAttempt(maxAttemptCount))
+      .build();
+}
+</code></pre><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3 id="write方法" tabindex="-1"><a class="header-anchor" href="#write方法" aria-hidden="true">#</a> write方法</h3><p>该方法调用时会将BitSail Row类型把数据写到缓存队列中，也可以在这里对Row类型数据进行各种格式预处理。直接存储到缓存队列中，或者进行加工处理。如果这里设定了缓存队列的大小，那么在缓存队列写满后要调用flush进行刷写。</p><h4 id="示例-2" tabindex="-1"><a class="header-anchor" href="#示例-2" aria-hidden="true">#</a> 示例</h4><p>redis：将BitSail Row格式的数据直接存储到一定大小的缓存队列中</p><div class="language-Java line-numbers-mode" data-ext="Java"><pre class="language-Java"><code>public void write(Row record) throws IOException {
+  validate(record);
+  this.recordQueue.add(record);
+  if (recordQueue.isAtFullCapacity()) {
+    flush(false);
+  }
+}
+</code></pre><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>Druid：将BitSail Row格式的数据做格式预处理，转化到StringBuffer中储存起来。</p><div class="language-Java line-numbers-mode" data-ext="Java"><pre class="language-Java"><code>@Override
+public void write(final Row element) {
+  final StringJoiner joiner = new StringJoiner(DEFAULT_FIELD_DELIMITER, &quot;&quot;, &quot;&quot;);
+  for (int i = 0; i &lt; element.getArity(); i++) {
+    final Object v = element.getField(i);
+    if (v != null) {
+      joiner.add(v.toString());
+    }
+  }
+  // timestamp column is a required field to add in Druid.
+  // See https://druid.apache.org/docs/24.0.0/ingestion/data-model.html#primary-timestamp
+  joiner.add(String.valueOf(processTime));
+  data.append(joiner);
+  data.append(DEFAULT_LINE_DELIMITER);
+}
+</code></pre><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3 id="flush方法" tabindex="-1"><a class="header-anchor" href="#flush方法" aria-hidden="true">#</a> flush方法</h3><p>该方法中主要实现将write方法的缓存中的数据刷写到目标数据源中。</p><h4 id="示例-3" tabindex="-1"><a class="header-anchor" href="#示例-3" aria-hidden="true">#</a> 示例</h4><p>redis：将缓存队列中的BitSail Row格式的数据刷写到目标数据源中。</p><div class="language-Java line-numbers-mode" data-ext="Java"><pre class="language-Java"><code>public void flush(boolean endOfInput) throws IOException {
+  processorId++;
+  try (PipelineProcessor processor = genPipelineProcessor(recordQueue.size(), this.complexTypeWithTtl)) {
+    Row record;
+    while ((record = recordQueue.poll()) != null) {
+
+      String key = (String) record.getField(0);
+      String value = (String) record.getField(1);
+      String scoreOrHashKey = value;
+      if (columnSize == SORTED_SET_OR_HASH_COLUMN_SIZE) {
+        value = (String) record.getField(2);
+        // Replace empty key with additionalKey in sorted set and hash.
+        if (key.length() == 0) {
+          key = commandDescription.getAdditionalKey();
+        }
+      }
+
+      if (commandDescription.getJedisCommand() == JedisCommand.ZADD) {
+        // sorted set
+        processor.addInitialCommand(new Command(commandDescription, key.getBytes(), parseScoreFromString(scoreOrHashKey), value.getBytes()));
+      } else if (commandDescription.getJedisCommand() == JedisCommand.HSET) {
+        // hash
+        processor.addInitialCommand(new Command(commandDescription, key.getBytes(), scoreOrHashKey.getBytes(), value.getBytes()));
+      } else if (commandDescription.getJedisCommand() == JedisCommand.HMSET) {
+        //mhset
+        if ((record.getArity() - 1) % 2 != 0) {
+          throw new BitSailException(CONVERT_NOT_SUPPORT, &quot;Inconsistent data entry.&quot;);
+        }
+        List&lt;byte[]&gt; datas = Arrays.stream(record.getFields())
+            .collect(Collectors.toList()).stream().map(o -&gt; ((String) o).getBytes())
+            .collect(Collectors.toList()).subList(1, record.getFields().length);
+        Map&lt;byte[], byte[]&gt; map = new HashMap&lt;&gt;((record.getArity() - 1) / 2);
+        for (int index = 0; index &lt; datas.size(); index = index + 2) {
+          map.put(datas.get(index), datas.get(index + 1));
+        }
+        processor.addInitialCommand(new Command(commandDescription, key.getBytes(), map));
+      } else {
+        // set and string
+        processor.addInitialCommand(new Command(commandDescription, key.getBytes(), value.getBytes()));
+      }
+    }
+    retryer.call(processor::run);
+  } catch (ExecutionException | RetryException e) {
+    if (e.getCause() instanceof BitSailException) {
+      throw (BitSailException) e.getCause();
+    } else if (e.getCause() instanceof RedisUnexpectedException) {
+      throw (RedisUnexpectedException) e.getCause();
+    }
+    throw e;
+  } catch (IOException e) {
+    throw new RuntimeException(&quot;Error while init jedis client.&quot;, e);
+  }
+}
+</code></pre><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>Druid：使用HTTP post方式提交sink作业给数据源。</p><div class="language-Java line-numbers-mode" data-ext="Java"><pre class="language-Java"><code>private HttpURLConnection provideHttpURLConnection(final String coordinatorURL) throws IOException {
+    final URL url = new URL(&quot;http://&quot; + coordinatorURL + DRUID_ENDPOINT);
+    final HttpURLConnection con = (HttpURLConnection) url.openConnection();
+    con.setRequestMethod(&quot;POST&quot;);
+    con.setRequestProperty(&quot;Content-Type&quot;, &quot;application/json&quot;);
+    con.setRequestProperty(&quot;Accept&quot;, &quot;application/json, text/plain, */*&quot;);
+    con.setDoOutput(true);
+    return con;
+  }
+  
+  public void flush(final boolean endOfInput) throws IOException {
+    final ParallelIndexIOConfig ioConfig = provideDruidIOConfig(data);
+    final ParallelIndexSupervisorTask indexTask = provideIndexTask(ioConfig);
+    final String inputJSON = provideInputJSONString(indexTask);
+    final byte[] input = inputJSON.getBytes();
+    try (final OutputStream os = httpURLConnection.getOutputStream()) {
+      os.write(input, 0, input.length);
+    }
+    try (final BufferedReader br =
+                 new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream(), StandardCharsets.UTF_8))) {
+      final StringBuilder response = new StringBuilder();
+      String responseLine;
+      while ((responseLine = br.readLine()) != null) {
+        response.append(responseLine.trim());
+      }
+      LOG.info(&quot;Druid write task has been sent, and the response is {}&quot;, response);
+    }
+  }
+</code></pre><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3 id="close方法" tabindex="-1"><a class="header-anchor" href="#close方法" aria-hidden="true">#</a> close方法</h3><p>关闭之前创建的各种目标数据源连接对象。</p><h4 id="示例-4" tabindex="-1"><a class="header-anchor" href="#示例-4" aria-hidden="true">#</a> 示例</h4><div class="language-Java line-numbers-mode" data-ext="Java"><pre class="language-Java"><code>public void close() throws IOException {
+  bulkProcessor.close();
+  restClient.close();
+  checkErrorAndRethrow();
+}
+</code></pre><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div></div><!----><footer class="page-meta"><div class="meta-item edit-link"><a href="https://github.com/bytedance/bitsail/edit/main/zh/community/sink_connector_detail.md" rel="noopener noreferrer" target="_blank" aria-label="编辑此页" class="nav-link label"><!--[--><svg xmlns="http://www.w3.org/2000/svg" class="icon edit-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-label="edit icon"><path d="M430.818 653.65a60.46 60.46 0 0 1-50.96-93.281l71.69-114.012 7.773-10.365L816.038 80.138A60.46 60.46 0 0 1 859.225 62a60.46 60.46 0 0 1 43.186 18.138l43.186 43.186a60.46 60.46 0 0 1 0 86.373L588.879 565.55l-8.637 8.637-117.466 68.234a60.46 60.46 0 0 1-31.958 11.229z"></path><path d="M728.802 962H252.891A190.883 190.883 0 0 1 62.008 771.98V296.934a190.883 190.883 0 0 1 190.883-192.61h267.754a60.46 60.46 0 0 1 0 120.92H252.891a69.962 69.962 0 0 0-69.098 69.099V771.98a69.962 69.962 0 0 0 69.098 69.098h475.911A69.962 69.962 0 0 0 797.9 771.98V503.363a60.46 60.46 0 1 1 120.922 0V771.98A190.883 190.883 0 0 1 728.802 962z"></path></svg><!--]-->编辑此页<span><svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg><span class="external-link-icon-sr-only">open in new window</span></span><!----></a></div><div class="meta-item update-time"><span class="label">上次编辑于: </span><!----></div><div class="meta-item contributors"><span class="label">贡献者: </span><!--[--><!--[--><span class="contributor" title="email: 47937942+love-star@users.noreply.github.com">haoyuhua</span><!--]--><!--]--></div></footer><nav class="page-nav"><a href="/bitsail/zh/community/source_connector_detail.html" class="nav-link prev" aria-label="Source Connector 详解"><div class="hint"><span class="arrow left"></span>上一页</div><div class="link"><!---->Source Connector 详解</div></a><!----></nav><!----><!----><!--]--></main><!--]--><footer class="footer-wrapper"><div class="footer">
+  <div style="width: 100%;">
+    <div style="padding-top: 100px; display: flex; width: 100%;">
+      <div style="text-align: center; width: 50%;">
+        <img src="/bitsail/wechat_QR.png" width="140" />
+        <div style="margin-top: 20px; font-weight: bolder; font-size: 16px; line-height: 2;">联系我们</div>
+        <div style="color: rgb(144, 146, 150);">在这里你可以获取到最新的技术及产品知识</div>
+      </div>
+      <div style="width: 50%;">
+        <div style="display: flex; justify-content: center;">
+          <div style="text-align: center;">
+            <h3>文档</h3>
+            <a style="display: block; color: rgb(209, 213, 219); margin-bottom: 10px;" href="/bitsail/zh/documents/start/index.html">快速开始</a>
+            <a style="display: block; color: rgb(209, 213, 219); margin-bottom: 10px;" href="/bitsail/zh/documents/faq/index.html">FAQ</a>
+          </div>
+          <div style="text-align: center; margin-left: 40px;">
+            <h3>社区</h3>
+            <a style="display: block; color: rgb(209, 213, 219); margin-bottom: 10px;" href="/bitsail/zh/community/contribute.html">如何贡献</a>
+            <a style="display: block; color: rgb(209, 213, 219); margin-bottom: 10px;" href="/bitsail/zh/community/mailing.html">邮件列表</a>
+            <a style="display: block; color: rgb(209, 213, 219); margin-bottom: 10px;" href="/bitsail/zh/community/team.html">团队介绍</a>
+          </div>
+          <div style="text-align: center; margin-left: 40px;">
+            <h3>更多</h3>
+            <a style="display: block; color: rgb(209, 213, 219); margin-bottom: 10px;" href="/bitsail/zh/blog/blog.html">博客</a>
+            <a style="display: block; color: rgb(209, 213, 219); margin-bottom: 10px;" href="https://github.com/bytedance/bitsail" target="_blank">Github</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding: 20px; color: white;">
+      Apache LICENSE 2.0 Licensed, Copyright 2018-2023 BitSail All Rights Reserved
+    </div>
+  </div>
+</div><!----></footer><!--]--></div><!--]--><!----><!--]--></div>
+    <script type="module" src="/bitsail/assets/app.982a74e2.js" defer></script>
+  </body>
+</html>
