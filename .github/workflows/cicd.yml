@@ -105,7 +105,7 @@ jobs:
           oracleRepo: true
       - name: Setup Apache Thrift Compiler
         run:
-          wget http://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.tar.gz
+          curl -O http://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.tar.gz
           tar -zxvf thrift-0.13.0.tar.gz
           cd thrift-0.13.0
           ./configure
