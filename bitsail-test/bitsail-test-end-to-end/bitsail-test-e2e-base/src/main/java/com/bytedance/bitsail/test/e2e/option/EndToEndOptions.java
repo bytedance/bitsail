@@ -18,6 +18,7 @@ package com.bytedance.bitsail.test.e2e.option;
 
 import com.bytedance.bitsail.common.option.ConfigOption;
 
+import static com.bytedance.bitsail.common.option.CommonOptions.COMMON_PREFIX;
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
 import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
@@ -30,5 +31,9 @@ public interface EndToEndOptions {
 
   ConfigOption<String> E2E_WRITER_DATA_SOURCE_CLASS =
       key(WRITER_PREFIX + "e2e_data_source_class")
+          .noDefaultValue(String.class);
+
+  ConfigOption<String> E2E_GENERIC_EXECUTOR_SETTING_FILE =
+      key(COMMON_PREFIX + "e2e_generic_executor_setting_file")
           .noDefaultValue(String.class);
 }

@@ -18,6 +18,7 @@ package com.bytedance.bitsail.test.e2e.base.transfer;
 
 import com.bytedance.bitsail.common.util.Preconditions;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -31,11 +32,13 @@ public class TransferableFile {
   /**
    * Absolute path in host.
    */
+  @JsonProperty("host-path")
   private final String hostPath;
 
   /**
    * Absolute path in container.
    */
+  @JsonProperty("executor-path")
   private final String containerPath;
 
   public void checkExist() {

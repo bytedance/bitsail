@@ -17,9 +17,7 @@
 package com.bytedance.bitsail.test.e2e;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.test.e2e.datasource.ClickhouseDataSource;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
