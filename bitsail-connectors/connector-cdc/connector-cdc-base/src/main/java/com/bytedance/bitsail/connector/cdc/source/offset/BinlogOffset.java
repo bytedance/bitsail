@@ -16,6 +16,11 @@
 
 package com.bytedance.bitsail.connector.cdc.source.offset;
 
+import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.connector.cdc.error.BinlogReaderErrorCode;
+import com.bytedance.bitsail.connector.cdc.option.BinlogReaderOptions;
+
 import lombok.Data;
 
 import java.io.Serializable;
@@ -25,32 +30,61 @@ import java.util.Properties;
 public class BinlogOffset implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private final OffsetType offsetType;
+  private final BinlogOffsetType offsetType;
 
   private final Properties props;
 
-  public BinlogOffset(OffsetType offsetType, Properties props) {
+  public BinlogOffset(BinlogOffsetType offsetType, Properties props) {
     this.offsetType = offsetType;
     this.props = props;
   }
 
   public static BinlogOffset earliest() {
-    return new BinlogOffset(OffsetType.EARLIEST, new Properties());
+    return new BinlogOffset(BinlogOffsetType.EARLIEST, new Properties());
+  }
+
+  public static BinlogOffset latest() {
+    return new BinlogOffset(BinlogOffsetType.LATEST, new Properties());
   }
 
   public static BinlogOffset boundless() {
-    return new BinlogOffset(OffsetType.BOUNDLESS, new Properties());
+    return new BinlogOffset(BinlogOffsetType.BOUNDLESS, new Properties());
   }
 
-  public enum OffsetType {
-    // earliest point in binlog
-    EARLIEST,
-    // latest point in binlog
-    LATEST,
-    // specified point in the binlog file
-    SPECIFIED,
-    // represent an endless point, could only be the end point
-    BOUNDLESS
+  public static BinlogOffset specified() {
+    return new BinlogOffset(BinlogOffsetType.SPECIFIED, new Properties());
+  }
+
+  public static BinlogOffset createFromJobConf(BitSailConfiguration jobConf) {
+    String rawOffsetType = jobConf.getNecessaryOption(
+        BinlogReaderOptions.INITIAL_OFFSET_TYPE, BinlogReaderErrorCode.REQUIRED_VALUE).toUpperCase().trim();
+    BinlogOffsetType offsetType = BinlogOffsetType.valueOf(rawOffsetType);
+    switch (offsetType) {
+      case LATEST:
+        return latest();
+      case EARLIEST:
+        return earliest();
+      case BOUNDLESS:
+        return boundless();
+      case SPECIFIED:
+        // currently only support mysql. Using format filename,offset
+        String offsetValue = jobConf.getNecessaryOption(
+            BinlogReaderOptions.INITIAL_OFFSET_VALUE, BinlogReaderErrorCode.OFFSET_VAL_ERROR);
+        // TODO: make this more robust
+        String filename = offsetValue.split(",")[0];
+        String offset = offsetValue.split(",")[1];
+        BinlogOffset result = specified();
+        // TODO: move constant to common place
+        result.addProps("filename", filename);
+        result.addProps("offset", offset);
+        return result;
+      default:
+        throw new BitSailException(BinlogReaderErrorCode.UNSUPPORTED_ERROR, "Unsupported offset type: " + rawOffsetType);
+    }
+  }
+
+  public void addProps(String key, String value) {
+    this.props.put(key, value);
   }
 
   @Override

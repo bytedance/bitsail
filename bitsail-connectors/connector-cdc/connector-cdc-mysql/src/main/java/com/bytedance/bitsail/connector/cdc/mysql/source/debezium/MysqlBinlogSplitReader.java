@@ -63,10 +63,13 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Reader that actually execute the Debezium task.
+ * This reader is stateless and will read binlog starting from the given begin offset.
  */
 public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
 
   private static final Logger LOG = LoggerFactory.getLogger(MysqlBinlogSplitReader.class);
+
+  public static final int ROW_SIZE = 5;
 
   private boolean isRunning;
 
@@ -183,7 +186,7 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
         dispatcher,
         errorHandler,
         Clock.SYSTEM,
-        taskContext, // reuse binary log client
+        taskContext,
         new MySqlStreamingChangeEventSourceMetrics(
             taskContext, queue, metadataProvider)
     );
@@ -241,20 +244,27 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
     }
   }
 
+  @Override
   public boolean isCompleted() {
     return !isRunning;
   }
 
+  @Override
   public Row poll() {
     SourceRecord record = this.recordIterator.next();
     this.offset = record.sourceOffset();
     LOG.info("OFFSET:" + record.sourceOffset());
-    LOG.info("poll one record {}", record.value());
+    LOG.info("Record: " + record.toString());
+    //LOG.info("poll one record {}", record.value());
+
+    Row result = new Row(2);
+    result.setField(0, record.timestamp());
+    result.setField(1, record.value());
     // TODO: Build BitSail row and return
-    return null;
-    //return record;
+    return result;
   }
 
+  @Override
   public boolean hasNext() throws InterruptedException {
     if (this.recordIterator.hasNext()) {
       return true;
@@ -268,7 +278,6 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
     if (isRunning) {
       List<DataChangeEvent> dbzRecords = queue.poll();
       while (dbzRecords.isEmpty()) {
-        //sleep 10s
         LOG.info("No record found, sleep for 5s in reader");
         TimeUnit.SECONDS.sleep(5);
         dbzRecords = queue.poll();
