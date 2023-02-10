@@ -18,11 +18,12 @@ package com.bytedance.bitsail.connector.cdc.source.reader;
 
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 
 public interface BinlogSplitReader<T> extends Serializable {
-  void readSplit(BinlogSplit split);
+  void readSplit(BinlogSplit split) throws IOException, InterruptedException;
 
   Map<String, String> getOffset();
 

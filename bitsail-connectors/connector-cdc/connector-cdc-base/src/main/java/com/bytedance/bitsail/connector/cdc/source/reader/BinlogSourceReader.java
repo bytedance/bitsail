@@ -56,7 +56,7 @@ public abstract class BinlogSourceReader implements SourceReader<Row, BinlogSpli
   public abstract BinlogSplitReader<Row> getReader();
 
   @Override
-  public void start() {
+  public void start() throws Exception{
     //start debezium streaming reader and send data to queue
   }
 
