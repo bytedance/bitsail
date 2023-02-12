@@ -24,8 +24,10 @@ body:
       description: What do you think went wrong?
       placeholder: >
         Please explain why you think the behavior is erroneous.
+
         It is extremely helpful if you copy and paste the fragment of logs showing the exact error messages
         or wrong behavior and screenshots for UI problems.
+
         You can include files by dragging and dropping them here.
     validations:
       required: false
@@ -35,15 +37,23 @@ body:
       label: How to reproduce
       description: >
         What should we do to reproduce the problem?
+
         Please add the following content as appropriate and use screenshots if necessary.
+
         1. The job conf is: '....'
+
         2. The test data is: '....'
+
         3. BitSail run command: '....'
+
+        4. ...
       placeholder: >
         Please make sure you provide a reproducible step-by-step case of how to reproduce the problem
         as minimally and precisely as possible.
-        **Keep in mind we do not have access to your deployment.**
-        **Remember that non-reproducible issues will be closed!**
+
+        Keep in mind we do not have access to your deployment.
+
+        Remember that non-reproducible issues will be closed!
     validations:
       required: true
 
@@ -52,12 +62,18 @@ body:
       label: Build Environment
       description: >
         In which environment did you build the project?
+
         Not required if you download from our [Releases](https://github.com/bytedance/bitsail/releases).
       placeholder: >
         - Download from releases
+
         - OS [e.g. macOS Big Sur Version 11.3.1]
+
         - JDK [e.g. 1.8.0_301]
+
         - Maven [e.g. 3.6.3]
+
+        - ...
 
   - type: textarea
     attributes:
@@ -66,8 +82,12 @@ body:
         In which environment did you run the project?
       placeholder: >
         - OS [e.g. macOS Big Sur Version 11.3.1]
+
         - JDK [e.g. 1.8.0_301]
+
         - Deployment [e.g. Yarn | CDH 6.3.x]
+
+        - ...
 
   - type: dropdown
     attributes:
@@ -85,7 +105,7 @@ body:
     attributes:
       label: BitSail Component
       description: |
-        Which components of BitSail did you find the bug from?
+        Which component or code module of BitSail did you find the bug from?
       multiple: true
       options:
         - 'BitSail Doc'
