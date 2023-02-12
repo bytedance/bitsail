@@ -49,11 +49,9 @@ body:
         4. ...
       placeholder: >
         Please make sure you provide a reproducible step-by-step case of how to reproduce the problem
-        as minimally and precisely as possible.
+        as precisely as possible. Remember that non-reproducible issues will be closed!
 
         Keep in mind we do not have access to your deployment.
-
-        Remember that non-reproducible issues will be closed!
     validations:
       required: true
 
@@ -114,7 +112,7 @@ body:
         - 'BitSail Test'
         - 'BitSail Component'
         - 'BitSail Connector'
-        - 'Other for not specified component'
+        - 'Other for not specified type'
     validations:
       required: true
 
