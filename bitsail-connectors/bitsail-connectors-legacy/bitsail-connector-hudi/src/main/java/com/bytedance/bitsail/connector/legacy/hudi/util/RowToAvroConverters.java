@@ -30,7 +30,6 @@ import org.apache.flink.api.java.typeutils.ListTypeInfo;
 import org.apache.flink.api.java.typeutils.MapTypeInfo;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
-import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
