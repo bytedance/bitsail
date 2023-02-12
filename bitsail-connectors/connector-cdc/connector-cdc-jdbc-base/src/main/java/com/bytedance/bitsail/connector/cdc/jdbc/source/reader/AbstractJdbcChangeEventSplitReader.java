@@ -1,16 +1,31 @@
+/*
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package com.bytedance.bitsail.connector.cdc.jdbc.source.reader;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.cdc.jdbc.source.config.AbstractJdbcDebeziumConfig;
-import com.bytedance.bitsail.connector.cdc.jdbc.source.streaming.SplitChangeEventStreamingTaskContext;
+import com.bytedance.bitsail.connector.cdc.jdbc.source.streaming.AbstractSplitChangeEventStreamingTaskContext;
 import com.bytedance.bitsail.connector.cdc.jdbc.source.streaming.SplitChangeEventStreamingTaskController;
 import com.bytedance.bitsail.connector.cdc.source.reader.BinlogSplitReader;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 import com.bytedance.bitsail.common.row.Row;
 import io.debezium.connector.base.ChangeEventQueue;
-import io.debezium.connector.common.CdcSourceTaskContext;
 import io.debezium.pipeline.DataChangeEvent;
 import io.debezium.relational.RelationalDatabaseConnectorConfig;
+import lombok.Getter;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,58 +38,54 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public abstract class AbstractJdbcChangeEventReader implements BinlogSplitReader<Row> {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractJdbcChangeEventReader.class);
+@Getter
+public abstract class AbstractJdbcChangeEventSplitReader implements BinlogSplitReader<Row> {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractJdbcChangeEventSplitReader.class);
 
-  private final AbstractJdbcDebeziumConfig jdbcDebeziumConfig;
+  protected final AbstractJdbcDebeziumConfig jdbcDebeziumConfig;
 
-  private ChangeEventQueue<DataChangeEvent> queue;
+  protected ChangeEventQueue<DataChangeEvent> queue;
 
-  private RelationalDatabaseConnectorConfig connectorConfig;
+  protected RelationalDatabaseConnectorConfig connectorConfig;
 
-  private List<SourceRecord> batch;
+  protected List<SourceRecord> batch;
 
-  private Iterator<SourceRecord> recordIterator;
+  protected Iterator<SourceRecord> recordIterator;
 
-  private CdcSourceTaskContext taskContext;
+  protected Map<String, ?> offset;
 
-  private Map<String, ?> offset;
+  protected SplitChangeEventStreamingTaskController splitChangeEventStreamingTaskController;
 
-  private SplitChangeEventStreamingTaskController splitChangeEventStreamingTaskController;
-
-  private SplitChangeEventStreamingTaskContext splitChangeEventStreamingTaskContext;
+  protected AbstractSplitChangeEventStreamingTaskContext splitChangeEventStreamingTaskContext;
 
   private final int subtaskId;
 
-  public AbstractJdbcChangeEventReader(BitSailConfiguration jobConf, int subtaskId) {
+  public AbstractJdbcChangeEventSplitReader(BitSailConfiguration jobConf, int subtaskId) {
     jdbcDebeziumConfig = getJdbcDebeziumConfig(jobConf);
-    connectorConfig = jdbcDebeziumConfig.getConnectorConfig();
+    connectorConfig = jdbcDebeziumConfig.getDbzJdbcConnectorConfig();
     this.subtaskId = subtaskId;
     this.offset = new HashMap<>();
   }
 
-  public AbstractJdbcDebeziumConfig getJdbcDebeziumConfig(BitSailConfiguration jobConf) {
-    return AbstractJdbcDebeziumConfig.fromBitSailConf(jobConf);
-  }
+  public abstract AbstractJdbcDebeziumConfig getJdbcDebeziumConfig(BitSailConfiguration jobConf);
 
-  public abstract SplitChangeEventStreamingTaskContext getSplitReaderTaskContext();
-
-  public abstract void testConnectionAndValidBinlogConfiguration(RelationalDatabaseConnectorConfig connectorConfig) throws IOException;
+  public abstract AbstractSplitChangeEventStreamingTaskContext getSplitReaderTaskContext(BinlogSplit split, RelationalDatabaseConnectorConfig connectorConfig);
 
   public void inititialzeSplitReader(BinlogSplit split) {
-    splitChangeEventStreamingTaskContext = getSplitReaderTaskContext();
+    splitChangeEventStreamingTaskContext = getSplitReaderTaskContext(split, connectorConfig);
     this.offset = new HashMap<>();
     this.queue = new ChangeEventQueue.Builder<DataChangeEvent>()
             .pollInterval(connectorConfig.getPollInterval())
             .maxBatchSize(connectorConfig.getMaxBatchSize())
             .maxQueueSize(connectorConfig.getMaxQueueSize())
             .maxQueueSizeInBytes(connectorConfig.getMaxQueueSizeInBytes())
-            .loggingContextSupplier(() -> taskContext.configureLoggingContext(splitChangeEventStreamingTaskContext.threadNamePrefix()))
+            .loggingContextSupplier(() -> splitChangeEventStreamingTaskContext.getDbzTaskContext()
+                    .configureLoggingContext(splitChangeEventStreamingTaskContext.threadNamePrefix()))
             .buffering()
             .build();
     this.batch = new ArrayList<>();
     this.recordIterator = this.batch.iterator();
-    splitChangeEventStreamingTaskContext.initializeSplitReaderTaskContext(connectorConfig, this.queue);
+    splitChangeEventStreamingTaskContext.attachStreamingToQueue(this.queue);
     splitChangeEventStreamingTaskController = new SplitChangeEventStreamingTaskController(splitChangeEventStreamingTaskContext, this.subtaskId);
   }
 
@@ -136,7 +147,7 @@ public abstract class AbstractJdbcChangeEventReader implements BinlogSplitReader
    * @throws Exception
    */
   @Override
-  public boolean hasNext() throws Exception {
+  public boolean hasNext() {
     if (this.recordIterator.hasNext()) {
       return true;
     } else {
@@ -149,20 +160,24 @@ public abstract class AbstractJdbcChangeEventReader implements BinlogSplitReader
     return !splitChangeEventStreamingTaskController.isRunning();
   }
 
-  private boolean pollNextBatch() throws InterruptedException {
+  private boolean pollNextBatch() {
     if (splitChangeEventStreamingTaskController.isRunning()) {
-      List<DataChangeEvent> dbzRecords = queue.poll();
-      while (dbzRecords.isEmpty()) {
-        //sleep 10s
-        LOG.info("No record found, sleep for 5s in reader");
-        TimeUnit.SECONDS.sleep(5);
-        dbzRecords = queue.poll();
+      try {
+        List<DataChangeEvent> dbzRecords = queue.poll();
+        while (dbzRecords.isEmpty()) {
+          //sleep 10s
+          LOG.info("No record found, sleep for 5s in reader");
+          TimeUnit.SECONDS.sleep(5);
+          dbzRecords = queue.poll();
+        }
+        this.batch = new ArrayList<>();
+        for (DataChangeEvent event : dbzRecords) {
+          this.batch.add(event.getRecord());
+        }
+        this.recordIterator = this.batch.iterator();
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
       }
-      this.batch = new ArrayList<>();
-      for (DataChangeEvent event : dbzRecords) {
-        this.batch.add(event.getRecord());
-      }
-      this.recordIterator = this.batch.iterator();
       return true;
     }
     return false;

@@ -33,6 +33,7 @@ import com.bytedance.bitsail.flink.core.runtime.RuntimeContextInjectable;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import lombok.SneakyThrows;
 import org.apache.flink.api.connector.source.ReaderOutput;
 import org.apache.flink.api.connector.source.SourceReader;
 import org.apache.flink.api.connector.source.SourceReaderContext;
@@ -137,6 +138,7 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
     }
   }
 
+  @SneakyThrows
   @Override
   public void start() {
     this.metricManager.start();

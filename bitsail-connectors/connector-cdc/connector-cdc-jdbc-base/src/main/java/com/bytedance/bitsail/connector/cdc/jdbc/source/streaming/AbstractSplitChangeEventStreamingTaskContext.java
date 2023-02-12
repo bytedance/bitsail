@@ -1,5 +1,21 @@
+/*
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package com.bytedance.bitsail.connector.cdc.jdbc.source.streaming;
 
+import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 import io.debezium.config.Configuration;
 import io.debezium.connector.base.ChangeEventQueue;
 import io.debezium.connector.common.CdcSourceTaskContext;
@@ -21,9 +37,14 @@ import org.apache.kafka.connect.source.SourceTask;
 
 import java.sql.SQLException;
 
-
 @Getter
-public abstract class SplitChangeEventStreamingTaskContext {
+public abstract class AbstractSplitChangeEventStreamingTaskContext {
+
+  /**
+   * split info
+   */
+  public BinlogSplit split;
+
   /**
    * OffsetContext includes context and operations on offset
    */
@@ -44,7 +65,9 @@ public abstract class SplitChangeEventStreamingTaskContext {
    */
   public TopicSelector<TableId> topicSelector;
 
-
+  /**
+   * Adjuster to convert names of databases schema (e.g. fieldName) to valid Avro name
+   */
   public SchemaNameAdjuster schemaNameAdjuster;
 
   /**
@@ -75,33 +98,40 @@ public abstract class SplitChangeEventStreamingTaskContext {
   /**
    * Contains contextual information and objects scoped to the lifecycle of Debezium's {@link SourceTask} implementations
    */
-  private volatile CdcSourceTaskContext taskContext;
+  public volatile CdcSourceTaskContext dbzTaskContext;
 
   /**
    * all related config of database
    */
-  private RelationalDatabaseConnectorConfig connectorConfig;
+  public RelationalDatabaseConnectorConfig connectorConfig;
+
+  /**
+   * Message queue to receive Change Event from event dispatcher
+   */
+  public ChangeEventQueue<DataChangeEvent> queue;
 
   /**
    * jdbc connection instance
    */
-  private JdbcConnection jdbcConnection;
+  public JdbcConnection jdbcConnection;
 
-  public void initializeSplitReaderTaskContext(RelationalDatabaseConnectorConfig connectorConfig, ChangeEventQueue<DataChangeEvent> queue) {
+  public AbstractSplitChangeEventStreamingTaskContext(BinlogSplit split, RelationalDatabaseConnectorConfig connectorConfig) {
+    this.split = split;
     this.connectorConfig = connectorConfig;
-
+    this.jdbcConnection = tryEstablishedConnection(connectorConfig);
     this.offsetContext = buildOffsetContext();
-
     this.topicSelector = buildTopicSelector();
-
     this.valueConverters = buildValueConverters(connectorConfig);
-
     this.schema = buildRelationalDatabaseSchema(connectorConfig);
-
+    this.errorHandler = buildErrorHandler(connectorConfig, queue);
     this.schemaNameAdjuster = SchemaNameAdjuster.create();
+    this.dbzTaskContext = buildCdcSourceTaskContext(connectorConfig, schema);
+    this.metadataProvider = buildEventMetadataProvider();
+  }
 
-    this.taskContext = buildCdcSourceTaskContext(connectorConfig, schema);
+  protected abstract ErrorHandler buildErrorHandler(RelationalDatabaseConnectorConfig connectorConfig, ChangeEventQueue<DataChangeEvent> queue);
 
+  public void attachStreamingToQueue(ChangeEventQueue<DataChangeEvent> queue) {
     this.eventDispatcher = new EventDispatcher<>(
             connectorConfig,
             topicSelector,
@@ -112,17 +142,17 @@ public abstract class SplitChangeEventStreamingTaskContext {
             metadataProvider,
             schemaNameAdjuster);
 
-    this.streamingChangeEventSource = getStreamingChangeEventSource();
+    this.streamingChangeEventSource = buildStreamingChangeEventSource();
   }
 
   public void closeContextResources() throws SQLException {
     this.closeStreamingChangeEventSource();
-    this.jdbcConnection.close();
+    if (this.jdbcConnection.isConnected()) {
+      this.jdbcConnection.close();
+    }
   }
 
-  public void testConnectionAndValidBinlogConfiguration() {
-    this.jdbcConnection = tryEstablishedConnection(connectorConfig);
-  }
+  public abstract void testConnectionAndValidBinlogConfiguration();
 
   /**
    * established a connection with jdbc database using the given config

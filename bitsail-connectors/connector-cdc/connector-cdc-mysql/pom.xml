@@ -43,25 +43,15 @@
         </dependency>
 
         <dependency>
-            <groupId>io.debezium</groupId>
-            <artifactId>debezium-connector-mysql</artifactId>
-            <version>${debezium.version}</version>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-cdc-jdbc-base</artifactId>
+            <version>${revision}</version>
         </dependency>
 
         <dependency>
             <groupId>io.debezium</groupId>
-            <artifactId>debezium-embedded</artifactId>
+            <artifactId>debezium-connector-mysql</artifactId>
             <version>${debezium.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>jakarta.activation</groupId>
-                    <artifactId>jakarta.activation-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.kafka</groupId>
-                    <artifactId>kafka-clients</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- resolve debezium conflict -->
@@ -89,14 +79,6 @@
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-connector-print</artifactId>
             <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.debezium</groupId>
-            <artifactId>debezium-core</artifactId>
-            <version>${debezium.version}</version>
-            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>
