@@ -30,6 +30,7 @@ import org.apache.flink.api.java.typeutils.ListTypeInfo;
 import org.apache.flink.api.java.typeutils.MapTypeInfo;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
+import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -73,7 +74,19 @@ public class RowToAvroConverters {
               return ((Short) object).intValue();
             }
           };
-    } else if (BasicTypeInfo.BOOLEAN_TYPE_INFO.getTypeClass().equals(typeClass) || BasicTypeInfo.INT_TYPE_INFO.getTypeClass().equals(typeClass) ||
+    }
+        else if (BasicTypeInfo.BYTE_TYPE_INFO.getTypeClass().equals(typeClass)) {
+        converter =
+                new RowToAvroConverter() {
+                    private static final long serialVersionUID = 1L;
+
+                    @Override
+                    public Object convert(Schema schema, Object object) {
+                        return Integer.valueOf(Long.toString((Long) object));
+                    }
+                };
+    }
+        else if (BasicTypeInfo.BOOLEAN_TYPE_INFO.getTypeClass().equals(typeClass) || BasicTypeInfo.INT_TYPE_INFO.getTypeClass().equals(typeClass) ||
         BasicTypeInfo.LONG_TYPE_INFO.getTypeClass().equals(typeClass) || BasicTypeInfo.FLOAT_TYPE_INFO.getTypeClass().equals(typeClass) ||
         BasicTypeInfo.DOUBLE_TYPE_INFO.getTypeClass().equals(typeClass) || SqlTimeTypeInfo.TIME.getTypeClass().equals(typeClass) ||
         SqlTimeTypeInfo.DATE.getTypeClass().equals(typeClass) || SqlTimeTypeInfo.TIMESTAMP.getTypeClass().equals(typeClass)) {

@@ -105,6 +105,8 @@ public class SchemaUtils {
       case "tinyint":
       case "int":
         return DataTypes.INT();
+      case "byte":
+        return DataTypes.TINYINT();
       case "long":
       case "bigint":
         return DataTypes.BIGINT();
