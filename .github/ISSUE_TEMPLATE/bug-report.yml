@@ -1,5 +1,5 @@
 name: '🐛 Bug Report'
-title: '[Bug]'
+title: '[Bug][XxxType] Description'
 description: Problems and issues with code of BitSail
 body:
   - type: markdown
@@ -101,7 +101,7 @@ body:
 
   - type: dropdown
     attributes:
-      label: BitSail Component
+      label: BitSail Component or Code Module
       description: |
         Which component or code module of BitSail did you find the bug from?
       multiple: true
