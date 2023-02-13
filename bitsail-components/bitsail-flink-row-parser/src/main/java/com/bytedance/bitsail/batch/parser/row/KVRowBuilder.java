@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 
-abstract class KVRowBuilder<T> implements RowBuilder<T> {
+public abstract class KVRowBuilder<T> implements RowBuilder<T> {
 
   private ContentType contentType;
   private BytesParser bytesParser;
@@ -45,14 +45,14 @@ abstract class KVRowBuilder<T> implements RowBuilder<T> {
   }
 
   @Override
-  public void build(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
+  public void build(T value, Row reuse, RowTypeInfo rowTypeInfo) throws BitSailException {
     switch (contentType) {
       case JSON:
       case PROTOBUF:
-        buildRowWithParser(value, reuse, mandatoryEncoding, rowTypeInfo, bytesParser);
+        buildRowWithParser(value, reuse, rowTypeInfo, bytesParser);
         break;
       case PLAIN:
-        buildTextRow(value, reuse, mandatoryEncoding, rowTypeInfo);
+        buildTextRow(value, reuse, rowTypeInfo);
         break;
       default:
         throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_ENCODING, contentType + " not supported");
@@ -64,7 +64,7 @@ abstract class KVRowBuilder<T> implements RowBuilder<T> {
    *
    * @param reuse
    */
-  private void buildTextRow(T obj, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) {
+  private void buildTextRow(T obj, Row reuse, RowTypeInfo rowTypeInfo) {
     try {
       byte[] key = getKey(obj);
       byte[] value;
@@ -93,7 +93,7 @@ abstract class KVRowBuilder<T> implements RowBuilder<T> {
    *
    * @param reuse
    */
-  private void buildRowWithParser(T obj, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo, BytesParser bytesParser) {
+  private void buildRowWithParser(T obj, Row reuse, RowTypeInfo rowTypeInfo, BytesParser bytesParser) {
     try {
       byte[] key = getKey(obj);
       byte[] value = getValue(obj);

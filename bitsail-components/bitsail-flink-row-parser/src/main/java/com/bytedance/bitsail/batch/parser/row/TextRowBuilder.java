@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import com.bytedance.bitsail.flink.core.parser.BytesParser;
 import com.bytedance.bitsail.parser.error.ParserErrorCode;
 
 import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 
@@ -50,23 +51,23 @@ public class TextRowBuilder<T> implements RowBuilder<T> {
   }
 
   @Override
-  public void build(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
-    build(value, reuse, mandatoryEncoding, rowTypeInfo, IntStream.range(0, reuse.getArity()).toArray());
+  public void build(T value, Row reuse, RowTypeInfo rowTypeInfo) throws BitSailException {
+    build(value, reuse, rowTypeInfo, IntStream.range(0, reuse.getArity()).toArray());
   }
 
   @Override
-  public void build(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo, int[] fieldIndexes) throws BitSailException {
+  public void build(T value, Row reuse, RowTypeInfo rowTypeInfo, int[] fieldIndexes) throws BitSailException {
     switch (contentType) {
       case JSON:
       case PROTOBUF:
       case BINARY:
-        buildRowWithParser(value, reuse, mandatoryEncoding, rowTypeInfo, bytesParser);
+        buildRowWithParser(value, reuse, rowTypeInfo, bytesParser);
         break;
       case CSV:
-        buildRowWithCsvParser(value, reuse, mandatoryEncoding, rowTypeInfo, bytesParser, fieldIndexes);
+        buildRowWithCsvParser(value, reuse, rowTypeInfo, bytesParser, fieldIndexes);
         break;
       case PLAIN:
-        buildPlainTextRow(value.toString(), reuse, mandatoryEncoding, rowTypeInfo);
+        buildPlainTextRow(value.toString(), reuse, rowTypeInfo);
         break;
       default:
         throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_ENCODING, contentType + " not supported");
@@ -76,7 +77,7 @@ public class TextRowBuilder<T> implements RowBuilder<T> {
   /**
    * text file is a json/protobuf file which needs a parser to parse
    */
-  private void buildRowWithParser(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo, @NonNull BytesParser bytesParser) throws BitSailException {
+  private void buildRowWithParser(T value, Row reuse, RowTypeInfo rowTypeInfo, @NonNull BytesParser bytesParser) throws BitSailException {
     try {
       bytesParser.parse(reuse, value, rowTypeInfo);
     } catch (Exception e) {
@@ -87,11 +88,11 @@ public class TextRowBuilder<T> implements RowBuilder<T> {
   /**
    * text file is a csv file which needs a parser to parse
    */
-  private void buildRowWithCsvParser(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo, @NonNull BytesParser bytesParser,
+  private void buildRowWithCsvParser(T value, Row reuse, RowTypeInfo rowTypeInfo, @NonNull BytesParser bytesParser,
                                      int[] fieldIndexes
   ) throws BitSailException {
     try {
-      ((CsvBytesParser) bytesParser).parse(reuse, value, mandatoryEncoding, rowTypeInfo, fieldIndexes);
+      ((CsvBytesParser) bytesParser).parse(reuse, value, StringUtils.EMPTY, rowTypeInfo, fieldIndexes);
     } catch (Exception e) {
       throw BitSailException.asBitSailException(ParserErrorCode.ILLEGAL_TEXT, "value: " + value.toString(), e);
     }
@@ -100,7 +101,7 @@ public class TextRowBuilder<T> implements RowBuilder<T> {
   /**
    * text file is a plain-text file which does not need a parser to parse
    */
-  private void buildPlainTextRow(String value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
+  private void buildPlainTextRow(String value, Row reuse, RowTypeInfo rowTypeInfo) throws BitSailException {
     try {
       reuse.setField(0, new StringColumn(value));
     } catch (Exception e) {

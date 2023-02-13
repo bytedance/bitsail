@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,13 +54,20 @@ public class CommittableStateSerializerTest {
 
   public static class StringBinarySerializer implements BinarySerializer<String> {
 
+    private static final int VERSION = 1;
+
+    @Override
+    public int getVersion() {
+      return VERSION;
+    }
+
     @Override
     public byte[] serialize(String obj) throws IOException {
       return obj.getBytes();
     }
 
     @Override
-    public String deserialize(byte[] serialized) throws IOException {
+    public String deserialize(int version, byte[] serialized) throws IOException {
       return new String(serialized);
     }
   }

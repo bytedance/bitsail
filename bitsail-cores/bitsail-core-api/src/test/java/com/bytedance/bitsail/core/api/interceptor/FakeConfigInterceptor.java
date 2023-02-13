@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.bytedance.bitsail.core.api.interceptor;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ConfigOption;
+import com.bytedance.bitsail.core.api.command.CoreCommandArgs;
 
 public class FakeConfigInterceptor implements ConfigInterceptor {
   private static final ConfigOption<String> TEST_KEY = CommonOptions.JOB_TYPE;
@@ -30,13 +31,13 @@ public class FakeConfigInterceptor implements ConfigInterceptor {
   }
 
   @Override
-  public void intercept(BitSailConfiguration globalConfiguration) {
+  public void intercept(BitSailConfiguration globalConfiguration, CoreCommandArgs coreCommandArgs) {
     globalConfiguration.set(TEST_KEY, TEST_VAL);
   }
 
   @Override
   public String getComponentName() {
-    return "fale-config-interceptor";
+    return "fake-config-interceptor";
   }
 
   public static boolean validate(BitSailConfiguration globalConfiguration) {

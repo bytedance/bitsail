@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import com.bytedance.bitsail.base.connector.writer.v1.Sink;
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.base.connector.writer.v1.WriterCommitter;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
-import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
+import com.bytedance.bitsail.base.serializer.SimpleVersionedBinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
@@ -83,7 +83,7 @@ public class SelectdbSink<InputT> implements Sink<InputT, SelectdbCommittable, S
 
   @Override
   public BinarySerializer<SelectdbWriterState> getWriteStateSerializer() {
-    return new SimpleBinarySerializer<SelectdbWriterState>();
+    return new SimpleVersionedBinarySerializer<SelectdbWriterState>();
   }
 
   private void initSelectdbOptions(BitSailConfiguration writerConfiguration) {

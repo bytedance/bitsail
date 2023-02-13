@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,13 @@ import java.io.IOException;
 
 public class DorisCommittableSerializer implements BinarySerializer<DorisCommittable> {
 
+  private static final int VERSION = 1;
+
+  @Override
+  public int getVersion() {
+    return VERSION;
+  }
+
   @Override
   public byte[] serialize(DorisCommittable dorisCommittable) throws IOException {
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -39,7 +46,7 @@ public class DorisCommittableSerializer implements BinarySerializer<DorisCommitt
   }
 
   @Override
-  public DorisCommittable deserialize(byte[] bytes) throws IOException {
+  public DorisCommittable deserialize(int version, byte[] bytes) throws IOException {
     try (final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
          final DataInputStream in = new DataInputStream(bais)) {
       final String hostPort = in.readUTF();

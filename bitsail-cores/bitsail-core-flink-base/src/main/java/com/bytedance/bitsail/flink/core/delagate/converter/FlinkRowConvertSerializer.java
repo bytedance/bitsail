@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,6 @@ import static com.bytedance.bitsail.common.typeinfo.TypeInfos.STRING_TYPE_INFO;
  * Created 2022/6/21
  */
 public class FlinkRowConvertSerializer implements RowSerializer<Row> {
-
   private final List<ColumnInfo> columns;
 
   private final TypeInfo<?>[] typeInfos;

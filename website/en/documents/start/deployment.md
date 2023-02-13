@@ -1,19 +1,32 @@
+---
+order: 1
+---
 
 # Deployment Guide
-English | [简体中文](../../../zh/documents/start/deployment.md)
+
+English | [简体中文](../../../zh/documents/start/config.md)
+
+-----
 
 > At present, ***BitSail*** only supports flink deployment on Yarn.<br>
 Other platforms like `native kubernetes` will be release recently.
 
 Here are the contents of this part:
 
-- [Pre Configuration](#jump_pre_configure)
-    - [Configure Hadoop Environment](#jump_configure_hadoop)
-    - [Configure Flink Cluster](#jump_configure_flink)
-- [Submit to Yarn](#jump_submit_to_yarn)
-    - [Submit an example job](#jump_submit_example)
-    - [Log for Debugging](#jump_log)
-- [Submit to Local Flink Session](#jump_submit_local)
+- [Deployment Guide](#deployment-guide)
+  - [Pre configuration](#pre-configuration)
+    - [Configure Hadoop Environment](#configure-hadoop-environment)
+    - [Configure Flink Cluster](#configure-flink-cluster)
+  - [Submit to Yarn](#submit-to-yarn)
+    - [Submit an example job](#submit-an-example-job)
+    - [Log for Debugging](#log-for-debugging)
+      - [Client side log file](#client-side-log-file)
+      - [Yarn task log file](#yarn-task-log-file)
+  - [Submit to Flink](#submit-to-flink)
+    - [Run in Remote Flink Session](#run-in-remote-flink-session)
+    - [Run Locally](#run-locally)
+      - [Run Fake\_to\_Print example](#run-fake_to_print-example)
+      - [Run hadoop related job](#run-hadoop-related-job)
 
 Below is a step-by-step guide to help you effectively deploy it on Yarn.
 

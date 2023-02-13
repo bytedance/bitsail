@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class JsonRowBuilder<T> implements RowBuilder<T> {
   }
 
   @Override
-  public void build(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
+  public void build(T value, Row reuse, RowTypeInfo rowTypeInfo) throws BitSailException {
     try {
       bytesParser.parse(reuse, value, rowTypeInfo);
     } catch (Exception e) {

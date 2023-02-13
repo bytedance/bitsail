@@ -1,0 +1,11 @@
+{
+  "job": {
+    "writer": {
+      "write_mode": "overwrite",
+      "partition": "date=20210916",
+      "db_name": "test",
+      "metastore_properties": "{\"metastore_uri\":\"thrift://:9083\"}",
+      "table_name": "bitsail_unit_test_hive_output"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2022 Bytedance Ltd. and/or its affiliates.
+  ~ Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -42,6 +42,8 @@
         <skipITCase>true</skipITCase>
         <skipE2E>true</skipE2E>
         <skipUT>false</skipUT>
+        <enforcer.skip>false</enforcer.skip>
+        <skipCheckStyle>false</skipCheckStyle>
         <maven.complie.plugin.version>3.10.1</maven.complie.plugin.version>
         <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
@@ -52,6 +54,8 @@
         <maven.jacoco.plugin.version>0.8.1</maven.jacoco.plugin.version>
         <maven.flatten.plugin.version>1.2.7</maven.flatten.plugin.version>
         <maven.enforcer.plugin.version>3.0.0-M2</maven.enforcer.plugin.version>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.source.encoding>UTF-8</project.source.encoding>
         <project.build.source.encoding>UTF-8</project.build.source.encoding>
@@ -77,6 +81,7 @@
         <powermock.version>2.0.0-beta.5</powermock.version>
         <commons.lang3.version>3.3.2</commons.lang3.version>
         <commons.io.version>2.4</commons.io.version>
+        <commons.net.version>3.6</commons.net.version>
         <commons.pool2.version>2.4.2</commons.pool2.version>
         <common.collections>3.2.2</common.collections>
         <commons.collections4>4.2</commons.collections4>
@@ -100,6 +105,8 @@
 
         <!--   enforce dependency     -->
         <curator.version>2.6.0</curator.version>
+        <ant.version>1.9.6</ant.version>
+        <servlet.api.version>2.5</servlet.api.version>
     </properties>
 
     <dependencyManagement>
@@ -235,6 +242,12 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons.io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${commons.net.version}</version>
             </dependency>
 
             <dependency>
@@ -453,6 +466,13 @@
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-pb</artifactId>
+                <version>${flink.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-avro</artifactId>
                 <version>${flink.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -792,15 +812,41 @@
                 <artifactId>curator-framework</artifactId>
                 <version>${curator.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-client</artifactId>
                 <version>${curator.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-recipes</artifactId>
                 <version>${curator.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant</artifactId>
+                <version>${ant.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>${servlet.api.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-compiler</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-reflect</artifactId>
+                <version>${scala.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -923,6 +969,7 @@
                     <artifactId>maven-checkstyle-plugin</artifactId>
                     <version>${maven.checkstyle.plugin.version}</version>
                     <configuration>
+                        <skip>${skipCheckStyle}</skip>
                         <configLocation>/tools/maven/checkstyle.xml</configLocation>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
                         <encoding>UTF-8</encoding>
@@ -953,7 +1000,7 @@
                     <encoding>${project.source.encoding}</encoding>
                 </configuration>
             </plugin>
-    
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -1077,6 +1124,7 @@
                     <execution>
                         <id>enforce</id>
                         <configuration>
+                            <skip>${enforcer.skip}</skip>
                             <rules>
                                 <dependencyConvergence/>
                                 <bannedDependencies>

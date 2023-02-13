@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.bytedance.bitsail.core.api.interceptor;
 
 import com.bytedance.bitsail.base.extension.Component;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.core.api.command.CoreCommandArgs;
 
 public interface ConfigInterceptor extends Component {
   int DEFAULT_ORDER = 1;
@@ -32,7 +33,7 @@ public interface ConfigInterceptor extends Component {
   /**
    * Invoke intercept.
    */
-  void intercept(BitSailConfiguration globalConfiguration);
+  void intercept(BitSailConfiguration globalConfiguration, CoreCommandArgs coreCommandArgs);
 
   /**
    * Order for the interceptor

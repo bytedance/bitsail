@@ -1,6 +1,12 @@
+---
+order: 1
+---
+
 # 部署指南
 
 [English](../../../en/documents/start/deployment.md) | 简体中文
+
+-----
 
 > 目前 BitSail 仅支持本地和Yarn上部署。
 > 其他平台的部署（例如原生kubernetes）将在不久后支持。
@@ -8,17 +14,19 @@
 本部分目录:
 
 - [部署指南](#部署指南)
-    - [<span id="jump_pre_configure">环境配置</span>](#环境配置)
-        - [<span id="jump_configure_hadoop">配置Hadoop</span>](#配置hadoop)
-        - [<span id="jump_configure_flink">配置Flink</span>](#配置flink)
-    - [<span id="jump_submit_to_yarn">提交到Yarn</span>](#提交到yarn)
-        - [<span id="jump_submit_example">提交一个示例作业</span>](#提交一个示例作业)
-        - [<span id="jump_log">调试日志</span>](#调试日志)
-            - [client端日志](#client端日志)
-            - [Yarn作业日志](#yarn作业日志)
+  - [环境配置](#环境配置)
+    - [配置Hadoop](#配置hadoop)
+    - [配置Flink](#配置flink)
+  - [提交到Yarn](#提交到yarn)
+    - [提交一个示例作业](#提交一个示例作业)
+    - [调试日志](#调试日志)
+      - [client端日志](#client端日志)
+      - [Yarn作业日志](#yarn作业日志)
+  - [Flink提交](#flink提交)
+    - [远程提交](#远程提交)
     - [本地提交](#本地提交)
-        - [运行Fake_to_Print示例作业](#运行fake_to_print示例作业)
-        - [运行Fake_to_Hive示例作业](#运行fake_to_hive示例作业)
+      - [运行Fake\_to\_Hive示例作业](#运行fake_to_hive示例作业)
+      - [运行hadoop相关任务](#运行hadoop相关任务)
 
 
 下面各部分详细介绍BitSail的部署。

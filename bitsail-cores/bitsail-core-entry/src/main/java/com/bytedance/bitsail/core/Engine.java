@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,20 +22,16 @@ import com.bytedance.bitsail.base.packages.PluginFinderFactory;
 import com.bytedance.bitsail.base.statistics.VMInfo;
 import com.bytedance.bitsail.client.api.command.CommandArgsParser;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.configuration.ConfigParser;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.core.api.command.CoreCommandArgs;
-import com.bytedance.bitsail.core.api.interceptor.ConfigInterceptorHelper;
+import com.bytedance.bitsail.core.api.parser.ConfigurationHelper;
 import com.bytedance.bitsail.core.api.program.Program;
 import com.bytedance.bitsail.core.program.ProgramFactory;
 import com.bytedance.bitsail.core.util.ExceptionTracker;
 
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Base64;
 
 public class Engine {
   private static final Logger LOG = LoggerFactory.getLogger(Engine.class);
@@ -46,15 +42,9 @@ public class Engine {
 
   public Engine(String[] args) {
     coreCommandArgs = new CoreCommandArgs();
-    CommandArgsParser.parseArguments(args, coreCommandArgs);
-    if (StringUtils.isNotEmpty(coreCommandArgs.getJobConfPath())) {
-      configuration = ConfigParser.fromRawConfPath(coreCommandArgs.getJobConfPath());
-    } else {
-      configuration = BitSailConfiguration.from(
-          new String(Base64.getDecoder().decode(coreCommandArgs.getJobConfBase64())));
-    }
-
-    ConfigInterceptorHelper.intercept(configuration);
+    String[] unknown = CommandArgsParser.parseArguments(args, coreCommandArgs);
+    coreCommandArgs.setUnknownOptions(unknown);
+    configuration = ConfigurationHelper.load(coreCommandArgs);
     LOG.info("BitSail configuration: {}", configuration.desensitizedBeautify());
     mode = Mode.getJobRunMode(configuration.get(CommonOptions.JOB_TYPE));
   }

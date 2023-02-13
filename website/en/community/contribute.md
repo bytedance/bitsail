@@ -1,8 +1,12 @@
 ---
 order: 2
 ---
+
 # Contributor Guide
+
 English | [简体中文](../../zh/community/contribute.md)
+
+-----
 
 BitSail community welcomes contributions from anyone!
 
@@ -49,8 +53,24 @@ After importing, run command `mvn checkstyle:check` to see if checkstyle satisfi
 We use project [lombok](https://projectlombok.org/). So please install this plugin as well.
 
 ### Add License Header
-All the source files are required to add License header. Please add [Apache License header](https://www.apache.org/legal/src-headers#headers)
+All the source files are required to add License header. Please copy License header text **below** and add 
 to your IDE Copyright settings. After this step, IDE will add license to new source files automatically.
+
+```
+Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
 
 ![](../../images/license_header.png)
 
@@ -68,6 +88,7 @@ If it is the first time to submit a pull request, you can read this doc [About P
 - Commit changes to the branch and push to the fork repo
 - Create a pull request to the ***BitSail*** repo
 
+If you are a freshman to open source projects, you can read [How to submit a github pull request](pr_guide.md) for a more detailed guide.
 ## Ask for a code review
 After you have your pull request ready, with all the items from the pull request checklist being completed.
 Tag a committer to review you pull request.
@@ -80,7 +101,7 @@ When any document update is merged into master branch, a GitHub action is trigge
 
 The BitSail homepage is built through the [VuePress](https://vuepress-theme-hope.github.io/v2/) framework. After the markdown document is modified, you can try generating a test homepage through the following steps:
 
- 1. Install [yarn](https://yarnpkg.com/) (A JS package manager)
+1. Install [yarn](https://yarnpkg.com/) (A JS package manager)
 
 ```bash
 # install yarn
@@ -90,10 +111,11 @@ npm install -g yarn
 yarn --version
 ```
 
- 2. Generate test homepage locally
+2. Generate test homepage locally
+
 ```bash
-# install vuepress
-yarn add -D vuepress@next
+# install dependencies
+yarn install
 
 # generate homepage
 yarn docs:dev

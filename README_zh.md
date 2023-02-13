@@ -1,6 +1,6 @@
 <!--
 
-Copyright 2022 Bytedance Ltd. and/or its affiliates.
+Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
          
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -146,6 +146,12 @@ BitSail目前已被广泛使用,并支持数百万亿的大流量场景。同时
     <td>-</td>
     <td>✅</td>
     <td>✅</td>
+  </tr>
+  <tr>
+    <td>LocalFileSystem</td>
+    <td>-</td>
+    <td>✅</td>
+    <td></td>
   </tr>
   <tr>
     <td rowspan="4">JDBC</td>

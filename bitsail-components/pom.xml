@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2022 Bytedance Ltd. and/or its affiliates.
+  ~ Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -35,7 +35,26 @@
         <module>bitsail-component-formats-flink</module>
         <module>bitsail-component-security</module>
         <module>bitsail-component-formats</module>
+        <module>bitsail-component-metrics</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.bytedance.bitsail</groupId>
+                <artifactId>bitsail-base</artifactId>
+                <version>${revision}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.bytedance.bitsail</groupId>
+                <artifactId>bitsail-common</artifactId>
+                <version>${revision}</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>

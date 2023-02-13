@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package com.bytedance.bitsail.common.option;
 import com.bytedance.bitsail.common.annotation.Essential;
 
 import com.alibaba.fastjson.TypeReference;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import java.util.List;
 import java.util.Map;
@@ -29,6 +29,7 @@ import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 /**
  * The set of configuration options relating to common config.
  */
+@SuppressWarnings("checkstyle:MagicNumber")
 public interface CommonOptions {
   String JOB_COMMON = "job.common";
   String COMMON_PREFIX = JOB_COMMON + ".";
@@ -67,7 +68,9 @@ public interface CommonOptions {
 
   ConfigOption<Integer> GLOBAL_PARALLELISM_NUM =
       key(COMMON_PREFIX + "global_parallelism_num")
-          .defaultValue(-1);
+          .defaultValue(-1)
+          .withAlias("global_parallelism_num");
+
 
   /**
    * an optional option to store user-defined common parameters
@@ -88,20 +91,19 @@ public interface CommonOptions {
   @Essential
   ConfigOption<Long> JOB_ID =
       key(COMMON_PREFIX + "job_id")
-          .noDefaultValue(Long.class);
+          .noDefaultValue(Long.class)
+          .withAlias("job_id");
 
   @Essential
   ConfigOption<String> JOB_NAME =
       key(COMMON_PREFIX + "job_name")
-          .noDefaultValue(String.class);
+          .noDefaultValue(String.class)
+          .withAlias("job_name");
 
   ConfigOption<Boolean> JOB_CONFIG_SKIP =
       key(COMMON_PREFIX + "job.config_skip")
-          .defaultValue(true);
-
-  ConfigOption<String> DEPLOY_TYPE =
-      key(COMMON_PREFIX + "deploy_type")
-          .defaultValue("yarn");
+          .defaultValue(true)
+          .withAlias("job.config_skip");
 
   ConfigOption<Boolean> SHOW_JOB_PROGRESS =
       key(COMMON_PREFIX + "show_job_progress")
@@ -206,19 +208,23 @@ public interface CommonOptions {
   interface CheckPointOptions {
     ConfigOption<Boolean> CHECKPOINT_ENABLE =
         key(COMMON_PREFIX + "checkpoint_enable")
-            .defaultValue(false);
+            .defaultValue(false)
+            .withAlias("checkpoint_enable");
 
     ConfigOption<Long> CHECKPOINT_INTERVAL =
         key(COMMON_PREFIX + "checkpoint_interval")
-            .defaultValue(900000L);
+            .defaultValue(900000L)
+            .withAlias("checkpoint_interval");
 
     ConfigOption<Long> CHECKPOINT_TIMEOUT =
         key(COMMON_PREFIX + "checkpoint_timeout")
-            .defaultValue(600000L);
+            .defaultValue(600000L)
+            .withAlias("checkpoint_timeout");
 
     ConfigOption<Integer> CHECKPOINT_TOLERABLE_FAILURE_NUMBER_KEY =
         key(COMMON_PREFIX + "checkpoint_tolerable_failure_number")
-            .noDefaultValue(Integer.class);
+            .noDefaultValue(Integer.class)
+            .withAlias("checkpoint.tolerable_failure_number");
   }
 
   interface RestartOptions {
@@ -238,31 +244,40 @@ public interface CommonOptions {
   interface DirtyRecordOptions {
     ConfigOption<Long> DIRTY_ROLLING_POLICY_INTERVAL =
         key(COMMON_PREFIX + "dirty.rolling_policy.interval")
-            .defaultValue(60 * 60 * 1000L);
+            .defaultValue(60 * 60 * 1000L)
+            .withAlias("dirty.rolling_policy.interval");
 
     ConfigOption<Long> DIRTY_ROLLING_POLICY_SIZE =
         key(COMMON_PREFIX + "dirty.rolling_policy.size")
-            .defaultValue(512 * 1024 * 1024L);
+            .defaultValue(512 * 1024 * 1024L)
+            .withAlias("dirty.rolling_policy.size");
 
     ConfigOption<Integer> DIRTY_COLLECTOR_SIZE =
         key(COMMON_PREFIX + "dirty.collector_size")
-            .defaultValue(50);
+            .defaultValue(50)
+            .withAlias("dirty.collector_size");
 
     ConfigOption<Double> DIRTY_SAMPLE_RATIO =
         key(COMMON_PREFIX + "dirty.sample_ratio")
-            .defaultValue(1.0);
+            .defaultValue(1.0)
+            .withAlias(
+                "dirty.sample_threshold",
+                COMMON_PREFIX + "dirty.sample_threshold");
 
     ConfigOption<String> DIRTY_COLLECTOR_TYPE =
         key(COMMON_PREFIX + "dirty_collector.type")
-            .noDefaultValue(String.class);
+            .noDefaultValue(String.class)
+            .withAlias("dirty_collector.type");
 
     ConfigOption<Long> DIRTY_RECORD_SAMPLE_THRESHOLD =
         key(COMMON_PREFIX + "dirty_record_sample_threshold")
-            .defaultValue(1000L);
+            .defaultValue(1000L)
+            .withAlias("dirty_record_sample_threshold");
 
     ConfigOption<Boolean> DIRTY_RECORD_SKIP_ENABLED =
         key(COMMON_PREFIX + "dirty_record_skip_enabled")
-            .defaultValue(true);
+            .defaultValue(true)
+            .withAlias("dirty_record_skip_enabled");
   }
 
   interface DateFormatOptions {
@@ -276,8 +291,10 @@ public interface CommonOptions {
         .defaultValue("HH:mm:ss");
 
     ConfigOption<List<String>> EXTRA_FORMATS = key(COMMON_PREFIX + "column.extraFormats")
-        .defaultValue(ImmutableList.of("yyyyMMdd HH:mm:ss",
-            "yyyyMMdd"));
+        .defaultValue(Lists.newArrayList(
+            "[yyyyMMdd][yyyy-MM-dd]['T'][' '][HH:mm:ss][.SSS]",
+            "yyyy-MM-dd'T'HH:mm:ssXXX"
+        ));
 
     ConfigOption<String> TIME_ZONE = key(COMMON_PREFIX + "column.timeZone")
         .noDefaultValue(String.class);
