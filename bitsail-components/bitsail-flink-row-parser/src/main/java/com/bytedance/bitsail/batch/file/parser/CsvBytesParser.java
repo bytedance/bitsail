@@ -72,7 +72,7 @@ public class CsvBytesParser extends BytesParser {
   @Override
   public Row parse(Row row, Object line, RowTypeInfo rowTypeInfo) throws Exception {
     int[] fieldIndexes = IntStream.range(0, row.getArity()).toArray();
-    return parse(row, line, "UTF-8", rowTypeInfo, fieldIndexes);
+    return parse(row, line, StringUtils.EMPTY, rowTypeInfo, fieldIndexes);
   }
 
   public Row parse(Row row, Object line, String mandatoryEncoding, RowTypeInfo rowTypeInfo, int[] fieldIndexes) throws Exception {
