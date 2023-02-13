@@ -19,7 +19,7 @@ package com.bytedance.bitsail.entry.flink.handlers;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.component.format.security.kerberos.option.KerberosOptions;
 import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
-import com.bytedance.bitsail.entry.flink.utils.FlinikDirectory;
+import com.bytedance.bitsail.entry.flink.utils.FlinkDirectory;
 
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
