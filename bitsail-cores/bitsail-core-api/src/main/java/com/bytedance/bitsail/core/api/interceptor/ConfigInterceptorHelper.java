@@ -18,6 +18,7 @@ package com.bytedance.bitsail.core.api.interceptor;
 
 import com.bytedance.bitsail.base.component.DefaultComponentBuilderLoader;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.core.api.command.CoreCommandArgs;
 
 import com.google.common.collect.Lists;
 
@@ -26,7 +27,7 @@ import java.util.List;
 
 public class ConfigInterceptorHelper {
 
-  public static void intercept(BitSailConfiguration globalConfiguration) {
+  public static void intercept(BitSailConfiguration globalConfiguration, CoreCommandArgs coreCommandArgs) {
     DefaultComponentBuilderLoader<ConfigInterceptor> loader =
         new DefaultComponentBuilderLoader<>(ConfigInterceptor.class);
 
@@ -34,7 +35,7 @@ public class ConfigInterceptorHelper {
     interceptors.sort(Comparator.comparingInt(ConfigInterceptor::order));
     for (ConfigInterceptor interceptor : interceptors) {
       if (interceptor.accept(globalConfiguration)) {
-        interceptor.intercept(globalConfiguration);
+        interceptor.intercept(globalConfiguration, coreCommandArgs);
       }
     }
   }

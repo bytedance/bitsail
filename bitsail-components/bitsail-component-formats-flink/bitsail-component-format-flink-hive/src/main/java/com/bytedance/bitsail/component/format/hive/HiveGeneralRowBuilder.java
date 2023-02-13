@@ -103,7 +103,7 @@ public class HiveGeneralRowBuilder implements RowBuilder<Writable> {
   }
 
   @Override
-  public void build(Writable objectValue, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
+  public void build(Writable objectValue, Row reuse, RowTypeInfo rowTypeInfo) throws BitSailException {
     if (deserializer == null) {
       synchronized (hiveShim) {
         if (deserializer == null) {

@@ -20,6 +20,7 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -31,7 +32,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -53,8 +53,7 @@ public class LocalFSPluginFinder implements PluginFinder {
 
     Path frameworkBaseDirPath = Paths.get(frameworkBaseDir);
 
-    pluginStores = new ArrayList<>();
-    pluginStores.add(PluginStore.builder()
+    addPluginStore(PluginStore.builder()
         .pluginBaseDirPath(frameworkBaseDirPath.resolve(pluginDirName))
         .pluginMappingBaseDirPath(frameworkBaseDirPath.resolve(pluginMappingDirName))
         .build());
@@ -62,13 +61,24 @@ public class LocalFSPluginFinder implements PluginFinder {
     String engineDirName = commonConfiguration.get(CommonOptions.JOB_ENGINE_DIR_NAME);
     String engineMappingDirName = commonConfiguration.get(CommonOptions.JOB_ENGINE_MAPPING_DIR_NAME);
 
-    pluginStores.add(PluginStore.builder()
+    addPluginStore(PluginStore.builder()
         .pluginBaseDirPath(frameworkBaseDirPath.resolve(engineDirName))
         .pluginMappingBaseDirPath(frameworkBaseDirPath.resolve(engineMappingDirName))
         .build());
 
-    this.pluginClassloader = URLClassLoader.newInstance(new URL[] {}, Thread.currentThread()
-        .getContextClassLoader());
+    setPluginClassloader(URLClassLoader.newInstance(new URL[] {}, Thread.currentThread()
+        .getContextClassLoader()));
+  }
+
+  public void addPluginStore(PluginStore pluginStore) {
+    if (pluginStores == null) {
+      pluginStores = Lists.newArrayList();
+    }
+    pluginStores.add(pluginStore);
+  }
+
+  public void setPluginClassloader(URLClassLoader classloader) {
+    pluginClassloader = classloader;
   }
 
   @Override

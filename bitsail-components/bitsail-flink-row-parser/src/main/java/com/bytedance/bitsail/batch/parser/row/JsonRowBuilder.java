@@ -36,7 +36,7 @@ public class JsonRowBuilder<T> implements RowBuilder<T> {
   }
 
   @Override
-  public void build(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
+  public void build(T value, Row reuse, RowTypeInfo rowTypeInfo) throws BitSailException {
     try {
       bytesParser.parse(reuse, value, rowTypeInfo);
     } catch (Exception e) {
