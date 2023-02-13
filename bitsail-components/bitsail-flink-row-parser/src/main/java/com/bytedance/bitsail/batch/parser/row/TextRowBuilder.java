@@ -63,7 +63,8 @@ public class TextRowBuilder<T> implements RowBuilder<T> {
       case BINARY:
         buildRowWithParser(value, reuse, rowTypeInfo, bytesParser);
         break;
-      case CSV: buildRowWithCsvParser(value, reuse, StringUtils.EMPTY, rowTypeInfo, bytesParser, fieldIndexes);
+      case CSV:
+        buildRowWithCsvParser(value, reuse, rowTypeInfo, bytesParser, fieldIndexes);
         break;
       case PLAIN:
         buildPlainTextRow(value.toString(), reuse, rowTypeInfo);
@@ -87,11 +88,11 @@ public class TextRowBuilder<T> implements RowBuilder<T> {
   /**
    * text file is a csv file which needs a parser to parse
    */
-  private void buildRowWithCsvParser(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo, @NonNull BytesParser bytesParser,
+  private void buildRowWithCsvParser(T value, Row reuse, RowTypeInfo rowTypeInfo, @NonNull BytesParser bytesParser,
                                      int[] fieldIndexes
   ) throws BitSailException {
     try {
-      ((CsvBytesParser) bytesParser).parse(reuse, value, mandatoryEncoding, rowTypeInfo, fieldIndexes);
+      ((CsvBytesParser) bytesParser).parse(reuse, value, StringUtils.EMPTY, rowTypeInfo, fieldIndexes);
     } catch (Exception e) {
       throw BitSailException.asBitSailException(ParserErrorCode.ILLEGAL_TEXT, "value: " + value.toString(), e);
     }

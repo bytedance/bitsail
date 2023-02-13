@@ -82,8 +82,8 @@ public class FtpSource implements Source<Row, FtpSourceSplit, EmptyState>, Paral
     }
 
     return ParallelismAdvice.builder()
-        .enforceDownStreamChain(false)
         .adviceParallelism(parallelism)
+        .enforceDownStreamChain(false)
         .build();
   }
 }

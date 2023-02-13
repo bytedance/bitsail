@@ -763,12 +763,14 @@ public class BitSailConfiguration implements Serializable {
           result = getInt(path);
           break;
         case List:
+        case ArrayList:
           result = getList(path);
           break;
         case Long:
           result = getLong(path);
           break;
         case Map:
+        case HashMap:
           result = getMap(path);
           break;
         default:
@@ -935,6 +937,6 @@ public class BitSailConfiguration implements Serializable {
 
   private enum ConfigType {
     //Basic data type enumeration
-    Boolean, Character, Double, Float, Integer, List, Long, Map, String
+    Boolean, Character, Double, Float, Integer, List, Long, Map, String, ArrayList, HashMap
   }
 }

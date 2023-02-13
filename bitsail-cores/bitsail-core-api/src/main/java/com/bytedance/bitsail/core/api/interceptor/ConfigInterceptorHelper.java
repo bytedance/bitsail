@@ -21,11 +21,15 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.core.api.command.CoreCommandArgs;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.List;
 
 public class ConfigInterceptorHelper {
+
+  private static final Logger LOG = LoggerFactory.getLogger(ConfigInterceptorHelper.class);
 
   public static void intercept(BitSailConfiguration globalConfiguration, CoreCommandArgs coreCommandArgs) {
     DefaultComponentBuilderLoader<ConfigInterceptor> loader =
@@ -35,6 +39,7 @@ public class ConfigInterceptorHelper {
     interceptors.sort(Comparator.comparingInt(ConfigInterceptor::order));
     for (ConfigInterceptor interceptor : interceptors) {
       if (interceptor.accept(globalConfiguration)) {
+        LOG.info("Interceptor accepted: {} for the config.", interceptor.getComponentName());
         interceptor.intercept(globalConfiguration, coreCommandArgs);
       }
     }
