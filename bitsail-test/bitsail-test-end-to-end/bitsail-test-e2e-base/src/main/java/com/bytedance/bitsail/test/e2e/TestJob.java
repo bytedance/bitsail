@@ -89,9 +89,7 @@ public class TestJob implements AutoCloseable {
   /**
    * Create data source for reader.
    */
-  protected AbstractDataSource prepareSource(BitSailConfiguration jobConf,
-                                             Network executorNetwork,
-                                             boolean recycle) {
+  protected AbstractDataSource prepareSource(BitSailConfiguration jobConf, boolean recycle) {
     if (source != null && recycle) {
       source.reset();
       return source;
@@ -119,7 +117,7 @@ public class TestJob implements AutoCloseable {
       }
     }
     source.configure(jobConf);
-    source.initNetwork(executorNetwork);
+    source.initNetwork(network);
     source.start();
 
     LOG.info("DataSource is started as source in [{}].", source.getContainerName());
@@ -129,9 +127,7 @@ public class TestJob implements AutoCloseable {
   /**
    * Create data source for writer.
    */
-  protected AbstractDataSource prepareSink(BitSailConfiguration jobConf,
-                                           Network executorNetwork,
-                                           boolean recycle) {
+  protected AbstractDataSource prepareSink(BitSailConfiguration jobConf, boolean recycle) {
     if (sink != null && recycle) {
       sink.reset();
       return sink;
@@ -159,7 +155,7 @@ public class TestJob implements AutoCloseable {
       }
     }
     sink.configure(jobConf);
-    sink.initNetwork(executorNetwork);
+    sink.initNetwork(network);
     sink.start();
 
     LOG.info("DataSource is started as sink in [{}].", sink.getContainerName());
@@ -183,8 +179,8 @@ public class TestJob implements AutoCloseable {
     executors = createExecutors();
 
     for (AbstractExecutor executor : executors) {
-      source = prepareSource(jobConf, network, recycleSource);
-      sink = prepareSink(jobConf, network, recycleSink);
+      source = prepareSource(jobConf, recycleSource);
+      sink = prepareSink(jobConf, recycleSink);
 
       source.fillData(executor);
       source.modifyJobConf(jobConf);

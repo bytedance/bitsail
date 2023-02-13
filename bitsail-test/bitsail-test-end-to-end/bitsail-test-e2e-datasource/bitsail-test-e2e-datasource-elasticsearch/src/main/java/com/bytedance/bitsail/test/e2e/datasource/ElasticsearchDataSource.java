@@ -150,7 +150,7 @@ public class ElasticsearchDataSource extends AbstractDataSource {
   }
 
   /**
-   * Create a index.
+   * Create an index.
    */
   @SneakyThrows
   public void createIndex(String indexName) {
@@ -160,6 +160,9 @@ public class ElasticsearchDataSource extends AbstractDataSource {
     client.indices().create(new CreateIndexRequest(indexName), RequestOptions.DEFAULT);
   }
 
+  /**
+   * Delete an index.
+   */
   public void deleteIndex(String indexName) {
     RestClientBuilder builder = getRestClientBuilder();
     RestHighLevelClient client = new RestHighLevelClient(builder);

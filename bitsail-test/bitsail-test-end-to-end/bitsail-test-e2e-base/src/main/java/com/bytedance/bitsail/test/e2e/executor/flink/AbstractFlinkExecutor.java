@@ -60,10 +60,6 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
    */
   protected GenericContainer<?> executor;
 
-  public AbstractFlinkExecutor() {
-    initNetwork(null);
-  }
-
   @Override
   public void configure(BitSailConfiguration executorConf) {
     super.configure(executorConf);
