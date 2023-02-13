@@ -90,6 +90,9 @@ public class ClickhouseSource implements Source<Row, ClickhouseSourceSplit, Empt
         LOG.warn("Failed to compute splits for computing parallelism, will use default 1.");
       }
     }
-    return new ParallelismAdvice(false, parallelism);
+    return ParallelismAdvice.builder()
+        .adviceParallelism(parallelism)
+        .enforceDownStreamChain(false)
+        .build();
   }
 }

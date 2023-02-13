@@ -68,7 +68,9 @@ public interface CommonOptions {
 
   ConfigOption<Integer> GLOBAL_PARALLELISM_NUM =
       key(COMMON_PREFIX + "global_parallelism_num")
-          .defaultValue(-1);
+          .defaultValue(-1)
+          .withAlias("global_parallelism_num");
+
 
   /**
    * an optional option to store user-defined common parameters

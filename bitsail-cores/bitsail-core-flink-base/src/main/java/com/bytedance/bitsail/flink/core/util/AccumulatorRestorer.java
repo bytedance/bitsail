@@ -77,6 +77,6 @@ public class AccumulatorRestorer {
   }
 
   private static long getAccumulatorValue(String name, Map<String, Object> allAccumulatorResults) {
-    return (long) allAccumulatorResults.get(name);
+    return (long) allAccumulatorResults.getOrDefault(name, 0L);
   }
 }

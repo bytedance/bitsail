@@ -43,7 +43,7 @@ public class FlinkExecutionEnvironTest {
   }
 
   @Test
-  public void testAddPluginToExecution() throws Exception {
+  public void testAddPluginToExecution() throws Throwable {
     URL fakeFile = new URL("file:///tmp/urls/a.jar");
     Set<URL> urls = Sets.newHashSet(fakeFile);
     environ.addPluginToExecution(urls);
