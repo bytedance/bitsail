@@ -22,6 +22,7 @@ import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.connector.fake.source.FakeSource;
 import com.bytedance.bitsail.connector.print.sink.PrintSink;
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
+import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,8 +47,12 @@ public class GenericExecutorTest {
     jobConf.set(WriterOptions.WRITER_CLASS, PrintSink.class.getName());
     executor.configure(jobConf);
     Set<TransferableFile> transferableFiles = executor.getTransferableFiles();
-    TransferableFile file1 = new TransferableFile("/local/1.jar", "/executor/1.jar");
-    TransferableFile file2 = new TransferableFile("/local/2.jar", "/executor/2.jar");
+
+    String localRootPath = AbstractExecutor.getLocalRootDir();
+    TransferableFile file1 = new TransferableFile(Paths.get(localRootPath, "/local/1.jar").toAbsolutePath().toString(),
+        "/executor/1.jar");
+    TransferableFile file2 = new TransferableFile(Paths.get(localRootPath, "/local/2.jar").toAbsolutePath().toString(),
+        "/executor/2.jar");
     Assert.assertTrue(transferableFiles.contains(file1));
     Assert.assertTrue(transferableFiles.contains(file2));
   }

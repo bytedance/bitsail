@@ -166,6 +166,11 @@ public class GenericExecutor extends AbstractExecutor {
   @Override
   protected void addEngineLibs(String buildVersion) {
     List<TransferableFile> engineLibs = setting.getEngineLibs();
+    engineLibs.forEach(tf -> {
+      String relativePath = tf.getHostPath();
+      String absolutePath = Paths.get(localRootDir, relativePath).toAbsolutePath().toString();
+      tf.setHostPath(absolutePath);
+    });
     transferableFiles.addAll(engineLibs);
     LOG.info("Successfully add libs for {}", setting.getExecutorName());
   }

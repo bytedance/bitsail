@@ -20,14 +20,14 @@ import com.bytedance.bitsail.common.util.Preconditions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@Getter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransferableFile {
