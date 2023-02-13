@@ -1,0 +1,54 @@
+name: '👍 Improve Request'
+title: '[Improve][XxxType] Description'
+description: Improve the functionality for BitSail
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for finding the time to propose improvement!
+
+        We really appreciate the community efforts to improve BitSail.
+
+  - type: textarea
+    attributes:
+      label: Description
+      description: A short description of your improvement suggestion.
+
+  - type: dropdown
+    attributes:
+      label: BitSail Component or Code Module
+      description: |
+        Which component or code module of BitSail did you find the bug from?
+      multiple: true
+      options:
+        - 'BitSail Doc'
+        - 'BitSail Pom'
+        - 'BitSail Core'
+        - 'BitSail Test'
+        - 'BitSail Component'
+        - 'BitSail Connector'
+        - 'Other for not specified type'
+    validations:
+      required: true
+
+  - type: checkboxes
+    attributes:
+      label: Are you willing to submit PR?
+      description: >
+        This is absolutely not required, but we are happy to guide you in the contribution process
+        especially if you already have a good understanding of how to implement the improvement.
+      options:
+        - label: Yes, I am willing to submit a PR!
+
+  - type: checkboxes
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: >
+            I agree to follow this project's
+            [Code of Conduct](https://www.apache.org/foundation/policies/conduct)
+          required: true
+
+  - type: markdown
+    attributes:
+      value: "Thanks for completing our form!"
