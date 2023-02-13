@@ -23,6 +23,7 @@ import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.clickhouse.option.ClickhouseReaderOptions;
 import com.bytedance.bitsail.connector.clickhouse.source.ClickhouseSource;
+import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 
 import com.clickhouse.jdbc.ClickHouseConnection;
 import com.clickhouse.jdbc.ClickHouseDataSource;
@@ -125,7 +126,7 @@ public class ClickhouseDataSource extends AbstractDataSource {
   }
 
   @Override
-  public void fillData() {
+  public void fillData(AbstractExecutor ignored) {
     List<String> values = new ArrayList<>();
     try {
       performQuery(DROP_TABLE_SQL);

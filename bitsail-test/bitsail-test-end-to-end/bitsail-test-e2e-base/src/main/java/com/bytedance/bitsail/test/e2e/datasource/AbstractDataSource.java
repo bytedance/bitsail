@@ -19,6 +19,7 @@ package com.bytedance.bitsail.test.e2e.datasource;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.test.e2e.base.AbstractContainer;
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
+import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 
 import lombok.Setter;
 
@@ -54,7 +55,16 @@ public abstract class AbstractDataSource extends AbstractContainer {
   /**
    * Produce some data if it is for source.
    */
-  public abstract void fillData();
+  public void fillData(AbstractExecutor executor) {
+
+  }
+
+  /**
+   * Reset data source before reuse.
+   */
+  public void reset() {
+
+  }
 
   enum Role {
     SOURCE,

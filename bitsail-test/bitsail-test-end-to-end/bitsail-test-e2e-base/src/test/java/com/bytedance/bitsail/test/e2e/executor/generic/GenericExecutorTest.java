@@ -38,8 +38,7 @@ public class GenericExecutorTest {
         .getResource("executor/generic/TestGenericExecutorSetting.json")
         .toURI()).toString();
 
-    GenericExecutor executor = new GenericExecutor();
-    executor.initFromSettings(settingFilePath);
+    GenericExecutor executor = new GenericExecutor(GenericExecutorSetting.initFromFile(settingFilePath));
     Assert.assertEquals("test-executor", executor.getContainerName());
 
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();

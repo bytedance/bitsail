@@ -19,20 +19,20 @@ package com.bytedance.bitsail.test.e2e;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
-import com.bytedance.bitsail.common.util.Preconditions;
+import com.bytedance.bitsail.test.e2e.base.AbstractContainer;
 import com.bytedance.bitsail.test.e2e.datasource.AbstractDataSource;
 import com.bytedance.bitsail.test.e2e.datasource.DataSourceFactory;
 import com.bytedance.bitsail.test.e2e.datasource.EmptyDataSource;
 import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
-import com.bytedance.bitsail.test.e2e.executor.flink.Flink11Executor;
+import com.bytedance.bitsail.test.e2e.executor.ExecutorLoader;
 import com.bytedance.bitsail.test.e2e.option.EndToEndOptions;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -40,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
-@AllArgsConstructor
 @Builder
 public class TestJob implements AutoCloseable {
   private static final Logger LOG = LoggerFactory.getLogger(TestJob.class);
@@ -55,11 +54,6 @@ public class TestJob implements AutoCloseable {
   protected final BitSailConfiguration jobConf;
 
   /**
-   * Engine type.
-   */
-  protected final String engineType;
-
-  /**
    * Data source for reader.
    */
   protected AbstractDataSource source;
@@ -72,142 +66,169 @@ public class TestJob implements AutoCloseable {
   /**
    * Executor.
    */
-  protected AbstractExecutor executor;
-
-  TestJob(BitSailConfiguration jobConf, String engineType) {
-    this.jobConf = jobConf;
-    this.engineType = engineType.trim().toLowerCase();
-  }
+  protected List<AbstractExecutor> executors;
 
   /**
-   * Prepare data sources and executor.
+   * Network for executor and data sources.
    */
-  protected void init() {
-    executor = createExecutor();
-    Network executorNetwork = executor.getNetwork();
+  @Builder.Default
+  protected Network network = Network.newNetwork();
 
-    source = prepareSource(jobConf, executorNetwork);
-    sink = prepareSink(jobConf, executorNetwork);
-  }
+  /**
+   * If to recycle data source (source).
+   */
+  @Builder.Default
+  protected boolean recycleSource = true;
+
+  /**
+   * If to reuse data source (sink).
+   */
+  @Builder.Default
+  protected boolean recycleSink = true;
 
   /**
    * Create data source for reader.
    */
   protected AbstractDataSource prepareSource(BitSailConfiguration jobConf,
-                                             Network executorNetwork) {
-    AbstractDataSource dataSource = null;
+                                             Network executorNetwork,
+                                             boolean recycle) {
+    if (source != null && recycle) {
+      source.reset();
+      return source;
+    }
+
     String dataSourceClass = jobConf.get(EndToEndOptions.E2E_READER_DATA_SOURCE_CLASS);
 
     if (dataSourceClass != null) {
       try {
         LOG.info("Reader data source class name: [{}]", dataSourceClass);
         Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(dataSourceClass);
-        dataSource = (AbstractDataSource) clazz.newInstance();
+        source = (AbstractDataSource) clazz.newInstance();
       } catch (Exception e) {
         LOG.error("Failed to create data source [{}], will try using class name.", dataSourceClass, e);
-        dataSource = null;
+        source = null;
       }
     }
 
-    if (dataSource == null) {
+    if (source == null) {
       try {
-        dataSource = DataSourceFactory.getAsSource(jobConf);
+        source = DataSourceFactory.getAsSource(jobConf);
       } catch (BitSailException e) {
         LOG.error("Failed create data source from factory, will use empty source.", e);
-        dataSource = new EmptyDataSource();
+        source = new EmptyDataSource();
       }
     }
-    dataSource.configure(jobConf);
-    dataSource.initNetwork(executorNetwork);
-    dataSource.start();
-    dataSource.fillData();
+    source.configure(jobConf);
+    source.initNetwork(executorNetwork);
+    source.start();
 
-    LOG.info("DataSource is started as source in [{}].", dataSource.getContainerName());
-    return dataSource;
+    LOG.info("DataSource is started as source in [{}].", source.getContainerName());
+    return source;
   }
 
   /**
    * Create data source for writer.
    */
   protected AbstractDataSource prepareSink(BitSailConfiguration jobConf,
-                                           Network executorNetwork) {
-    AbstractDataSource dataSource = null;
+                                           Network executorNetwork,
+                                           boolean recycle) {
+    if (sink != null && recycle) {
+      sink.reset();
+      return sink;
+    }
+
     String dataSourceClass = jobConf.get(EndToEndOptions.E2E_WRITER_DATA_SOURCE_CLASS);
 
     if (dataSourceClass != null) {
       try {
         LOG.info("Writer data source class name: [{}]", dataSourceClass);
         Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(dataSourceClass);
-        dataSource = (AbstractDataSource) clazz.newInstance();
+        sink = (AbstractDataSource) clazz.newInstance();
       } catch (Exception e) {
         LOG.error("Failed to create data source [{}], will try using class name.", dataSourceClass, e);
-        dataSource = null;
+        sink = null;
       }
     }
 
-    if (dataSource == null) {
+    if (sink == null) {
       try {
-        dataSource = DataSourceFactory.getAsSink(jobConf);
+        sink = DataSourceFactory.getAsSink(jobConf);
       } catch (BitSailException e) {
         LOG.error("Failed create data source from factory, will use empty source.", e);
-        dataSource = new EmptyDataSource();
+        sink = new EmptyDataSource();
       }
     }
-    dataSource.configure(jobConf);
-    dataSource.initNetwork(executorNetwork);
-    dataSource.start();
+    sink.configure(jobConf);
+    sink.initNetwork(executorNetwork);
+    sink.start();
 
-    LOG.info("DataSource is started as sink in [{}].", dataSource.getContainerName());
-    return dataSource;
+    LOG.info("DataSource is started as sink in [{}].", sink.getContainerName());
+    return sink;
   }
 
   /**
-   * Create test executor.
+   * Create test executors.
    */
-  protected AbstractExecutor createExecutor() {
-    switch (engineType) {
-      case "flink11":
-        executor = new Flink11Executor();
-        break;
-      default:
-        throw new UnsupportedOperationException("engine type " + engineType + " is not supported yet.");
-    }
-    return executor;
+  protected List<AbstractExecutor> createExecutors() {
+    ExecutorLoader loader = new ExecutorLoader(null, null);
+    List<AbstractExecutor> executors = loader.loadAll();
+    executors.forEach(executor -> executor.initNetwork(network));
+    return executors;
   }
 
   /**
    * Run a job.
    */
-  public int run(String caseName,
-                 int allowedTimeout) throws Exception {
-    init();
+  public int run(String caseName, int allowedTimeout) throws Exception {
+    executors = createExecutors();
 
-    source.modifyJobConf(jobConf);
-    sink.modifyJobConf(jobConf);
+    for (AbstractExecutor executor : executors) {
+      source = prepareSource(jobConf, network, recycleSource);
+      sink = prepareSink(jobConf, network, recycleSink);
 
-    executor.configure(jobConf);
-    executor.init();
+      source.fillData(executor);
+      source.modifyJobConf(jobConf);
+      sink.modifyJobConf(jobConf);
 
-    boolean allowTimeout = allowedTimeout > 0;
-    int execTimeout = allowTimeout ? allowedTimeout : 300;
+      executor.configure(jobConf);
+      executor.init();
 
-    ExecutorService service = Executors.newSingleThreadExecutor();
-    try {
-      Future<?> future = service.submit(() ->
-          executor.run(String.format("%s_on_%s", caseName, engineType)));
-      return (Integer) future.get(execTimeout, TimeUnit.SECONDS);
-    } catch (TimeoutException te) {
-      if (allowTimeout) {
-        LOG.info("Execute more than {} seconds, will terminate it.", allowedTimeout);
-        return 0;
-      } else {
-        LOG.error("Execute more than {} seconds.", allowedTimeout);
-        throw te;
+      boolean allowTimeout = allowedTimeout > 0;
+      int execTimeout = allowTimeout ? allowedTimeout : 300;
+
+      int exitCode;
+      ExecutorService service = Executors.newSingleThreadExecutor();
+      try {
+        Future<?> future = service.submit(() ->
+            executor.run(String.format("%s_on_%s", caseName, executor.getContainerName())));
+        exitCode = (Integer) future.get(execTimeout, TimeUnit.SECONDS);
+      } catch (TimeoutException te) {
+        if (allowTimeout) {
+          LOG.info("Execute more than {} seconds, will terminate it.", allowedTimeout);
+          exitCode = SUCCESS_EXIT_CODE;
+        } else {
+          LOG.error("Execute more than {} seconds.", allowedTimeout);
+          throw te;
+        }
+      } catch (Exception e) {
+        LOG.error("Failed to execute job.", e);
+        throw e;
       }
-    } catch (Exception e) {
-      LOG.error("Failed to execute job.", e);
-      throw e;
+
+      LOG.info("Exit code on executor {}: {}", executor.getContainerName(), exitCode);
+      if (exitCode != SUCCESS_EXIT_CODE) {
+        return exitCode;
+      }
+
+      if (!recycleSource) {
+        source.closeQuietly();
+      }
+      if (!recycleSink) {
+        sink.closeQuietly();
+      }
     }
+
+    return SUCCESS_EXIT_CODE;
   }
 
   /**
@@ -228,9 +249,15 @@ public class TestJob implements AutoCloseable {
   @Override
   public void close() {
     LOG.info("Test Job Closing...");
-    executor.closeQuietly();
-    source.closeQuietly();
-    sink.closeQuietly();
+    if (executors != null) {
+      executors.forEach(AbstractContainer::closeQuietly);
+    }
+    if (source != null) {
+      source.closeQuietly();
+    }
+    if (sink != null) {
+      sink.closeQuietly();
+    }
     LOG.info("Test Job Closed!");
   }
 
@@ -239,29 +266,5 @@ public class TestJob implements AutoCloseable {
    */
   public static TestJobBuilder builder() {
     return new TestJobBuilder();
-  }
-
-  /**
-   * Job Builder.
-   */
-  public static class TestJobBuilder {
-    private BitSailConfiguration jobConf;
-    private String engineType;
-
-    public TestJobBuilder withJobConf(BitSailConfiguration jobConf) {
-      this.jobConf = jobConf;
-      return this;
-    }
-
-    public TestJobBuilder withEngineType(String engineType) {
-      this.engineType = engineType;
-      return this;
-    }
-
-    public TestJob build() {
-      Preconditions.checkNotNull(jobConf);
-      Preconditions.checkNotNull(engineType);
-      return new TestJob(jobConf, engineType);
-    }
   }
 }

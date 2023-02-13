@@ -31,6 +31,7 @@ import lombok.Data;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.Network;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -94,6 +95,11 @@ public abstract class AbstractExecutor extends AbstractContainer {
 
     Preconditions.checkState(new File(localRootDir).exists(), "Failed to locate project.");
     LOG.info("Detect project root dir: {}", localRootDir);
+  }
+
+  @Override
+  public void initNetwork(Network network) {
+    this.network = network != null ? network : Network.newNetwork();
   }
 
   /**

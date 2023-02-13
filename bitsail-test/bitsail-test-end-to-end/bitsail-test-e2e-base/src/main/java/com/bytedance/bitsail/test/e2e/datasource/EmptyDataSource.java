@@ -65,9 +65,4 @@ public class EmptyDataSource extends AbstractDataSource {
   public void start() {
 
   }
-
-  @Override
-  public void fillData() {
-
-  }
 }

@@ -39,7 +39,7 @@ public class GenericExecutorSettingTest {
     Assert.assertEquals("test-executor", setting.getExecutorName());
     Assert.assertEquals("test-image", setting.getExecutorImage());
 
-    List<TransferableFile> transferableFileList = setting.getEngineLibs();
+    List<TransferableFile> transferableFileList = setting.getAdditionalFiles();
     Assert.assertEquals(2, transferableFileList.size());
     TransferableFile file1 = new TransferableFile("/local/1.jar", "/executor/1.jar");
     TransferableFile file2 = new TransferableFile("/local/2.jar", "/executor/2.jar");

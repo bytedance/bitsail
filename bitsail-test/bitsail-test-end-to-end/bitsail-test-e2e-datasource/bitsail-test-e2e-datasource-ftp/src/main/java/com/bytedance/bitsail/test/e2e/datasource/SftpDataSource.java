@@ -120,11 +120,6 @@ public class SftpDataSource extends AbstractDataSource {
   }
 
   @Override
-  public void fillData() {
-    // Data are already loaded by file system binding.
-  }
-
-  @Override
   public void close() throws IOException {
     sftpServer.close();
     LOG.info("Sftp container closed.");

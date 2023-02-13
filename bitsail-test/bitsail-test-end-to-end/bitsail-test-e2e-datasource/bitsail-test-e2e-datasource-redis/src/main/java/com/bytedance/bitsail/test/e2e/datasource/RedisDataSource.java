@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
+import redis.clients.jedis.Jedis;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -91,8 +92,10 @@ public class RedisDataSource extends AbstractDataSource {
   }
 
   @Override
-  public void fillData() {
-
+  public void reset() {
+    try (Jedis jedis = new Jedis(redis.getHost(), redis.getMappedPort(port))) {
+      jedis.flushAll();
+    }
   }
 
   @Override

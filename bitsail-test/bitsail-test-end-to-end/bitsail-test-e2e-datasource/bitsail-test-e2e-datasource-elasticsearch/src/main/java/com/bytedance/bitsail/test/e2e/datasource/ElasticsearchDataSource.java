@@ -26,6 +26,7 @@ import com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchSink;
 import lombok.SneakyThrows;
 import org.apache.http.HttpHost;
 import org.apache.http.util.EntityUtils;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Response;
@@ -116,8 +117,9 @@ public class ElasticsearchDataSource extends AbstractDataSource {
   }
 
   @Override
-  public void fillData() {
-    // todo
+  public void reset() {
+    deleteIndex(ES_INDEX);
+    createIndex(ES_INDEX);
   }
 
   @Override
@@ -156,6 +158,18 @@ public class ElasticsearchDataSource extends AbstractDataSource {
     RestHighLevelClient client = new RestHighLevelClient(builder);
 
     client.indices().create(new CreateIndexRequest(indexName), RequestOptions.DEFAULT);
+  }
+
+  public void deleteIndex(String indexName) {
+    RestClientBuilder builder = getRestClientBuilder();
+    RestHighLevelClient client = new RestHighLevelClient(builder);
+
+    try {
+      DeleteIndexRequest request = new DeleteIndexRequest(indexName);
+      client.indices().delete(request, RequestOptions.DEFAULT);
+    } catch (Exception ignored) {
+      // ignored
+    }
   }
 
   /**

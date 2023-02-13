@@ -54,9 +54,15 @@ public class GenericExecutorSetting {
   @JsonProperty(value = "executor-image", required = true)
   private String executorImage;
 
-  @JsonProperty("engine-libs")
+  @JsonProperty("client-modules")
+  private List<String> clientModules;
+
+  @JsonProperty("core-modules")
+  private List<String> coreModules;
+
+  @JsonProperty("additional-files")
   @JsonDeserialize(using = TransferableFileDeserializer.class)
-  private List<TransferableFile> engineLibs;
+  private List<TransferableFile> additionalFiles;
 
   @JsonProperty(value = "exec-commands", required = true)
   private List<String> execCommands;
@@ -68,6 +74,9 @@ public class GenericExecutorSetting {
   private String globalJobConf;
 
   public BitSailConfiguration getGlobalJobConf() {
+    if (globalJobConf == null) {
+      return BitSailConfiguration.newDefault();
+    }
     return BitSailConfiguration.from(globalJobConf);
   }
 

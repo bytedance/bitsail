@@ -21,24 +21,24 @@ import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
 import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 
 import com.google.common.collect.Lists;
-import lombok.NoArgsConstructor;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerLoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-@NoArgsConstructor
 public class GenericExecutor extends AbstractExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(GenericExecutor.class);
 
@@ -57,8 +57,8 @@ public class GenericExecutor extends AbstractExecutor {
    */
   protected GenericContainer<?> executor;
 
-  public void initFromSettings(String settingFilePath) {
-    setting = GenericExecutorSetting.initFromFile(settingFilePath);
+  public GenericExecutor(GenericExecutorSetting setting) {
+    this.setting = setting;
   }
 
   @Override
@@ -70,11 +70,6 @@ public class GenericExecutor extends AbstractExecutor {
   @Override
   public String getContainerName() {
     return setting.getExecutorName();
-  }
-
-  @Override
-  public void initNetwork(Network executorNetwork) {
-    network = Network.newNetwork();
   }
 
   @Override
@@ -128,7 +123,7 @@ public class GenericExecutor extends AbstractExecutor {
             + "============================================\n",
         testId, getContainerName(), stdOut == null ? "null" : stdOut, stdErr == null ? "null" : stdErr);
 
-    if (exitCode != 0) {
+    if (exitCode != 0 && CollectionUtils.isNotEmpty(setting.getFailureHandleCommands())) {
       commands = String.join(" ", setting.getFailureHandleCommands());
       result = executor.execInContainer("bash", "-c", commands);
 
@@ -165,13 +160,73 @@ public class GenericExecutor extends AbstractExecutor {
 
   @Override
   protected void addEngineLibs(String buildVersion) {
-    List<TransferableFile> engineLibs = setting.getEngineLibs();
-    engineLibs.forEach(tf -> {
-      String relativePath = tf.getHostPath();
-      String absolutePath = Paths.get(localRootDir, relativePath).toAbsolutePath().toString();
-      tf.setHostPath(absolutePath);
-    });
-    transferableFiles.addAll(engineLibs);
+    List<String> coreModules = setting.getCoreModules();
+    if (CollectionUtils.isNotEmpty(coreModules)) {
+      coreModules.forEach(this::addCoreModuleLibs);
+    }
+
+    List<String> clientModules = setting.getClientModules();
+    if (CollectionUtils.isNotEmpty(clientModules)) {
+      clientModules.forEach(this::addClientModuleLibs);
+    }
+
+    // additional files
+    List<TransferableFile> additionalFiles = setting.getAdditionalFiles();
+    if (CollectionUtils.isNotEmpty(additionalFiles)) {
+      additionalFiles.forEach(tf -> {
+        String relativePath = tf.getHostPath();
+        String absolutePath = Paths.get(localRootDir, relativePath).toAbsolutePath().toString();
+        tf.setHostPath(absolutePath);
+      });
+      transferableFiles.addAll(additionalFiles);
+    }
+
     LOG.info("Successfully add libs for {}", setting.getExecutorName());
+  }
+
+  private void addCoreModuleLibs(String moduleName) {
+    File targetFolder = Paths.get(localRootDir, moduleName, "target").toFile();
+    File[] targetFiles = targetFolder.listFiles();
+    if (targetFiles != null) {
+      Arrays.stream(targetFiles)
+          .filter(file -> file.getName().endsWith(".jar"))
+          .filter(file -> !file.getName().startsWith("original-"))
+          .forEach(file -> {
+            String localPath = file.getAbsolutePath();
+            String remotePath = Paths.get(executorRootDir,
+                "libs", "engines", file.getName()).toAbsolutePath().toString();
+            transferableFiles.add(new TransferableFile(localPath, remotePath));
+          });
+    }
+
+    File resourceFolder = Paths.get(localRootDir, moduleName, "src", "main", "resources").toFile();
+    File[] confFiles = resourceFolder.listFiles();
+    if (confFiles != null) {
+      Arrays.stream(confFiles)
+          .filter(file -> file.getName().endsWith(".json"))
+          .forEach(file -> {
+            String localPath = file.getAbsolutePath();
+            String remotePath = Paths.get(executorRootDir,
+                "libs", "engines", "mapping", file.getName()).toAbsolutePath().toString();
+            transferableFiles.add(new TransferableFile(localPath, remotePath));
+          });
+    }
+
+    LOG.info("Successfully add libs for cores.");
+  }
+
+  private void addClientModuleLibs(String moduleName) {
+    File clientModule = Paths.get(localRootDir, moduleName, "target").toFile();
+    File[] targetFiles = clientModule.listFiles();
+    if (targetFiles != null) {
+      Arrays.stream(targetFiles).filter(file -> file.getName().endsWith(".jar")).forEach(file -> {
+        String localPath = file.getAbsolutePath();
+        String remotePath = Paths.get(executorRootDir,
+            "libs", "clients", file.getName()).toAbsolutePath().toString();
+        transferableFiles.add(new TransferableFile(localPath, remotePath));
+      });
+    }
+
+    LOG.info("Successfully add libs for clients.");
   }
 }

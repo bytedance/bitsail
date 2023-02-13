@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.lifecycle.Startables;
@@ -70,11 +69,6 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
     super.configure(executorConf);
     this.conf = executorConf;
     this.flinkRootDir = getFlinkRootDir();
-  }
-
-  @Override
-  public void initNetwork(Network executorNetwork) {
-    network = Network.newNetwork();
   }
 
   @Override

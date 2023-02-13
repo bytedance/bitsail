@@ -29,6 +29,7 @@ import com.bytedance.bitsail.common.util.JsonSerializer;
 import com.bytedance.bitsail.connector.rocketmq.option.RocketMQSourceOptions;
 import com.bytedance.bitsail.connector.rocketmq.source.RocketMQSource;
 import com.bytedance.bitsail.test.e2e.datasource.util.RowGenerator;
+import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 
 import com.alibaba.dcm.DnsCacheManipulator;
 import com.google.common.collect.Lists;
@@ -70,6 +71,8 @@ public class RocketMQDataSource extends AbstractDataSource {
 
   private List<ColumnInfo> columnInfos;
   private RowGenerator rowGenerator;
+
+  private boolean hasFillData = false;
 
   @Override
   public String getContainerName() {
@@ -158,7 +161,12 @@ public class RocketMQDataSource extends AbstractDataSource {
 
   @SuppressWarnings("checkstyle:MagicNumber")
   @Override
-  public void fillData() {
+  public void fillData(AbstractExecutor ignored) {
+    if (hasFillData) {
+      return;
+    }
+    hasFillData = true;
+
     synchronized (RocketMQSource.class) {
       DnsCacheManipulator.setDnsCache("broker", "127.0.0.1");
     }
