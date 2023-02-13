@@ -31,7 +31,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 
-abstract class KVRowBuilder<T> implements RowBuilder<T> {
+public abstract class KVRowBuilder<T> implements RowBuilder<T> {
 
   private ContentType contentType;
   private BytesParser bytesParser;

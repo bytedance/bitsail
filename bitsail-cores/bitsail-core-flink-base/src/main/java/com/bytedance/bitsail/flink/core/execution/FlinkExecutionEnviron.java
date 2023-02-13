@@ -70,14 +70,14 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
   /**
    * runtime plugins including JobProgress and Metrics
    */
-  private List<RuntimePlugin> runtimePlugins;
+  protected List<RuntimePlugin> runtimePlugins;
 
   /**
    * compute parallelism for each reader and writer
    */
-  private FlinkParallelismAdvisor parallelismAdvisor;
+  protected FlinkParallelismAdvisor parallelismAdvisor;
 
-  private StreamExecutionEnvironment executionEnvironment;
+  protected StreamExecutionEnvironment executionEnvironment;
   private TableEnvironment tableEnvironment;
 
   @Override
@@ -128,7 +128,7 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
                               List<DataWriterDAGBuilder> writerBuilders) throws Exception {
 
     /* initialize and launch runtime plugins */
-    BitSailRuntimePluginConfigurer runtimePluginConfigurer = new BitSailRuntimePluginConfigurer(flinkJobMode);
+    BitSailRuntimePluginConfigurer runtimePluginConfigurer = new BitSailRuntimePluginConfigurer(flinkJobMode.getRuntimePluginClasses());
     runtimePlugins = runtimePluginConfigurer.getRuntimePlugins();
     runtimePlugins.forEach(plugin -> {
       plugin.configure(commonConfiguration, readerBuilders, writerBuilders);
