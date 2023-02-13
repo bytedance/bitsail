@@ -103,7 +103,7 @@ public class HadoopInputFormat<K, V> extends
 
   @Override
   public Row buildRow(Row reuse, String mandatoryEncoding) throws BitSailException {
-    rowBuilder.build(value, reuse, mandatoryEncoding, rowTypeInfo, fieldIndex);
+    rowBuilder.build(value, reuse, rowTypeInfo, fieldIndex);
 
     return reuse;
   }
