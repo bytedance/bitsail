@@ -21,6 +21,7 @@ import com.bytedance.bitsail.common.util.Preconditions;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
@@ -28,18 +29,19 @@ import java.nio.file.Paths;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class TransferableFile {
   /**
    * Absolute path in host.
    */
   @JsonProperty("host-path")
-  private final String hostPath;
+  private String hostPath;
 
   /**
    * Absolute path in container.
    */
   @JsonProperty("executor-path")
-  private final String containerPath;
+  private String containerPath;
 
   public void checkExist() {
     Path filePath = Paths.get(hostPath);

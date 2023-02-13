@@ -16,32 +16,80 @@
 
 package com.bytedance.bitsail.test.e2e.executor.generic;
 
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 
 @Getter
-@Builder
+@Setter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class GenericExecutorSetting {
-  @JsonProperty("name")
-  private final String executorName;
+  private static final Logger LOG = LoggerFactory.getLogger(GenericExecutorSetting.class);
 
-  @JsonProperty("docker-image")
-  private final String dockerImage;
+  @JsonProperty(value = "name", required = true)
+  private String executorName;
+
+  @JsonProperty(value = "executor-image", required = true)
+  private String executorImage;
 
   @JsonProperty("engine-libs")
-  private final List<TransferableFile> engineLibs;
+  @JsonDeserialize(using = TransferableFileDeserializer.class)
+  private List<TransferableFile> engineLibs;
 
-  @JsonProperty("exec-commands")
-  private final List<String> execCommands;
+  @JsonProperty(value = "exec-commands", required = true)
+  private List<String> execCommands;
 
   @JsonProperty("failure-handle-commands")
-  private final List<String> failureHandleCommands;
+  private List<String> failureHandleCommands;
 
   @JsonProperty("global-job-config")
-  private final String globalJobConf;
+  private String globalJobConf;
+
+  public BitSailConfiguration getGlobalJobConf() {
+    return BitSailConfiguration.from(globalJobConf);
+  }
+
+  /**
+   * Initialize a {@link GenericExecutorSetting} from setting files.
+   * @param settingFilePath An executor setting file.
+   */
+  public static GenericExecutorSetting initFromFile(String settingFilePath) {
+    try {
+      File settingFile = new File(settingFilePath);
+      String settingStr = IOUtils.toString(new FileInputStream(settingFile));
+      return new ObjectMapper().readValue(settingStr, GenericExecutorSetting.class);
+    } catch (Exception e) {
+      LOG.error("Failed to initialize generic executor setting.", e);
+      throw new RuntimeException("Failed to initialize generic executor setting.", e);
+    }
+  }
+
+  static class TransferableFileDeserializer extends JsonDeserializer<List<TransferableFile>> {
+    @Override
+    public List<TransferableFile> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+      return p.readValueAs(new TypeReference<List<TransferableFile>>(){});
+    }
+  }
 }

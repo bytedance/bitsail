@@ -21,6 +21,7 @@ import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
 import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 
 import com.google.common.collect.Lists;
+import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
@@ -37,6 +38,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.Stream;
 
+@NoArgsConstructor
 public class GenericExecutor extends AbstractExecutor {
   private static final Logger LOG = LoggerFactory.getLogger(GenericExecutor.class);
 
@@ -55,8 +57,8 @@ public class GenericExecutor extends AbstractExecutor {
    */
   protected GenericContainer<?> executor;
 
-  public void initFromSettings(String settingFile) {
-    setting = GenericExecutorSetting.builder().build();
+  public void initFromSettings(String settingFilePath) {
+    setting = GenericExecutorSetting.initFromFile(settingFilePath);
   }
 
   @Override
@@ -82,11 +84,11 @@ public class GenericExecutor extends AbstractExecutor {
         "echo " + EXECUTOR_READY_MSG,
         "while true; do sleep 5; done"
     );
-    executor = new GenericContainer<>(setting.getDockerImage())
+    executor = new GenericContainer<>(setting.getExecutorImage())
         .withNetwork(network)
         .withNetworkAliases(getContainerName())
         .withLogConsumer(new Slf4jLogConsumer(
-            DockerLoggerFactory.getLogger(setting.getDockerImage())).withSeparateOutputStreams())
+            DockerLoggerFactory.getLogger(setting.getExecutorImage())).withSeparateOutputStreams())
         .withStartupAttempts(1)
         .withWorkingDirectory(executorRootDir)
         .withCommand("bash", "-c", String.join(" ;", initCommands))
@@ -156,7 +158,7 @@ public class GenericExecutor extends AbstractExecutor {
 
   @Override
   protected void addJobConf(BitSailConfiguration executorConf) {
-    BitSailConfiguration globalConf = BitSailConfiguration.from(setting.getGlobalJobConf());
+    BitSailConfiguration globalConf = setting.getGlobalJobConf();
     executorConf.merge(globalConf, true);
     super.addJobConf(executorConf);
   }
