@@ -14,31 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.core.api.interceptor;
+package com.bytedance.bitsail.core.api.parser;
 
 import com.bytedance.bitsail.base.extension.Component;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.core.api.command.CoreCommandArgs;
 
-public interface ConfigInterceptor extends Component {
-  int DEFAULT_ORDER = 1;
+import java.io.IOException;
+
+public interface ConfigurationParser extends Component {
 
   /**
-   * Check interceptor could accept the input global configuration
+   * Accept command or not.
    */
-  default boolean accept(BitSailConfiguration globalConfiguration) {
-    return false;
-  }
+  boolean accept(CoreCommandArgs args);
 
-  /**
-   * Invoke intercept.
-   */
-  void intercept(BitSailConfiguration globalConfiguration, CoreCommandArgs coreCommandArgs);
-
-  /**
-   * Order for the interceptor
-   */
-  default int order() {
-    return DEFAULT_ORDER;
-  }
+  BitSailConfiguration parse(CoreCommandArgs args) throws IOException;
 }
