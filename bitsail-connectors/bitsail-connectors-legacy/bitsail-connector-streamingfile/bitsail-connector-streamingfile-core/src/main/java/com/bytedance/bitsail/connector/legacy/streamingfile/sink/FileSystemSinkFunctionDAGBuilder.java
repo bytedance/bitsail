@@ -117,6 +117,7 @@ public class FileSystemSinkFunctionDAGBuilder<OUT extends Row> extends FlinkData
       return;
     }
     if (HIVE_FORMAT_TYPE_VALUE.equalsIgnoreCase(formatType)) {
+      //TODO: whether to load from hive conf location?
       Preconditions.checkState(jobConf.fieldExists(FileSystemSinkOptions.HIVE_METASTORE_PROPERTIES));
     }
   }

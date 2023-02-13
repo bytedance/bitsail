@@ -71,6 +71,7 @@ public class HiveGeneralRowBuilder implements RowBuilder<Writable> {
   private final Map<String, String> hiveProperties;
   private final String db;
   private final String table;
+  private final String hiveConfLocation;
   private final Map<String, Integer> columnMapping;
   private final HiveShim hiveShim;
 
@@ -84,11 +85,13 @@ public class HiveGeneralRowBuilder implements RowBuilder<Writable> {
   public HiveGeneralRowBuilder(Map<String, Integer> columnMapping,
                                String database,
                                String table,
+                               String hiveConfLocation,
                                Map<String, String> hiveProperties) {
     this.columnMapping = columnMapping;
     // Hive table related
     this.db = database;
     this.table = table;
+    this.hiveConfLocation = hiveConfLocation;
     this.hiveProperties = hiveProperties;
     this.hiveShim = HiveShimLoader.loadHiveShim();
   }
@@ -98,6 +101,7 @@ public class HiveGeneralRowBuilder implements RowBuilder<Writable> {
     this.columnMapping = null;
     this.db = null;
     this.table = null;
+    this.hiveConfLocation = null;
     this.hiveProperties = null;
     this.hiveShim = null;
   }
@@ -109,7 +113,12 @@ public class HiveGeneralRowBuilder implements RowBuilder<Writable> {
         if (deserializer == null) {
           try {
             HiveMetaClientUtil.init();
-            HiveConf hiveConf = HiveMetaClientUtil.getHiveConf(hiveProperties);
+            HiveConf hiveConf;
+            if (hiveConfLocation != null) {
+              hiveConf = HiveMetaClientUtil.getHiveConf(hiveConfLocation);
+            } else {
+              hiveConf = HiveMetaClientUtil.getHiveConf(hiveProperties);
+            }
             StorageDescriptor storageDescriptor = HiveMetaClientUtil.getTableFormat(hiveConf, db, table);
             deserializer = (Deserializer) Class.forName(storageDescriptor.getSerdeInfo().getSerializationLib()).newInstance();
             Configuration conf = new Configuration();

@@ -70,16 +70,20 @@ public class HiveTableMetaStoreFactory implements TableMetaStoreFactory {
   private final String database;
   private final String tableName;
   private final Map<String, String> metaStoreProperties;
+
+  private final String hiveConfLocation;
   private final HiveShim hiveShim;
 
   public HiveTableMetaStoreFactory(
       String database,
       String tableName,
-      String metaStoreProperties) {
+      String metaStoreProperties,
+      String hiveConfLocation) {
     this.database = database;
     this.tableName = tableName;
     this.metaStoreProperties = JsonSerializer.parseToMap(metaStoreProperties);
     LOG.info("Meta store properties: {}.", metaStoreProperties);
+    this.hiveConfLocation = hiveConfLocation;
     this.hiveShim = HiveMetaClientUtil.getHiveShim();
   }
 
@@ -96,7 +100,11 @@ public class HiveTableMetaStoreFactory implements TableMetaStoreFactory {
 
   @Override
   public HiveTableMetaStore createTableMetaStore() {
-    return new HiveTableMetaStore(metaStoreProperties);
+    if (hiveConfLocation != null) {
+      return new HiveTableMetaStore(hiveConfLocation);
+    } else {
+      return new HiveTableMetaStore(metaStoreProperties);
+    }
   }
 
   public class HiveTableMetaStore implements TableMetaStoreFactory.TableMetaStore {
@@ -105,6 +113,10 @@ public class HiveTableMetaStoreFactory implements TableMetaStoreFactory {
 
     private HiveTableMetaStore(Map<String, String> metaStoreProperties) {
       hiveConf = HiveMetaClientUtil.getHiveConf(metaStoreProperties);
+    }
+
+    private HiveTableMetaStore(String location) {
+      hiveConf = HiveMetaClientUtil.getHiveConf(location);
     }
 
     private IMetaStoreClient getMetastoreClient() throws Exception {

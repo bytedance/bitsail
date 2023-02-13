@@ -26,37 +26,52 @@ import com.bytedance.bitsail.connector.legacy.hive.option.HiveReaderOptions;
 import com.bytedance.bitsail.connector.legacy.hive.option.HiveWriterOptions;
 import com.bytedance.bitsail.connector.legacy.hive.util.HiveConfUtils;
 
+import org.apache.hadoop.hive.conf.HiveConf;
+
 public class HiveTableCatalogFactory implements TableCatalogFactory {
 
   @Override
   public TableCatalog createTableCatalog(BuilderGroup builderGroup,
                                          ExecutionEnviron executionEnviron,
                                          BitSailConfiguration connectorConfiguration) {
+
     if (BuilderGroup.READER.equals(builderGroup)) {
       String database = connectorConfiguration
           .getNecessaryOption(HiveReaderOptions.DB_NAME, FrameworkErrorCode.REQUIRED_VALUE);
       String table = connectorConfiguration
           .getNecessaryOption(HiveReaderOptions.TABLE_NAME, FrameworkErrorCode.REQUIRED_VALUE);
+      HiveConf hiveConf;
+      if (connectorConfiguration.fieldExists(HiveReaderOptions.HIVE_CONF_LOCATION)) {
+        hiveConf = HiveConfUtils.fromHiveConfPath(connectorConfiguration.get(HiveReaderOptions.HIVE_CONF_LOCATION));
+      } else {
+        hiveConf = HiveConfUtils.fromJsonProperties(
+            connectorConfiguration.get(HiveReaderOptions.HIVE_METASTORE_PROPERTIES));
+      }
       return HiveTableCatalog
           .builder()
           .database(database)
           .table(table)
           .namespace(null)
-          .hiveConf(HiveConfUtils.fromJsonProperties(
-              connectorConfiguration.get(HiveReaderOptions.HIVE_METASTORE_PROPERTIES)))
+          .hiveConf(hiveConf)
           .build();
     } else {
       String database = connectorConfiguration
           .getNecessaryOption(HiveWriterOptions.DB_NAME, FrameworkErrorCode.REQUIRED_VALUE);
       String table = connectorConfiguration
           .getNecessaryOption(HiveWriterOptions.TABLE_NAME, FrameworkErrorCode.REQUIRED_VALUE);
+      HiveConf hiveConf;
+      if (connectorConfiguration.fieldExists(HiveWriterOptions.HIVE_CONF_LOCATION)) {
+        hiveConf = HiveConfUtils.fromHiveConfPath(connectorConfiguration.get(HiveWriterOptions.HIVE_CONF_LOCATION));
+      } else {
+        hiveConf = HiveConfUtils.fromJsonProperties(
+            connectorConfiguration.get(HiveWriterOptions.HIVE_METASTORE_PROPERTIES));
+      }
       return HiveTableCatalog
           .builder()
           .database(database)
           .table(table)
           .namespace(null)
-          .hiveConf(HiveConfUtils.fromJsonProperties(
-              connectorConfiguration.get(HiveWriterOptions.HIVE_METASTORE_PROPERTIES)))
+          .hiveConf(hiveConf)
           .build();
     }
   }
