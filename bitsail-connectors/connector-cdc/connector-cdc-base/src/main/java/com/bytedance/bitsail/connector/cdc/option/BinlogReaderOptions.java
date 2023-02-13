@@ -24,6 +24,7 @@ import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffsetType;
 import com.alibaba.fastjson.TypeReference;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
@@ -57,7 +58,8 @@ public interface BinlogReaderOptions extends ReaderOptions.BaseReaderOptions {
       key(READER_PREFIX + "initial_offset_type")
           .defaultValue(String.valueOf(BinlogOffsetType.EARLIEST).toLowerCase());
 
-  ConfigOption<String> INITIAL_OFFSET_VALUE =
-      key(READER_PREFIX + "initial_offset_value")
-          .noDefaultValue(String.class);
+  ConfigOption<Map<String, String>> INITIAL_OFFSET_PROPS =
+      key(READER_PREFIX + "initial_offset_props")
+          .onlyReference(new TypeReference<Map<String, String>>() {
+          });
 }

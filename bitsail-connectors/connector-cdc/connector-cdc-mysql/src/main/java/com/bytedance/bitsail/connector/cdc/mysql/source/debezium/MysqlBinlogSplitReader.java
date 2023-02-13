@@ -265,7 +265,7 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
   }
 
   @Override
-  public boolean hasNext() throws InterruptedException {
+  public boolean hasNext() {
     if (this.recordIterator.hasNext()) {
       return true;
     } else {
@@ -274,20 +274,24 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
   }
 
   @SuppressWarnings("checkstyle:MagicNumber")
-  private boolean pollNextBatch() throws InterruptedException {
+  private boolean pollNextBatch() {
     if (isRunning) {
-      List<DataChangeEvent> dbzRecords = queue.poll();
-      while (dbzRecords.isEmpty()) {
-        LOG.info("No record found, sleep for 5s in reader");
-        TimeUnit.SECONDS.sleep(5);
-        dbzRecords = queue.poll();
+      try {
+        List<DataChangeEvent> dbzRecords = queue.poll();
+        while (dbzRecords.isEmpty()) {
+          LOG.info("No record found, sleep for 5s in reader");
+          TimeUnit.SECONDS.sleep(5);
+          dbzRecords = queue.poll();
+        }
+        this.batch = new ArrayList<>();
+        for (DataChangeEvent event : dbzRecords) {
+          this.batch.add(event.getRecord());
+        }
+        this.recordIterator = this.batch.iterator();
+        return true;
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
       }
-      this.batch = new ArrayList<>();
-      for (DataChangeEvent event : dbzRecords) {
-        this.batch.add(event.getRecord());
-      }
-      this.recordIterator = this.batch.iterator();
-      return true;
     }
     return false;
   }

@@ -14,23 +14,10 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.cdc.source.reader;
+package com.bytedance.bitsail.connector.cdc.mysql.source.constant;
 
-import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
+public class MysqlConstant {
+  public static String BINLOG_PROPS_FILENAME = "binlog_filename";
+  public static String BINLOG_PROPS_OFFSET = "binlog_offset";
 
-import java.io.Serializable;
-import java.util.Map;
-
-public interface BinlogSplitReader<T> extends Serializable {
-  void readSplit(BinlogSplit split);
-
-  Map<String, String> getOffset();
-
-  void close();
-
-  T poll();
-
-  boolean hasNext();
-
-  boolean isCompleted();
 }

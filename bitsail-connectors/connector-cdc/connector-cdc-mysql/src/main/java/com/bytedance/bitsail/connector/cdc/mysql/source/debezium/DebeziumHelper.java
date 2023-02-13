@@ -18,6 +18,8 @@ package com.bytedance.bitsail.connector.cdc.mysql.source.debezium;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.connector.cdc.error.BinlogReaderErrorCode;
+import com.bytedance.bitsail.connector.cdc.mysql.source.constant.MysqlConstant;
+import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 
 import io.debezium.DebeziumException;
@@ -32,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 public class DebeziumHelper {
 
@@ -102,17 +105,35 @@ public class DebeziumHelper {
     }
   }
 
+  public static BinlogOffset convertDbzOffsetToBinlogOffset(Map<String, String> dbzOffset) {
+    String fileName = dbzOffset.get("file");
+    String position = dbzOffset.get("pos");
+    BinlogOffset offset = BinlogOffset.specified();
+    offset.addProps(MysqlConstant.BINLOG_PROPS_FILENAME, fileName);
+    offset.addProps(MysqlConstant.BINLOG_PROPS_OFFSET, position);
+    return offset;
+  }
+
   public static MySqlOffsetContext loadOffsetContext(MySqlConnectorConfig config, BinlogSplit split) {
-    final MySqlOffsetContext offset = new MySqlOffsetContext(config, false, false, new SourceInfo(config));
+    final MySqlOffsetContext offsetContext = new MySqlOffsetContext(config, false, false, new SourceInfo(config));
     switch (split.getBeginOffset().getOffsetType()) {
       case EARLIEST:
-        offset.setBinlogStartPoint("", 0L);
+        offsetContext.setBinlogStartPoint("", 0L);
         break;
-        //TODO: Add other offset context
+      case LATEST:
+        //TODO: support latest offset
+        offsetContext.setBinlogStartPoint("", 0L);
+        break;
+      case SPECIFIED:
+        BinlogOffset offset = split.getBeginOffset();
+        String binlogFilename = offset.getProps().get(MysqlConstant.BINLOG_PROPS_FILENAME);
+        String binlogOffset = offset.getProps().get(MysqlConstant.BINLOG_PROPS_OFFSET);
+        offsetContext.setBinlogStartPoint(binlogFilename, Long.parseLong(binlogOffset));
+        break;
       default:
         throw new BitSailException(BinlogReaderErrorCode.UNSUPPORTED_ERROR,
             String.format("the begin binlog type %s is not supported", split.getBeginOffset().getOffsetType()));
     }
-    return offset;
+    return offsetContext;
   }
 }

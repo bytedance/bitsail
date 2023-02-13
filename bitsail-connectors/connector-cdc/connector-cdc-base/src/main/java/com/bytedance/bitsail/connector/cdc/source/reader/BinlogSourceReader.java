@@ -41,13 +41,16 @@ public abstract class BinlogSourceReader implements SourceReader<Row, BinlogSpli
 
   private final Queue<BinlogSplit> remainSplits;
 
-  private final BinlogSplitReader reader;
+  protected final BinlogSplitReader<Row> reader;
+
+  private boolean isRunning;
 
   public BinlogSourceReader(BitSailConfiguration jobConf, SourceReader.Context readerContext) {
     this.jobConf = jobConf;
     this.readerContext = readerContext;
     this.remainSplits = new ArrayDeque<>();
     this.reader = getReader();
+    this.isRunning = false;
   }
 
   public abstract BinlogSplitReader<Row> getReader();
@@ -55,15 +58,16 @@ public abstract class BinlogSourceReader implements SourceReader<Row, BinlogSpli
   @Override
   public void start() {
     //start debezium streaming reader and send data to queue
-    if (!remainSplits.isEmpty()) {
-      BinlogSplit curSplit = remainSplits.poll();
-      LOG.info("submit split to binlog reader: {}", curSplit.toString());
-      this.reader.readSplit(curSplit);
-    }
   }
 
   @Override
   public void pollNext(SourcePipeline<Row> pipeline) throws Exception {
+    // each reader only read one binlog split
+    if (!isRunning) {
+      submitSplit();
+      isRunning = true;
+    }
+
     // poll from reader
     if (!this.reader.isCompleted() && this.reader.hasNext()) {
       //SourceRecord record = this.reader.poll();
@@ -80,7 +84,7 @@ public abstract class BinlogSourceReader implements SourceReader<Row, BinlogSpli
 
   @Override
   public boolean hasMoreElements() {
-    return false;
+    return this.reader.hasNext();
   }
 
   @Override
@@ -96,9 +100,7 @@ public abstract class BinlogSourceReader implements SourceReader<Row, BinlogSpli
   }
 
   @Override
-  public List<BinlogSplit> snapshotState(long checkpointId) {
-    return null;
-  }
+  public abstract List<BinlogSplit> snapshotState(long checkpointId);
 
   @Override
   public void notifyCheckpointComplete(long checkpointId) throws Exception {
@@ -110,6 +112,14 @@ public abstract class BinlogSourceReader implements SourceReader<Row, BinlogSpli
     if (this.reader != null && !this.reader.isCompleted()) {
       this.reader.close();
       LOG.info("Reader close successfully");
+    }
+  }
+
+  private void submitSplit() {
+    if (!remainSplits.isEmpty()) {
+      BinlogSplit curSplit = remainSplits.poll();
+      LOG.info("submit split to binlog reader: {}, size of the remaining splits: {}", curSplit.toString(), remainSplits.size());
+      this.reader.readSplit(curSplit);
     }
   }
 }
