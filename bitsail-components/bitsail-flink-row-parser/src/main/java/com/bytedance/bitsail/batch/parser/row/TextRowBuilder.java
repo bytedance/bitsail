@@ -28,6 +28,7 @@ import com.bytedance.bitsail.flink.core.parser.BytesParser;
 import com.bytedance.bitsail.parser.error.ParserErrorCode;
 
 import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 
@@ -62,8 +63,7 @@ public class TextRowBuilder<T> implements RowBuilder<T> {
       case BINARY:
         buildRowWithParser(value, reuse, rowTypeInfo, bytesParser);
         break;
-      case CSV:
-        buildRowWithCsvParser(value, reuse, "UTF-8", rowTypeInfo, bytesParser, fieldIndexes);
+      case CSV: buildRowWithCsvParser(value, reuse, StringUtils.EMPTY, rowTypeInfo, bytesParser, fieldIndexes);
         break;
       case PLAIN:
         buildPlainTextRow(value.toString(), reuse, rowTypeInfo);
