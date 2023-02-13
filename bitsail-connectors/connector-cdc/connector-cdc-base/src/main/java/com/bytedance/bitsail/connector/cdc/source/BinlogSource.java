@@ -30,15 +30,15 @@ import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.connector.cdc.source.coordinator.CDCSourceSplitCoordinator;
+import com.bytedance.bitsail.connector.cdc.source.coordinator.state.BaseAssignmentState;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
-import com.bytedance.bitsail.connector.cdc.source.state.BinlogOffsetState;
 
 import java.io.IOException;
 
 /**
  * WIP: Source to read mysql binlog.
  */
-public abstract class BinlogSource implements Source<Row, BinlogSplit, BinlogOffsetState>, ParallelismComputable {
+public abstract class BinlogSource implements Source<Row, BinlogSplit, BaseAssignmentState>, ParallelismComputable {
 
   protected BitSailConfiguration jobConf;
 
@@ -57,8 +57,8 @@ public abstract class BinlogSource implements Source<Row, BinlogSplit, BinlogOff
   public abstract SourceReader<Row, BinlogSplit> createReader(SourceReader.Context readerContext);
 
   @Override
-  public SourceSplitCoordinator<BinlogSplit, BinlogOffsetState> createSplitCoordinator(
-      SourceSplitCoordinator.Context<BinlogSplit, BinlogOffsetState> coordinatorContext) {
+  public SourceSplitCoordinator<BinlogSplit, BaseAssignmentState> createSplitCoordinator(
+      SourceSplitCoordinator.Context<BinlogSplit, BaseAssignmentState> coordinatorContext) {
     return new CDCSourceSplitCoordinator(coordinatorContext, jobConf);
   }
 
@@ -68,7 +68,7 @@ public abstract class BinlogSource implements Source<Row, BinlogSplit, BinlogOff
   }
 
   @Override
-  public BinarySerializer<BinlogOffsetState> getSplitCoordinatorCheckpointSerializer() {
+  public BinarySerializer<BaseAssignmentState> getSplitCoordinatorCheckpointSerializer() {
     return new SimpleVersionedBinarySerializer<>();
   }
 
