@@ -74,6 +74,21 @@ public class MysqlConfig implements Serializable {
         .build();
   }
 
+  //Visible for testing
+  public static MysqlConfig newDefault() {
+    Properties props = new Properties();
+    Configuration config = Configuration.from(props);
+    return MysqlConfig.builder()
+        .hostname("")
+        .port(0)
+        .username("username")
+        .password("password")
+        .dbzProperties(props)
+        .dbzConfiguration(config)
+        .dbzMySqlConnectorConfig(new MySqlConnectorConfig(config))
+        .build();
+  }
+
   public static Properties extractProps(BitSailConfiguration jobConf) {
     Properties props = new Properties();
     jobConf.getKeys().stream()

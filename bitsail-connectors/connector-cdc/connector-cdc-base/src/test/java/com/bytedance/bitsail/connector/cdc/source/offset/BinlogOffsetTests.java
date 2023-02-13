@@ -22,15 +22,21 @@ import com.bytedance.bitsail.connector.cdc.option.BinlogReaderOptions;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class BinlogOffsetTests {
   @Test
   public void testSpecifiedOffsetFromConfig() {
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
     jobConf.set(BinlogReaderOptions.INITIAL_OFFSET_TYPE, "specified");
-    jobConf.set(BinlogReaderOptions.INITIAL_OFFSET_VALUE, "mysql.0001,1111");
+    Map<String, String> offsetProps = new HashMap<>();
+    offsetProps.put("filename", "mysql.0001");
+    offsetProps.put("offset", "1111");
+    jobConf.set(BinlogReaderOptions.INITIAL_OFFSET_PROPS, offsetProps);
     BinlogOffset result = BinlogOffset.createFromJobConf(jobConf);
-    Assert.assertEquals("mysql.0001", result.getProps().getProperty("filename"));
-    Assert.assertEquals("1111", result.getProps().getProperty("offset"));
+    Assert.assertEquals("mysql.0001", result.getProps().get("filename"));
+    Assert.assertEquals("1111", result.getProps().get("offset"));
   }
 
   @Test
