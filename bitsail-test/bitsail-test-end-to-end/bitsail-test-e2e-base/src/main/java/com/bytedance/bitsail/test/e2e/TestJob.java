@@ -28,6 +28,7 @@ import com.bytedance.bitsail.test.e2e.executor.ExecutorLoader;
 import com.bytedance.bitsail.test.e2e.option.EndToEndOptions;
 
 import lombok.Builder;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
@@ -40,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
+@Getter
 @Builder
 public class TestJob implements AutoCloseable {
   private static final Logger LOG = LoggerFactory.getLogger(TestJob.class);
@@ -75,22 +77,20 @@ public class TestJob implements AutoCloseable {
   protected Network network = Network.newNetwork();
 
   /**
-   * If to recycle data source (source).
+   * Pattern of those executors should be loaded.
    */
-  @Builder.Default
-  protected boolean recycleSource = true;
+  protected List<String> includedExecutorPattern;
 
   /**
-   * If to reuse data source (sink).
+   * Pattern of those executors should not be loaded.
    */
-  @Builder.Default
-  protected boolean recycleSink = true;
+  protected List<String> excludedExecutorPattern;
 
   /**
    * Create data source for reader.
    */
-  protected AbstractDataSource prepareSource(BitSailConfiguration jobConf, boolean recycle) {
-    if (source != null && recycle) {
+  protected AbstractDataSource prepareSource(BitSailConfiguration jobConf) {
+    if (source != null) {
       source.reset();
       return source;
     }
@@ -127,8 +127,8 @@ public class TestJob implements AutoCloseable {
   /**
    * Create data source for writer.
    */
-  protected AbstractDataSource prepareSink(BitSailConfiguration jobConf, boolean recycle) {
-    if (sink != null && recycle) {
+  protected AbstractDataSource prepareSink(BitSailConfiguration jobConf) {
+    if (sink != null) {
       sink.reset();
       return sink;
     }
@@ -165,22 +165,23 @@ public class TestJob implements AutoCloseable {
   /**
    * Create test executors.
    */
-  protected List<AbstractExecutor> createExecutors() {
-    ExecutorLoader loader = new ExecutorLoader(null, null);
-    List<AbstractExecutor> executors = loader.loadAll();
-    executors.forEach(executor -> executor.initNetwork(network));
-    return executors;
+  protected void loadExecutors() {
+    if (executors == null) {
+      ExecutorLoader loader = new ExecutorLoader(includedExecutorPattern, excludedExecutorPattern);
+      executors = loader.loadAll();
+      executors.forEach(executor -> executor.initNetwork(network));
+    }
   }
 
   /**
    * Run a job.
    */
   public int run(String caseName, int allowedTimeout) throws Exception {
-    executors = createExecutors();
+    loadExecutors();
 
     for (AbstractExecutor executor : executors) {
-      source = prepareSource(jobConf, recycleSource);
-      sink = prepareSink(jobConf, recycleSink);
+      source = prepareSource(jobConf);
+      sink = prepareSink(jobConf);
 
       source.fillData(executor);
       source.modifyJobConf(jobConf);
@@ -215,13 +216,6 @@ public class TestJob implements AutoCloseable {
       if (exitCode != SUCCESS_EXIT_CODE) {
         return exitCode;
       }
-
-      if (!recycleSource) {
-        source.closeQuietly();
-      }
-      if (!recycleSink) {
-        sink.closeQuietly();
-      }
     }
 
     return SUCCESS_EXIT_CODE;
@@ -245,22 +239,30 @@ public class TestJob implements AutoCloseable {
   @Override
   public void close() {
     LOG.info("Test Job Closing...");
-    if (executors != null) {
-      executors.forEach(AbstractContainer::closeQuietly);
-    }
-    if (source != null) {
-      source.closeQuietly();
-    }
-    if (sink != null) {
-      sink.closeQuietly();
-    }
+    closeExecutors();
+    closeSink();
+    closeSource();
     LOG.info("Test Job Closed!");
   }
 
-  /**
-   * @return A Job Builder.
-   */
-  public static TestJobBuilder builder() {
-    return new TestJobBuilder();
+  public void closeExecutors() {
+    if (executors != null) {
+      executors.forEach(AbstractContainer::closeQuietly);
+    }
+    executors = null;
+  }
+
+  public void closeSource() {
+    if (source != null) {
+      source.closeQuietly();
+    }
+    source = null;
+  }
+
+  public void closeSink() {
+    if (sink != null) {
+      sink.closeQuietly();
+    }
+    sink = null;
   }
 }

@@ -19,6 +19,8 @@ package com.bytedance.bitsail.test.e2e;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.connector.fake.option.FakeReaderOptions;
+import com.bytedance.bitsail.test.e2e.annotation.ExecutorPatterns;
+import com.bytedance.bitsail.test.e2e.annotation.ReuseContainers;
 import com.bytedance.bitsail.test.e2e.datasource.ElasticsearchDataSource;
 
 import org.junit.Assert;
@@ -27,6 +29,8 @@ import org.junit.Test;
 import java.io.File;
 import java.nio.file.Paths;
 
+@ExecutorPatterns(exclude = {"generic*"})
+@ReuseContainers(reuse = {"executor", "sink"})
 public class FakeToElasticsearchE2ETest extends AbstractE2ETest {
   private static  final int TOTAL_COUNT = 300;
   private static final int RATE = 100;
@@ -42,7 +46,7 @@ public class FakeToElasticsearchE2ETest extends AbstractE2ETest {
     jobConf.set(FakeReaderOptions.RATE, RATE);
 
     // Check if there are 300 docs in elasticsearch.
-    submitFlink11Job(jobConf,
+    submitJob(jobConf,
         "test_fake_to_elasticsearch_batch",
         dataSource -> Assert.assertEquals(
             TOTAL_COUNT,
@@ -66,7 +70,7 @@ public class FakeToElasticsearchE2ETest extends AbstractE2ETest {
     jobConf.set(CommonOptions.CheckPointOptions.CHECKPOINT_INTERVAL, 10000L);
 
     // Check if there are 300 docs in elasticsearch.
-    submitFlink11Job(jobConf,
+    submitJob(jobConf,
         "test_fake_to_elasticsearch_streaming",
         dataSource -> Assert.assertEquals(
             TOTAL_COUNT,

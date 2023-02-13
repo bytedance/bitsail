@@ -32,6 +32,6 @@ public class ClickhouseToPrintE2ETest extends AbstractE2ETest {
             .getResource("clickhouse_to_print.json")
             .toURI()).toString()));
 
-    submitFlink11Job(jobConf, "test_clickhouse_to_print");
+    submitJob(jobConf, "test_clickhouse_to_print");
   }
 }

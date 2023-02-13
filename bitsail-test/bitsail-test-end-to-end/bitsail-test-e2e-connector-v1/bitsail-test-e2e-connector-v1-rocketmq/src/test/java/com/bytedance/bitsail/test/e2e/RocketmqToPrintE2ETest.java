@@ -32,6 +32,6 @@ public class RocketmqToPrintE2ETest extends AbstractE2ETest {
             .getResource("rocketmq_to_print.json")
             .toURI()).toString()));
 
-    submitFlink11Job(jobConf, "test_rocketmq_to_print", 30);
+    submitJob(jobConf, "test_rocketmq_to_print", 30);
   }
 }

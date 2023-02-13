@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.e2e;
+package com.bytedance.bitsail.test.e2e.annotation;
 
-import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.junit.Test;
-
-import java.io.File;
-import java.nio.file.Paths;
-
-public class FakeToPrintE2ETest extends AbstractE2ETest {
-
-  @Test
-  public void testFakeToPrint() throws Exception {
-    BitSailConfiguration jobConf = BitSailConfiguration.from(
-        new File(Paths.get(getClass().getClassLoader()
-            .getResource("fake_to_print.json")
-            .toURI()).toString()));
-    submitJob(jobConf, "test_fake_to_print");
-  }
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface ReuseContainers {
+  String[] reuse() default {};
 }

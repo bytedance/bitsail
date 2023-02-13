@@ -37,7 +37,7 @@ public class FakeToRedisE2ETest extends AbstractE2ETest {
     jobConf.set(FakeReaderOptions.TOTAL_COUNT, 500);
 
     // Check if there are 500 keys in redis.
-    submitFlink11Job(jobConf,
+    submitJob(jobConf,
         "test_fake_to_redis",
         dataSource -> Assert.assertEquals(
             500,

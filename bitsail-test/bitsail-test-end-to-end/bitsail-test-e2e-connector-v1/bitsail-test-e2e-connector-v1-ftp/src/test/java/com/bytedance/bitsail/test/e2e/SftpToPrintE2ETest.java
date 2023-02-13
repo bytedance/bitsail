@@ -34,6 +34,6 @@ public class SftpToPrintE2ETest extends AbstractE2ETest {
         new File(Paths.get(getClass().getClassLoader()
             .getResource("sftp_to_print.json")
             .toURI()).toString()));
-    submitFlink11Job(jobConf, "test_sftp_to_print");
+    submitJob(jobConf, "test_sftp_to_print");
   }
 }
