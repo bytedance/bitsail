@@ -17,7 +17,7 @@
 package com.bytedance.bitsail.entry.flink.deployment;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
+import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 import com.bytedance.bitsail.entry.flink.deployment.kubernetes.KubernetesDeploymentSupplier;
 import com.bytedance.bitsail.entry.flink.deployment.local.LocalDeploymentSupplier;
 import com.bytedance.bitsail.entry.flink.deployment.yarn.YarnDeploymentSupplier;
@@ -34,7 +34,7 @@ public class DeploymentSupplierFactory {
   private static final String DEPLOYMENT_LOCAL = "local";
   private static final String DEPLOYMENT_REMOTE = "remote";
 
-  public DeploymentSupplier getDeploymentSupplier(FlinkRunCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
+  public DeploymentSupplier getDeploymentSupplier(FlinkCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
     String deploymentMode = flinkCommandArgs.getDeploymentMode().toLowerCase().trim();
 
     switch (deploymentMode) {

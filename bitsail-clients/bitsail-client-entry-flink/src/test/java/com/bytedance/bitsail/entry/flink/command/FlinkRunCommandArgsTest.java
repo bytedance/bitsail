@@ -31,7 +31,7 @@ public class FlinkRunCommandArgsTest {
 
   @Test(expected = ParameterException.class)
   public void requiredParameterTest() {
-    FlinkRunCommandArgs flinkRunCommandArgs = new FlinkRunCommandArgs();
+    FlinkCommandArgs flinkRunCommandArgs = new FlinkCommandArgs();
     String[] args = new String[] {
         "--queue", "test",
         "--deployment-mode", "yarn-per-job"
@@ -57,7 +57,7 @@ public class FlinkRunCommandArgsTest {
         "--priority", "1",
         "--key", "value"
     };
-    FlinkRunCommandArgs flinkRunCommandArgs = new FlinkRunCommandArgs();
+    FlinkCommandArgs flinkRunCommandArgs = new FlinkCommandArgs();
     String[] unknownArgs = CommandArgsParser.parseArguments(args, flinkRunCommandArgs);
     assertEquals(unknownArgs.length, 2);
   }

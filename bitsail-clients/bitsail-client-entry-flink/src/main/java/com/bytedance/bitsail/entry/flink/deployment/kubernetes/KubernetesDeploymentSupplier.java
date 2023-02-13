@@ -17,26 +17,26 @@
 package com.bytedance.bitsail.entry.flink.deployment.kubernetes;
 
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
-import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
+import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
 
 import java.util.List;
 
-import static com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs.KUBERNETES_CLUSTER_ID;
-import static com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs.KUBERNETES_CONTAINER_IMAGE;
-import static com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs.KUBERNETES_JOBMANAGER_CPU;
-import static com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs.KUBERNETES_TASKMANAGER_CPU;
+import static com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs.KUBERNETES_CLUSTER_ID;
+import static com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs.KUBERNETES_CONTAINER_IMAGE;
+import static com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs.KUBERNETES_JOBMANAGER_CPU;
+import static com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs.KUBERNETES_TASKMANAGER_CPU;
 
 /**
  * Created 2022/12/23
  */
 public class KubernetesDeploymentSupplier implements DeploymentSupplier {
 
-  private FlinkRunCommandArgs flinkRunCommandArgs;
+  private FlinkCommandArgs flinkRunCommandArgs;
 
   private String deploymentMode;
 
-  public KubernetesDeploymentSupplier(FlinkRunCommandArgs flinkRunCommandArgs) {
+  public KubernetesDeploymentSupplier(FlinkCommandArgs flinkRunCommandArgs) {
     this.flinkRunCommandArgs = flinkRunCommandArgs;
     this.deploymentMode = flinkRunCommandArgs.getDeploymentMode();
   }

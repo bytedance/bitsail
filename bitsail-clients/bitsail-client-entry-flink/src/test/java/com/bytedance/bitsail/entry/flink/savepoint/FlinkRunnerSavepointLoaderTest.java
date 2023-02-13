@@ -21,7 +21,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.configuration.BitSailSystemConfiguration;
 import com.bytedance.bitsail.common.configuration.ConfigParser;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
+import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 import com.bytedance.bitsail.entry.flink.configuration.FlinkRunnerConfigOptions;
 import com.bytedance.bitsail.entry.flink.engine.FlinkEngineRunnerTest;
 
@@ -89,7 +89,7 @@ public class FlinkRunnerSavepointLoaderTest {
   public void testLoadSavepointAuto() {
     List<String> commands = Lists.newArrayList();
     FlinkRunnerSavepointLoader.loadSavepointPath(sysConfiguration, jobConfiguration, new BaseCommandArgs(),
-        new FlinkRunCommandArgs(), commands);
+        new FlinkCommandArgs(), commands);
 
     Assert.assertEquals(2, commands.size());
     Path checkpoint = Paths.get(commands.get(1));

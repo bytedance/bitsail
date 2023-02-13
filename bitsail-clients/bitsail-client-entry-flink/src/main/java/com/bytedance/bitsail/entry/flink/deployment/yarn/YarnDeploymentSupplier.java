@@ -20,7 +20,7 @@ import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
+import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
 
 import java.util.List;
@@ -30,13 +30,13 @@ import java.util.List;
  */
 public class YarnDeploymentSupplier implements DeploymentSupplier {
 
-  private FlinkRunCommandArgs flinkCommandArgs;
+  private FlinkCommandArgs flinkCommandArgs;
 
   private BitSailConfiguration jobConfiguration;
 
   private String deploymentMode;
 
-  public YarnDeploymentSupplier(FlinkRunCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
+  public YarnDeploymentSupplier(FlinkCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
     this.flinkCommandArgs = flinkCommandArgs;
     this.jobConfiguration = jobConfiguration;
     this.deploymentMode = flinkCommandArgs.getDeploymentMode();

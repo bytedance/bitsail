@@ -17,7 +17,7 @@
 package com.bytedance.bitsail.entry.flink.deployment.local;
 
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
-import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
+import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,9 +29,9 @@ import java.util.List;
 public class LocalDeploymentSupplier implements DeploymentSupplier {
   private static final Logger LOG = LoggerFactory.getLogger(LocalDeploymentSupplier.class);
 
-  private final FlinkRunCommandArgs flinkCommandArgs;
+  private final FlinkCommandArgs flinkCommandArgs;
 
-  public LocalDeploymentSupplier(FlinkRunCommandArgs flinkCommandArgs) {
+  public LocalDeploymentSupplier(FlinkCommandArgs flinkCommandArgs) {
     this.flinkCommandArgs = flinkCommandArgs;
   }
 

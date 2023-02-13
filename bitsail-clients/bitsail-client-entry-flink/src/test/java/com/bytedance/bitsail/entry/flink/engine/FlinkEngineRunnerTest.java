@@ -40,7 +40,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs.KUBERNETES_CLUSTER_ID;
+import static com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs.KUBERNETES_CLUSTER_ID;
 import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_KUBERNETES_APPLICATION;
 import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_YARN_PER_JOB;
 
@@ -60,6 +60,8 @@ public class FlinkEngineRunnerTest {
     variables.set("BITSAIL_CONF_DIR", Paths.get(FlinkEngineRunnerTest.class.getClassLoader().getResource("").toURI()).toString());
     File file = new File("/tmp/embedded/flink/bin/flink");
     Files.createParentDirs(file);
+    File tmpLog4jFile = new File("/tmp/embedded/flink/conf/log4j.properties");
+    Files.createParentDirs(tmpLog4jFile);
   }
 
   @Test

@@ -23,12 +23,13 @@ import com.bytedance.bitsail.client.api.engine.EngineRunner;
 import com.bytedance.bitsail.client.api.utils.PackageResolver;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.configuration.ConfigParser;
-import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
+import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 import com.bytedance.bitsail.entry.flink.configuration.FlinkRunnerConfigOptions;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory;
+import com.bytedance.bitsail.entry.flink.handlers.CustomFlinkPackageHandler;
 import com.bytedance.bitsail.entry.flink.savepoint.FlinkRunnerSavepointLoader;
-import com.bytedance.bitsail.entry.flink.security.FlinkSecurityHandler;
+import com.bytedance.bitsail.entry.flink.utils.FlinkDirectory;
 import com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver;
 
 import com.google.common.collect.Lists;
@@ -47,11 +48,13 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.bytedance.bitsail.common.exception.CommonErrorCode.CONFIG_ERROR;
 import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_KUBERNETES_APPLICATION;
+import static com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver.ENV_PROP_FLINK_CONF_DIR;
 
 /**
  * Created 2022/8/5
@@ -82,7 +85,7 @@ public class FlinkEngineRunner implements EngineRunner {
   @Override
   @SneakyThrows
   public void loadLibrary(URLClassLoader classLoader) {
-    Path flinkLibDir = FlinkPackageResolver.getFlinkLibDir(flinkDir);
+    Path flinkLibDir = FlinkPackageResolver.getFlinkDir(flinkDir, FlinkDirectory.LIB);
     LOG.info("Load flink library from path: {}.", flinkLibDir);
 
     try (Stream<Path> libraries = Files.list(flinkLibDir)) {
@@ -113,27 +116,40 @@ public class FlinkEngineRunner implements EngineRunner {
   }
 
   private ProcessBuilder getRunProcBuilder(BaseCommandArgs baseCommandArgs) throws IOException {
-    FlinkRunCommandArgs flinkCommandArgs = new FlinkRunCommandArgs();
-    CommandArgsParser.parseArguments(baseCommandArgs.getUnknownOptions(), flinkCommandArgs);
-    BitSailConfiguration jobConfiguration = StringUtils.isNotBlank(baseCommandArgs.getJobConf()) ?
-            ConfigParser.fromRawConfPath(baseCommandArgs.getJobConf()) :
-            BitSailConfiguration.from(
-                    new String(Base64.getDecoder().decode(baseCommandArgs.getJobConfInBase64())));
-    DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(flinkCommandArgs,
-        jobConfiguration);
-
+    FlinkCommandArgs flinkRunCommandArgs = new FlinkCommandArgs();
+    CommandArgsParser.parseArguments(baseCommandArgs.getUnknownOptions(), flinkRunCommandArgs);
     ProcessBuilder flinkProcBuilder = new ProcessBuilder();
+    flinkProcBuilderBuildWithRunCommands(flinkProcBuilder, baseCommandArgs, flinkRunCommandArgs);
+    flinkProcBuilderBuildWithEnvProperties(flinkProcBuilder, flinkRunCommandArgs);
+    return flinkProcBuilder;
+  }
+
+  private ProcessBuilder getStopProcBuilder(BaseCommandArgs baseCommandArgs) {
+    FlinkCommandArgs flinkStopCommandArgs = new FlinkCommandArgs();
+    CommandArgsParser.parseArguments(baseCommandArgs.getUnknownOptions(), flinkStopCommandArgs);
+    ProcessBuilder flinkProcBuilder = new ProcessBuilder();
+    flinkProcBuilderWithStopCommands(flinkProcBuilder, baseCommandArgs, flinkStopCommandArgs);
+    return flinkProcBuilder;
+  }
+
+  private void flinkProcBuilderBuildWithRunCommands(ProcessBuilder flinkProcBuilder, BaseCommandArgs baseCommandArgs, FlinkCommandArgs flinkRunCommandArgs) {
+    BitSailConfiguration jobConfiguration = StringUtils.isNotBlank(baseCommandArgs.getJobConf()) ?
+        ConfigParser.fromRawConfPath(baseCommandArgs.getJobConf()) :
+        BitSailConfiguration.from(
+            new String(Base64.getDecoder().decode(baseCommandArgs.getJobConfInBase64())));
+    DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(flinkRunCommandArgs,
+        jobConfiguration);
     List<String> flinkCommands = Lists.newArrayList();
 
     flinkCommands.add(flinkDir + "/bin/flink");
-    flinkCommands.add(flinkCommandArgs.getExecutionMode());
+    flinkCommands.add(flinkRunCommandArgs.getExecutionMode());
     deploymentSupplier.addDeploymentMode(flinkCommands);
     deploymentSupplier.addRunDeploymentCommands(baseCommandArgs);
 
     FlinkRunnerSavepointLoader.loadSavepointPath(sysConfiguration,
         jobConfiguration,
         baseCommandArgs,
-        flinkCommandArgs,
+        flinkRunCommandArgs,
         flinkCommands);
 
     if (!baseCommandArgs.isDetach()) {
@@ -161,13 +177,13 @@ public class FlinkEngineRunner implements EngineRunner {
       flinkCommands.add(StringUtils.trim(property.getKey()) + "=" + StringUtils.trim(property.getValue()));
     }
 
-    /**
+    /*
      * Customize path of BitSail JAR file for Kubernetes application mode, because Kubernetes
      * application mode bundles BitSail JAR file together with the custom image and runs the user
      * code's main() method on the cluster. Programmed path for
      * BitSail JAR: local:///opt/flink/usrlibs/bitsail-core.jar
      */
-    if (DEPLOYMENT_KUBERNETES_APPLICATION.equalsIgnoreCase(flinkCommandArgs.getDeploymentMode())) {
+    if (DEPLOYMENT_KUBERNETES_APPLICATION.equalsIgnoreCase(flinkRunCommandArgs.getDeploymentMode())) {
       flinkCommands.add("local:///opt/flink/usrlibs/" + ENTRY_JAR_NAME);
     } else {
       flinkCommands.add(PackageResolver.getLibraryDir().resolve(ENTRY_JAR_NAME).toString());
@@ -181,21 +197,23 @@ public class FlinkEngineRunner implements EngineRunner {
       flinkCommands.add(baseCommandArgs.getJobConfInBase64());
     }
     flinkProcBuilder.command(flinkCommands);
-
-    FlinkSecurityHandler.processSecurity(sysConfiguration, flinkProcBuilder, flinkDir);
-    return flinkProcBuilder;
   }
 
-  private ProcessBuilder getStopProcBuilder(BaseCommandArgs baseCommandArgs) {
-    FlinkRunCommandArgs flinkCommandArgs = new FlinkRunCommandArgs();
-    CommandArgsParser.parseArguments(baseCommandArgs.getUnknownOptions(), flinkCommandArgs);
-    DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(flinkCommandArgs, null);
+  private void flinkProcBuilderBuildWithEnvProperties(ProcessBuilder flinkProcBuilder, FlinkCommandArgs flinkRunCommandArgs) throws IOException {
+    Path customFlinkPackageDir = CustomFlinkPackageHandler.buildCustomFlinkPackage(sysConfiguration, flinkRunCommandArgs, flinkDir);
+    if (Objects.nonNull(customFlinkPackageDir)) {
+      Map<String, String> envProps = flinkProcBuilder.environment();
+      envProps.put(ENV_PROP_FLINK_CONF_DIR, customFlinkPackageDir.toString());
+      LOG.info("Set env prop in procBuilder: {}={}", ENV_PROP_FLINK_CONF_DIR, customFlinkPackageDir);
+    }
+  }
 
-    ProcessBuilder flinkProcBuilder = new ProcessBuilder();
+  private void flinkProcBuilderWithStopCommands(ProcessBuilder flinkProcBuilder, BaseCommandArgs baseCommandArgs, FlinkCommandArgs flinkStopCommandArgs) {
+    DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(flinkStopCommandArgs, null);
     List<String> flinkCommands = Lists.newArrayList();
 
     flinkCommands.add(flinkDir + "/bin/flink");
-    flinkCommands.add(flinkCommandArgs.getExecutionMode());
+    flinkCommands.add(flinkStopCommandArgs.getExecutionMode());
     deploymentSupplier.addDeploymentMode(flinkCommands);
     deploymentSupplier.addStopDeploymentCommands(baseCommandArgs);
 
@@ -204,10 +222,9 @@ public class FlinkEngineRunner implements EngineRunner {
       flinkCommands.add("-D");
       flinkCommands.add(StringUtils.trim(property.getKey()) + "=" + StringUtils.trim(property.getValue()));
     }
-    flinkCommands.add(flinkCommandArgs.getJobId());
+    flinkCommands.add(flinkStopCommandArgs.getJobId());
 
     flinkProcBuilder.command(flinkCommands);
-    return flinkProcBuilder;
   }
 
   @Override

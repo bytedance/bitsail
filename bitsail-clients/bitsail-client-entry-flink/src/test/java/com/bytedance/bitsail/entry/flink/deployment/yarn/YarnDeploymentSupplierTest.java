@@ -19,7 +19,7 @@ package com.bytedance.bitsail.entry.flink.deployment.yarn;
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
+import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 
 import org.junit.Test;
 
@@ -35,7 +35,7 @@ public class YarnDeploymentSupplierTest {
   @Test
   public void testAddDeploymentCommands() {
     String deploymentMode = DEPLOYMENT_YARN_PER_JOB;
-    FlinkRunCommandArgs flinkRunCommandArgs = new FlinkRunCommandArgs();
+    FlinkCommandArgs flinkRunCommandArgs = new FlinkCommandArgs();
     flinkRunCommandArgs.setQueue("test");
     flinkRunCommandArgs.setDeploymentMode(deploymentMode);
 
