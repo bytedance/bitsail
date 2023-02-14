@@ -55,7 +55,7 @@ public class KubernetesDeploymentSupplierTest {
     assertEquals(flinkCommands.size(), 2);
     assertEquals(flinkCommands.get(1), DEPLOYMENT_KUBERNETES_APPLICATION);
 
-    assertEquals(baseCommandArgs.getProperties().size(), 4);
+    assertEquals(baseCommandArgs.getProperties().size(), 5);
   }
 
   @Test
