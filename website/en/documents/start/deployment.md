@@ -202,18 +202,6 @@ $ kubectl create serviceaccount <self-defined-service-account> # Please replace 
 $ kubectl create clusterrolebinding <self-defined-cluster-role-binding> --clusterrole=edit --serviceaccount=default:<self-defined-service-account> # Please replace <self-defined-service-account> and <self-defined-cluster-role-binding> with custom names
 ```
 
-### <span id="jump_configure_enable_logs">Enable cluster logs</span>
-By default, the JobManager and TaskManager only store logs under `/opt/flink/log` in each pod. If you want to use `kubectl logs <PodName>` to view the logs, you must perform the following:
-1. Add a new appender to the `log4j.properties` in `${FLINK_HOME}/conf`.
-2. Add the following ‘appenderRef’ the rootLogger in `log4j.properties` `rootLogger.appenderRef.console.ref = ConsoleAppender`.
-```bash
-# Log all infos to the console
-appender.console.name = ConsoleAppender
-appender.console.type = CONSOLE
-appender.console.layout.type = PatternLayout
-appender.console.layout.pattern = %d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
-```
-
 ## <span id="jump_application_mode"> Application Mode</span>
 Application mode allows users to create a single image containing their Job and the Flink runtime, which will automatically create and destroy cluster components as needed. The Flink community provides base docker images [customized](https://nightlies.apache.org/flink/flink-docs-release-1.11/ops/deployment/docker.html#customize-flink-image) for any use case.
 ### <span id="jump_build_custom_flink_image">[First Time or Per BitSail JAR Executable Update] Build Custom Flink Image</span>
@@ -247,6 +235,7 @@ bash ./bin/bitsail run \
    --target kubernetes-application \
    --deployment-mode kubernetes-application \
    --execution-mode run-application \
+   --kubernetes.kubernetes.jobmanager.service-account <self-defined-service-account> \
    --kubernetes.container.image <CustomImage> \
    --kubernetes.jobmanager.cpu 0.25 \
    --kubernetes.taskmanager.cpu 0.5 \
@@ -273,4 +262,41 @@ There are three types of logs:
 2. BitSail JobManager log: `/opt/flink/log/jobmanager.log` on Kubernetes JobManager pod
 3. BitSail TaskManager log: `/opt/flink/log/taskmanager.log` on Kubernetes TaskManager pod
 
-User can also dump JobManager/TaskManager logs on client end by 
+User can also dump JobManager/TaskManager logs on client end by running `kubectl` commands
+```bash
+# During job running
+kubectl get pods # Will return jobmanager pod and taskmanager pod
+
+kubectl logs -f <jobmanagerPod> # Will dump jobManager log
+
+kubectl logs -f <taskmanagerPod>  # Will dump taskManager log
+```
+
+
+### <span id="jump_history_server">History Server</span>
+Flink has a history server that can be used to query the statistics of completed jobs after the corresponding Flink cluster has been shut down.
+Furthermore, it exposes a REST API that accepts HTTP requests and responds with JSON data. More information in https://nightlies.apache.org/flink/flink-docs-release-1.11/monitoring/historyserver.html
+
+Start or stop the HistoryServer
+```bash
+${FLINK_HOME}/bin/historyserver.sh (start|start-foreground|stop)
+```
+
+Run BitSail command line to configure history server.
+```bash
+bash ./bin/bitsail run \
+   --engine flink \
+   --target kubernetes-application \
+   --deployment-mode kubernetes-application \
+   --execution-mode run-application \
+   --kubernetes.kubernetes.jobmanager.service-account <self-defined-service-account> \
+   --kubernetes.container.image <CustomImage> \
+   --kubernetes.jobmanager.cpu 0.25 \
+   --kubernetes.taskmanager.cpu 0.5 \
+   --jobmanager.archive.fs.dir hdfs:///completed-jobs/ \
+   --historyserver.web.address 0.0.0.0 \
+   --historyserver.web.port 8082 \
+   --historyserver.archive.fs.dir hdfs:///completed-jobs/ \
+   historyserver.archive.fs.refresh-interval \
+   --conf-in-base64 <base64 conf>
+```

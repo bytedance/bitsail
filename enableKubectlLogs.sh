@@ -20,11 +20,18 @@ func_result=
 get_full_path "${BITSAIL_DIST_BIN_DIR}bitsail-archive*/"
 BITSAIL_DIR=${func_result}
 EMBEDDED_FLINK_DIR=${BITSAIL_DIR}embedded/flink
+LOG4J_PROPERTIES=${EMBEDDED_FLINK_DIR}/conf/log4j.properties
+COPY_LOG4J_PROPERTIES=${EMBEDDED_FLINK_DIR}/conf/copy_log4j.properties
 
-echo -e "\nAppend client flink's log4j.properties with ConsoleAppender setup."
-cp ${EMBEDDED_FLINK_DIR}/conf/log4j.properties ${EMBEDDED_FLINK_DIR}/conf/copy_log4j.properties
+if [ -f $COPY_LOG4J_PROPERTIES ]; then
+  mv $COPY_LOG4J_PROPERTIES $LOG4J_PROPERTIES
+  echo "Replace '$LOG4J_PROPERTIES' with original copy '$COPY_LOG4J_PROPERTIES'"
+fi
+
+echo -e "\nAppend client flink's log4j.properties with ConsoleAppender setup. Saving original copy from '$LOG4J_PROPERTIES' to '$COPY_LOG4J_PROPERTIES'"
+cp $LOG4J_PROPERTIES $COPY_LOG4J_PROPERTIES
 echo "rootLogger.appenderRef.console.ref = ConsoleAppender
 appender.console.name = ConsoleAppender
 appender.console.type = CONSOLE
 appender.console.layout.type = PatternLayout
-appender.console.layout.pattern = %d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n" >> ${EMBEDDED_FLINK_DIR}/conf/log4j.properties
+appender.console.layout.pattern = %d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n" >> $LOG4J_PROPERTIES

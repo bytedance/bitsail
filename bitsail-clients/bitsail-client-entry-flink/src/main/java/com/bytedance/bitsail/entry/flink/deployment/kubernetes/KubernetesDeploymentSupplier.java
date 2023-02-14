@@ -25,6 +25,7 @@ import java.util.List;
 import static com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs.KUBERNETES_CLUSTER_ID;
 import static com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs.KUBERNETES_CONTAINER_IMAGE;
 import static com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs.KUBERNETES_JOBMANAGER_CPU;
+import static com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs.KUBERNETES_SERVICE_ACCOUNT;
 import static com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs.KUBERNETES_TASKMANAGER_CPU;
 
 /**
@@ -49,13 +50,11 @@ public class KubernetesDeploymentSupplier implements DeploymentSupplier {
 
   @Override
   public void addRunDeploymentCommands(BaseCommandArgs baseCommandArgs) {
+    baseCommandArgs.getProperties().put(KUBERNETES_SERVICE_ACCOUNT, flinkRunCommandArgs.getKubernetesServiceAccount());
     baseCommandArgs.getProperties().put(KUBERNETES_CLUSTER_ID, flinkRunCommandArgs.getKubernetesClusterId());
-
     baseCommandArgs.getProperties().put(KUBERNETES_CONTAINER_IMAGE, flinkRunCommandArgs.getKubernetesContainerImage());
-
     baseCommandArgs.getProperties().put(KUBERNETES_JOBMANAGER_CPU,
             String.valueOf(flinkRunCommandArgs.getKubernetesJobManagerCpu()));
-
     baseCommandArgs.getProperties().put(KUBERNETES_TASKMANAGER_CPU,
             String.valueOf(flinkRunCommandArgs.getKubernetesTaskManagerCpu()));
   }
