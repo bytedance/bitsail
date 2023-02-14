@@ -18,6 +18,7 @@ package com.bytedance.bitsail.test.e2e;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.fake.option.FakeReaderOptions;
+import com.bytedance.bitsail.test.e2e.annotation.ExecutorPatterns;
 import com.bytedance.bitsail.test.e2e.datasource.RedisDataSource;
 
 import org.junit.Assert;
@@ -26,6 +27,7 @@ import org.junit.Test;
 import java.io.File;
 import java.nio.file.Paths;
 
+@ExecutorPatterns(exclude = {"generic*"})
 public class FakeToRedisE2ETest extends AbstractE2ETest {
 
   @Test

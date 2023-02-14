@@ -103,7 +103,7 @@ public class TestJob implements AutoCloseable {
         Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(dataSourceClass);
         source = (AbstractDataSource) clazz.newInstance();
       } catch (Exception e) {
-        LOG.error("Failed to create data source [{}], will try using class name.", dataSourceClass, e);
+        LOG.error("Failed to create data source [{}], will try using DataSourceFactory.", dataSourceClass, e);
         source = null;
       }
     }
@@ -141,7 +141,7 @@ public class TestJob implements AutoCloseable {
         Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(dataSourceClass);
         sink = (AbstractDataSource) clazz.newInstance();
       } catch (Exception e) {
-        LOG.error("Failed to create data source [{}], will try using class name.", dataSourceClass, e);
+        LOG.error("Failed to create data source [{}], will try using DataSourceFactory.", dataSourceClass, e);
         sink = null;
       }
     }

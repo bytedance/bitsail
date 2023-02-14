@@ -17,12 +17,14 @@
 package com.bytedance.bitsail.test.e2e;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.test.e2e.annotation.ExecutorPatterns;
 
 import org.junit.Test;
 
 import java.io.File;
 import java.nio.file.Paths;
 
+@ExecutorPatterns(exclude = {"generic*"})
 public class RocketmqToPrintE2ETest extends AbstractE2ETest {
 
   @Test

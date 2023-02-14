@@ -11,8 +11,6 @@ E2E框架使用Docker构建测试数据源 & 测试容器，所以需要先在�
 目前的E2E框架针对 V1 版本的connector进行设计，比如 `connector-redis`, `connector-rocketmq`。
 但对于`bitsail-connectors-legacy`下的connector不支持测试。
 
-
- - 支持的测试数据源统一在 `bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-datasource` 模块中进行管理。
  - 支持的测试样例统一在 `bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-connector-v1` 模块中进行管理。
 
 
@@ -38,7 +36,7 @@ mvn clean verify -DskipUT=true -DskipITCase=true -DskipE2E=false -D"checkstyle.s
 
 ### 1. 准备测试数据源
 
-目前已有一些测试数据源在 `bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-datasource` 模块中进行了支持。
+目前已有一些测试数据源在 `bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-connector-v1` 模块中进行了支持。
 
 如果用户需要测试的conenctor所关联的数据源并未实现，则需要先实现一个测试数据源。
     

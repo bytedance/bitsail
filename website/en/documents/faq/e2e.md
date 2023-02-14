@@ -12,8 +12,6 @@ Curent E2E test framework is aim at connector V2, _e.g._, `connector-redis`, `co
 
 Connectors under `bitsail-connectors-legacy` cannot be test.
 
-
-- Supported data sources: `bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-datasource`
 - Supported test cases: `bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-connector-v1`
 
 
@@ -41,7 +39,7 @@ mvn clean verify -DskipUT=true -DskipITCase=true -DskipE2E=false -D"checkstyle.s
 
 ### 1. Prepare data source
 
-There are some existing data sources are supported in `bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-datasource`.
+There are some existing data sources are supported in `bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-connector-v1`.
 
 If you cannot find target data source, then you need to implement it at first. 
 
