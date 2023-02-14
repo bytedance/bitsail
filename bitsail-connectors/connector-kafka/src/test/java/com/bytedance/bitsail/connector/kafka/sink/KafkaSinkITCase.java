@@ -48,7 +48,7 @@ public class KafkaSinkITCase {
   }
 
   @Test
-  public void testKafkaOutputFormat() throws Exception {
+  public void testKafkaSink() throws Exception {
     BitSailConfiguration configuration = JobConfUtils.fromClasspath("fake_to_kafka.json");
     updateConfiguration(configuration);
     EmbeddedFlinkCluster.submitJob(configuration);
