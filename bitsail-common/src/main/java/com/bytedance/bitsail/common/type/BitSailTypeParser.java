@@ -72,19 +72,16 @@ public class BitSailTypeParser {
     LOG.debug("type string = {}.", typeString);
     typeString = StringUtils.trim(StringUtils.upperCase(typeString));
 
-    if (StringUtils.startsWithIgnoreCase(typeString, Types.MAP.name())
-        || StringUtils.startsWithIgnoreCase(typeString, Types.LIST.name())) {
-
-      if (StringUtils.startsWithIgnoreCase(typeString, Types.MAP.name())) {
-
-        String[] mapTypeString = parseMapTypeString(typeString);
-        return new MapTypeInfo<>(fromTypeString(mapTypeString[0]), fromTypeString(mapTypeString[1]));
-      } else {
-
-        String elementTypeString = parseListTypeString(typeString);
-        return new ListTypeInfo<>(fromTypeString(elementTypeString));
-      }
+    if (StringUtils.startsWithIgnoreCase(typeString, Types.MAP.name())) {
+      String[] mapTypeString = parseMapTypeString(typeString);
+      return new MapTypeInfo<>(fromTypeString(mapTypeString[0]), fromTypeString(mapTypeString[1]));
     }
+
+    if (StringUtils.startsWithIgnoreCase(typeString, Types.LIST.name())) {
+      String elementTypeString = parseListTypeString(typeString);
+      return new ListTypeInfo<>(fromTypeString(elementTypeString));
+    }
+
     TypeInfo<?> typeInfo = TypeInfoBridge.bridgeTypeInfo(typeString);
     if (Objects.isNull(typeInfo)) {
       throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,
