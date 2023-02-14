@@ -22,6 +22,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.connector.kafka.common.KafkaErrorCode;
 import com.bytedance.bitsail.connector.kafka.model.KafkaRecord;
 import com.bytedance.bitsail.connector.kafka.option.KafkaWriterOptions;
@@ -69,13 +70,22 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
    * The INDEX list of partition fields in columns
    */
   private List<Integer> partitionFieldsIndices;
-  private final List<ColumnInfo> columns;
 
-  public KafkaWriter(BitSailConfiguration commonConf, BitSailConfiguration writerConf) {
+  private final transient Writer.Context context;
+
+  private final TypeInfo<?>[] typeInfos;
+
+  //TODO: move fieldNames to writer context
+  private final List<String> fieldNames;
+
+  public KafkaWriter(BitSailConfiguration commonConf, BitSailConfiguration writerConf, Context context) {
+    this.context = context;
+    List<ColumnInfo> columns = writerConf.getNecessaryOption(KafkaWriterOptions.COLUMNS, KafkaErrorCode.REQUIRED_VALUE);
+    this.typeInfos = context.getTypeInfos();
+    this.fieldNames = columns.stream().map(ColumnInfo::getName).collect(Collectors.toList());
     this.kafkaServers = writerConf.getNecessaryOption(KafkaWriterOptions.KAFKA_SERVERS, KafkaErrorCode.REQUIRED_VALUE);
     this.kafkaTopic = writerConf.getNecessaryOption(KafkaWriterOptions.TOPIC_NAME, KafkaErrorCode.REQUIRED_VALUE);
 
-    columns = writerConf.getNecessaryOption(KafkaWriterOptions.COLUMNS, KafkaErrorCode.REQUIRED_VALUE);
     logFailuresOnly = writerConf.get(KafkaWriterOptions.LOG_FAILURES_ONLY);
 
     optionalConfig = commonConf.getUnNecessaryOption(CommonOptions.OPTIONAL, new HashMap<>());
@@ -85,7 +95,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     String partitionField = writerConf.get(KafkaWriterOptions.PARTITION_FIELD);
     if (StringUtils.isNotEmpty(partitionField)) {
       List<String> partitionFieldsNames = Arrays.asList(partitionField.split(",\\s*"));
-      partitionFieldsIndices = getPartitionFieldsIndices(columns, partitionFieldsNames);
+      partitionFieldsIndices = getPartitionFieldsIndices(fieldNames, partitionFieldsNames);
     }
 
     this.kafkaProducer = new KafkaProducer(this.kafkaServers, this.kafkaTopic, optionalConfig);
@@ -111,7 +121,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     String columnName;
     Object columnValue;
     for (int i = 0; i < record.getArity(); i++) {
-      columnName = columns.get(i).getName();
+      columnName = fieldNames.get(i);
       columnValue = record.getField(i);
       jsonObject.put(columnName, columnValue);
     }
@@ -174,11 +184,11 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   /**
    * get all partition fields indices according to their name
    */
-  private List<Integer> getPartitionFieldsIndices(List<ColumnInfo> columns, List<String> partitionFieldsNames) {
+  private List<Integer> getPartitionFieldsIndices(List<String> fieldNames, List<String> partitionFieldsNames) {
     return partitionFieldsNames.stream()
         .map(partitionFieldsName -> {
-          for (int i = 0; i < columns.size(); i++) {
-            String columnName = columns.get(i).getName();
+          for (int i = 0; i < fieldNames.size(); i++) {
+            String columnName = fieldNames.get(i);
             if (columnName.equals(partitionFieldsName)) {
               return i;
             }

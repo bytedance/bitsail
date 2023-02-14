@@ -34,16 +34,6 @@
         <kafka.clients.version>1.0.1</kafka.clients.version>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka-clients</artifactId>
-                <version>${kafka.clients.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <!-- Kafka -->
         <dependency>
@@ -51,44 +41,6 @@
             <artifactId>kafka-clients</artifactId>
             <version>${kafka.clients.version}</version>
         </dependency>
-
-        <!-- flink connector -->
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka-base_${scala.binary.version}</artifactId>
-            <version>${flink.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka_${scala.binary.version}</artifactId>
-            <version>${flink.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-common</artifactId>
-            <version>${flink.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-json</artifactId>
-            <version>${flink.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- base message queue interface -->
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-messagequeue</artifactId>
-            <version>${revision}</version>
-            <scope>compile</scope>
-        </dependency>
-
 
         <!--   test     -->
         <dependency>
