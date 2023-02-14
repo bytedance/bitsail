@@ -220,19 +220,6 @@ public abstract class AbstractExecutor extends AbstractContainer {
     transferableFiles.add(new TransferableFile(clientEntry,
         Paths.get(executorRootDir, "libs", "clients", clientEntryFile).toAbsolutePath().toString()));
 
-    // log libs under libs/clients
-    Path logLibPath = Paths.get(localRootDir,
-        "bitsail-test",
-        "bitsail-test-end-to-end",
-        "bitsail-test-e2e-base",
-        "target", "log-libs");
-    File[] logLibs = logLibPath.toFile().listFiles();
-    Preconditions.checkNotNull(logLibs, "Cannot find log libs from {}", logLibPath);
-    for (File logLib : logLibs) {
-      String logLibFile = logLib.getName();
-      transferableFiles.add(new TransferableFile(logLibPath.resolve(logLibFile).toAbsolutePath().toString(),
-          Paths.get(executorRootDir, "libs", "clients", logLibFile).toAbsolutePath().toString()));
-    }
     LOG.info("Successfully load bitsail libs.");
 
     // libs/engines

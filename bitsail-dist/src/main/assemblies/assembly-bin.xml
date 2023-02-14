@@ -37,10 +37,6 @@
             <includes>
                 <include>com.bytedance.bitsail:bitsail-client-entry-*</include>
                 <include>com.bytedance.bitsail:bitsail-client-entry:*</include>
-                <include>ch.qos.logback:logback-access</include>
-                <include>ch.qos.logback:logback-core</include>
-                <include>ch.qos.logback:logback-classic</include>
-                <include>org.slf4j:slf4j-api</include>
             </includes>
         </dependencySet>
 
