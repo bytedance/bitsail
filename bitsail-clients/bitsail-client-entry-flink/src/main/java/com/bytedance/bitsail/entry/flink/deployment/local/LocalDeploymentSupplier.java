@@ -17,7 +17,7 @@
 package com.bytedance.bitsail.entry.flink.deployment.local;
 
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
-import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
+import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,14 +29,14 @@ import java.util.List;
 public class LocalDeploymentSupplier implements DeploymentSupplier {
   private static final Logger LOG = LoggerFactory.getLogger(LocalDeploymentSupplier.class);
 
-  private final FlinkRunCommandArgs flinkCommandArgs;
+  private final FlinkCommandArgs flinkCommandArgs;
 
-  public LocalDeploymentSupplier(FlinkRunCommandArgs flinkCommandArgs) {
+  public LocalDeploymentSupplier(FlinkCommandArgs flinkCommandArgs) {
     this.flinkCommandArgs = flinkCommandArgs;
   }
 
   @Override
-  public void addDeploymentCommands(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
+  public void addDeploymentMode(List<String> flinkCommands) {
     String jobManagerAddress = flinkCommandArgs.getJobManagerAddress();
     if (StringUtils.isNotEmpty(jobManagerAddress)) {
       flinkCommands.add("-m");
@@ -44,5 +44,13 @@ public class LocalDeploymentSupplier implements DeploymentSupplier {
     } else {
       LOG.info("Job manager is not specified. Job will be submit to default job manager.");
     }
+  }
+
+  @Override
+  public void addRunDeploymentCommands(BaseCommandArgs baseCommandArgs) {
+  }
+
+  @Override
+  public void addStopDeploymentCommands(BaseCommandArgs baseCommandArgs) {
   }
 }

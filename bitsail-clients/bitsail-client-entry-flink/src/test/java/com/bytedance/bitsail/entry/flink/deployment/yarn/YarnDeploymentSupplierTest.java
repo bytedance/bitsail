@@ -19,7 +19,7 @@ package com.bytedance.bitsail.entry.flink.deployment.yarn;
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
+import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 
 import org.junit.Test;
 
@@ -27,14 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_YARN_PER_JOB;
 import static org.junit.Assert.assertEquals;
 
 public class YarnDeploymentSupplierTest {
 
   @Test
   public void testAddDeploymentCommands() {
-    String deploymentMode = "yarn-per-job";
-    FlinkRunCommandArgs flinkRunCommandArgs = new FlinkRunCommandArgs();
+    String deploymentMode = DEPLOYMENT_YARN_PER_JOB;
+    FlinkCommandArgs flinkRunCommandArgs = new FlinkCommandArgs();
     flinkRunCommandArgs.setQueue("test");
     flinkRunCommandArgs.setDeploymentMode(deploymentMode);
 
@@ -44,7 +45,8 @@ public class YarnDeploymentSupplierTest {
     YarnDeploymentSupplier deploymentSupplier = new YarnDeploymentSupplier(flinkRunCommandArgs, conf);
     BaseCommandArgs baseCommandArgs = new BaseCommandArgs();
     List<String> flinkCommands = new ArrayList<>();
-    deploymentSupplier.addDeploymentCommands(baseCommandArgs, flinkCommands);
+    deploymentSupplier.addDeploymentMode(flinkCommands);
+    deploymentSupplier.addRunDeploymentCommands(baseCommandArgs);
     assertEquals(flinkCommands.size(), 2);
     assertEquals(flinkCommands.get(1), deploymentMode);
 

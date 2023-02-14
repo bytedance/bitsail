@@ -17,7 +17,8 @@
 package com.bytedance.bitsail.entry.flink.deployment;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
+import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
+import com.bytedance.bitsail.entry.flink.deployment.kubernetes.KubernetesDeploymentSupplier;
 import com.bytedance.bitsail.entry.flink.deployment.local.LocalDeploymentSupplier;
 import com.bytedance.bitsail.entry.flink.deployment.yarn.YarnDeploymentSupplier;
 
@@ -25,14 +26,14 @@ import com.bytedance.bitsail.entry.flink.deployment.yarn.YarnDeploymentSupplier;
  * Created 2022/8/8
  */
 public class DeploymentSupplierFactory {
-
+  public static final String DEPLOYMENT_YARN_PER_JOB = "yarn-per-job";
+  public static final String DEPLOYMENT_YARN_SESSION = "yarn-session";
+  public static final String DEPLOYMENT_YARN_APPLICATION = "yarn-application";
+  public static final String DEPLOYMENT_KUBERNETES_APPLICATION = "kubernetes-application";
   private static final String DEPLOYMENT_LOCAL = "local";
   private static final String DEPLOYMENT_REMOTE = "remote";
-  private static final String DEPLOYMENT_YARN_PER_JOB = "yarn-per-job";
-  private static final String DEPLOYMENT_YARN_SESSION = "yarn-session";
-  private static final String DEPLOYMENT_YARN_APPLICATION = "yarn-application";
 
-  public DeploymentSupplier getDeploymentSupplier(FlinkRunCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
+  public DeploymentSupplier getDeploymentSupplier(FlinkCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
     String deploymentMode = flinkCommandArgs.getDeploymentMode().toLowerCase().trim();
 
     switch (deploymentMode) {
@@ -43,6 +44,8 @@ public class DeploymentSupplierFactory {
       case DEPLOYMENT_YARN_SESSION:
       case DEPLOYMENT_YARN_APPLICATION:
         return new YarnDeploymentSupplier(flinkCommandArgs, jobConfiguration);
+      case DEPLOYMENT_KUBERNETES_APPLICATION:
+        return new KubernetesDeploymentSupplier(flinkCommandArgs);
       default:
         throw new UnsupportedOperationException("Unsupported deployment mode: " + deploymentMode);
     }

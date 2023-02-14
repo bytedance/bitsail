@@ -8,23 +8,26 @@ English | [简体中文](../../../zh/documents/start/config.md)
 
 -----
 
-> At present, ***BitSail*** only supports flink deployment on Yarn.<br>
-Other platforms like `native kubernetes` will be release recently.
+> At present, ***BitSail*** supports flink deployment on Yarn and native Kubernetes.<br>
 
 Here are the contents of this part:
 
-- [Pre Configuration](#jump_pre_configure)
-    - [Configure Hadoop Environment](#jump_configure_hadoop)
-    - [Configure Flink Cluster](#jump_configure_flink)
-- [Submit to Yarn](#jump_submit_to_yarn)
-    - [Submit an example job](#jump_submit_example)
-    - [Log for Debugging](#jump_log)
-- [Submit to Local Flink Session](#jump_submit_local)
-
-Below is a step-by-step guide to help you effectively deploy it on Yarn.
+- [Yarn Deployment](#yarn_deployment)
+  - [Pre Configuration](#jump_pre_configure)
+      - [Configure Hadoop Environment](#jump_configure_hadoop)
+      - [Configure Flink Cluster](#jump_configure_flink)
+  - [Submit to Yarn](#jump_submit_to_yarn)
+      - [Submit an example job](#jump_submit_example)
+      - [Log for Debugging](#jump_log)
+  - [Submit to Local Flink Session](#jump_submit_local)
+- [Native Kubernetes Deployment](#native_kubernetes_deployment)
+  - [Prerequisites](#jump_prerequisites_k8s)
+  - [Pre Configuration](#jump_pre_configuration_k8s)
 
 -----
+# <span id="yarn_deployment">Yarn Deployment</span>
 
+Below is a step-by-step guide to help you effectively deploy it on Yarn.
 ## <span id="jump_pre_configure">Pre configuration</span>
 
 ### <span id="jump_configure_hadoop">Configure Hadoop Environment</span>
@@ -87,8 +90,6 @@ Here are some frequently-used options in the configuration file:
 
 ## <span id="jump_submit_to_yarn">Submit to Yarn</span>
 
-> ***BitSail*** only support resource provider `yarn's yarn-per-job` mode until now, others like `native kubernetes` will be release recently.
-
 You can use the startup script `bin/bitsail` to submit flink jobs to yarn.
 
 The specific commands are as follows:
@@ -112,7 +113,7 @@ Parameter description
 ### <span id="jump_submit_example">Submit an example job</span>
 Submit a fake source to print sink test to yarn.
 ``` bash
-bash ./bin/bitsail run --engine flink --conf ~/bitsail-archive-0.1.0-SNAPSHOT/examples/Fake_Print_Example.json --execution-mode run -p 1=1  --deployment-mode yarn-per-job  --queue default
+bash ./bin/bitsail run --engine flink --conf ~/bitsail-archive-0.2.0-SNAPSHOT/examples/Fake_Print_Example.json --execution-mode run -p 1=1  --deployment-mode yarn-per-job  --queue default
 ```
 
 ### <span id="jump_log">Log for Debugging</span>
@@ -131,7 +132,7 @@ Suppose that BitSail install path is: `${BITSAIL_HOME}`.
 
 After building BitSail, we can enter the following path and find runnable jars and example job configuration files:
 ```shell
-cd ${BITSAIL_HOME}/bitsail-dist/target/bitsail-dist-0.1.0-SNAPSHOT-bin/bitsail-archive-0.1.0-SNAPSHOT/
+cd ${BITSAIL_HOME}/bitsail-dist/target/bitsail-dist-0.2.0-SNAPSHOT-bin/bitsail-archive-0.2.0-SNAPSHOT/
 ```
 
 ### Run Fake_to_Print example
@@ -180,3 +181,129 @@ bash bin/bitsail run \
   --conf examples/Fake_Hive_Example.json \
   --jm-address <job-manager-address>
   ```
+
+
+-----
+# <span id="native_kubernetes_deployment">Native Kubernetes Deployment</span>
+
+> At present, ***BitSail*** supports native Kubernetes via Flink 1.11 engine.<br>
+> 
+Below is a step-by-step guide to help you effectively deploy it on native Kubernetes. Currently, BitSail support Application deployment mode: Allows users to create a single image containing their Job and the Flink runtime, which will automatically create and destroy cluster components as needed.
+
+## <span id="jump_prerequisites_k8s">Prerequisites</span>
+1. Kubernetes >= 1.9
+2. KubeConfig, which has access to list, create, delete pods and services, configurable via `~/.kube/config`. You can verify permissions by running `kubectl auth can-i <list|create|edit|delete> pods` 
+3. Kubernetes DNS enabled
+
+If you have problems setting up a Kubernetes cluster, then take a look at [how to setup a Kubernetes cluster](https://kubernetes.io/docs/setup/).
+
+## <span id="jump_pre_configuration_k8s">Pre Configuration</span>
+
+### <span id="jump_configure_RBAC">Setup [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)</span>
+Role-based access control ([RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)) is a method of regulating access to compute or network resources based on the roles of individual users within an enterprise. Users can configure RBAC roles and service accounts used by JobManager to access the Kubernetes API server within the Kubernetes cluster.
+
+Every namespace has a default service account. However, the `default` service account may not have the permission to create or delete pods within the Kubernetes cluster. Users can instead use the following command to create a new service account `<self-defined-service-account>` and set the role binding. Then use the config option `kubernetes.service-account=<self-defined-service-account>` to make the JobManager pod use the `<self-defined-service-account>` service account to create/delete TaskManager pods and leader ConfigMaps. Also this will allow the TaskManager to watch leader ConfigMaps to retrieve the address of JobManager and ResourceManager.
+
+```bash
+$ kubectl create serviceaccount <self-defined-service-account> # Please replace <self-defined-service-account> with a custom name
+$ kubectl create clusterrolebinding <self-defined-cluster-role-binding> --clusterrole=edit --serviceaccount=default:<self-defined-service-account> # Please replace <self-defined-service-account> and <self-defined-cluster-role-binding> with custom names
+```
+
+## <span id="jump_application_mode"> Application Mode</span>
+Application mode allows users to create a single image containing their Job and the Flink runtime, which will automatically create and destroy cluster components as needed. The Flink community provides base docker images [customized](https://nightlies.apache.org/flink/flink-docs-release-1.11/ops/deployment/docker.html#customize-flink-image) for any use case.
+### <span id="jump_build_custom_flink_image">[First Time or Per BitSail JAR Executable Update] Build Custom Flink Image</span>
+
+Build your `<CustomImage>` using below [`Dockerfile`](https://docs.docker.com/engine/reference/builder/):
+```dockerfile
+FROM flink:1.11.6-scala_2.11-java8
+ENV USERLIB=/opt/flink/usrlib
+RUN mkdir -p $USERLIB
+COPY libs/ $USERLIB/
+```
+
+Path tree:
+```
+.
+├── Dockerfile
+└── libs
+    ├── bitsail-core.jar
+    ├── clients/*
+    ├── connectors/*
+    └── engines/*
+```
+The content of `libs` can be copied from `${BITSAIL_HOME}/bitsail-dist/target/bitsail-dist-0.2.0-SNAPSHOT-bin/bitsail-archive-0.2.0-SNAPSHOT/libs/`
+
+Publish your `<CustomImage>` onto Dockerhub so that Kubernetes cluster can download.
+
+### <span id="jump_start_application">Start Application</span>
+```bash
+bash ./bin/bitsail run \
+   --engine flink \
+   --target kubernetes-application \
+   --deployment-mode kubernetes-application \
+   --execution-mode run-application \
+   --kubernetes.kubernetes.jobmanager.service-account <self-defined-service-account> \
+   --kubernetes.container.image <CustomImage> \
+   --kubernetes.jobmanager.cpu 0.25 \
+   --kubernetes.taskmanager.cpu 0.5 \
+   --conf-in-base64 <base64 conf>
+```
+
+### <span id="jump_stop_application">Stop Application</span>
+```bash
+bash ./bin/bitsail stop \
+   --engine flink \
+   --target kubernetes-application \
+   --deployment-mode kubernetes-application \
+   --execution-mode cancel \
+   --job-id <jobId>
+```
+Alternatively, users can run `kubectl` commands to delete the whole deployment in order to stop the application
+```bash
+kubectl delete deployments bitsail-job
+```
+
+### <span id="jump_kubernetes_logs">Kubernetes Logs</span>
+There are three types of logs:
+1. BitSail client log: `${FLINK_HOME}/log/flink-xxx.log` on client end
+2. BitSail JobManager log: `/opt/flink/log/jobmanager.log` on Kubernetes JobManager pod
+3. BitSail TaskManager log: `/opt/flink/log/taskmanager.log` on Kubernetes TaskManager pod
+
+User can also dump JobManager/TaskManager logs on client end by running `kubectl` commands
+```bash
+# During job running
+kubectl get pods # Will return jobmanager pod and taskmanager pod
+
+kubectl logs -f <jobmanagerPod> # Will dump jobManager log
+
+kubectl logs -f <taskmanagerPod>  # Will dump taskManager log
+```
+
+
+### <span id="jump_history_server">History Server</span>
+Flink has a history server that can be used to query the statistics of completed jobs after the corresponding Flink cluster has been shut down.
+Furthermore, it exposes a REST API that accepts HTTP requests and responds with JSON data. More information in https://nightlies.apache.org/flink/flink-docs-release-1.11/monitoring/historyserver.html
+
+Start or stop the HistoryServer
+```bash
+${FLINK_HOME}/bin/historyserver.sh (start|start-foreground|stop)
+```
+
+Run BitSail command line to configure history server.
+```bash
+bash ./bin/bitsail run \
+   --engine flink \
+   --target kubernetes-application \
+   --deployment-mode kubernetes-application \
+   --execution-mode run-application \
+   --kubernetes.kubernetes.jobmanager.service-account <self-defined-service-account> \
+   --kubernetes.container.image <CustomImage> \
+   --kubernetes.jobmanager.cpu 0.25 \
+   --kubernetes.taskmanager.cpu 0.5 \
+   --jobmanager.archive.fs.dir hdfs:///completed-jobs/ \
+   --historyserver.web.address 0.0.0.0 \
+   --historyserver.web.port 8082 \
+   --historyserver.archive.fs.dir hdfs:///completed-jobs/ \
+   historyserver.archive.fs.refresh-interval \
+   --conf-in-base64 <base64 conf>
+```
