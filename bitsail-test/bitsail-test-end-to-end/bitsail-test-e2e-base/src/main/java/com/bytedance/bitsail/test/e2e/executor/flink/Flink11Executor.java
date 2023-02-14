@@ -23,8 +23,6 @@ import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -39,7 +37,7 @@ public class Flink11Executor extends AbstractFlinkExecutor {
 
   @Override
   protected String getFlinkDockerImage() {
-    return "flink:1.11.6";
+    return "blockliu/flink-1.11.6-hadoop-2.7.5";
   }
 
   @Override
@@ -88,21 +86,5 @@ public class Flink11Executor extends AbstractFlinkExecutor {
     transferableFiles.add(new TransferableFile(clientEngine,
         Paths.get(executorRootDir, "libs", "clients", clientEngineFile).toAbsolutePath().toString()));
     LOG.info("Successfully add libs for flink clients.");
-
-    // flink-shaded-hadoop
-    Path hadoopLibPath = Paths.get(localRootDir,
-        "bitsail-test",
-        "bitsail-test-end-to-end",
-        "bitsail-test-e2e-base",
-        "target", "hadoop-libs");
-    File[] hadoopLibs = hadoopLibPath.toFile().listFiles();
-    if (hadoopLibs != null) {
-      for (File hadoopLib : hadoopLibs) {
-        String hadoopLibFile = hadoopLib.getName();
-        transferableFiles.add(new TransferableFile(hadoopLibPath.resolve(hadoopLibFile).toAbsolutePath().toString(),
-            Paths.get(getFlinkRootDir(), "lib", hadoopLibFile).toAbsolutePath().toString()));
-      }
-      LOG.info("Successfully add hadoop libs for flink.");
-    }
   }
 }
