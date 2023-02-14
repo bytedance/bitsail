@@ -43,10 +43,15 @@
         </dependency>
 
         <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-test-e2e-datasource-clickhouse</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>clickhouse</artifactId>
+            <version>1.17.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
+            <version>1.6.0</version>
         </dependency>
     </dependencies>
 

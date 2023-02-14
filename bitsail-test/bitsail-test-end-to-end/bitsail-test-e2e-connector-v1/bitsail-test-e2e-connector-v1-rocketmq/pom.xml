@@ -43,10 +43,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-test-e2e-datasource-rocketmq</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dns-cache-manipulator</artifactId>
+            <version>1.8.0</version>
         </dependency>
     </dependencies>
 

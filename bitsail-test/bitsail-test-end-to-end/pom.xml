@@ -28,7 +28,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>bitsail-test-e2e-base</module>
-        <module>bitsail-test-e2e-datasource</module>
         <module>bitsail-test-e2e-connector-v1</module>
         <module>bitsail-test-e2e-generic-executors</module>
     </modules>
