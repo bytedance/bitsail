@@ -96,7 +96,6 @@
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
                                         <exclude>org/log4j/**</exclude>
-                                        <exclude>org/slf4j/impl/**</exclude>
                                         <exclude>org/apache/logging/log4j/**</exclude>
                                         <exclude>org/apache/log4j/**</exclude>
                                         <exclude>log4j.properties</exclude>
