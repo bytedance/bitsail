@@ -58,4 +58,8 @@ public interface KafkaWriterOptions extends WriterOptions.BaseWriterOptions {
   ConfigOption<Long> LINGER_MS =
       key(WRITER_PREFIX + "linger_ms")
           .defaultValue(5000L);
+
+  ConfigOption<String> CONTENT_TYPE =
+      key(WRITER_PREFIX + "content_type")
+          .defaultValue("json");
 }
