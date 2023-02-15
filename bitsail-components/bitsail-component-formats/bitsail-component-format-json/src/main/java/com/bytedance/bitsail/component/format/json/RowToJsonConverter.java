@@ -16,14 +16,105 @@
 
 package com.bytedance.bitsail.component.format.json;
 
+import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfos;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Arrays;
 
 /**
- * Convert BitSail Row data structure into Json.
+ * Convert BitSail Row into Json.
  */
 public class RowToJsonConverter implements Serializable {
   private static final long serialVersionUID = 1L;
 
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+  private final int arity;
+  private final String[] fieldNames;
+  private final JsonConverter[] fieldConverters;
+
+  public RowToJsonConverter(TypeInfo<?>[] typeInfos, String[] fieldNames) {
+    assert typeInfos.length == fieldNames.length;
+    this.arity = typeInfos.length;
+    this.fieldNames = fieldNames;
+    this.fieldConverters = Arrays.stream(typeInfos)
+        .map(this::createConverter).toArray(JsonConverter[]::new);
+  }
+
+  public JsonNode convert(Row row) {
+    ObjectNode objectNode = OBJECT_MAPPER.createObjectNode();
+    String columnName;
+    for (int i = 0; i < arity; i++) {
+      columnName = fieldNames[i];
+      objectNode.set(columnName, fieldConverters[i].convert(OBJECT_MAPPER, row.getField(i)));
+    }
+    return objectNode;
+  }
+
+  public interface JsonConverter extends Serializable {
+    JsonNode convert(ObjectMapper mapper, Object value);
+  }
+
+  private JsonConverter createConverter(TypeInfo<?> typeInfo) {
+    Class<?> typeClass = typeInfo.getTypeClass();
+
+    if (typeClass == TypeInfos.VOID_TYPE_INFO.getTypeClass()) {
+      return (mapper, value) -> mapper.getNodeFactory().nullNode();
+    }
+    if (typeClass == TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass()) {
+      return (mapper, value) ->
+          mapper.getNodeFactory().booleanNode((boolean) value);
+    }
+    if (typeClass == TypeInfos.SHORT_TYPE_INFO.getTypeClass()) {
+      return (mapper, value) -> mapper.getNodeFactory().numberNode((short) value);
+    }
+    if (typeClass == TypeInfos.INT_TYPE_INFO.getTypeClass()) {
+      return (mapper, value) -> mapper.getNodeFactory().numberNode((int) value);
+    }
+    if (typeClass == TypeInfos.LONG_TYPE_INFO.getTypeClass()) {
+      return (mapper, value) -> mapper.getNodeFactory().numberNode((long) value);
+    }
+    if (typeClass == TypeInfos.BIG_INTEGER_TYPE_INFO.getTypeClass()) {
+      return (mapper, value) -> mapper.getNodeFactory().numberNode((BigInteger) value);
+    }
+    if (typeClass == TypeInfos.FLOAT_TYPE_INFO.getTypeClass()) {
+      return (mapper, value) -> mapper.getNodeFactory().numberNode((float) value);
+    }
+    if (typeClass == TypeInfos.DOUBLE_TYPE_INFO.getTypeClass()) {
+      return (mapper, value) -> mapper.getNodeFactory().numberNode((double) value);
+    }
+    if (typeClass == TypeInfos.BIG_DECIMAL_TYPE_INFO.getTypeClass()) {
+      return (mapper, value) -> mapper.getNodeFactory().numberNode(new BigDecimal(value.toString()));
+    }
+    if (typeClass == TypeInfos.STRING_TYPE_INFO.getTypeClass()) {
+      return createStringConverter();
+    }
+    if (typeClass == TypeInfos.LOCAL_DATE_TIME_TYPE_INFO.getTypeClass()) {
+      return createStringConverter();
+    }
+    if (typeClass == TypeInfos.LOCAL_DATE_TYPE_INFO.getTypeClass()) {
+      return createStringConverter();
+    }
+    if (typeClass == TypeInfos.LOCAL_TIME_TYPE_INFO.getTypeClass()) {
+      return createStringConverter();
+    }
+    if (typeClass == BasicArrayTypeInfo.BINARY_TYPE_INFO.getTypeClass()) {
+      return (mapper, value) -> mapper.getNodeFactory().binaryNode((byte[]) value);
+    }
+    return createStringConverter();
+  }
+
+  private JsonConverter createStringConverter() {
+    return (mapper, value) -> mapper.getNodeFactory().textNode(value.toString());
+  }
 
 }

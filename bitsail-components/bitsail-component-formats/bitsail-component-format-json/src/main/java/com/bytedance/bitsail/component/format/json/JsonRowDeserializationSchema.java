@@ -24,7 +24,6 @@ import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
-import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 import com.bytedance.bitsail.component.format.json.error.JsonFormatErrorCode;
@@ -66,7 +65,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class JsonDeserializationSchema implements DeserializationSchema<byte[], Row> {
+/**
+ * DeserializationSchema of Json bytes into BitSail Row.
+ */
+public class JsonRowDeserializationSchema implements DeserializationSchema<byte[], Row> {
+  private static final long serialVersionUID = 1L;
 
   private final BitSailConfiguration deserializationConfiguration;
 
@@ -83,13 +86,14 @@ public class JsonDeserializationSchema implements DeserializationSchema<byte[], 
   private final boolean isCaseInsensitive;
   private final boolean convertErrorColumnAsNull;
 
-  public JsonDeserializationSchema(BitSailConfiguration deserializationConfiguration,
-                                   RowTypeInfo rowTypeInfo) {
+  public JsonRowDeserializationSchema(BitSailConfiguration deserializationConfiguration,
+                                      TypeInfo<?>[] typeInfos,
+                                      String[] fieldNames) {
     this.isCaseInsensitive = deserializationConfiguration.get(JsonReaderOptions.CASE_INSENSITIVE);
     this.convertErrorColumnAsNull = deserializationConfiguration.get(JsonReaderOptions.CONVERT_ERROR_COLUMN_AS_NULL);
     this.deserializationConfiguration = deserializationConfiguration;
-    this.typeInfos = rowTypeInfo.getTypeInfos();
-    this.fieldNames = rowTypeInfo.getFieldNames();
+    this.typeInfos = typeInfos;
+    this.fieldNames = fieldNames;
     this.objectMapper = createObjectMapper(isCaseInsensitive);
     this.localDateTimeFormatter = DateTimeFormatter.ofPattern(
         deserializationConfiguration.get(CommonOptions.DateFormatOptions.DATE_TIME_PATTERN));
