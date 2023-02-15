@@ -24,8 +24,6 @@ import com.bytedance.bitsail.flink.core.typeinfo.MapColumnTypeInfo;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.typeutils.ListTypeInfo;
-import org.apache.flink.api.java.typeutils.MapTypeInfo;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 
 import java.util.List;
@@ -92,16 +90,16 @@ public class ColumnFlinkTypeInfoUtil {
   }
 
   private static TypeInfo<?> toTypeInfo(TypeInformation<?> typeInformation) {
-    if (typeInformation instanceof MapTypeInfo) {
-      MapTypeInfo<?, ?> mapTypeInfo = (MapTypeInfo<?, ?>) typeInformation;
+    if (typeInformation instanceof MapColumnTypeInfo) {
+      MapColumnTypeInfo<?, ?> mapTypeInfo = (MapColumnTypeInfo<?, ?>) typeInformation;
       TypeInformation<?> keyTypeInfo = mapTypeInfo.getKeyTypeInfo();
       TypeInformation<?> valueTypeInfo = mapTypeInfo.getValueTypeInfo();
       return new com.bytedance.bitsail.common.typeinfo.MapTypeInfo<>(toTypeInfo(keyTypeInfo),
           toTypeInfo(valueTypeInfo));
     }
 
-    if (typeInformation instanceof ListTypeInfo) {
-      ListTypeInfo<?> listTypeInfo = (ListTypeInfo<?>) typeInformation;
+    if (typeInformation instanceof ListColumnTypeInfo) {
+      ListColumnTypeInfo<?> listTypeInfo = (ListColumnTypeInfo<?>) typeInformation;
       return new com.bytedance.bitsail.common.typeinfo.ListTypeInfo<>(toTypeInfo(listTypeInfo.getElementTypeInfo()));
     }
 
