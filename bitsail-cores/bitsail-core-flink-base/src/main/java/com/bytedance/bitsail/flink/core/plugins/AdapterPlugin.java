@@ -138,8 +138,8 @@ public abstract class AdapterPlugin extends RichFlatMapFunction<Row, Row> implem
   }
 
   private RowTypeInfo getCustomTypeInfoFromFlink() {
-    TypeInfo<?>[] typeInfos = NativeFlinkTypeInfoUtil.toTypeInfos(flinkRowTypeInfo);
-    return ColumnFlinkTypeInfoUtil.getRowTypeInformation(typeInfos);
+    com.bytedance.bitsail.common.typeinfo.RowTypeInfo rowTypeInfo = NativeFlinkTypeInfoUtil.toRowTypeInfo(flinkRowTypeInfo);
+    return ColumnFlinkTypeInfoUtil.getRowTypeInformation(rowTypeInfo);
   }
 
   public abstract Row transform(Row outputRow, Row inputRow) throws BitSailException;

@@ -39,6 +39,7 @@ import com.bytedance.bitsail.core.flink.bridge.writer.delegate.DelegateFlinkComm
 import com.bytedance.bitsail.core.flink.bridge.writer.delegate.DelegateFlinkWriter;
 import com.bytedance.bitsail.flink.core.execution.FlinkExecutionEnviron;
 import com.bytedance.bitsail.flink.core.runtime.messenger.impl.FlinkAccumulatorStatisticsMessenger;
+import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 import com.bytedance.bitsail.flink.core.util.AccumulatorRestorer;
 import com.bytedance.bitsail.flink.core.writer.FlinkDataWriterDAGBuilder;
 
@@ -113,6 +114,7 @@ public class FlinkWriterBuilder<InputT, CommitT extends Serializable, WriterStat
         commonConfiguration,
         writerConfiguration,
         sink,
+        NativeFlinkTypeInfoUtil.toRowTypeInfo(source.getType()),
         isCheckpointingEnabled);
     flinkWriter.setMessenger(messenger);
     flinkWriter.setDirtyCollector(dirtyCollector);

@@ -53,13 +53,13 @@ public class ColumnFlinkTypeInfoUtil {
     return new RowTypeInfo(fieldTypes, fieldNames);
   }
 
-  public static RowTypeInfo getRowTypeInformation(TypeInfo<?>[] typeInfos) {
+  public static RowTypeInfo getRowTypeInformation(com.bytedance.bitsail.common.typeinfo.RowTypeInfo rowTypeInfo) {
 
-    TypeInformation<?>[] fieldTypes = new TypeInformation[typeInfos.length];
-    for (int index = 0; index < typeInfos.length; index++) {
-      fieldTypes[index] = toColumnFlinkTypeInformation(typeInfos[index]);
+    TypeInformation<?>[] fieldTypes = new TypeInformation[rowTypeInfo.getTypeInfos().length];
+    for (int index = 0; index < rowTypeInfo.getTypeInfos().length; index++) {
+      fieldTypes[index] = toColumnFlinkTypeInformation(rowTypeInfo.getTypeInfos()[index]);
     }
-    return new RowTypeInfo(fieldTypes);
+    return new RowTypeInfo(fieldTypes, rowTypeInfo.getFieldNames());
   }
 
   private static TypeInformation<?> toColumnFlinkTypeInformation(TypeInfo<?> typeInfo) {

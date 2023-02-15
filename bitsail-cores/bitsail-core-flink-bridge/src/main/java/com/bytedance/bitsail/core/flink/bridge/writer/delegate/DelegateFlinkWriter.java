@@ -101,6 +101,7 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
   public DelegateFlinkWriter(BitSailConfiguration commonConfiguration,
                              BitSailConfiguration writerConfiguration,
                              Sink<InputT, CommitT, WriterStateT> sink,
+                             RowTypeInfo upstreamRowTypeInfo,
                              boolean isCheckpointingEnabled) {
     super();
     this.isCheckpointingEnabled = isCheckpointingEnabled;
@@ -109,11 +110,15 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
     this.sink = sink;
 
     List<ColumnInfo> columnInfos = writerConfiguration.get(WriterOptions.BaseWriterOptions.COLUMNS);
-    rowTypeInfo = TypeInfoUtils
-        .getRowTypeInfo(sink.createTypeInfoConverter(), columnInfos);
+    if (CollectionUtils.isEmpty(columnInfos)) {
+      this.rowTypeInfo = upstreamRowTypeInfo;
+    } else {
+      this.rowTypeInfo = TypeInfoUtils
+          .getRowTypeInfo(sink.createTypeInfoConverter(), columnInfos);
+    }
 
     this.flinkRowConvertSerializer = new FlinkRowConvertSerializer(
-        rowTypeInfo,
+        this.rowTypeInfo,
         this.commonConfiguration);
   }
 

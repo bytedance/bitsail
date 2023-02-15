@@ -56,6 +56,9 @@ public class TypeInfoUtils {
   }
 
   public static RowTypeInfo getRowTypeInfo(TypeInfoConverter converter, List<ColumnInfo> columnInfos) {
+    if (Objects.isNull(columnInfos)) {
+      throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR, "The columns option should not be null.");
+    }
     String[] fieldNames = columnInfos
         .stream()
         .map(ColumnInfo::getName)

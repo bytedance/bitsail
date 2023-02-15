@@ -114,6 +114,6 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
 
   @Override
   public TypeInformation<T> getProducedType() {
-    return (TypeInformation<T>) NativeFlinkTypeInfoUtil.getRowTypeInformation(rowTypeInfo.getTypeInfos());
+    return (TypeInformation<T>) NativeFlinkTypeInfoUtil.getRowTypeInformation(rowTypeInfo);
   }
 }
