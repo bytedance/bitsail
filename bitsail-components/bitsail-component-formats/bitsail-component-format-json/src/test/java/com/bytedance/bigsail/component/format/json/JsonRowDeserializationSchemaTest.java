@@ -20,13 +20,13 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
-import com.bytedance.bitsail.component.format.json.JsonDeserializationSchema;
+import com.bytedance.bitsail.component.format.json.JsonRowDeserializationSchema;
 import com.bytedance.bitsail.component.format.json.option.JsonReaderOptions;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class JsonDeserializationSchemaTest {
+public class JsonRowDeserializationSchemaTest {
   @Test
   public void testConvertErrorColumnAsNull() {
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
@@ -34,7 +34,7 @@ public class JsonDeserializationSchemaTest {
     TypeInfo<?>[] typeInfos = {TypeInfos.INT_TYPE_INFO};
     String[] fieldNames = {"c1"};
     String json = "{\"c1\":\"aaa\"}";
-    JsonDeserializationSchema deserializationSchema = new JsonDeserializationSchema(jobConf, typeInfos, fieldNames);
+    JsonRowDeserializationSchema deserializationSchema = new JsonRowDeserializationSchema(jobConf, typeInfos, fieldNames);
     Row row = deserializationSchema.deserialize(json.getBytes());
     Assert.assertNull(row.getField(0));
   }
@@ -46,7 +46,7 @@ public class JsonDeserializationSchemaTest {
     TypeInfo<?>[] typeInfos = {TypeInfos.STRING_TYPE_INFO};
     String[] fieldNames = {"aB1"};
     String json = "{\"Ab1\":\"aaa\"}";
-    JsonDeserializationSchema deserializationSchema = new JsonDeserializationSchema(jobConf, typeInfos, fieldNames);
+    JsonRowDeserializationSchema deserializationSchema = new JsonRowDeserializationSchema(jobConf, typeInfos, fieldNames);
     Row row = deserializationSchema.deserialize(json.getBytes());
     Assert.assertEquals(row.getField(0), "aaa");
   }

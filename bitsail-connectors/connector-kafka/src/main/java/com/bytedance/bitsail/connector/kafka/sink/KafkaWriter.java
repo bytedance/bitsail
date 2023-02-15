@@ -23,11 +23,11 @@ import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.component.format.json.RowToJsonConverter;
 import com.bytedance.bitsail.connector.kafka.common.KafkaErrorCode;
 import com.bytedance.bitsail.connector.kafka.model.KafkaRecord;
 import com.bytedance.bitsail.connector.kafka.option.KafkaWriterOptions;
 
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.Callback;
@@ -63,7 +63,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
    */
   protected boolean logFailuresOnly;
   private final String kafkaTopic;
-  private final String kafkaServers;
+  private final String bootstrapServers;
 
   private final KafkaProducer kafkaProducer;
   /**
@@ -78,13 +78,19 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   //TODO: move fieldNames to writer context
   private final List<String> fieldNames;
 
+  private final String format;
+
+  private final RowToJsonConverter jsonConverter;
+
   public KafkaWriter(BitSailConfiguration commonConf, BitSailConfiguration writerConf, Context context) {
     this.context = context;
     List<ColumnInfo> columns = writerConf.getNecessaryOption(KafkaWriterOptions.COLUMNS, KafkaErrorCode.REQUIRED_VALUE);
     this.typeInfos = context.getTypeInfos();
     this.fieldNames = columns.stream().map(ColumnInfo::getName).collect(Collectors.toList());
-    this.kafkaServers = writerConf.getNecessaryOption(KafkaWriterOptions.KAFKA_SERVERS, KafkaErrorCode.REQUIRED_VALUE);
+    this.jsonConverter = new RowToJsonConverter(typeInfos, fieldNames.toArray(new String[0]));
+    this.bootstrapServers = writerConf.getNecessaryOption(KafkaWriterOptions.BOOTSTRAP_SERVERS, KafkaErrorCode.REQUIRED_VALUE);
     this.kafkaTopic = writerConf.getNecessaryOption(KafkaWriterOptions.TOPIC_NAME, KafkaErrorCode.REQUIRED_VALUE);
+    this.format = writerConf.getNecessaryOption(KafkaWriterOptions.CONTENT_TYPE, KafkaErrorCode.REQUIRED_VALUE);
 
     logFailuresOnly = writerConf.get(KafkaWriterOptions.LOG_FAILURES_ONLY);
 
@@ -98,7 +104,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
       partitionFieldsIndices = getPartitionFieldsIndices(fieldNames, partitionFieldsNames);
     }
 
-    this.kafkaProducer = new KafkaProducer(this.kafkaServers, this.kafkaTopic, optionalConfig);
+    this.kafkaProducer = new KafkaProducer(this.bootstrapServers, this.kafkaTopic, optionalConfig);
     if (logFailuresOnly) {
       callback = (metadata, e) -> {
         if (e != null) {
@@ -117,26 +123,28 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   @Override
   public void write(Row record) throws IOException {
     checkErroneous();
-    JSONObject jsonObject = new JSONObject();
-    String columnName;
-    Object columnValue;
-    for (int i = 0; i < record.getArity(); i++) {
-      columnName = fieldNames.get(i);
-      columnValue = record.getField(i);
-      jsonObject.put(columnName, columnValue);
-    }
-    // get partition id to insert if 'partitionFieldsIndices' is not empty
-    if (CollectionUtils.isNotEmpty(partitionFieldsIndices)) {
-      String[] partitionFieldsValues = new String[partitionFieldsIndices.size()];
-      for (int i = 0; i < partitionFieldsIndices.size(); i++) {
-        int partitionFieldIndex = partitionFieldsIndices.get(i);
-        partitionFieldsValues[i] = String.valueOf(record.getField(partitionFieldIndex));
-      }
-      int partitionId = choosePartitionIdByFields(partitionFieldsValues);
-      sendByPartitionId(jsonObject.toJSONString(), partitionId);
+    //TODO: refactor this as a format factory
+    if (format.equals("debezium")) {
+      writeDebezium(record);
     } else {
-      send(jsonObject.toJSONString());
+      String result = jsonConverter.convert(record).toString();
+      // get partition id to insert if 'partitionFieldsIndices' is not empty
+      if (CollectionUtils.isNotEmpty(partitionFieldsIndices)) {
+        String[] partitionFieldsValues = new String[partitionFieldsIndices.size()];
+        for (int i = 0; i < partitionFieldsIndices.size(); i++) {
+          int partitionFieldIndex = partitionFieldsIndices.get(i);
+          partitionFieldsValues[i] = String.valueOf(record.getField(partitionFieldIndex));
+        }
+        int partitionId = choosePartitionIdByFields(partitionFieldsValues);
+        sendByPartitionId(result, partitionId);
+      } else {
+        send(result);
+      }
     }
+  }
+
+  public void writeDebezium(Row record) {
+    // TODO: debezium specified row
   }
 
   @Override

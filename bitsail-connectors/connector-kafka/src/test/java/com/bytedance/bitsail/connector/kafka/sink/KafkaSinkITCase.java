@@ -61,7 +61,7 @@ public class KafkaSinkITCase {
   }
 
   protected void updateConfiguration(BitSailConfiguration jobConfiguration) {
-    jobConfiguration.set(KafkaWriterOptions.KAFKA_SERVERS, KafkaCluster.getBootstrapServer());
+    jobConfiguration.set(KafkaWriterOptions.BOOTSTRAP_SERVERS, KafkaCluster.getBootstrapServer());
     jobConfiguration.set(KafkaWriterOptions.TOPIC_NAME, topicName);
   }
 }

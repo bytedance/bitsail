@@ -21,7 +21,7 @@ import com.bytedance.bitsail.base.format.DeserializationSchema;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.component.format.csv.CsvDeserializationSchema;
-import com.bytedance.bitsail.component.format.json.JsonDeserializationSchema;
+import com.bytedance.bitsail.component.format.json.JsonRowDeserializationSchema;
 import com.bytedance.bitsail.connector.ftp.core.config.FtpConfig;
 import com.bytedance.bitsail.connector.ftp.error.FtpErrorCode;
 
@@ -33,7 +33,7 @@ public class DeserializationSchemaFactory {
           context.getTypeInfos(),
           context.getFieldNames());
     } else if (ftpConfig.getContentType() == FtpConfig.ContentType.JSON) {
-      return new JsonDeserializationSchema(
+      return new JsonRowDeserializationSchema(
           jobConf,
           context.getTypeInfos(),
           context.getFieldNames());

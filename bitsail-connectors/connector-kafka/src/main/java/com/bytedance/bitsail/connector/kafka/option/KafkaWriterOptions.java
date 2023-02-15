@@ -24,9 +24,10 @@ import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
 
 public interface KafkaWriterOptions extends WriterOptions.BaseWriterOptions {
-  ConfigOption<String> KAFKA_SERVERS =
-      key(WRITER_PREFIX + "kafka_servers")
-          .noDefaultValue(String.class);
+  ConfigOption<String> BOOTSTRAP_SERVERS =
+      key(WRITER_PREFIX + "bootstrap_servers")
+          .noDefaultValue(String.class)
+          .withAlias(WRITER_PREFIX + "kafka_servers");
 
   @Essential
   ConfigOption<String> TOPIC_NAME =
@@ -58,4 +59,8 @@ public interface KafkaWriterOptions extends WriterOptions.BaseWriterOptions {
   ConfigOption<Long> LINGER_MS =
       key(WRITER_PREFIX + "linger_ms")
           .defaultValue(5000L);
+
+  ConfigOption<String> CONTENT_TYPE =
+      key(WRITER_PREFIX + "content_type")
+          .defaultValue("json");
 }
