@@ -88,6 +88,10 @@ public interface ReaderOptions {
         key(READER_PREFIX + "db_name")
             .noDefaultValue(String.class);
 
+    ConfigOption<String> CONNECTION_TIMEZONE =
+            key(READER_PREFIX + "connection_timezone")
+                    .defaultValue("UTC");
+
     ConfigOption<String> TABLE_NAME =
         key(READER_PREFIX + "table_name")
             .noDefaultValue(String.class);

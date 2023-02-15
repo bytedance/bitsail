@@ -13,25 +13,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package com.bytedance.bitsail.connector.cdc.jdbc.source.constant;
 
-package com.bytedance.bitsail.connector.cdc.source.reader;
-
-import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Map;
-
-public interface BinlogSplitReader<T> extends Serializable {
-  void readSplit(BinlogSplit split) throws IOException, InterruptedException;
-
-  Map<String, String> getOffset();
-
-  void close();
-
-  T poll();
-
-  boolean hasNext();
-
-  boolean isCompleted();
+public class DebeziumConstant {
+  public static final String DATABASE_HOSTNAME = "database.hostname";
+  public static final String DATABASE_PORT = "database.port";
+  public static final String DATABASE_USER = "database.user";
+  public static final String DATABASE_PASSWORD = "database.password";
+  public static final String DATABASE_NAME = "database.dbname";
+  public static final String DATABASE_TIMEZONE = "database.serverTimezone";
 }

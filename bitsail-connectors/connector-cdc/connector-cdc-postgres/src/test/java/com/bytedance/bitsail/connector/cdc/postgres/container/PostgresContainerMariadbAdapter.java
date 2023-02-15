@@ -13,25 +13,24 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package com.bytedance.bitsail.connector.cdc.postgres.container;
 
-package com.bytedance.bitsail.connector.cdc.source.reader;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.utility.DockerImageName;
 
-import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
+public class PostgresContainerMariadbAdapter<SELF extends PostgresContainerMariadbAdapter<SELF>> extends PostgreSQLContainer<SELF> {
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Map;
+  public PostgresContainerMariadbAdapter(DockerImageName dockerImageName) {
+    super(String.valueOf(dockerImageName));
+  }
 
-public interface BinlogSplitReader<T> extends Serializable {
-  void readSplit(BinlogSplit split) throws IOException, InterruptedException;
+  @Override
+  public String getDriverClassName() {
+    return "org.mariadb.jdbc.Driver";
+  }
 
-  Map<String, String> getOffset();
-
-  void close();
-
-  T poll();
-
-  boolean hasNext();
-
-  boolean isCompleted();
+  @Override
+  public String getJdbcUrl() {
+    return super.getJdbcUrl();
+  }
 }

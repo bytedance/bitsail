@@ -13,25 +13,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package com.bytedance.bitsail.connector.cdc.postgres.source.constant;
 
-package com.bytedance.bitsail.connector.cdc.source.reader;
-
-import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Map;
-
-public interface BinlogSplitReader<T> extends Serializable {
-  void readSplit(BinlogSplit split) throws IOException, InterruptedException;
-
-  Map<String, String> getOffset();
-
-  void close();
-
-  T poll();
-
-  boolean hasNext();
-
-  boolean isCompleted();
+public class PostgresConstant {
+  public static final String LSN = "lsn";
+  public static final String TS_USEC = "ts_usec";
 }

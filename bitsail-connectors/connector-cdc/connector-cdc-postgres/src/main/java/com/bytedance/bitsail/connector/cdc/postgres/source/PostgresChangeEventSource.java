@@ -13,25 +13,22 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package com.bytedance.bitsail.connector.cdc.postgres.source;
 
-package com.bytedance.bitsail.connector.cdc.source.reader;
-
+import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
+import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.connector.cdc.postgres.source.reader.PostgresChangeEventReader;
+import com.bytedance.bitsail.connector.cdc.source.BinlogSource;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Map;
+public class PostgresChangeEventSource extends BinlogSource {
+  @Override
+  public String getReaderName() {
+    return "postgres-cdc";
+  }
 
-public interface BinlogSplitReader<T> extends Serializable {
-  void readSplit(BinlogSplit split) throws IOException, InterruptedException;
-
-  Map<String, String> getOffset();
-
-  void close();
-
-  T poll();
-
-  boolean hasNext();
-
-  boolean isCompleted();
+  @Override
+  public SourceReader<Row, BinlogSplit> createReader(SourceReader.Context readerContext) {
+    return new PostgresChangeEventReader(jobConf, readerContext);
+  }
 }

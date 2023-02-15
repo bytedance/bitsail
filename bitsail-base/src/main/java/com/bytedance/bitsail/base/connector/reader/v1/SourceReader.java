@@ -23,7 +23,7 @@ import java.util.List;
 
 public interface SourceReader<T, SplitT extends SourceSplit> extends Serializable, AutoCloseable {
 
-  void start();
+  void start() throws Exception;
 
   void pollNext(SourcePipeline<T> pipeline) throws Exception;
 

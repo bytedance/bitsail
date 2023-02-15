@@ -14,18 +14,17 @@
   ~  See the License for the specific language governing permissions and
   ~  limitations under the License.
   -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <groupId>com.bytedance.bitsail</groupId>
         <artifactId>connector-cdc</artifactId>
+        <groupId>com.bytedance.bitsail</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>connector-cdc-mysql</artifactId>
+    <artifactId>connector-cdc-postgres</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -34,37 +33,27 @@
         <debezium.version>1.6.4.Final</debezium.version>
         <maridb.version>3.0.8</maridb.version>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>connector-cdc-base</artifactId>
             <version>${revision}</version>
         </dependency>
-
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>connector-cdc-jdbc-base</artifactId>
             <version>${revision}</version>
         </dependency>
-
         <dependency>
             <groupId>io.debezium</groupId>
-            <artifactId>debezium-connector-mysql</artifactId>
+            <artifactId>debezium-connector-postgres</artifactId>
             <version>${debezium.version}</version>
         </dependency>
-
         <!-- resolve debezium conflict -->
         <dependency>
             <groupId>jakarta.activation</groupId>
             <artifactId>jakarta.activation-api</artifactId>
             <version>1.2.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>${maridb.version}</version>
         </dependency>
 
         <!-- dependencies for test -->
@@ -79,6 +68,13 @@
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-connector-print</artifactId>
             <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>1.12.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

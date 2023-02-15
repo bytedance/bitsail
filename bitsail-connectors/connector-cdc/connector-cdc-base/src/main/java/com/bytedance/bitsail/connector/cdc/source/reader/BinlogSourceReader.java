@@ -27,6 +27,7 @@ import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
@@ -56,7 +57,7 @@ public abstract class BinlogSourceReader implements SourceReader<Row, BinlogSpli
   public abstract BinlogSplitReader<Row> getReader();
 
   @Override
-  public void start() {
+  public void start() throws Exception{
     //start debezium streaming reader and send data to queue
   }
 
@@ -115,7 +116,7 @@ public abstract class BinlogSourceReader implements SourceReader<Row, BinlogSpli
     }
   }
 
-  private void submitSplit() {
+  private void submitSplit() throws IOException, InterruptedException {
     if (!remainSplits.isEmpty()) {
       BinlogSplit curSplit = remainSplits.poll();
       LOG.info("submit split to binlog reader: {}, size of the remaining splits: {}", curSplit.toString(), remainSplits.size());
