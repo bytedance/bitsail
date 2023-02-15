@@ -63,7 +63,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
    */
   protected boolean logFailuresOnly;
   private final String kafkaTopic;
-  private final String kafkaServers;
+  private final String bootstrapServers;
 
   private final KafkaProducer kafkaProducer;
   /**
@@ -88,7 +88,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     this.typeInfos = context.getTypeInfos();
     this.fieldNames = columns.stream().map(ColumnInfo::getName).collect(Collectors.toList());
     this.jsonConverter = new RowToJsonConverter(typeInfos, fieldNames.toArray(new String[0]));
-    this.kafkaServers = writerConf.getNecessaryOption(KafkaWriterOptions.KAFKA_SERVERS, KafkaErrorCode.REQUIRED_VALUE);
+    this.bootstrapServers = writerConf.getNecessaryOption(KafkaWriterOptions.BOOTSTRAP_SERVERS, KafkaErrorCode.REQUIRED_VALUE);
     this.kafkaTopic = writerConf.getNecessaryOption(KafkaWriterOptions.TOPIC_NAME, KafkaErrorCode.REQUIRED_VALUE);
     this.format = writerConf.getNecessaryOption(KafkaWriterOptions.CONTENT_TYPE, KafkaErrorCode.REQUIRED_VALUE);
 
@@ -104,7 +104,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
       partitionFieldsIndices = getPartitionFieldsIndices(fieldNames, partitionFieldsNames);
     }
 
-    this.kafkaProducer = new KafkaProducer(this.kafkaServers, this.kafkaTopic, optionalConfig);
+    this.kafkaProducer = new KafkaProducer(this.bootstrapServers, this.kafkaTopic, optionalConfig);
     if (logFailuresOnly) {
       callback = (metadata, e) -> {
         if (e != null) {
