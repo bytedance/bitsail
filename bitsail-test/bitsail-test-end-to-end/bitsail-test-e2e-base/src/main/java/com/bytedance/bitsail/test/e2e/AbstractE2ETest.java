@@ -26,6 +26,7 @@ import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 
 import lombok.ToString;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.junit.AfterClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +36,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @ToString
+@ExecutorPatterns(exclude = {"example-*"})
 public abstract class AbstractE2ETest {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractE2ETest.class);
 
@@ -90,13 +91,23 @@ public abstract class AbstractE2ETest {
       }
     }
 
-    ExecutorPatterns executorPatterns = getClass().getAnnotation(ExecutorPatterns.class);
+    ExecutorPatterns executorPatterns;
+    includedExecutorPattern = Lists.newArrayList();
+    excludedExecutorPattern = Lists.newArrayList();
+
+    executorPatterns = getClass().getAnnotation(ExecutorPatterns.class);
     if (executorPatterns != null) {
-      includedExecutorPattern = Arrays.stream(executorPatterns.include()).collect(Collectors.toList());
-      excludedExecutorPattern = Arrays.stream(executorPatterns.exclude()).collect(Collectors.toList());
+      includedExecutorPattern.addAll(Arrays.asList(executorPatterns.include()));
+      excludedExecutorPattern.addAll(Arrays.asList(executorPatterns.exclude()));
     }
 
-    LOG.info("AbstractE2ETest setting: {}", this.toString());
+    executorPatterns = AbstractE2ETest.class.getAnnotation(ExecutorPatterns.class);
+    if (executorPatterns != null) {
+      includedExecutorPattern.addAll(Arrays.asList(executorPatterns.include()));
+      excludedExecutorPattern.addAll(Arrays.asList(executorPatterns.exclude()));
+    }
+
+    LOG.info("AbstractE2ETest setting: {}", this);
   }
 
   protected TestJob createJob(BitSailConfiguration jobConf) {
