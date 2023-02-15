@@ -19,7 +19,6 @@ package com.bytedance.bitsail.connector.kafka.sink;
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
@@ -28,6 +27,7 @@ import com.bytedance.bitsail.connector.kafka.model.KafkaRecord;
 import com.bytedance.bitsail.connector.kafka.option.KafkaWriterOptions;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.Callback;
@@ -78,11 +78,10 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   //TODO: move fieldNames to writer context
   private final List<String> fieldNames;
 
-  public KafkaWriter(BitSailConfiguration commonConf, BitSailConfiguration writerConf, Context context) {
+  public KafkaWriter(BitSailConfiguration commonConf, BitSailConfiguration writerConf, Context<EmptyState> context) {
     this.context = context;
-    List<ColumnInfo> columns = writerConf.getNecessaryOption(KafkaWriterOptions.COLUMNS, KafkaErrorCode.REQUIRED_VALUE);
-    this.typeInfos = context.getTypeInfos();
-    this.fieldNames = columns.stream().map(ColumnInfo::getName).collect(Collectors.toList());
+    this.typeInfos = context.getRowTypeInfo().getTypeInfos();
+    this.fieldNames = Lists.newArrayList(context.getRowTypeInfo().getFieldNames());
     this.kafkaServers = writerConf.getNecessaryOption(KafkaWriterOptions.KAFKA_SERVERS, KafkaErrorCode.REQUIRED_VALUE);
     this.kafkaTopic = writerConf.getNecessaryOption(KafkaWriterOptions.TOPIC_NAME, KafkaErrorCode.REQUIRED_VALUE);
 
