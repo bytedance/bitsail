@@ -18,6 +18,7 @@ package com.bytedance.bitsail.component.format.json;
 
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 
@@ -42,11 +43,11 @@ public class RowToJsonConverter implements Serializable {
   private final String[] fieldNames;
   private final JsonConverter[] fieldConverters;
 
-  public RowToJsonConverter(TypeInfo<?>[] typeInfos, String[] fieldNames) {
-    assert typeInfos.length == fieldNames.length;
-    this.arity = typeInfos.length;
-    this.fieldNames = fieldNames;
-    this.fieldConverters = Arrays.stream(typeInfos)
+  public RowToJsonConverter(RowTypeInfo rowTypeInfo) {
+    assert rowTypeInfo.getTypeInfos().length == rowTypeInfo.getFieldNames().length;
+    this.arity = rowTypeInfo.getTypeInfos().length;
+    this.fieldNames = rowTypeInfo.getFieldNames();
+    this.fieldConverters = Arrays.stream(rowTypeInfo.getTypeInfos())
         .map(this::createConverter).toArray(JsonConverter[]::new);
   }
 

@@ -20,7 +20,7 @@ import com.bytedance.bitsail.base.format.SerializationSchema;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.component.format.json.error.JsonFormatErrorCode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,9 +36,8 @@ public class JsonRowSerializationSchema implements SerializationSchema<Row> {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   public JsonRowSerializationSchema(BitSailConfiguration deserializationConfiguration,
-                                    TypeInfo<?>[] typeInfos,
-                                    String[] fieldNames) {
-    this.converter = new RowToJsonConverter(typeInfos, fieldNames);
+                                    RowTypeInfo rowTypeInfo) {
+    this.converter = new RowToJsonConverter(rowTypeInfo);
   }
 
   @Override
