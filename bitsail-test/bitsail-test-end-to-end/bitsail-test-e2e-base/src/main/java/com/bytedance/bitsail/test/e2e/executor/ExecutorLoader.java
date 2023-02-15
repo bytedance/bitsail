@@ -59,22 +59,17 @@ public class ExecutorLoader {
     }
 
     // create GenericExecutors
-    File parentModule = Paths.get(AbstractExecutor.getLocalRootDir(),
+    File module = Paths.get(AbstractExecutor.getLocalRootDir(),
         "bitsail-test",
         "bitsail-test-end-to-end",
-        "bitsail-test-e2e-generic-executors").toFile();
-    File[] subModules = parentModule.listFiles();
-    if (subModules != null) {
-      Arrays.stream(subModules).filter(File::isDirectory).forEach(module -> {
-        File settingFolder = Paths.get(module.getAbsolutePath(),
-              "src", "main", "settings").toFile();
-        List<GenericExecutorSetting> settings = loadSettings(settingFolder);
-        settings.forEach(setting -> {
-          loadedExecutors.add(new GenericExecutor(setting));
-          LOG.info("Load generic executor: {}", setting.getExecutorName());
-        });
-      });
-    }
+        "bitsail-test-e2e-generic-executor-templates").toFile();
+    File settingFolder = Paths.get(module.getAbsolutePath(),
+        "src", "main", "settings").toFile();
+    List<GenericExecutorSetting> settings = loadSettings(settingFolder);
+    settings.forEach(setting -> {
+      loadedExecutors.add(new GenericExecutor(setting));
+      LOG.info("Load generic executor: {}", setting.getExecutorName());
+    });
 
     return loadedExecutors;
   }

@@ -29,7 +29,7 @@
     <modules>
         <module>bitsail-test-e2e-base</module>
         <module>bitsail-test-e2e-connector-v1</module>
-        <module>bitsail-test-e2e-generic-executors</module>
+        <module>bitsail-test-e2e-generic-executor-templates</module>
     </modules>
 
     <properties>
