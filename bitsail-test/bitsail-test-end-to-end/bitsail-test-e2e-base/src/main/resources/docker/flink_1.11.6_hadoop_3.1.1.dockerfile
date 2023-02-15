@@ -14,13 +14,15 @@
 # limitations under the License.
 #
 
-# Flink 1.11.6 image with hadoop 2.7.5 dependencies.
-# Online image: blockliu/flink-1.11.6-hadoop-2.7.5
+# Flink 1.11.6 image with hadoop 3.1.1 dependencies.
+# Online image: blockliu/flink-1.11.6-hadoop-3.1.1
 
 FROM flink:1.11.6
 
 LABEL maintainer="96pengpeng@gmail.com"
 
-ENV HADOOP_UBER_URL=https://repo.maven.apache.org/maven2/org/apache/flink/flink-shaded-hadoop-2-uber/2.7.5-10.0/flink-shaded-hadoop-2-uber-2.7.5-10.0.jar
+ENV HADOOP_UBER_URL=https://repository.cloudera.com/artifactory/cloudera-repos/org/apache/flink/flink-shaded-hadoop-3/3.1.1.7.2.8.0-224-9.0/flink-shaded-hadoop-3-3.1.1.7.2.8.0-224-9.0.jar
+ENV COMMONS_CLI_URL=https://repo1.maven.org/maven2/commons-cli/commons-cli/1.5.0/commons-cli-1.5.0.jar
 
-RUN wget -nv -O /opt/flink/lib/flink-shaded-hadoop-2-uber.jar "${HADOOP_UBER_URL}";
+RUN wget -nv -O /opt/flink/lib/flink-shaded-hadoop-3-uber.jar "${HADOOP_UBER_URL}";
+RUN wget -nv -O /opt/flink/lib/commons-cli.jar "${COMMONS_CLI_URL}";
