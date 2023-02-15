@@ -64,7 +64,7 @@ jobs:
       - name: Setting Maven Repository
         uses: s4u/maven-settings-action@v2.8.0
         with:
-          mirrors: '[{"id": "oss", "name": "oss", "mirrorOf": "*", "url": "https://oss.sonatype.org/content/repositories/public/"}]'
+          mirrors: '[{"id": "apache", "name": "apache", "mirrorOf": "*", "url": "https://repository.apache.org/content/repositories/"},{"id": "third-part", "name": "third-part", "mirrorOf": "*", "url": "https://repository.jboss.org/nexus/content/repositories/thirdparty-uploads/"}]'
 
       - name: Compile
         run:
@@ -91,7 +91,7 @@ jobs:
       - name: Setting Maven Repository
         uses: s4u/maven-settings-action@v2.8.0
         with:
-          mirrors: '[{"id": "oss", "name": "oss", "mirrorOf": "*", "url": "https://oss.sonatype.org/content/repositories/public/"}]'
+          mirrors: '[{"id": "apache", "name": "apache", "mirrorOf": "*", "url": "https://repository.apache.org/content/repositories/"},{"id": "third-part", "name": "third-part", "mirrorOf": "*", "url": "https://repository.jboss.org/nexus/content/repositories/thirdparty-uploads/"}]'
 
       - name: Maven Verify Unit Test
         run:
@@ -118,7 +118,7 @@ jobs:
       - name: Setting Maven Repository
         uses: s4u/maven-settings-action@v2.8.0
         with:
-          mirrors: '[{"id": "oss", "name": "oss", "mirrorOf": "*", "url": "https://oss.sonatype.org/content/repositories/public/"}]'
+          mirrors: '[{"id": "apache", "name": "apache", "mirrorOf": "*", "url": "https://repository.apache.org/content/repositories/"},{"id": "third-part", "name": "third-part", "mirrorOf": "*", "url": "https://repository.jboss.org/nexus/content/repositories/thirdparty-uploads/"}]'
 
       - name: Maven Verify Integration Test
         run:
