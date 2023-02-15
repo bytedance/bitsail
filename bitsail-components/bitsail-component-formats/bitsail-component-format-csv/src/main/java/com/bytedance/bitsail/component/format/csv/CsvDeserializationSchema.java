@@ -22,6 +22,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 import com.bytedance.bitsail.component.format.csv.error.CsvFormatErrorCode;
@@ -64,8 +65,7 @@ public class CsvDeserializationSchema implements DeserializationSchema<byte[], R
   private final transient DeserializationConverter<CSVRecord, Row> typeInfoConverter;
 
   public CsvDeserializationSchema(BitSailConfiguration deserializationConfiguration,
-                                  TypeInfo<?>[] typeInfos,
-                                  String[] fieldNames) {
+                                  RowTypeInfo rowTypeInfo) {
     this.deserializationConfiguration = deserializationConfiguration;
     this.csvDelimiter = deserializationConfiguration.get(CsvReaderOptions.CSV_DELIMITER);
     this.csvMultiDelimiterReplaceChar = deserializationConfiguration.get(CsvReaderOptions.CSV_MULTI_DELIMITER_REPLACER);
@@ -87,7 +87,7 @@ public class CsvDeserializationSchema implements DeserializationSchema<byte[], R
     this.localTimeFormatter = DateTimeFormatter
         .ofPattern(deserializationConfiguration.get(CommonOptions.DateFormatOptions.TIME_PATTERN));
 
-    this.typeInfoConverter = createConverters(typeInfos, fieldNames);
+    this.typeInfoConverter = createConverters(rowTypeInfo.getTypeInfos(), rowTypeInfo.getFieldNames());
     this.convertErrorColumnAsNull = deserializationConfiguration.get(CsvReaderOptions.CONVERT_ERROR_COLUMN_AS_NULL);
 
   }
@@ -106,7 +106,7 @@ public class CsvDeserializationSchema implements DeserializationSchema<byte[], R
         inputStr = inputStr.replace(csvDelimiter, csvMultiDelimiterReplaceString);
       }
       CSVParser parser = CSVParser.parse(inputStr, csvFormat);
-      csvRecord =  parser.getRecords().get(0);
+      csvRecord = parser.getRecords().get(0);
     } catch (Exception e) {
       throw BitSailException.asBitSailException(CsvFormatErrorCode.CSV_FORMAT_SCHEMA_PARSE_FAILED, e);
     }
@@ -156,8 +156,8 @@ public class CsvDeserializationSchema implements DeserializationSchema<byte[], R
     return wrapperCreateConverter(typeInfo);
   }
 
-  private DeserializationConverter<String, Object>  wrapperCreateConverter(TypeInfo<?> typeInfo) {
-    DeserializationConverter<String, Object>  typeInfoConverter =
+  private DeserializationConverter<String, Object> wrapperCreateConverter(TypeInfo<?> typeInfo) {
+    DeserializationConverter<String, Object> typeInfoConverter =
         createTypeInfoConverter(typeInfo);
     return (field) -> {
       if (field == null) {
@@ -176,7 +176,7 @@ public class CsvDeserializationSchema implements DeserializationSchema<byte[], R
     };
   }
 
-  private DeserializationConverter<String, Object>  createTypeInfoConverter(TypeInfo<?> typeInfo) {
+  private DeserializationConverter<String, Object> createTypeInfoConverter(TypeInfo<?> typeInfo) {
     Class<?> typeClass = typeInfo.getTypeClass();
 
     if (typeClass == TypeInfos.VOID_TYPE_INFO.getTypeClass()) {

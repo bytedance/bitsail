@@ -40,7 +40,7 @@ public class LocalFileSystemSourceReaderTest {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath(jobConfPath);
     SourceReader.Context context = new SourceReader.Context() {
       @Override
-      public TypeInfo<?>[] getTypeInfos() {
+      public TypeInfo<?>[] getRowTypeInfo() {
         return new TypeInfo[]{
             TypeInfos.LONG_TYPE_INFO,
             TypeInfos.LOCAL_DATE_TYPE_INFO,

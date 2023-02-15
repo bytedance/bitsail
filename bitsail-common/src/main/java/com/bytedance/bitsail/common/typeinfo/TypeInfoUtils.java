@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class TypeInfoUtils {
 
@@ -52,5 +53,14 @@ public class TypeInfoUtils {
       fieldTypes[index] = typeInfo;
     }
     return fieldTypes;
+  }
+
+  public static RowTypeInfo getRowTypeInfo(TypeInfoConverter converter, List<ColumnInfo> columnInfos) {
+    String[] fieldNames = columnInfos
+        .stream()
+        .map(ColumnInfo::getName)
+        .collect(Collectors.toList()).toArray(new String[] {});
+
+    return new RowTypeInfo(fieldNames, getTypeInfos(converter, columnInfos));
   }
 }

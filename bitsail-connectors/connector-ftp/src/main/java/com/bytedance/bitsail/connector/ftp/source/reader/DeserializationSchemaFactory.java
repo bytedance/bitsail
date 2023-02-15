@@ -30,13 +30,11 @@ public class DeserializationSchemaFactory {
     if (ftpConfig.getContentType() == FtpConfig.ContentType.CSV) {
       return new CsvDeserializationSchema(
           jobConf,
-          context.getTypeInfos(),
-          context.getFieldNames());
+          context.getRowTypeInfo());
     } else if (ftpConfig.getContentType() == FtpConfig.ContentType.JSON) {
       return new JsonDeserializationSchema(
           jobConf,
-          context.getTypeInfos(),
-          context.getFieldNames());
+          context.getRowTypeInfo());
     } else {
       throw BitSailException.asBitSailException(FtpErrorCode.CONTENT_TYPE_NOT_SUPPORTED,
           "Content type only supports JSON and CSV");

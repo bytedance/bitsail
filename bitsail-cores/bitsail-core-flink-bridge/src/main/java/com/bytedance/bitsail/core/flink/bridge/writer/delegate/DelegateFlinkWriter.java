@@ -32,7 +32,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfoUtils;
 import com.bytedance.bitsail.common.util.Pair;
 import com.bytedance.bitsail.core.flink.bridge.serializer.DelegateSimpleVersionedSerializer;
@@ -82,7 +82,7 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
   private final BitSailConfiguration writerConfiguration;
   private final BitSailConfiguration commonConfiguration;
   private final FlinkRowConvertSerializer flinkRowConvertSerializer;
-  private final TypeInfo<?>[] typeInfos;
+  private final RowTypeInfo rowTypeInfo;
   private transient Writer<InputT, CommitT, WriterStateT> writer;
   private transient ListState<WriterStateT> writeState;
   private boolean endOfInput = false;
@@ -109,13 +109,11 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
     this.sink = sink;
 
     List<ColumnInfo> columnInfos = writerConfiguration.get(WriterOptions.BaseWriterOptions.COLUMNS);
-    this.typeInfos = TypeInfoUtils
-        .getTypeInfos(sink.createTypeInfoConverter(),
-            columnInfos);
+    rowTypeInfo = TypeInfoUtils
+        .getRowTypeInfo(sink.createTypeInfoConverter(), columnInfos);
 
     this.flinkRowConvertSerializer = new FlinkRowConvertSerializer(
-        typeInfos,
-        columnInfos,
+        rowTypeInfo,
         this.commonConfiguration);
   }
 
@@ -156,8 +154,8 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
     Writer.Context<WriterStateT> writeSinkContext = new Writer.Context<WriterStateT>() {
 
       @Override
-      public TypeInfo<?>[] getTypeInfos() {
-        return typeInfos;
+      public RowTypeInfo getRowTypeInfo() {
+        return rowTypeInfo;
       }
 
       @Override
