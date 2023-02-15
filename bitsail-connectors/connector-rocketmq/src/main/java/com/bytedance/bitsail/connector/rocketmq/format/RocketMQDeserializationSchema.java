@@ -20,7 +20,7 @@ import com.bytedance.bitsail.base.format.DeserializationSchema;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
-import com.bytedance.bitsail.component.format.json.JsonDeserializationSchema;
+import com.bytedance.bitsail.component.format.json.JsonRowDeserializationSchema;
 
 public class RocketMQDeserializationSchema implements DeserializationSchema<byte[], Row> {
 
@@ -30,7 +30,7 @@ public class RocketMQDeserializationSchema implements DeserializationSchema<byte
 
   private String[] fieldNames;
 
-  private transient JsonDeserializationSchema deserializationSchema;
+  private transient JsonRowDeserializationSchema deserializationSchema;
 
   public RocketMQDeserializationSchema(BitSailConfiguration deserializationConfiguration,
                                        TypeInfo<?>[] typeInfos,
@@ -39,7 +39,7 @@ public class RocketMQDeserializationSchema implements DeserializationSchema<byte
     this.typeInfos = typeInfos;
     this.fieldNames = fieldNames;
     //todo spi.
-    this.deserializationSchema = new JsonDeserializationSchema(deserializationConfiguration,
+    this.deserializationSchema = new JsonRowDeserializationSchema(deserializationConfiguration,
         typeInfos,
         fieldNames);
   }
