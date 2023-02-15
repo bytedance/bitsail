@@ -64,9 +64,7 @@ jobs:
       - name: Setting Maven Repository
         uses: s4u/maven-settings-action@v2.8.0
         with:
-          apacheSnapshots: true
           sonatypeSnapshots: true
-          oracleRepo: true
 
       - name: Compile
         run:
@@ -93,9 +91,7 @@ jobs:
       - name: Setting Maven Repository
         uses: s4u/maven-settings-action@v2.8.0
         with:
-          apacheSnapshots: true
           sonatypeSnapshots: true
-          oracleRepo: true
 
       - name: Maven Verify Unit Test
         run:
@@ -122,9 +118,7 @@ jobs:
       - name: Setting Maven Repository
         uses: s4u/maven-settings-action@v2.8.0
         with:
-          apacheSnapshots: true
           sonatypeSnapshots: true
-          oracleRepo: true
 
       - name: Maven Verify Integration Test
         run:
