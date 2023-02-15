@@ -42,6 +42,13 @@
             <version>${kafka.clients.version}</version>
         </dependency>
 
+        <!-- Format -->
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-component-format-json</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
         <!--   test     -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>

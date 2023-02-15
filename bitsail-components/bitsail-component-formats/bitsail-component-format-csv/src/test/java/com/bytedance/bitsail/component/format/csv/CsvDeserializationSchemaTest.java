@@ -18,6 +18,7 @@ package com.bytedance.bitsail.component.format.csv;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 import com.bytedance.bitsail.component.format.csv.option.CsvReaderOptions;
@@ -34,7 +35,8 @@ public class CsvDeserializationSchemaTest {
     TypeInfo<?>[] typeInfos = {TypeInfos.INT_TYPE_INFO};
     String[] fieldNames = {"c1"};
     String csv = "aaa";
-    CsvDeserializationSchema deserializationSchema = new CsvDeserializationSchema(jobConf, typeInfos, fieldNames);
+    RowTypeInfo rowTypeInfo = new RowTypeInfo(fieldNames, typeInfos);
+    CsvDeserializationSchema deserializationSchema = new CsvDeserializationSchema(jobConf, rowTypeInfo);
     Row row = deserializationSchema.deserialize(csv.getBytes());
     Assert.assertNull(row.getField(0));
   }
@@ -46,7 +48,8 @@ public class CsvDeserializationSchemaTest {
     TypeInfo<?>[] typeInfos = {TypeInfos.STRING_TYPE_INFO, TypeInfos.INT_TYPE_INFO};
     String[] fieldNames = {"c1", "c2"};
     String csv = "aaa#111";
-    CsvDeserializationSchema deserializationSchema = new CsvDeserializationSchema(jobConf, typeInfos, fieldNames);
+    RowTypeInfo rowTypeInfo = new RowTypeInfo(fieldNames, typeInfos);
+    CsvDeserializationSchema deserializationSchema = new CsvDeserializationSchema(jobConf, rowTypeInfo);
     Row row = deserializationSchema.deserialize(csv.getBytes());
     Assert.assertEquals(row.getField(0).toString(), "aaa");
     Assert.assertEquals((int) row.getField(1), 111);
@@ -61,7 +64,8 @@ public class CsvDeserializationSchemaTest {
     TypeInfo<?>[] typeInfos = {TypeInfos.STRING_TYPE_INFO, TypeInfos.INT_TYPE_INFO};
     String[] fieldNames = {"c1", "c2"};
     String csv = "\"star\"#2222";
-    CsvDeserializationSchema deserializationSchema = new CsvDeserializationSchema(jobConf, typeInfos, fieldNames);
+    RowTypeInfo rowTypeInfo = new RowTypeInfo(fieldNames, typeInfos);
+    CsvDeserializationSchema deserializationSchema = new CsvDeserializationSchema(jobConf, rowTypeInfo);
     Row row = deserializationSchema.deserialize(csv.getBytes());
     Assert.assertEquals(row.getField(0).toString(), "star");
     Assert.assertEquals((int) row.getField(1), 2222);
@@ -74,7 +78,8 @@ public class CsvDeserializationSchemaTest {
     TypeInfo<?>[] typeInfos = {TypeInfos.STRING_TYPE_INFO, TypeInfos.INT_TYPE_INFO};
     String[] fieldNames = {"c1", "c2"};
     String csv = "star##2222";
-    CsvDeserializationSchema deserializationSchema = new CsvDeserializationSchema(jobConf, typeInfos, fieldNames);
+    RowTypeInfo rowTypeInfo = new RowTypeInfo(fieldNames, typeInfos);
+    CsvDeserializationSchema deserializationSchema = new CsvDeserializationSchema(jobConf, rowTypeInfo);
     Row row = deserializationSchema.deserialize(csv.getBytes());
     Assert.assertEquals(row.getField(0).toString(), "star");
     Assert.assertEquals((int) row.getField(1), 2222);
