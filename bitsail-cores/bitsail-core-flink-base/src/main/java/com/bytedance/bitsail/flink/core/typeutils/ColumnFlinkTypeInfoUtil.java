@@ -24,6 +24,8 @@ import com.bytedance.bitsail.flink.core.typeinfo.MapColumnTypeInfo;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.typeutils.ListTypeInfo;
+import org.apache.flink.api.java.typeutils.MapTypeInfo;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 
 import java.util.List;
@@ -62,6 +64,15 @@ public class ColumnFlinkTypeInfoUtil {
     return new RowTypeInfo(fieldTypes, rowTypeInfo.getFieldNames());
   }
 
+  public static com.bytedance.bitsail.common.typeinfo.RowTypeInfo getRowTypeInfo(RowTypeInfo rowTypeInfo) {
+
+    TypeInfo<?>[] fieldTypes = new TypeInfo[rowTypeInfo.getFieldTypes().length];
+    for (int index = 0; index < rowTypeInfo.getFieldTypes().length; index++) {
+      fieldTypes[index] = toTypeInfo(rowTypeInfo.getFieldTypes()[index]);
+    }
+    return new com.bytedance.bitsail.common.typeinfo.RowTypeInfo(rowTypeInfo.getFieldNames(), fieldTypes);
+  }
+
   private static TypeInformation<?> toColumnFlinkTypeInformation(TypeInfo<?> typeInfo) {
     if (typeInfo instanceof com.bytedance.bitsail.common.typeinfo.MapTypeInfo) {
       com.bytedance.bitsail.common.typeinfo.MapTypeInfo<?, ?> mapTypeInfo = (com.bytedance.bitsail.common.typeinfo.MapTypeInfo<?, ?>) typeInfo;
@@ -78,5 +89,22 @@ public class ColumnFlinkTypeInfoUtil {
     }
 
     return TypeInfoColumnBridge.bridgeTypeInfo(typeInfo);
+  }
+
+  private static TypeInfo<?> toTypeInfo(TypeInformation<?> typeInformation) {
+    if (typeInformation instanceof MapTypeInfo) {
+      MapTypeInfo<?, ?> mapTypeInfo = (MapTypeInfo<?, ?>) typeInformation;
+      TypeInformation<?> keyTypeInfo = mapTypeInfo.getKeyTypeInfo();
+      TypeInformation<?> valueTypeInfo = mapTypeInfo.getValueTypeInfo();
+      return new com.bytedance.bitsail.common.typeinfo.MapTypeInfo<>(toTypeInfo(keyTypeInfo),
+          toTypeInfo(valueTypeInfo));
+    }
+
+    if (typeInformation instanceof ListTypeInfo) {
+      ListTypeInfo<?> listTypeInfo = (ListTypeInfo<?>) typeInformation;
+      return new com.bytedance.bitsail.common.typeinfo.ListTypeInfo<>(toTypeInfo(listTypeInfo.getElementTypeInfo()));
+    }
+
+    return TypeInfoColumnBridge.bridgeTypeInformation(typeInformation);
   }
 }

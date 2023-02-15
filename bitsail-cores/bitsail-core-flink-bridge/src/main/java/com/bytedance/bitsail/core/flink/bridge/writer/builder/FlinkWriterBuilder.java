@@ -39,13 +39,14 @@ import com.bytedance.bitsail.core.flink.bridge.writer.delegate.DelegateFlinkComm
 import com.bytedance.bitsail.core.flink.bridge.writer.delegate.DelegateFlinkWriter;
 import com.bytedance.bitsail.flink.core.execution.FlinkExecutionEnviron;
 import com.bytedance.bitsail.flink.core.runtime.messenger.impl.FlinkAccumulatorStatisticsMessenger;
-import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
+import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
 import com.bytedance.bitsail.flink.core.util.AccumulatorRestorer;
 import com.bytedance.bitsail.flink.core.writer.FlinkDataWriterDAGBuilder;
 
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,7 +115,8 @@ public class FlinkWriterBuilder<InputT, CommitT extends Serializable, WriterStat
         commonConfiguration,
         writerConfiguration,
         sink,
-        NativeFlinkTypeInfoUtil.toRowTypeInfo(source.getType()),
+        //todo in future will be replaced into native flink type info.
+        ColumnFlinkTypeInfoUtil.getRowTypeInfo((RowTypeInfo) source.getType()),
         isCheckpointingEnabled);
     flinkWriter.setMessenger(messenger);
     flinkWriter.setDirtyCollector(dirtyCollector);
