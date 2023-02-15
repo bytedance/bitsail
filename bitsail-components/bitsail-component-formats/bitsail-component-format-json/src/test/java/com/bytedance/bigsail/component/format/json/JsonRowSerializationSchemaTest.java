@@ -19,6 +19,7 @@ package com.bytedance.bigsail.component.format.json;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 import com.bytedance.bitsail.component.format.json.JsonRowDeserializationSchema;
@@ -62,8 +63,8 @@ public class JsonRowSerializationSchemaTest {
     expected.setField(9, "Gary");
     expected.setField(10, "Gary".getBytes());
 
-    JsonRowSerializationSchema serializationSchema = new JsonRowSerializationSchema(jobConf, typeInfos, fieldNames);
-    JsonRowDeserializationSchema deserializationSchema = new JsonRowDeserializationSchema(jobConf, typeInfos, fieldNames);
+    JsonRowSerializationSchema serializationSchema = new JsonRowSerializationSchema(jobConf, new RowTypeInfo(fieldNames, typeInfos));
+    JsonRowDeserializationSchema deserializationSchema = new JsonRowDeserializationSchema(jobConf, new RowTypeInfo(fieldNames, typeInfos));
     byte[] serialized = serializationSchema.serialize(expected);
     Row deserialized = deserializationSchema.deserialize(serialized);
     Assert.assertArrayEquals(expected.getFields(), deserialized.getFields());

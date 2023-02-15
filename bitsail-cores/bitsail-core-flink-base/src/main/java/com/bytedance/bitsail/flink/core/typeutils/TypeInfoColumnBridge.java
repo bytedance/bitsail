@@ -40,6 +40,9 @@ public class TypeInfoColumnBridge {
   public static final Map<Class<?>, TypeInformation<?>> COLUMN_BRIDGE_CLASS_MAPPING =
       Maps.newHashMap();
 
+  public static final Map<Class<?>, TypeInfo<?>> TYPE_INFO_BRIDGE_CLASS_MAPPING =
+      Maps.newHashMap();
+
   static {
     COLUMN_BRIDGE_TYPE_INFO_MAPPING.put(TypeInfos.SHORT_TYPE_INFO,
         PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO);
@@ -82,6 +85,11 @@ public class TypeInfoColumnBridge {
       COLUMN_BRIDGE_CLASS_MAPPING.put(typeInfo.getTypeClass(),
           COLUMN_BRIDGE_TYPE_INFO_MAPPING.get(typeInfo));
     }
+
+    for (TypeInfo<?> typeInfo : COLUMN_BRIDGE_TYPE_INFO_MAPPING.keySet()) {
+      TYPE_INFO_BRIDGE_CLASS_MAPPING.put(COLUMN_BRIDGE_TYPE_INFO_MAPPING.get(typeInfo).getTypeClass(),
+          typeInfo);
+    }
   }
 
   public static TypeInformation<?> bridgeTypeInfo(TypeInfo<?> bridge) {
@@ -91,5 +99,14 @@ public class TypeInfoColumnBridge {
           .format("Primitive type info %s has no column bridge type information.", bridge));
     }
     return typeInformation;
+  }
+
+  public static TypeInfo<?> bridgeTypeInformation(TypeInformation<?> bridge) {
+    TypeInfo<?> typeInfo = TYPE_INFO_BRIDGE_CLASS_MAPPING.get(bridge.getTypeClass());
+    if (Objects.isNull(typeInfo)) {
+      throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT, String
+          .format("Primitive TypeInformation %s has no bridge type info.", bridge));
+    }
+    return typeInfo;
   }
 }

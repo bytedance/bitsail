@@ -93,7 +93,7 @@ public class ClickhouseSourceReader implements SourceReader<Row, ClickhouseSourc
 
     this.splits = new ConcurrentLinkedDeque<>();
     this.connectionHolder = new ClickhouseConnectionHolder(jobConf);
-    this.rowDeserializer = new ClickhouseRowDeserializer(readerContext.getTypeInfos());
+    this.rowDeserializer = new ClickhouseRowDeserializer(readerContext.getRowTypeInfo());
     LOG.info("Clickhouse source reader {} is initialized.", subTaskId);
   }
 

@@ -19,6 +19,7 @@ package com.bytedance.bitsail.connector.localfilesystem.reader;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
@@ -40,25 +41,20 @@ public class LocalFileSystemSourceReaderTest {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath(jobConfPath);
     SourceReader.Context context = new SourceReader.Context() {
       @Override
-      public TypeInfo<?>[] getTypeInfos() {
-        return new TypeInfo[]{
-            TypeInfos.LONG_TYPE_INFO,
-            TypeInfos.LOCAL_DATE_TYPE_INFO,
-            TypeInfos.SQL_TIMESTAMP_TYPE_INFO,
-            TypeInfos.STRING_TYPE_INFO,
-            TypeInfos.BOOLEAN_TYPE_INFO
-        };
-      }
-
-      @Override
-      public String[] getFieldNames() {
-        return new String[]{
+      public RowTypeInfo getRowTypeInfo() {
+        return new RowTypeInfo(new String[] {
             "id",
             "date",
             "localdatetime_value",
             "last_name",
             "bool_value"
-        };
+        }, new TypeInfo[] {
+            TypeInfos.LONG_TYPE_INFO,
+            TypeInfos.LOCAL_DATE_TYPE_INFO,
+            TypeInfos.SQL_TIMESTAMP_TYPE_INFO,
+            TypeInfos.STRING_TYPE_INFO,
+            TypeInfos.BOOLEAN_TYPE_INFO
+        });
       }
 
       @Override

@@ -20,7 +20,7 @@
           "properties": "unique"
         },
         {
-          "name": "id",
+          "name": "local_date_value",
           "type": "date"
         },
         {

@@ -18,6 +18,7 @@ package com.bytedance.bigsail.component.format.json;
 
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 import com.bytedance.bitsail.component.format.json.RowToJsonConverter;
@@ -46,7 +47,7 @@ public class RowToJsonConverterTest {
         BasicArrayTypeInfo.BINARY_TYPE_INFO};
     String[] fieldNames = {"void", "boolean", "short", "int", "long",
         "big_int", "float", "double", "big_decimal", "string", "binary"};
-    RowToJsonConverter converter = new RowToJsonConverter(typeInfos, fieldNames);
+    RowToJsonConverter converter = new RowToJsonConverter(new RowTypeInfo(fieldNames, typeInfos));
 
     Row row = new Row(typeInfos.length);
     row.setField(0, null);

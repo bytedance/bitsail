@@ -92,7 +92,7 @@ public class LarkSheetReader implements SourceReader<Row, LarkSheetSplit> {
   public LarkSheetReader(BitSailConfiguration jobConf, Context readerContext) {
     this.jobConf = jobConf;
     this.readerContext = readerContext;
-    this.typeInfos = readerContext.getTypeInfos();
+    this.typeInfos = readerContext.getRowTypeInfo().getTypeInfos();
 
     // Sheet configurations for request
     SheetConfig larkSheetConfig = new SheetConfig().configure(this.jobConf);

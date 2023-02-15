@@ -82,12 +82,12 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
 
   private final RowToJsonConverter jsonConverter;
 
-  public KafkaWriter(BitSailConfiguration commonConf, BitSailConfiguration writerConf, Context context) {
+  public KafkaWriter(BitSailConfiguration commonConf, BitSailConfiguration writerConf, Context<EmptyState> context) {
     this.context = context;
     List<ColumnInfo> columns = writerConf.getNecessaryOption(KafkaWriterOptions.COLUMNS, KafkaErrorCode.REQUIRED_VALUE);
-    this.typeInfos = context.getTypeInfos();
+    this.typeInfos = context.getRowTypeInfo().getTypeInfos();
     this.fieldNames = columns.stream().map(ColumnInfo::getName).collect(Collectors.toList());
-    this.jsonConverter = new RowToJsonConverter(typeInfos, fieldNames.toArray(new String[0]));
+    this.jsonConverter = new RowToJsonConverter(context.getRowTypeInfo());
     this.bootstrapServers = writerConf.getNecessaryOption(KafkaWriterOptions.BOOTSTRAP_SERVERS, KafkaErrorCode.REQUIRED_VALUE);
     this.kafkaTopic = writerConf.getNecessaryOption(KafkaWriterOptions.TOPIC_NAME, KafkaErrorCode.REQUIRED_VALUE);
     this.format = writerConf.getNecessaryOption(KafkaWriterOptions.CONTENT_TYPE, KafkaErrorCode.REQUIRED_VALUE);
