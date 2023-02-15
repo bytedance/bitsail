@@ -28,7 +28,6 @@ import com.bytedance.bitsail.common.column.ColumnCast;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.flink.core.legacy.connector.Pluggable;
 import com.bytedance.bitsail.flink.core.parser.RowBytesParser;
 import com.bytedance.bitsail.flink.core.runtime.RuntimeContextInjectable;
