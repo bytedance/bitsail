@@ -40,7 +40,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs.KUBERNETES_CLUSTER_ID;
 import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_KUBERNETES_APPLICATION;
 import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_YARN_PER_JOB;
 
@@ -103,8 +102,6 @@ public class FlinkEngineRunnerTest {
             "cancel",
             "-t",
             DEPLOYMENT_KUBERNETES_APPLICATION,
-            "-D",
-            KUBERNETES_CLUSTER_ID + "=" + "bitsail-job",
             "test-jobId");
     Assert.assertEquals(expectedCommand, command);
   }

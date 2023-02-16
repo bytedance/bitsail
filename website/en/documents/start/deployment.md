@@ -23,6 +23,13 @@ Here are the contents of this part:
 - [Native Kubernetes Deployment](#native_kubernetes_deployment)
   - [Prerequisites](#jump_prerequisites_k8s)
   - [Pre Configuration](#jump_pre_configuration_k8s)
+    - [Setup RBAC](#jump_configure_RBAC)
+  - [Application Mode](#jump_application_mode)
+    - [Build Custom Flink Image](#jump_build_custom_flink_image)
+    - [Start Application](#jump_start_application)
+    - [Stop Application](#jump_stop_application)
+    - [Kubernetes Logs](#jump_kubernetes_logs)
+    - [History Server](#jump_history_server)
 
 -----
 # <span id="yarn_deployment">Yarn Deployment</span>
@@ -231,7 +238,7 @@ Path tree:
     ├── connectors/*
     └── engines/*
 ```
-The content of `libs` can be copied from `${BITSAIL_HOME}/bitsail-dist/target/bitsail-dist-0.2.0-SNAPSHOT-bin/bitsail-archive-0.2.0-SNAPSHOT/libs/`
+The content of `libs` can be copied from `${BITSAIL_HOME}/output/libs/`
 
 Publish your `<CustomImage>` onto Dockerhub so that Kubernetes cluster can download.
 
@@ -242,12 +249,91 @@ bash ./bin/bitsail run \
    --target kubernetes-application \
    --deployment-mode kubernetes-application \
    --execution-mode run-application \
-   --kubernetes.kubernetes.jobmanager.service-account <self-defined-service-account> \
-   --kubernetes.container.image <CustomImage> \
-   --kubernetes.jobmanager.cpu 0.25 \
-   --kubernetes.taskmanager.cpu 0.5 \
+   -p kubernetes.kubernetes.jobmanager.service-account=<self-defined-service-account> \
+   -p kubernetes.container.image=<CustomImage> \
+   -p kubernetes.jobmanager.cpu=0.25 \
+   -p kubernetes.taskmanager.cpu=0.5 \
    --conf-in-base64 <base64 conf>
 ```
+
+User can specify more configurations by adding more `-p key=value` in bitsail command lines. 
+
+Configurations:
+
+
+<table>
+  <tr>
+    <th>Key</th>
+    <th>Required or Optional</th>
+    <th>Default</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+
+  <tr>
+    <td>kubernetes.container.image</td>
+    <td>Required</td>
+    <td>The default value depends on the actually running version. In general it looks like "bitsail-core:appmode"</td>
+    <td>String</td>
+    <td>Image to use for BitSail containers. The specified image must be based upon the same Apache Flink and Scala versions as used by the application. Visit https://hub.docker.com/_/flink?tab=tags for the images provided by the Flink project.</td>
+  </tr>
+
+  <tr>
+    <td>kubernetes.container.image.pull-policy</td>
+    <td>Optional</td>
+    <td>IfNotPresent</td>
+    <td>Enum. Possible values: [IfNotPresent, Always, Never]</td>
+    <td>The Kubernetes container image pull policy (IfNotPresent or Always or Never). The default policy is IfNotPresent to avoid putting pressure to image repository.</td>
+  </tr>
+
+  <tr>
+    <td>kubernetes.container.image.pull-secrets</td>
+    <td>Optional</td>
+    <td>(none)</td>
+    <td>List &#60;String&#62;</td>
+    <td>A semicolon-separated list of the Kubernetes secrets used to access private image registries.</td>
+  </tr>
+
+  <tr>
+    <td>kubernetes.hadoop.conf.config-map.name</td>
+    <td>Optional</td>
+    <td>(none)</td>
+    <td>String</td>
+    <td>Specify the name of an existing ConfigMap that contains custom Hadoop configuration to be mounted on the JobManager(s) and TaskManagers.</td>
+  </tr>
+
+  <tr>
+    <td>kubernetes.jobmanager.cpu</td>
+    <td>Optional</td>
+    <td>1.0</td>
+    <td>Double</td>
+    <td>The number of cpu used by job manager</td>
+  </tr>
+
+  <tr>
+    <td>kubernetes.jobmanager.service-account</td>
+    <td>Required</td>
+    <td>"default"</td>
+    <td>String</td>
+    <td>Service account that is used by jobmanager within kubernetes cluster. The job manager uses this service account when requesting taskmanager pods from the API server.</td>
+  </tr>
+
+  <tr>
+    <td>kubernetes.namespace</td>
+    <td>Optional</td>
+    <td>"default"</td>
+    <td>String</td>
+    <td>The namespace that will be used for running the jobmanager and taskmanager pods.</td>
+  </tr>
+
+  <tr>
+    <td>kubernetes.taskmanager.cpu</td>
+    <td>Optional</td>
+    <td>-1.0</td>
+    <td>Double</td>
+    <td>The number of cpu used by task manager. By default, the cpu is set to the number of slots per TaskManager</td>
+  </tr>
+</table>
 
 ### <span id="jump_stop_application">Stop Application</span>
 ```bash
@@ -296,14 +382,14 @@ bash ./bin/bitsail run \
    --target kubernetes-application \
    --deployment-mode kubernetes-application \
    --execution-mode run-application \
-   --kubernetes.kubernetes.jobmanager.service-account <self-defined-service-account> \
-   --kubernetes.container.image <CustomImage> \
-   --kubernetes.jobmanager.cpu 0.25 \
-   --kubernetes.taskmanager.cpu 0.5 \
+   -p kubernetes.kubernetes.jobmanager.service-account=<self-defined-service-account> \
+   -p kubernetes.container.image=<CustomImage> \
+   -p kubernetes.jobmanager.cpu=0.25 \
+   -p kubernetes.taskmanager.cpu=0.5 \
    --jobmanager.archive.fs.dir hdfs:///completed-jobs/ \
    --historyserver.web.address 0.0.0.0 \
    --historyserver.web.port 8082 \
    --historyserver.archive.fs.dir hdfs:///completed-jobs/ \
-   historyserver.archive.fs.refresh-interval \
+   --historyserver.archive.fs.refresh-interval \
    --conf-in-base64 <base64 conf>
 ```

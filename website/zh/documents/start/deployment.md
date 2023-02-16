@@ -8,8 +8,7 @@ order: 1
 
 -----
 
-> 目前 BitSail 仅支持本地和Yarn上部署。
-> 其他平台的部署（例如原生kubernetes）将在不久后支持。
+> 目前 BitSail 支持本地和Yarn和原生kubernetes部署。
 
 本部分目录:
 
@@ -25,6 +24,16 @@ order: 1
     - [本地提交](#本地提交)
         - [运行Fake_to_Print示例作业](#运行fake_to_print示例作业)
         - [运行Fake_to_Hive示例作业](#运行fake_to_hive示例作业)
+  - [部署原生Kubernetes](#cn_native_kubernetes_deployment)
+    - [要求](#cn_jump_prerequisites_k8s)
+    - [前置作业](#cn_jump_pre_configuration_k8s)
+        - [建立RBAC鉴权](#cn_jump_configure_RBAC)
+    - [Application模式](#cn_jump_application_mode)
+        - [自定义 Flink Docker 镜像](#cn_jump_build_custom_flink_image)
+        - [启动Application](#cn_jump_start_application)
+        - [停止Application](#cn_jump_stop_application)
+        - [Kubernetes日志文件](#cn_jump_kubernetes_logs)
+        - [History Server](#cn_jump_history_server)
 
 
 下面各部分详细介绍BitSail的部署。
@@ -181,3 +190,210 @@ bash bin/bitsail run \
   --conf examples/Fake_Hive_Example.json \
   --jm-address <job-manager-address>
   ```
+
+
+
+-----
+# <span id="cn_native_kubernetes_deployment">部署原生Kubernetes</span>
+
+> 目前***BitSail***仅支持在Flink 1.11引擎上的原生Kubernetes.<br>
+>
+以下的内容将一步步带领你部署BitSail到原生Kubernetes。目前BitSail支持Application模式：让使用者去创建一个单一镜像去包住任务和Flink runtime。这个镜像将会在kubernetes cluster自动创建及退出删除。
+
+## <span id="cn_jump_prerequisites_k8s">要求</span>
+1. Kubernetes 版本 1.9 或以上。
+2. KubeConfig 可以查看、创建、删除 pods 和 services，可以通过~/.kube/config 配置。你可以通过运行 kubectl auth can-i <list|create|edit|delete> pods 来验证权限。
+3. 启用 Kubernetes DNS。
+
+若您有创见kubernetes集群相关的问题，可以查看[如何创建Kubernetes集群](https://kubernetes.io/zh-cn/docs/setup/).
+
+## <span id="cn_jump_pre_configuration_k8s">前置作业</span>
+
+### <span id="cn_jump_configure_RBAC">建立 [RBAC鉴权](https://kubernetes.io/zh-cn/docs/reference/access-authn-authz/rbac/)</span>
+基于角色的访问控制（RBAC）是一种在企业内部基于单个用户的角色来调节对计算或网络资源的访问的方法。 用户可以配置 RBAC 角色和服务账户，JobManager 使用这些角色和服务帐户访问 Kubernetes 集群中的 Kubernetes API server。
+
+如果你不想使用默认服务账户，使用以下命令创建一个新的 <自定义帐户名称> 服务账户并设置角色绑定。然后使用配置项 -p kubernetes.jobmanager.service-account=<自定义账户名称> 来使 JobManager pod 使用 <自定义帐户名称> 服务账户去创建和删除 TaskManager pod。
+每个命名空间有默认的服务账户，但是默认服务账户可能没有权限在 Kubernetes 集群中创建或删除 pod。用户可能需要更新默认服务账户的权限或指定另一个绑定了正确角色的服务账户。
+
+```bash
+$ kubectl create serviceaccount <self-defined-service-account> # 请把<self-defined-service-account>替换成实际的帐户名称
+$ kubectl create clusterrolebinding <self-defined-cluster-role-binding> --clusterrole=edit --serviceaccount=default:<self-defined-service-account> # 请把<self-defined-service-account>和<self-defined-cluster-role-binding>替换成实际的名称
+```
+
+## <span id="cn_jump_application_mode"> Application模式</span>
+Application 模式允许用户创建单个镜像，其中包含他们的作业和 Flink 运行时，该镜像将按需自动创建和销毁集群组件。Flink 社区提供了可以构建多用途自定义镜像的基础镜像。
+### <span id="cn_jump_build_custom_flink_image">[在第一次跑BitSail或当BitSail Jar改动时] 自定义 Flink Docker 镜像</span>
+
+用以下的 [`Dockerfile`](https://docs.docker.com/engine/reference/builder/)创建你的 `<CustomImage>` :
+```dockerfile
+FROM flink:1.11.6-scala_2.11-java8
+ENV USERLIB=/opt/flink/usrlib
+RUN mkdir -p $USERLIB
+COPY libs/ $USERLIB/
+```
+
+路径树:
+```
+.
+├── Dockerfile
+└── libs
+    ├── bitsail-core.jar
+    ├── clients/*
+    ├── connectors/*
+    └── engines/*
+```
+其中`libs`的内容可以从`${BITSAIL_HOME}/output/libs/`复制过来
+
+把你的`<CustomImage>`发表到Dockerhub，让Kubernetes集群可以下载下来。
+
+### <span id="cn_jump_start_application">启动Application</span>
+```bash
+bash ./bin/bitsail run \
+   --engine flink \
+   --target kubernetes-application \
+   --deployment-mode kubernetes-application \
+   --execution-mode run-application \
+   -p kubernetes.kubernetes.jobmanager.service-account=<self-defined-service-account> \
+   -p kubernetes.container.image=<CustomImage> \
+   -p kubernetes.jobmanager.cpu=0.25 \
+   -p kubernetes.taskmanager.cpu=0.5 \
+   --conf-in-base64 <base64 conf>
+```
+
+使用者可以在BitSail 指令集用`-p key=value`配置参数
+
+配置参数:
+
+<table>
+  <tr>
+    <th>Key</th>
+    <th>Required or Optional</th>
+    <th>Default</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+
+  <tr>
+    <td>kubernetes.container.image</td>
+    <td>Required</td>
+    <td>The default value depends on the actually running version. In general it looks like "bitsail-core:appmode"</td>
+    <td>String</td>
+    <td>Image to use for BitSail containers. The specified image must be based upon the same Apache Flink and Scala versions as used by the application. Visit https://hub.docker.com/_/flink?tab=tags for the images provided by the Flink project.</td>
+  </tr>
+
+  <tr>
+    <td>kubernetes.container.image.pull-policy</td>
+    <td>Optional</td>
+    <td>IfNotPresent</td>
+    <td>Enum. Possible values: [IfNotPresent, Always, Never]</td>
+    <td>The Kubernetes container image pull policy (IfNotPresent or Always or Never). The default policy is IfNotPresent to avoid putting pressure to image repository.</td>
+  </tr>
+
+  <tr>
+    <td>kubernetes.container.image.pull-secrets</td>
+    <td>Optional</td>
+    <td>(none)</td>
+    <td>List &#60;String&#62;</td>
+    <td>A semicolon-separated list of the Kubernetes secrets used to access private image registries.</td>
+  </tr>
+
+  <tr>
+    <td>kubernetes.hadoop.conf.config-map.name</td>
+    <td>Optional</td>
+    <td>(none)</td>
+    <td>String</td>
+    <td>Specify the name of an existing ConfigMap that contains custom Hadoop configuration to be mounted on the JobManager(s) and TaskManagers.</td>
+  </tr>
+
+  <tr>
+    <td>kubernetes.jobmanager.cpu</td>
+    <td>Optional</td>
+    <td>1.0</td>
+    <td>Double</td>
+    <td>The number of cpu used by job manager</td>
+  </tr>
+
+  <tr>
+    <td>kubernetes.jobmanager.service-account</td>
+    <td>Required</td>
+    <td>"default"</td>
+    <td>String</td>
+    <td>Service account that is used by jobmanager within kubernetes cluster. The job manager uses this service account when requesting taskmanager pods from the API server.</td>
+  </tr>
+
+  <tr>
+    <td>kubernetes.namespace</td>
+    <td>Optional</td>
+    <td>"default"</td>
+    <td>String</td>
+    <td>The namespace that will be used for running the jobmanager and taskmanager pods.</td>
+  </tr>
+
+  <tr>
+    <td>kubernetes.taskmanager.cpu</td>
+    <td>Optional</td>
+    <td>-1.0</td>
+    <td>Double</td>
+    <td>The number of cpu used by task manager. By default, the cpu is set to the number of slots per TaskManager</td>
+  </tr>
+</table>
+
+### <span id="cn_jump_stop_application">停止Application</span>
+```bash
+bash ./bin/bitsail stop \
+   --engine flink \
+   --target kubernetes-application \
+   --deployment-mode kubernetes-application \
+   --execution-mode cancel \
+   --job-id <jobId>
+```
+当 Application 停止时，所有 Flink 集群资源都会自动销毁。 与往常一样，作业可能会在手动取消或执行完的情况下停止。
+使用者也可以跑 `kubectl` 指令集来删除整个部署的Application
+```bash
+kubectl delete deployments bitsail-job
+```
+
+### <span id="cn_jump_kubernetes_logs">Kubernetes日志文件</span>
+以下三种日志文件可以使用：
+1. BitSail 客戶端日志： `${FLINK_HOME}/log/flink-xxx.log` on client end
+2. BitSail JobManager日志： `/opt/flink/log/jobmanager.log` on Kubernetes JobManager pod
+3. BitSail TaskManager日志： `/opt/flink/log/taskmanager.log` on Kubernetes TaskManager pod
+
+使用者也可以使用以下`kubectl` 指令集来查看日志
+```bash
+# During job running
+kubectl get pods # Will return jobmanager pod and taskmanager pod
+
+kubectl logs -f <jobmanagerPod> # Will dump jobManager log
+
+kubectl logs -f <taskmanagerPod>  # Will dump taskManager log
+```
+
+
+### <span id="cn_jump_history_server">History Server</span>
+Flink 提供了 history server，可以在相应的 Flink 集群关闭之后查询已完成作业的统计信息。 此外，它暴露了一套 REST API，该 API 接受 HTTP 请求并返回 JSON 格式的数据。
+更多相关讯息在 https://nightlies.apache.org/flink/flink-docs-release-1.11/monitoring/historyserver.html
+
+启动及停止HistoryServer
+```bash
+${FLINK_HOME}/bin/historyserver.sh (start|start-foreground|stop)
+```
+
+使用BitSail指令集去配置history server。
+```bash
+bash ./bin/bitsail run \
+   --engine flink \
+   --target kubernetes-application \
+   --deployment-mode kubernetes-application \
+   --execution-mode run-application \
+   -p kubernetes.kubernetes.jobmanager.service-account=<self-defined-service-account> \
+   -p kubernetes.container.image=<CustomImage> \
+   -p kubernetes.jobmanager.cpu=0.25 \
+   -p kubernetes.taskmanager.cpu=0.5 \
+   --jobmanager.archive.fs.dir hdfs:///completed-jobs/ \
+   --historyserver.web.address 0.0.0.0 \
+   --historyserver.web.port 8082 \
+   --historyserver.archive.fs.dir hdfs:///completed-jobs/ \
+   --historyserver.archive.fs.refresh-interval \
+   --conf-in-base64 <base64 conf>
+```

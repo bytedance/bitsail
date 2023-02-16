@@ -29,10 +29,6 @@ import lombok.Setter;
 @Setter
 public class FlinkCommandArgs implements CommandArgs {
   public static final String KUBERNETES_CLUSTER_ID = "kubernetes.cluster-id";
-  public static final String KUBERNETES_SERVICE_ACCOUNT = "kubernetes.jobmanager.service-account";
-  public static final String KUBERNETES_CONTAINER_IMAGE = "kubernetes.container.image";
-  public static final String KUBERNETES_JOBMANAGER_CPU = "kubernetes.jobmanager.cpu";
-  public static final String KUBERNETES_TASKMANAGER_CPU = "kubernetes.taskmanager.cpu";
   public static final String JOB_ID = "job-id";
   private static final String JOBMANAGER_ARCHIVE_FS_DIR = "jobmanager.archive.fs.dir";
   private static final String HISTORYSERVER_WEB_ADDRESS = "historyserver.web.address";
@@ -70,28 +66,9 @@ public class FlinkCommandArgs implements CommandArgs {
       description = "Specify the job manager to use, eg: localhost:8081.")
   private String jobManagerAddress;
 
-  @Parameter(names = "--" + KUBERNETES_SERVICE_ACCOUNT,
-          description = "The service account of kubernetes jobmanager")
-  private String kubernetesServiceAccount = "bitsail-service-account";
-
   @Parameter(names = "--" + KUBERNETES_CLUSTER_ID,
           description = "The cluster-id of kubernetes")
   private String kubernetesClusterId = "bitsail-job";
-
-  @Parameter(names = "--" + KUBERNETES_CONTAINER_IMAGE,
-          description = "The container image of kubernetes")
-  private String kubernetesContainerImage;
-
-  @SuppressWarnings("checkstyle:MagicNumber")
-  @Parameter(names = "--" + KUBERNETES_JOBMANAGER_CPU,
-          description = "The number (Double) of cpu used by job manager")
-  private double kubernetesJobManagerCpu = 0.5;
-
-  @SuppressWarnings("checkstyle:MagicNumber")
-  @Parameter(names = "--" + KUBERNETES_TASKMANAGER_CPU,
-          description = "The number (Double) of cpu used by task manager. By default, " +
-                  "the cpu is set to the number of slots per TaskManager")
-  private double kubernetesTaskManagerCpu = 0.5;
 
   @Parameter(names = "--" + JOB_ID,
           description = "The job id of running job")

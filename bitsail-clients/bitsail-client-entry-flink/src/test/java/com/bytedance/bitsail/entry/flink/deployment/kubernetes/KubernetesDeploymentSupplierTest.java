@@ -45,9 +45,6 @@ public class KubernetesDeploymentSupplierTest {
   public void testAddRunDeploymentCommands() {
     flinkRunCommandArgs.setDeploymentMode(DEPLOYMENT_KUBERNETES_APPLICATION);
     flinkRunCommandArgs.setKubernetesClusterId("testClusterId");
-    flinkRunCommandArgs.setKubernetesContainerImage("testImage");
-    flinkRunCommandArgs.setKubernetesJobManagerCpu(0.5);
-    flinkRunCommandArgs.setKubernetesTaskManagerCpu(0.5);
     final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs);
 
     deploymentSupplier.addDeploymentMode(flinkCommands);
@@ -55,7 +52,7 @@ public class KubernetesDeploymentSupplierTest {
     assertEquals(flinkCommands.size(), 2);
     assertEquals(flinkCommands.get(1), DEPLOYMENT_KUBERNETES_APPLICATION);
 
-    assertEquals(baseCommandArgs.getProperties().size(), 5);
+    assertEquals(baseCommandArgs.getProperties().size(), 1);
   }
 
   @Test

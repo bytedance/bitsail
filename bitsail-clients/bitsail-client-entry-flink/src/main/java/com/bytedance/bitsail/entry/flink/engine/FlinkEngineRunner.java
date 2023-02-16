@@ -212,11 +212,6 @@ public class FlinkEngineRunner implements EngineRunner {
     deploymentSupplier.addDeploymentMode(flinkCommands);
     deploymentSupplier.addStopDeploymentCommands(baseCommandArgs);
 
-    for (Map.Entry<String, String> property : baseCommandArgs.getProperties().entrySet()) {
-      LOG.info("Add Users property {} = {}.", property.getKey(), property.getValue());
-      flinkCommands.add("-D");
-      flinkCommands.add(StringUtils.trim(property.getKey()) + "=" + StringUtils.trim(property.getValue()));
-    }
     flinkCommands.add(flinkStopCommandArgs.getJobId());
 
     flinkProcBuilder.command(flinkCommands);
