@@ -111,7 +111,7 @@ public class RedisWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     // initialize command factory
     String redisDataType = StringUtils.upperCase(writerConfiguration.get(RedisWriterOptions.REDIS_DATA_TYPE));
     String additionalKey = writerConfiguration.getUnNecessaryOption(RedisWriterOptions.ADDITIONAL_KEY, "default_redis_key");
-    this.jedisCommand = initJedisCommand(redisDataType, ttlInSeconds, additionalKey, context.getTypeInfos());
+    this.jedisCommand = initJedisCommand(redisDataType, ttlInSeconds, additionalKey, context.getRowTypeInfo().getTypeInfos());
 
     // initialize jedis pool
     JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
