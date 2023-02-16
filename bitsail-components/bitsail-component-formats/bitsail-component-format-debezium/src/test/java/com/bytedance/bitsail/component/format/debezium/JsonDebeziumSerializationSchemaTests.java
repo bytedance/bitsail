@@ -16,11 +16,15 @@
 
 package com.bytedance.bitsail.component.format.debezium;
 
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+
 import org.junit.Test;
 
 public class JsonDebeziumSerializationSchemaTests {
   @Test
   public void testSerializer() {
     //TODO: Add UT
+    BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
+    JsonDebeziumSerializationSchema serializationSchema = new JsonDebeziumSerializationSchema(jobConf);
   }
 }

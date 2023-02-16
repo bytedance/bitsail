@@ -21,7 +21,7 @@ import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.common.row.DebeziumRow;
+import com.bytedance.bitsail.common.row.BinlogRow;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.component.format.json.RowToJsonConverter;
@@ -126,7 +126,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     checkErroneous();
     //TODO: refactor this as a format factory
     if (format.equals("debezium")) {
-      writeDebezium(record);
+      writeDebezium((BinlogRow) record);
     } else {
       String result = jsonConverter.convert(record).toString();
       // get partition id to insert if 'partitionFieldsIndices' is not empty
@@ -145,18 +145,17 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   }
 
   @SuppressWarnings("checkstyle:MagicNumber")
-  public void writeDebezium(Row record) {
-    // TODO: debezium specified row
+  public void writeDebezium(BinlogRow record) {
     String[] partitionFieldsValues = new String[1];
-    String key = record.getString(DebeziumRow.ID_INDEX);
-    partitionFieldsValues[1] = record.getString(DebeziumRow.ID_INDEX);
+    String key = record.getKey();
+    partitionFieldsValues[0] = key;
     int partitionId = choosePartitionIdByFields(partitionFieldsValues);
-    Map<String, String> headers = new HashMap<>(3);
-    headers.put("db", record.getString(DebeziumRow.DATABASE_INDEX));
-    headers.put("table", record.getString(DebeziumRow.TABLE_INDEX));
-    headers.put("ddl_flag", String.valueOf(record.getBoolean(DebeziumRow.DDL_FLAG_INDEX)));
-    headers.put("version", String.valueOf(record.getInt(DebeziumRow.DDL_FLAG_INDEX)));
-    byte[] value = record.getBinary(DebeziumRow.VALUE_INDEX);
+    Map<String, String> headers = new HashMap<>(4);
+    headers.put("db", record.getDatabase());
+    headers.put("table", record.getTable());
+    headers.put("ddl_flag", String.valueOf(record.getDDL()));
+    headers.put("version", String.valueOf(record.getVersion()));
+    byte[] value = record.getValue();
     sendWithHeaders(key, value, partitionId, headers);
   }
 

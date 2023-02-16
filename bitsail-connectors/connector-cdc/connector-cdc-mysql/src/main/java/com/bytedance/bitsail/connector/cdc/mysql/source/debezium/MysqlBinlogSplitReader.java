@@ -17,7 +17,7 @@
 package com.bytedance.bitsail.connector.cdc.mysql.source.debezium;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.row.DebeziumRow;
+import com.bytedance.bitsail.common.row.BinlogRow;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.component.format.debezium.JsonDebeziumSerializationSchema;
 import com.bytedance.bitsail.connector.cdc.mysql.source.config.MysqlConfig;
@@ -261,14 +261,14 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
     byte[] serialized = this.serializer.serialize(record);
     Struct val = (Struct) record.value();
     Field keyField = record.keySchema().fields().get(0);
-    Row result = new Row(DebeziumRow.ROW_SIZE);
-    result.setField(DebeziumRow.DATABASE_INDEX, val.getStruct("source").getString("db"));
-    result.setField(DebeziumRow.TABLE_INDEX, val.getStruct("source").getString("table"));
-    result.setField(DebeziumRow.ID_INDEX, ((Struct) record.key()).get(keyField).toString());
-    result.setField(DebeziumRow.TIMESTAMP_INDEX, val.getStruct("source").getInt64("ts_ms"));
-    result.setField(DebeziumRow.DDL_FLAG_INDEX, false);
-    result.setField(DebeziumRow.VERSION_INDEX, 1);
-    result.setField(DebeziumRow.VALUE_INDEX, serialized);
+    BinlogRow result = new BinlogRow();
+    result.setDatabase(val.getStruct("source").getString("db"));
+    result.setTable(val.getStruct("source").getString("table"));
+    result.setKey(((Struct) record.key()).get(keyField).toString());
+    result.setTimestamp(val.getStruct("source").getInt64("ts_ms").toString());
+    result.setDDL(false);
+    result.setVersion(1);
+    result.setValue(serialized);
     return result;
   }
 
