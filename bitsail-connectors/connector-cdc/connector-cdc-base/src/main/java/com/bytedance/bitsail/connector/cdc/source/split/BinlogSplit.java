@@ -27,6 +27,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class BinlogSplit implements SourceSplit {
+  private static final long serialVersionUID = 2L;
 
   private final String splitId;
 

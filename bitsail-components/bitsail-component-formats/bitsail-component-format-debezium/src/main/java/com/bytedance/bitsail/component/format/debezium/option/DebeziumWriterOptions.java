@@ -14,32 +14,16 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.kafka.model;
+package com.bytedance.bitsail.component.format.debezium.option;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.ToString;
+import com.bytedance.bitsail.common.option.ConfigOption;
+import com.bytedance.bitsail.common.option.WriterOptions;
 
-import java.util.Map;
+import static com.bytedance.bitsail.common.option.ConfigOptions.key;
+import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@Builder
-@NoArgsConstructor
-@ToString(of = {"key", "value", "partitionId"})
-public class KafkaRecord {
-  private String key;
-  @NonNull
-  private Object value;
-
-  private Integer partitionId;
-
-  private Long timestamp;
-
-  private Map<String, String> headers;
+public interface DebeziumWriterOptions extends WriterOptions.BaseWriterOptions {
+  ConfigOption<Boolean> DEBEZIUM_JSON_INCLUDE_SCHEMA =
+      key(WRITER_PREFIX + "DEBEZIUM_JSON_INCLUDE_SCHEMA")
+          .defaultValue(false);
 }
