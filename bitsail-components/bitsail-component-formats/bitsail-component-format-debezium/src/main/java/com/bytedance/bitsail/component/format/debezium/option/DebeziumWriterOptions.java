@@ -14,23 +14,16 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.component.format.debezium;
+package com.bytedance.bitsail.component.format.debezium.option;
 
-@SuppressWarnings("checkstyle:MagicNumber")
-public class DebeziumRowMessage {
-  public static int ROW_SIZE = 7;
+import com.bytedance.bitsail.common.option.ConfigOption;
+import com.bytedance.bitsail.common.option.WriterOptions;
 
-  public static int DATABASE_INDEX = 0;
+import static com.bytedance.bitsail.common.option.ConfigOptions.key;
+import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
 
-  public static int TABLE_INDEX = 1;
-
-  public static int ID_INDEX = 2;
-
-  public static int TIMESTAMP_INDEX = 3;
-
-  public static int DDL_FLAG_INDEX = 4;
-
-  public static int VERSION_INDEX = 5;
-
-  public static int VALUE_INDEX = 6;
+public interface DebeziumWriterOptions extends WriterOptions.BaseWriterOptions {
+  ConfigOption<Boolean> DEBEZIUM_JSON_INCLUDE_SCHEMA =
+      key(WRITER_PREFIX + "DEBEZIUM_JSON_INCLUDE_SCHEMA")
+          .defaultValue(false);
 }

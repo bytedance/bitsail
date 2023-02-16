@@ -17,6 +17,7 @@
 package com.bytedance.bitsail.component.format.debezium;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.component.format.debezium.option.DebeziumWriterOptions;
 
 import org.apache.kafka.connect.json.JsonConverter;
 import org.apache.kafka.connect.json.JsonConverterConfig;
@@ -33,9 +34,10 @@ public class JsonDebeziumSerializationSchema implements DebeziumSerializationSch
 
   public JsonDebeziumSerializationSchema(BitSailConfiguration jobConf) {
     this.jsonConverter = new JsonConverter();
+    boolean includeSchema = jobConf.get(DebeziumWriterOptions.DEBEZIUM_JSON_INCLUDE_SCHEMA);
     final HashMap<String, Object> configs = new HashMap<>();
     configs.put(ConverterConfig.TYPE_CONFIG, ConverterType.VALUE.getName());
-    configs.put(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, false);
+    configs.put(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, includeSchema);
     jsonConverter.configure(configs);
   }
 
