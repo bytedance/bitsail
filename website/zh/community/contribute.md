@@ -51,8 +51,23 @@ BitSail项目使用了[Google Java Style Guide](https://google.github.io/stylegu
 我们使用了[lombok](https://projectlombok.org/).请在IDE插件安装lombok
 
 ### 添加License配置
-所有源文件都需要添加许可证头。请添加 [Apache License header](https://www.apache.org/legal/src-headers#headers)
-到您的 IDE 版权设置。完成此步骤后，IDE 将自动将许可证添加到新的源文件。
+所有源文件都需要添加许可证头。请复制**下方**的许可证头并将其添加到您的 IDE 版权设置。完成此步骤后，IDE 将自动将许可证添加到新的源文件。
+
+```
+Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
 
 ![](../../images/license_header.png)
 

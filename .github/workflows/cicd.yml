@@ -61,16 +61,11 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
           architecture: x64
-      - name: Setting Maven Repository
-        uses: s4u/maven-settings-action@v2.8.0
-        with:
-          apacheSnapshots: true
-          sonatypeSnapshots: true
-          oracleRepo: true
+          cache: 'maven'
 
       - name: Compile
         run:
-          mvn clean verify -pl bitsail-dist -am -U -DskipUT=true -DskipITCase=true -P _maven.oracle.com_
+          mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=true
 
   # This workflow contains a single job called "unit-test"
   unit-test:
@@ -90,16 +85,11 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
           architecture: x64
-      - name: Setting Maven Repository
-        uses: s4u/maven-settings-action@v2.8.0
-        with:
-          apacheSnapshots: true
-          sonatypeSnapshots: true
-          oracleRepo: true
+          cache: 'maven'
 
       - name: Maven Verify Unit Test
         run:
-          mvn clean verify -pl bitsail-dist -am -U -DskipUT=false -DskipITCase=true -P _maven.oracle.com_
+          mvn clean verify -pl bitsail-dist -am -DskipUT=false -DskipITCase=true
 
     # This workflow contains a single job called "integration-tests"
   integration-tests:
@@ -119,13 +109,7 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
           architecture: x64
-      - name: Setting Maven Repository
-        uses: s4u/maven-settings-action@v2.8.0
-        with:
-          apacheSnapshots: true
-          sonatypeSnapshots: true
-          oracleRepo: true
-
+          cache: 'maven'
       - name: Maven Verify Integration Test
         run:
-          mvn clean verify -pl bitsail-dist -am -U -DskipUT=true -DskipITCase=false -P _maven.oracle.com_
+          mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=false

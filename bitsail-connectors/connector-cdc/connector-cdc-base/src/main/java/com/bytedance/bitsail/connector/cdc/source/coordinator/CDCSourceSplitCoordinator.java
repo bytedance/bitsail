@@ -97,7 +97,7 @@ public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BinlogS
 
   @Override
   public BaseAssignmentState snapshotState() {
-    // currently store nothing in state
+    // store whether the binlog split was assigned to reader
     return new BinlogAssignmentState(this.isBinlogAssigned);
   }
 
@@ -117,7 +117,7 @@ public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BinlogS
     BinlogOffset end = BinlogOffset.boundless();
 
     return BinlogSplit.builder()
-        .splitId("binlog")
+        .splitId("binlog-0")
         .beginOffset(begin)
         .endOffset(end)
         .build();
