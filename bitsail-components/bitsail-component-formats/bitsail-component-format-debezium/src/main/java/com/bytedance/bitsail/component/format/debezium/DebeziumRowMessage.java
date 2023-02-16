@@ -14,32 +14,23 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.kafka.model;
+package com.bytedance.bitsail.component.format.debezium;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.ToString;
+@SuppressWarnings("checkstyle:MagicNumber")
+public class DebeziumRowMessage {
+  public static int ROW_SIZE = 7;
 
-import java.util.Map;
+  public static int DATABASE_INDEX = 0;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@Builder
-@NoArgsConstructor
-@ToString(of = {"key", "value", "partitionId"})
-public class KafkaRecord {
-  private String key;
-  @NonNull
-  private Object value;
+  public static int TABLE_INDEX = 1;
 
-  private Integer partitionId;
+  public static int ID_INDEX = 2;
 
-  private Long timestamp;
+  public static int TIMESTAMP_INDEX = 3;
 
-  private Map<String, String> headers;
+  public static int DDL_FLAG_INDEX = 4;
+
+  public static int VERSION_INDEX = 5;
+
+  public static int VALUE_INDEX = 6;
 }

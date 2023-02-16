@@ -21,6 +21,7 @@ import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
+import com.bytedance.bitsail.common.row.DebeziumRow;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.component.format.json.RowToJsonConverter;
@@ -143,8 +144,20 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     }
   }
 
+  @SuppressWarnings("checkstyle:MagicNumber")
   public void writeDebezium(Row record) {
     // TODO: debezium specified row
+    String[] partitionFieldsValues = new String[1];
+    String key = record.getString(DebeziumRow.ID_INDEX);
+    partitionFieldsValues[1] = record.getString(DebeziumRow.ID_INDEX);
+    int partitionId = choosePartitionIdByFields(partitionFieldsValues);
+    Map<String, String> headers = new HashMap<>(3);
+    headers.put("db", record.getString(DebeziumRow.DATABASE_INDEX));
+    headers.put("table", record.getString(DebeziumRow.TABLE_INDEX));
+    headers.put("ddl_flag", String.valueOf(record.getBoolean(DebeziumRow.DDL_FLAG_INDEX)));
+    headers.put("version", String.valueOf(record.getInt(DebeziumRow.DDL_FLAG_INDEX)));
+    byte[] value = record.getBinary(DebeziumRow.VALUE_INDEX);
+    sendWithHeaders(key, value, partitionId, headers);
   }
 
   @Override
@@ -222,19 +235,19 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     kafkaProducer.send(record, callback);
   }
 
-  private void send(String value) {
+  private void send(Object value) {
     kafkaProducer.send(KafkaRecord.builder().value(value).build(), callback);
   }
 
-  private void send(String key, String value) {
+  private void send(String key, Object value) {
     kafkaProducer.send(KafkaRecord.builder().key(key).value(value).build(), callback);
   }
 
-  private void sendByPartitionId(String value, int partitionId) {
+  private void sendByPartitionId(Object value, int partitionId) {
     kafkaProducer.send(KafkaRecord.builder().value(value).partitionId(partitionId).build(), callback);
   }
 
-  private void sendByPartitionId(String key, String value, int partitionId) {
+  private void sendByPartitionId(String key, Object value, int partitionId) {
     kafkaProducer.send(KafkaRecord.builder().key(key).value(value).partitionId(partitionId).build(), callback);
   }
 
@@ -242,11 +255,11 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     kafkaProducer.send(KafkaRecord.builder().value(value).headers(headers).build(), callback);
   }
 
-  private void sendWithHeaders(String key, String value, Map<String, String> headers) {
+  private void sendWithHeaders(String key, Object value, Map<String, String> headers) {
     kafkaProducer.send(KafkaRecord.builder().key(key).value(value).headers(headers).build(), callback);
   }
 
-  private void sendWithHeaders(String key, String value, int partitionId, Map<String, String> headers) {
+  private void sendWithHeaders(String key, Object value, int partitionId, Map<String, String> headers) {
     kafkaProducer.send(KafkaRecord.builder().key(key).value(value).partitionId(partitionId).headers(headers).build(), callback);
   }
 
