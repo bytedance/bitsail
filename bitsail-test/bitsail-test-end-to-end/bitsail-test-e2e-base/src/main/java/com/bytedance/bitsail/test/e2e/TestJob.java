@@ -176,7 +176,7 @@ public class TestJob implements AutoCloseable {
   /**
    * Run a job.
    */
-  public int run(String caseName, int allowedTimeout) throws Exception {
+  public int run(String caseName, int execTimeout) throws Exception {
     loadExecutors();
 
     for (AbstractExecutor executor : executors) {
@@ -190,8 +190,8 @@ public class TestJob implements AutoCloseable {
       executor.configure(jobConf);
       executor.init();
 
-      boolean allowTimeout = allowedTimeout > 0;
-      int execTimeout = allowTimeout ? allowedTimeout : 300;
+      boolean allowTimeout = execTimeout > 0;
+      execTimeout = allowTimeout ? execTimeout : 300;
 
       int exitCode;
       ExecutorService service = Executors.newSingleThreadExecutor();
@@ -201,10 +201,10 @@ public class TestJob implements AutoCloseable {
         exitCode = (Integer) future.get(execTimeout, TimeUnit.SECONDS);
       } catch (TimeoutException te) {
         if (allowTimeout) {
-          LOG.info("Execute more than {} seconds, will terminate it.", allowedTimeout);
+          LOG.info("Execute more than {} seconds, will terminate it.", execTimeout);
           exitCode = SUCCESS_EXIT_CODE;
         } else {
-          LOG.error("Execute more than {} seconds.", allowedTimeout);
+          LOG.error("Execute more than {} seconds.", execTimeout);
           throw te;
         }
       } catch (Exception e) {
