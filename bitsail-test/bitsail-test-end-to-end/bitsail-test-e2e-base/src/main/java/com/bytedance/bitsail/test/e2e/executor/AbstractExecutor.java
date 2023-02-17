@@ -17,6 +17,7 @@
 package com.bytedance.bitsail.test.e2e.executor;
 
 import com.bytedance.bitsail.base.version.VersionHolder;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ReaderOptions;
@@ -24,6 +25,7 @@ import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.test.e2e.base.AbstractContainer;
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
+import com.bytedance.bitsail.test.e2e.error.E2ETestErrorCode;
 import com.bytedance.bitsail.test.e2e.mapping.ConnectorMapping;
 
 import com.google.common.collect.Lists;
@@ -46,6 +48,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Executor for running BitSail job.
@@ -277,18 +280,34 @@ public abstract class AbstractExecutor extends AbstractContainer {
    */
   private void addCoreModuleLibs(String moduleName) {
     File targetFolder = Paths.get(localRootDir, moduleName, "target").toFile();
-    File[] targetFiles = targetFolder.listFiles();
-    if (targetFiles != null) {
-      Arrays.stream(targetFiles)
-          .filter(file -> file.getName().endsWith(".jar"))
-          .filter(file -> !file.getName().startsWith("original-"))
-          .forEach(file -> {
-            String localPath = file.getAbsolutePath();
-            String remotePath = Paths.get(executorRootDir,
-                "libs", "engines", file.getName()).toAbsolutePath().toString();
-            transferableFiles.add(new TransferableFile(localPath, remotePath));
-          });
+    if (!targetFolder.exists()) {
+      throw BitSailException.asBitSailException(
+          E2ETestErrorCode.MODULE_NOT_FOUND,
+          "Core module " + moduleName + " not found");
     }
+
+    File[] targetFiles = targetFolder.listFiles();
+    if (targetFiles == null) {
+      throw BitSailException.asBitSailException(
+          E2ETestErrorCode.MODULE_NOT_COMPILED,
+          "Cannot found libs in core module " + moduleName + ", please build project.");
+    }
+
+    List<TransferableFile> coreLibs = Arrays.stream(targetFiles)
+        .filter(file -> file.getName().endsWith(".jar"))
+        .filter(file -> !file.getName().startsWith("original-"))
+        .map(file -> {
+          String localPath = file.getAbsolutePath();
+          String remotePath = Paths.get(executorRootDir,
+              "libs", "engines", file.getName()).toAbsolutePath().toString();
+          return new TransferableFile(localPath, remotePath);
+        }).collect(Collectors.toList());
+    if (CollectionUtils.isNotEmpty(coreLibs)) {
+      throw BitSailException.asBitSailException(
+          E2ETestErrorCode.MODULE_NOT_COMPILED,
+          "Cannot found libs in core module " + moduleName + ", please build project.");
+    }
+    transferableFiles.addAll(coreLibs);
 
     File resourceFolder = Paths.get(localRootDir, moduleName, "src", "main", "resources").toFile();
     File[] confFiles = resourceFolder.listFiles();
@@ -312,15 +331,28 @@ public abstract class AbstractExecutor extends AbstractContainer {
    */
   private void addClientModuleLibs(String moduleName) {
     File clientModule = Paths.get(localRootDir, moduleName, "target").toFile();
-    File[] targetFiles = clientModule.listFiles();
-    if (targetFiles != null) {
-      Arrays.stream(targetFiles).filter(file -> file.getName().endsWith(".jar")).forEach(file -> {
-        String localPath = file.getAbsolutePath();
-        String remotePath = Paths.get(executorRootDir,
-            "libs", "clients", file.getName()).toAbsolutePath().toString();
-        transferableFiles.add(new TransferableFile(localPath, remotePath));
-      });
+    if (!clientModule.exists()) {
+      throw BitSailException.asBitSailException(
+          E2ETestErrorCode.MODULE_NOT_FOUND,
+          "Client module " + moduleName + " not found");
     }
+
+    File[] targetFiles = clientModule.listFiles();
+    if (targetFiles == null) {
+      throw BitSailException.asBitSailException(
+          E2ETestErrorCode.MODULE_NOT_COMPILED,
+          "Cannot found libs in client module " + moduleName + ", please build project.");
+    }
+
+    List<TransferableFile> clientLibs = Arrays.stream(targetFiles)
+        .filter(file -> file.getName().endsWith(".jar"))
+        .map(file -> {
+          String localPath = file.getAbsolutePath();
+          String remotePath = Paths.get(executorRootDir,
+              "libs", "clients", file.getName()).toAbsolutePath().toString();
+          return new TransferableFile(localPath, remotePath);
+        }).collect(Collectors.toList());
+    transferableFiles.addAll(clientLibs);
 
     LOG.info("Successfully add libs for client module: {}", moduleName);
   }
