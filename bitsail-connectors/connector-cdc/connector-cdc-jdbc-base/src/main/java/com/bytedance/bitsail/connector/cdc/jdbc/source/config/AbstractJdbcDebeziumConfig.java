@@ -62,7 +62,7 @@ public abstract class AbstractJdbcDebeziumConfig {
     this.password = jobConf.getNecessaryOption(BinlogReaderOptions.PASSWORD, BinlogReaderErrorCode.REQUIRED_VALUE);
     this.dbName = jobConf.getNecessaryOption(BinlogReaderOptions.DB_NAME, BinlogReaderErrorCode.REQUIRED_VALUE);
     String timezone = jobConf.get(BinlogReaderOptions.CONNECTION_TIMEZONE);
-    fillConnectionInfo(this.dbzProperties, connectionInfo, timezone);
+    fillConnectionInfo(jobConf, this.dbzProperties, connectionInfo, timezone);
 
     this.dbzConfiguration = Configuration.from(this.dbzProperties);
     this.dbzJdbcConnectorConfig = getJdbcConnectorConfig(this.dbzConfiguration);
@@ -79,7 +79,7 @@ public abstract class AbstractJdbcDebeziumConfig {
 
   public abstract RelationalDatabaseConnectorConfig getJdbcConnectorConfig(Configuration config);
 
-  public void fillConnectionInfo(Properties props, ConnectionInfo connectionInfo, String timezone) {
+  public void fillConnectionInfo(BitSailConfiguration jobConf, Properties props, ConnectionInfo connectionInfo, String timezone) {
     props.put(DebeziumConstant.DATABASE_HOSTNAME, connectionInfo.getHost());
     props.put(DebeziumConstant.DATABASE_PORT, String.valueOf(connectionInfo.getPort()));
     props.put(DebeziumConstant.DATABASE_USER, username);

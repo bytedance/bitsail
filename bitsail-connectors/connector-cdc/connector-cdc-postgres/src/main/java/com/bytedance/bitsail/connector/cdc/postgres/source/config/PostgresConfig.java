@@ -26,15 +26,13 @@ import io.debezium.relational.RelationalDatabaseConnectorConfig;
 import java.util.Properties;
 
 public class PostgresConfig extends AbstractJdbcDebeziumConfig {
-  private final String pluginName;
-  private final String slotName;
+  private String pluginName;
+  private String slotName;
   private static final String PLUGIN_NAME_KEY = "plugin.name";
   private static final String SLOT_NAME_KEY = "slot.name";
 
   public PostgresConfig(BitSailConfiguration jobConf) {
     super(jobConf);
-    this.pluginName = jobConf.get(PostgresChangeEventOptions.PLUGIN_NAME);
-    this.slotName = jobConf.get(PostgresChangeEventOptions.SLOT_NAME);
   }
 
   @Override
@@ -42,9 +40,10 @@ public class PostgresConfig extends AbstractJdbcDebeziumConfig {
     return new PostgresConnectorConfig(config);
   }
 
-  public void fillConnectionInfo(Properties props, ConnectionInfo connectionInfo, String timezone) {
-    super.fillConnectionInfo(props, connectionInfo, timezone);
-
+  public void fillConnectionInfo(BitSailConfiguration jobConf, Properties props, ConnectionInfo connectionInfo, String timezone) {
+    super.fillConnectionInfo(jobConf, props, connectionInfo, timezone);
+    this.pluginName = jobConf.get(PostgresChangeEventOptions.PLUGIN_NAME);
+    this.slotName = jobConf.get(PostgresChangeEventOptions.SLOT_NAME);
     props.put(PLUGIN_NAME_KEY, pluginName);
     props.put(SLOT_NAME_KEY, slotName);
   }
