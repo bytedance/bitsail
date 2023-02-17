@@ -16,10 +16,23 @@
 
 package com.bytedance.bitsail.test.e2e.executor.flink;
 
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+
+import com.google.common.collect.Lists;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class Flink11Executor extends AbstractFlinkExecutor {
+
+  private static final String FLINK_11_CORE_MODULE = "bitsail-cores/bitsail-core-flink-bridge";
+  private static final String FLINK_11_CLIENT_MODULE = "bitsail-clients/bitsail-client-entry-flink";
+
+  @Override
+  public void configure(BitSailConfiguration executorConf) {
+    this.coreModules = Lists.newArrayList(FLINK_11_CORE_MODULE);
+    this.clientModules = Lists.newArrayList(FLINK_11_CLIENT_MODULE);
+    super.configure(executorConf);
+  }
 
   @Override
   public String getContainerName() {

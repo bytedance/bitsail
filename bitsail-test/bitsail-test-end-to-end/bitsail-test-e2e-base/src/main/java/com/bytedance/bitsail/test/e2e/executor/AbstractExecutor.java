@@ -29,6 +29,7 @@ import com.bytedance.bitsail.test.e2e.mapping.ConnectorMapping;
 import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.Getter;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
@@ -41,6 +42,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,6 +57,16 @@ public abstract class AbstractExecutor extends AbstractContainer {
   public static final String BITSAIL_REVISION = "bitsail.revision";
   public static final String BITSAIL_ROOT_DIR = "bitsail.rootDir";
   public static final String BITSAIL_E2E_EXECUTOR_ROOT_DIR = "/opt/bitsail";
+
+  /**
+   * Core modules of executor.
+   */
+  protected List<String> coreModules;
+
+  /**
+   * Client modules of executor.
+   */
+  protected List<String> clientModules;
 
   /**
    * Configuration of executor and job.
@@ -141,7 +153,15 @@ public abstract class AbstractExecutor extends AbstractContainer {
   /**
    * Add engine and corresponding client entry into transferable files.
    */
-  protected abstract void addEngineLibs(String buildVersion);
+  protected void addEngineLibs(String buildVersion) {
+    if (CollectionUtils.isNotEmpty(coreModules)) {
+      coreModules.forEach(this::addCoreModuleLibs);
+    }
+
+    if (CollectionUtils.isNotEmpty(clientModules)) {
+      clientModules.forEach(this::addClientModuleLibs);
+    }
+  }
 
   /**
    * Add connector libs into transferable files.
@@ -249,5 +269,59 @@ public abstract class AbstractExecutor extends AbstractContainer {
 
     transferableFiles.add(new TransferableFile(tmpJobConf.getAbsolutePath(),
         Paths.get(executorRootDir, "jobConf.json").toAbsolutePath().toString()));
+  }
+
+  /**
+   * Add libs of specific core module.
+   * @param moduleName Target core module name.
+   */
+  private void addCoreModuleLibs(String moduleName) {
+    File targetFolder = Paths.get(localRootDir, moduleName, "target").toFile();
+    File[] targetFiles = targetFolder.listFiles();
+    if (targetFiles != null) {
+      Arrays.stream(targetFiles)
+          .filter(file -> file.getName().endsWith(".jar"))
+          .filter(file -> !file.getName().startsWith("original-"))
+          .forEach(file -> {
+            String localPath = file.getAbsolutePath();
+            String remotePath = Paths.get(executorRootDir,
+                "libs", "engines", file.getName()).toAbsolutePath().toString();
+            transferableFiles.add(new TransferableFile(localPath, remotePath));
+          });
+    }
+
+    File resourceFolder = Paths.get(localRootDir, moduleName, "src", "main", "resources").toFile();
+    File[] confFiles = resourceFolder.listFiles();
+    if (confFiles != null) {
+      Arrays.stream(confFiles)
+          .filter(file -> file.getName().endsWith(".json"))
+          .forEach(file -> {
+            String localPath = file.getAbsolutePath();
+            String remotePath = Paths.get(executorRootDir,
+                "libs", "engines", "mapping", file.getName()).toAbsolutePath().toString();
+            transferableFiles.add(new TransferableFile(localPath, remotePath));
+          });
+    }
+
+    LOG.info("Successfully add libs for core module: {}", moduleName);
+  }
+
+  /**
+   * Add libs of specific client module.
+   * @param moduleName Target client module name.
+   */
+  private void addClientModuleLibs(String moduleName) {
+    File clientModule = Paths.get(localRootDir, moduleName, "target").toFile();
+    File[] targetFiles = clientModule.listFiles();
+    if (targetFiles != null) {
+      Arrays.stream(targetFiles).filter(file -> file.getName().endsWith(".jar")).forEach(file -> {
+        String localPath = file.getAbsolutePath();
+        String remotePath = Paths.get(executorRootDir,
+            "libs", "clients", file.getName()).toAbsolutePath().toString();
+        transferableFiles.add(new TransferableFile(localPath, remotePath));
+      });
+    }
+
+    LOG.info("Successfully add libs for client module: {}", moduleName);
   }
 }

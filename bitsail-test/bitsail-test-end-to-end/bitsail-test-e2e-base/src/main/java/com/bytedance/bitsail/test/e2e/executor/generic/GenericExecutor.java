@@ -31,11 +31,9 @@ import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerLoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -65,6 +63,8 @@ public class GenericExecutor extends AbstractExecutor {
   public void configure(BitSailConfiguration executorConf) {
     super.configure(executorConf);
     this.conf = executorConf;
+    this.coreModules = setting.getCoreModules();
+    this.clientModules = setting.getClientModules();
   }
 
   @Override
@@ -160,15 +160,7 @@ public class GenericExecutor extends AbstractExecutor {
 
   @Override
   protected void addEngineLibs(String buildVersion) {
-    List<String> coreModules = setting.getCoreModules();
-    if (CollectionUtils.isNotEmpty(coreModules)) {
-      coreModules.forEach(this::addCoreModuleLibs);
-    }
-
-    List<String> clientModules = setting.getClientModules();
-    if (CollectionUtils.isNotEmpty(clientModules)) {
-      clientModules.forEach(this::addClientModuleLibs);
-    }
+    super.addEngineLibs(buildVersion);
 
     // additional files
     List<TransferableFile> additionalFiles = setting.getAdditionalFiles();
@@ -182,51 +174,5 @@ public class GenericExecutor extends AbstractExecutor {
     }
 
     LOG.info("Successfully add libs for {}", setting.getExecutorName());
-  }
-
-  private void addCoreModuleLibs(String moduleName) {
-    File targetFolder = Paths.get(localRootDir, moduleName, "target").toFile();
-    File[] targetFiles = targetFolder.listFiles();
-    if (targetFiles != null) {
-      Arrays.stream(targetFiles)
-          .filter(file -> file.getName().endsWith(".jar"))
-          .filter(file -> !file.getName().startsWith("original-"))
-          .forEach(file -> {
-            String localPath = file.getAbsolutePath();
-            String remotePath = Paths.get(executorRootDir,
-                "libs", "engines", file.getName()).toAbsolutePath().toString();
-            transferableFiles.add(new TransferableFile(localPath, remotePath));
-          });
-    }
-
-    File resourceFolder = Paths.get(localRootDir, moduleName, "src", "main", "resources").toFile();
-    File[] confFiles = resourceFolder.listFiles();
-    if (confFiles != null) {
-      Arrays.stream(confFiles)
-          .filter(file -> file.getName().endsWith(".json"))
-          .forEach(file -> {
-            String localPath = file.getAbsolutePath();
-            String remotePath = Paths.get(executorRootDir,
-                "libs", "engines", "mapping", file.getName()).toAbsolutePath().toString();
-            transferableFiles.add(new TransferableFile(localPath, remotePath));
-          });
-    }
-
-    LOG.info("Successfully add libs for cores.");
-  }
-
-  private void addClientModuleLibs(String moduleName) {
-    File clientModule = Paths.get(localRootDir, moduleName, "target").toFile();
-    File[] targetFiles = clientModule.listFiles();
-    if (targetFiles != null) {
-      Arrays.stream(targetFiles).filter(file -> file.getName().endsWith(".jar")).forEach(file -> {
-        String localPath = file.getAbsolutePath();
-        String remotePath = Paths.get(executorRootDir,
-            "libs", "clients", file.getName()).toAbsolutePath().toString();
-        transferableFiles.add(new TransferableFile(localPath, remotePath));
-      });
-    }
-
-    LOG.info("Successfully add libs for clients.");
   }
 }
