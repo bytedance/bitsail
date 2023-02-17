@@ -61,10 +61,10 @@ public class GenericExecutor extends AbstractExecutor {
 
   @Override
   public void configure(BitSailConfiguration executorConf) {
-    super.configure(executorConf);
     this.conf = executorConf;
     this.coreModules = setting.getCoreModules();
     this.clientModules = setting.getClientModules();
+    super.configure(executorConf);
   }
 
   @Override

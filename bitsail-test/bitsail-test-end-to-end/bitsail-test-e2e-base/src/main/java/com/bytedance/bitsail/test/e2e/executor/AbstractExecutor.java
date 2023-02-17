@@ -307,7 +307,7 @@ public abstract class AbstractExecutor extends AbstractContainer {
               "libs", "engines", file.getName()).toAbsolutePath().toString();
           return new TransferableFile(localPath, remotePath);
         }).collect(Collectors.toList());
-    if (CollectionUtils.isNotEmpty(coreLibs)) {
+    if (CollectionUtils.isEmpty(coreLibs)) {
       throw BitSailException.asBitSailException(
           E2ETestErrorCode.MODULE_NOT_COMPILED,
           "Cannot found libs in core module " + moduleName + ", please build project.");
@@ -357,6 +357,11 @@ public abstract class AbstractExecutor extends AbstractContainer {
               "libs", "clients", file.getName()).toAbsolutePath().toString();
           return new TransferableFile(localPath, remotePath);
         }).collect(Collectors.toList());
+    if (CollectionUtils.isEmpty(clientLibs)) {
+      throw BitSailException.asBitSailException(
+          E2ETestErrorCode.MODULE_NOT_COMPILED,
+          "Cannot found libs in client module " + moduleName + ", please build project.");
+    }
     transferableFiles.addAll(clientLibs);
 
     LOG.info("Successfully add libs for client module: {}", moduleName);
