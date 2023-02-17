@@ -61,6 +61,21 @@ public abstract class AbstractExecutor extends AbstractContainer {
   public static final String BITSAIL_ROOT_DIR = "bitsail.rootDir";
   public static final String BITSAIL_E2E_EXECUTOR_ROOT_DIR = "/opt/bitsail";
 
+  protected static final String BIN_PATH = Paths.get(
+      "bitsail-dist", "src", "main", "archive", "bin", "bitsail").toString();
+  protected static final String LOGBACK_FILE = Paths.get(
+      "bitsail-dist", "src", "main", "resources", "logback.xml").toString();
+  protected static final String SYS_CONF_PATH = Paths.get(
+      "bitsail-test",
+      "bitsail-test-end-to-end",
+      "bitsail-test-e2e-base",
+      "src", "main", "resources", "conf", "bitsail.conf"
+  ).toString();
+  protected static final String CORE_LIB_PATH = Paths.get(
+      "bitsail-cores", "bitsail-core-entry", "target").toString();
+  protected static final String CLIENT_LIB_PATH = Paths.get(
+      "bitsail-clients", "bitsail-client-entry", "target").toString();
+
   /**
    * Core modules of executor.
    */
@@ -204,42 +219,32 @@ public abstract class AbstractExecutor extends AbstractContainer {
     String buildVersion = VersionHolder.getHolder().getBuildVersion();
 
     // bin/bitsail
-    String bin = Paths.get(localRootDir,
-        "bitsail-dist", "src", "main", "archive", "bin", "bitsail")
+    String bin = Paths.get(localRootDir, BIN_PATH)
         .toAbsolutePath().toString();
     transferableFiles.add(new TransferableFile(bin,
         Paths.get(executorRootDir, "bin", "bitsail").toAbsolutePath().toString()));
 
     // conf/logback.xml
-    String logback = Paths.get(localRootDir,
-        "bitsail-dist", "src", "main", "resources", "logback.xml")
+    String logback = Paths.get(localRootDir, LOGBACK_FILE)
         .toAbsolutePath().toString();
     transferableFiles.add(new TransferableFile(logback,
         Paths.get(executorRootDir, "conf", "logback.xml").toAbsolutePath().toString()));
 
     // conf/bitsail.conf
-    String sysConf = Paths.get(localRootDir,
-        "bitsail-test",
-        "bitsail-test-end-to-end",
-        "bitsail-test-e2e-base",
-        "src", "main", "resources", "conf", "bitsail.conf").toAbsolutePath().toString();
+    String sysConf = Paths.get(localRootDir, SYS_CONF_PATH).toAbsolutePath().toString();
     transferableFiles.add(new TransferableFile(sysConf,
         Paths.get(executorRootDir, "conf", "bitsail.conf").toAbsolutePath().toString()));
 
     // libs/bitsail-core.jar
-    String coreJar = Paths.get(localRootDir,
-        "bitsail-cores",
-        "bitsail-core-entry",
-        "target", "bitsail-core-entry-" + buildVersion + ".jar").toAbsolutePath().toString();
+    String coreJar = Paths.get(localRootDir, CORE_LIB_PATH,
+        "bitsail-core-entry-" + buildVersion + ".jar").toAbsolutePath().toString();
     transferableFiles.add(new TransferableFile(coreJar,
         Paths.get(executorRootDir, "libs", "bitsail-core.jar").toAbsolutePath().toString()));
 
     // libs/clients/bitsail-client-entry-{revision}.jar
     String clientEntryFile = "bitsail-client-entry-" + buildVersion + ".jar";
-    String clientEntry = Paths.get(localRootDir,
-        "bitsail-clients",
-        "bitsail-client-entry",
-        "target", clientEntryFile).toAbsolutePath().toString();
+    String clientEntry = Paths.get(localRootDir, CLIENT_LIB_PATH, clientEntryFile)
+        .toAbsolutePath().toString();
     transferableFiles.add(new TransferableFile(clientEntry,
         Paths.get(executorRootDir, "libs", "clients", clientEntryFile).toAbsolutePath().toString()));
 
