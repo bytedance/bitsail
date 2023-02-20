@@ -16,7 +16,7 @@
 
 package com.bytedance.bitsail.base.connector.reader.v1;
 
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 
 import java.io.Serializable;
 import java.util.List;
@@ -62,9 +62,7 @@ public interface SourceReader<T, SplitT extends SourceSplit> extends Serializabl
 
   interface Context {
 
-    TypeInfo<?>[] getTypeInfos();
-
-    String[] getFieldNames();
+    RowTypeInfo getRowTypeInfo();
 
     int getIndexOfSubtask();
 
