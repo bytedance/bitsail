@@ -58,8 +58,6 @@ public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BinlogS
 
   @Override
   public void start() {
-    int totalReader = this.context.registeredReaders().size();
-    LOG.info("Total registered reader number: {}", totalReader);
     if (!this.isBinlogAssigned) {
       List<BinlogSplit> splitList = new ArrayList<>();
       BinlogSplit split = createSplit(this.jobConf);
