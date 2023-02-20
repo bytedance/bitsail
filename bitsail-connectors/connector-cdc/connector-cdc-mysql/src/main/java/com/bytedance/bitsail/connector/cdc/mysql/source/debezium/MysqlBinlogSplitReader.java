@@ -17,7 +17,9 @@
 package com.bytedance.bitsail.connector.cdc.mysql.source.debezium;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.row.BinlogRow;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.component.format.debezium.JsonDebeziumSerializationSchema;
 import com.bytedance.bitsail.connector.cdc.mysql.source.config.MysqlConfig;
 import com.bytedance.bitsail.connector.cdc.source.reader.BinlogSplitReader;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
@@ -46,6 +48,8 @@ import io.debezium.relational.TableId;
 import io.debezium.schema.TopicSelector;
 import io.debezium.util.Clock;
 import io.debezium.util.SchemaNameAdjuster;
+import org.apache.kafka.connect.data.Field;
+import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +67,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Reader that actually execute the Debezium task.
+ * This reader is stateless and will read binlog starting from the given begin offset.
  */
 public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
 
@@ -105,6 +110,8 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
 
   private final int subtaskId;
 
+  private final JsonDebeziumSerializationSchema serializer;
+
   public MysqlBinlogSplitReader(BitSailConfiguration jobConf, int subtaskId) {
     this.mysqlConfig = MysqlConfig.fromBitSailConf(jobConf);
     this.schemaNameAdjuster = SchemaNameAdjuster.create();
@@ -114,6 +121,7 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
     ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("mysql-binlog-reader-" + this.subtaskId).build();
     this.executorService = Executors.newSingleThreadExecutor(threadFactory);
     this.offset = new HashMap<>();
+    this.serializer = new JsonDebeziumSerializationSchema(jobConf);
   }
 
   public void readSplit(BinlogSplit split) {
@@ -183,7 +191,7 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
         dispatcher,
         errorHandler,
         Clock.SYSTEM,
-        taskContext, // reuse binary log client
+        taskContext,
         new MySqlStreamingChangeEventSourceMetrics(
             taskContext, queue, metadataProvider)
     );
@@ -241,21 +249,31 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
     }
   }
 
+  @Override
   public boolean isCompleted() {
     return !isRunning;
   }
 
+  @Override
   public Row poll() {
     SourceRecord record = this.recordIterator.next();
     this.offset = record.sourceOffset();
-    LOG.info("OFFSET:" + record.sourceOffset());
-    LOG.info("poll one record {}", record.value());
-    // TODO: Build BitSail row and return
-    return null;
-    //return record;
+    byte[] serialized = this.serializer.serialize(record);
+    Struct val = (Struct) record.value();
+    Field keyField = record.keySchema().fields().get(0);
+    BinlogRow result = new BinlogRow();
+    result.setDatabase(val.getStruct("source").getString("db"));
+    result.setTable(val.getStruct("source").getString("table"));
+    result.setKey(((Struct) record.key()).get(keyField).toString());
+    result.setTimestamp(val.getStruct("source").getInt64("ts_ms").toString());
+    result.setDDL(false);
+    result.setVersion(1);
+    result.setValue(serialized);
+    return result;
   }
 
-  public boolean hasNext() throws InterruptedException {
+  @Override
+  public boolean hasNext() {
     if (this.recordIterator.hasNext()) {
       return true;
     } else {
@@ -264,21 +282,24 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
   }
 
   @SuppressWarnings("checkstyle:MagicNumber")
-  private boolean pollNextBatch() throws InterruptedException {
+  private boolean pollNextBatch() {
     if (isRunning) {
-      List<DataChangeEvent> dbzRecords = queue.poll();
-      while (dbzRecords.isEmpty()) {
-        //sleep 10s
-        LOG.info("No record found, sleep for 5s in reader");
-        TimeUnit.SECONDS.sleep(5);
-        dbzRecords = queue.poll();
+      try {
+        List<DataChangeEvent> dbzRecords = queue.poll();
+        while (dbzRecords.isEmpty()) {
+          LOG.info("No record found, sleep for 5s in reader");
+          TimeUnit.SECONDS.sleep(5);
+          dbzRecords = queue.poll();
+        }
+        this.batch = new ArrayList<>();
+        for (DataChangeEvent event : dbzRecords) {
+          this.batch.add(event.getRecord());
+        }
+        this.recordIterator = this.batch.iterator();
+        return true;
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
       }
-      this.batch = new ArrayList<>();
-      for (DataChangeEvent event : dbzRecords) {
-        this.batch.add(event.getRecord());
-      }
-      this.recordIterator = this.batch.iterator();
-      return true;
     }
     return false;
   }

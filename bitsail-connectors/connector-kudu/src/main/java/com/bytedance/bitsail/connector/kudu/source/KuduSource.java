@@ -94,6 +94,9 @@ public class KuduSource implements Source<Row, KuduSourceSplit, EmptyState>, Par
       }
     }
 
-    return new ParallelismAdvice(false, parallelism);
+    return ParallelismAdvice.builder()
+        .adviceParallelism(parallelism)
+        .enforceDownStreamChain(false)
+        .build();
   }
 }

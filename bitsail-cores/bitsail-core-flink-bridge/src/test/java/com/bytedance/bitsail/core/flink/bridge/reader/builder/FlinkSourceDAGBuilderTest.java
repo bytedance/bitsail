@@ -86,7 +86,7 @@ public class FlinkSourceDAGBuilderTest {
     flinkSourceDAGBuilder.addSource(environ, 1);
 
     Map<String, Object> mockAccumulator = Mockito.mock(Map.class);
-    Mockito.doReturn(1L).when(mockAccumulator).get(Mockito.anyString());
+    Mockito.doReturn(1L).when(mockAccumulator).getOrDefault(Mockito.anyString(), Mockito.any());
     JobExecutionResult jobExecutionResult = Mockito.mock(JobExecutionResult.class);
     Mockito.doReturn(mockAccumulator).when(jobExecutionResult).getAllAccumulatorResults();
     ProcessResult<?> processResult = ProcessResult.builder()

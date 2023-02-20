@@ -43,14 +43,38 @@ jobs:
       - name: Check License Header
         uses: apache/skywalking-eyes/header@main
 
+  # This workflow compile the project on Windows without running any test
+  compile:
+    name: Compile
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ windows-latest ]
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - run: git config --global core.longpaths true
+      - uses: actions/checkout@v3
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          architecture: x64
+          cache: 'maven'
+
+      - name: Compile
+        run:
+          mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=true
+
   # This workflow contains a single job called "unit-test"
-  macos-unit-test:
-    name: MacOS Unit Test
+  unit-test:
+    name: Unit Test
     # The type of runner that the job will run on
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ macos-latest ]
+        os: [ ubuntu-latest, macos-latest ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - run: git config --global core.longpaths true
@@ -61,55 +85,11 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
           architecture: x64
-      - name: Setting Maven Repository
-        uses: s4u/maven-settings-action@v2.8.0
-        with:
-          apacheSnapshots: true
-          sonatypeSnapshots: true
-          oracleRepo: true
-      - name: Setup Apache Thrift Compiler
-        run: |
-          brew tap-new $USER/local-tap
-          brew extract --version='0.13.0' thrift $USER/local-tap
-          brew install thrift@0.13.0
-          thrift -version 
+          cache: 'maven'
 
       - name: Maven Verify Unit Test
         run:
-          mvn clean verify -pl bitsail-dist -am -U -DskipUT=false -DskipITCase=true -P _maven.oracle.com_
-
-  # This workflow contains a single job called "Ubuntu Unit Test"
-  ubuntu-unit-test:
-    name: Ubuntu Unit Test
-    # The type of runner that the job will run on
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ ubuntu-latest ]
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      - run: git config --global core.longpaths true
-      - uses: actions/checkout@v3
-      - name: Set up JDK 8
-        uses: actions/setup-java@v3
-        with:
-          java-version: '8'
-          distribution: 'adopt'
-          architecture: x64
-      - name: Setting Maven Repository
-        uses: s4u/maven-settings-action@v2.8.0
-        with:
-          apacheSnapshots: true
-          sonatypeSnapshots: true
-          oracleRepo: true
-      - name: Setup Apache Thrift Compiler
-        uses: dodopizza/setup-thrift@v1
-        with:
-          version: 0.13.0
-
-      - name: Maven Verify Unit Test
-        run:
-          mvn clean verify -pl bitsail-dist -am -U -DskipUT=false -DskipITCase=true -P _maven.oracle.com_
+          mvn clean verify -pl bitsail-dist -am -DskipUT=false -DskipITCase=true
 
     # This workflow contains a single job called "integration-tests"
   integration-tests:
@@ -129,17 +109,7 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
           architecture: x64
-      - name: Setting Maven Repository
-        uses: s4u/maven-settings-action@v2.8.0
-        with:
-          apacheSnapshots: true
-          sonatypeSnapshots: true
-          oracleRepo: true
-      - name: Setup Apache Thrift Compiler
-        uses: dodopizza/setup-thrift@v1
-        with:
-          version: 0.13.0
-
+          cache: 'maven'
       - name: Maven Verify Integration Test
         run:
-          mvn clean verify -pl bitsail-dist -am -U -DskipUT=true -DskipITCase=false -P _maven.oracle.com_
+          mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=false

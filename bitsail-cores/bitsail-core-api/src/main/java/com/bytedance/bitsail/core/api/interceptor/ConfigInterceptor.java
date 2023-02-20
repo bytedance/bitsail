@@ -18,6 +18,7 @@ package com.bytedance.bitsail.core.api.interceptor;
 
 import com.bytedance.bitsail.base.extension.Component;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.core.api.command.CoreCommandArgs;
 
 public interface ConfigInterceptor extends Component {
   int DEFAULT_ORDER = 1;
@@ -32,7 +33,7 @@ public interface ConfigInterceptor extends Component {
   /**
    * Invoke intercept.
    */
-  void intercept(BitSailConfiguration globalConfiguration);
+  void intercept(BitSailConfiguration globalConfiguration, CoreCommandArgs coreCommandArgs);
 
   /**
    * Order for the interceptor

@@ -65,7 +65,7 @@ public class HiveRowBuilder implements RowBuilder<ArrayWritable> {
    * @param reuse
    */
   @Override
-  public void build(ArrayWritable objectValue, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException {
+  public void build(ArrayWritable objectValue, Row reuse, RowTypeInfo rowTypeInfo) throws BitSailException {
     String columnName = "";
     try {
       Writable[] vals = objectValue.get();

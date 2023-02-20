@@ -19,6 +19,7 @@ dir:
 - [HBase 连接器](hbase/hbase.md)
 - [Hive 连接器](hive/hive.md)
 - [Hudi 连接器](hudi/hudi.md)
+- [LocalFileSystem 连接器](localfilesystem/localfilesystem.md)
 - [JDBC 连接器](jdbc/jdbc.md)
 - [Kafka 连接器](kafka/kafka.md)
 - [Kudu 连接器](kudu/kudu.md)

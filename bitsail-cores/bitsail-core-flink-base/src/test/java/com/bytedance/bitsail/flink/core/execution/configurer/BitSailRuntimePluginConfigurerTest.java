@@ -30,11 +30,11 @@ public class BitSailRuntimePluginConfigurerTest {
   @Test
   public void testGetRuntimePlugins() {
     BitSailRuntimePluginConfigurer pluginConfigurer =
-        new BitSailRuntimePluginConfigurer(FlinkJobMode.BATCH);
+        new BitSailRuntimePluginConfigurer(FlinkJobMode.BATCH.getRuntimePluginClasses());
     List<RuntimePlugin> pluginList = pluginConfigurer.getRuntimePlugins();
     assertEquals(pluginList.size(), 2);
 
-    pluginConfigurer = new BitSailRuntimePluginConfigurer(FlinkJobMode.STREAMING);
+    pluginConfigurer = new BitSailRuntimePluginConfigurer(FlinkJobMode.STREAMING.getRuntimePluginClasses());
     pluginList = pluginConfigurer.getRuntimePlugins();
     assertEquals(pluginList.size(), 1);
   }

@@ -21,7 +21,7 @@ import com.bytedance.bitsail.common.exception.ErrorCode;
 public enum JsonFormatErrorCode implements ErrorCode {
 
   JSON_FORMAT_SCHEMA_PARSE_FAILED("JSON-Format-1", "JSOM format parse byte array failed."),
-  JSON_FORMAT_COVERT_FAILED("JSON-Format-1", "JSOM format covert failed.");
+  JSON_FORMAT_COVERT_FAILED("JSON-Format-2", "JSOM format covert failed.");
 
   public String code;
   public String description;

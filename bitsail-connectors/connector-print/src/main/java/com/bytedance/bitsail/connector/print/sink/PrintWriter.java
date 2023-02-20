@@ -18,8 +18,6 @@ package com.bytedance.bitsail.connector.print.sink;
 
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.print.sink.option.PrintWriterOptions;
@@ -32,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class PrintWriter implements Writer<Row, String, Integer> {
   private static final Logger LOG = LoggerFactory.getLogger(PrintWriter.class);
@@ -40,7 +37,7 @@ public class PrintWriter implements Writer<Row, String, Integer> {
   private final int subTaskId;
 
   private final int batchSize;
-  private final List<String> fieldNames;
+  private final String[] fieldNames;
   private final boolean sampleWrite;
   private final int sampleLimit;
 
@@ -55,16 +52,12 @@ public class PrintWriter implements Writer<Row, String, Integer> {
   }
 
   public PrintWriter(BitSailConfiguration writerConfiguration, Writer.Context<Integer> context, int alreadyPrintCount) {
-    this.batchSize = writerConfiguration.getNecessaryOption(PrintWriterOptions.BATCH_SIZE,
-      PrintErrorCode.REQUIRED_VALUE);
+    this.batchSize = writerConfiguration.get(PrintWriterOptions.BATCH_SIZE);
     Preconditions.checkState(this.batchSize > 0, "batch size must be larger than 0");
 
     this.sampleWrite = writerConfiguration.get(PrintWriterOptions.SAMPLE_WRITE);
     this.sampleLimit = writerConfiguration.get(PrintWriterOptions.SAMPLE_LIMIT);
-    this.fieldNames = writerConfiguration.get(WriterOptions.BaseWriterOptions.COLUMNS)
-      .stream()
-      .map(ColumnInfo::getName)
-      .collect(Collectors.toList());
+    this.fieldNames = context.getRowTypeInfo().getFieldNames();
 
     printCount = new AtomicInteger(alreadyPrintCount);
     samplePrintCount = new AtomicInteger(0);
@@ -88,13 +81,14 @@ public class PrintWriter implements Writer<Row, String, Integer> {
   private String stringByRow(Row element) {
     String[] fields = new String[element.getFields().length];
     for (int i = 0; i < element.getFields().length; ++i) {
-      fields[i] = String.format("\"%s\":\"%s\"", fieldNames.get(i), element.getField(i).toString());
+      fields[i] = String.format("\"%s\":\"%s\"", fieldNames[i], element.getField(i).toString());
     }
     return String.format("[%s]", String.join(",", fields));
   }
 
   @Override
-  public void flush(boolean endOfInput) {}
+  public void flush(boolean endOfInput) {
+  }
 
   @Override
   public List<String> prepareCommit() {

@@ -82,7 +82,7 @@ public class FtpInputFormat extends InputFormatPlugin<Row, InputSplit> implement
 
   @Override
   public Row buildRow(Row reuse, String mandatoryEncoding) throws BitSailException {
-    rowBuilder.build(line, reuse, mandatoryEncoding, rowTypeInfo);
+    rowBuilder.build(line, reuse, rowTypeInfo);
     return reuse;
   }
 
