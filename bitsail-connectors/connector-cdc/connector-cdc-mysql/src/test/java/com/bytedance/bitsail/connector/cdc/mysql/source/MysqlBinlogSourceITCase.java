@@ -14,16 +14,17 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.cdc.mysql.source.debezium;
+package com.bytedance.bitsail.connector.cdc.mysql.source;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.cdc.model.ClusterInfo;
 import com.bytedance.bitsail.connector.cdc.model.ConnectionInfo;
 import com.bytedance.bitsail.connector.cdc.mysql.container.MySQLContainerMariadbAdapter;
-import com.bytedance.bitsail.connector.cdc.mysql.utils.TestDatabase;
 import com.bytedance.bitsail.connector.cdc.option.BinlogReaderOptions;
-import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
-import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
+import com.bytedance.bitsail.connector.kafka.option.KafkaWriterOptions;
+import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
+import com.bytedance.bitsail.test.connector.test.testcontainers.kafka.KafkaCluster;
+import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
 import com.google.common.collect.Lists;
 import org.junit.After;
@@ -35,83 +36,81 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-public class MysqlBinlogSplitReaderContainerTest {
-
-  private static final Logger LOG = LoggerFactory.getLogger(MysqlBinlogSplitReaderContainerTest.class);
+public class MysqlBinlogSourceITCase {
+  private static final Logger LOG = LoggerFactory.getLogger(MysqlBinlogSourceITCase.class);
 
   private static final String MYSQL_DOCKER_IMAGER = "mysql:8.0.29";
 
-  private static final String TEST_USERNAME = "user1";
-  private static final String TEST_PASSWORD = "password1";
+  private static final String TEST_USERNAME = "root";
+  private static final String TEST_PASSWORD = "pw";
   private static final String TEST_DATABASE = "test";
 
   private MySQLContainer<?> container;
+
+  private final String topicName = "testTopic";
+
+  private final KafkaCluster kafkaCluster = new KafkaCluster();
 
   @Before
   public void before() {
     container = new MySQLContainerMariadbAdapter<>(DockerImageName.parse(MYSQL_DOCKER_IMAGER))
         //.withConfigurationOverride("container/my.cnf")
-        //.withUrlParam("permitMysqlScheme", null)
+        .withUrlParam("permitMysqlScheme", null)
         .withInitScript("scripts/jdbc_to_print.sql")
         //.withDatabaseName(TEST_DATABASE)
         .withUsername(TEST_USERNAME)
         .withPassword(TEST_PASSWORD)
         .withLogConsumer(new Slf4jLogConsumer(LOG));
-    //container.addParameter("MY_CNF", "container/my.cnf");
 
     Startables.deepStart(Stream.of(container)).join();
+
+    kafkaCluster.startService();
+    kafkaCluster.createTopic(topicName);
   }
 
   @After
   public void after() {
     container.close();
+    kafkaCluster.stopService();
   }
 
   //@Test
-  public void testDatabaseConnection() {
-    TestDatabase db = new TestDatabase(container, "test", TEST_USERNAME, TEST_PASSWORD);
-    db.executeSql("SHOW TABLES;");
-  }
-
-  //@Test
-  public void testBinlogReader() throws InterruptedException {
-    BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
-    TestDatabase database = new TestDatabase(container, "test", TEST_USERNAME, TEST_PASSWORD);
-
+  public void testMysqlCDC2Print() throws Exception {
+    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("bitsail_mysqlcdc_print.json");
     ConnectionInfo connectionInfo = ConnectionInfo.builder()
-        .host(database.getMySQLContainer().getHost())
-        .port(database.getMySQLContainer().getFirstMappedPort())
-        .url(database.getMySQLContainer().getJdbcUrl())
+        .host(container.getHost())
+        .port(container.getFirstMappedPort())
+        .url(container.getJdbcUrl())
+        .build();
+    ClusterInfo clusterInfo = ClusterInfo.builder()
+        .master(connectionInfo)
+        .build();
+    jobConf.set(BinlogReaderOptions.CONNECTIONS, Lists.newArrayList(clusterInfo));
+
+    EmbeddedFlinkCluster.submitJob(jobConf);
+  }
+
+  //@Test
+  public void testMysqlCDC2Kafka() throws Exception {
+    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("bitsail_mysqlcdc_kafka.json");
+    ConnectionInfo connectionInfo = ConnectionInfo.builder()
+        .host(container.getHost())
+        .port(container.getFirstMappedPort())
+        .url(container.getJdbcUrl())
         .build();
     ClusterInfo clusterInfo = ClusterInfo.builder()
         .master(connectionInfo)
         .build();
 
+    // set mysql connections info
     jobConf.set(BinlogReaderOptions.CONNECTIONS, Lists.newArrayList(clusterInfo));
-    jobConf.set(BinlogReaderOptions.USER_NAME, database.getUsername());
-    jobConf.set(BinlogReaderOptions.PASSWORD, database.getPassword());
-    jobConf.set("job.reader.debezium.database.allowPublicKeyRetrieval", "true");
-    jobConf.set("job.reader.debezium.database.server.id", "123");
-    jobConf.set("job.reader.debezium.database.server.name", "abc");
-    jobConf.set("job.reader.debezium.gtid.source.filter.dml.events", "false");
-    jobConf.set("job.reader.debezium.schema.history.internal", "io.debezium.relational.history.MemorySchemaHistory");
-    jobConf.set("job.reader.debezium.database.history", "io.debezium.relational.history.MemoryDatabaseHistory");
 
-    MysqlBinlogSplitReader reader = new MysqlBinlogSplitReader(jobConf, 0);
-    BinlogSplit split = new BinlogSplit("split-1", BinlogOffset.earliest(), BinlogOffset.boundless());
-    reader.readSplit(split);
-    int maxPeriod = 0;
-    while (maxPeriod <= 20) {
-      if (reader.hasNext()) {
-        reader.poll();
-      }
-      maxPeriod++;
-      TimeUnit.SECONDS.sleep(1);
-    }
-    reader.close();
+    // set kafka config
+    jobConf.set(KafkaWriterOptions.BOOTSTRAP_SERVERS, KafkaCluster.getBootstrapServer());
+    jobConf.set(KafkaWriterOptions.TOPIC_NAME, topicName);
+
+    EmbeddedFlinkCluster.submitJob(jobConf);
   }
-
 }

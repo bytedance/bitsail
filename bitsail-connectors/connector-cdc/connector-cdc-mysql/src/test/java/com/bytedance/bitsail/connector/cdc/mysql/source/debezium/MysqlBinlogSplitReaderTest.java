@@ -70,7 +70,6 @@ public class MysqlBinlogSplitReaderTest {
     jobConf.set("job.reader.debezium.database.allowPublicKeyRetrieval", "true");
     jobConf.set("job.reader.debezium.database.server.id", "123");
     jobConf.set("job.reader.debezium.database.server.name", "abc");
-    jobConf.set("job.reader.debezium.gtid.source.filter.dml.events", "false");
     jobConf.set("job.reader.debezium.schema.history.internal", "io.debezium.relational.history.MemorySchemaHistory");
     jobConf.set("job.reader.debezium.database.history", "io.debezium.relational.history.MemoryDatabaseHistory");
     jobConf.set("job.reader.debezium.include.schema.changes", "false");
