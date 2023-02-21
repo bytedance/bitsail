@@ -63,6 +63,7 @@ public class CustomFlinkPackageHandlerTest {
   public void testProcessHistoryServer() {
 
     FlinkCommandArgs flinkCommandArgs = new FlinkCommandArgs();
+    flinkCommandArgs.setHistoryServerEnable(true);
     flinkCommandArgs.setJobmanagerArchiveFsDir("test_dir");
     flinkCommandArgs.setHistoryServerWebAddress("test_address");
     flinkCommandArgs.setHistoryServerWebPort(100);
