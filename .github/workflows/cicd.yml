@@ -132,12 +132,7 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
           architecture: x64
-      - name: Setting Maven Repository
-        uses: s4u/maven-settings-action@v2.8.0
-        with:
-          apacheSnapshots: true
-          sonatypeSnapshots: true
-          oracleRepo: true
+          cache: 'maven'
 
       - name: Maven Verify End-to-End Test
         run:
