@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,12 +69,12 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
   /**
    * Used to de duplicate user-defined fields with the same name.
    */
-  private transient Map<String, byte[][]> namesMap;
+  private final transient Map<String, byte[][]> namesMap;
 
   /**
    * Schema Settings.
    */
-  private String tableName;
+  private final String tableName;
   private final transient Connection connection;
   private ResultScanner currentScanner;
   private HBaseSourceSplit currentSplit;
@@ -82,12 +82,12 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
   private boolean hasNoMoreSplits = false;
   private int totalSplitNum = 0;
   private final Deque<HBaseSourceSplit> splits;
+  private final TypeInfo<?>[] typeInfos;
 
-  private TypeInfo<?>[] typeInfos;
-  private List<String> columnNames;
-  private Set<String> columnFamilies;
-  private transient DeserializationFormat<byte[][], Row> deserializationFormat;
-  private transient DeserializationSchema<byte[][], Row> deserializationSchema;
+  private final List<String> columnNames;
+  private final Set<String> columnFamilies;
+  private final transient DeserializationFormat<byte[][], Row> deserializationFormat;
+  private final transient DeserializationSchema<byte[][], Row> deserializationSchema;
 
   /**
    * Parameters for Hbase/TableInputFormat.
@@ -148,12 +148,18 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
       this.currentSplit = this.splits.poll();
 
       Scan scan = new Scan();
+      scan.withStartRow(this.currentSplit.getStartRow(), true);
+      scan.withStopRow(this.currentSplit.getEndRow(), true);
       this.columnFamilies.forEach(cf -> scan.addFamily(Bytes.toBytes(cf)));
       this.currentScanner = this.connection.getTable(TableName.valueOf(this.tableName)).getScanner(scan);
     }
     Result result = this.currentScanner.next();
     if (result != null) {
       pipeline.output(this.deserializationSchema.deserialize(convertRawRow(result)));
+    } else {
+      this.currentScanner.close();
+      this.currentScanner = null;
+      LOG.info("Task {} finishes reading from split: {}", subTaskId, currentSplit.uniqSplitId());
     }
   }
 
@@ -239,12 +245,5 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
       }
       LOG.info("Current HBase connection is closed.");
     }
-  }
-
-  public JobConf getConf() {
-    JobConf jobConf = new JobConf(false);
-    jobConf.set(TableInputFormat.INPUT_TABLE, this.tableName);
-    this.hbaseConfig.forEach((key, value) -> jobConf.set(key, value.toString()));
-    return jobConf;
   }
 }

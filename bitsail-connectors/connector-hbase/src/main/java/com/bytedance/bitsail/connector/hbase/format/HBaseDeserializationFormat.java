@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,25 +70,25 @@ public class HBaseDeserializationFormat implements DeserializationFormat<byte[][
       private Column deserializeValue(TypeInfo<?> typeInfo, byte[] cell) throws BitSailException {
         Class<?> columnTypeClass = typeInfo.getTypeClass();
 
-        if (TypeInfos.STRING_TYPE_INFO.getTypeClass() == columnTypeClass) {
+        if (columnTypeClass == TypeInfos.STRING_TYPE_INFO.getTypeClass()) {
           return new StringColumn(cell == null ? null : new String(cell, Charset.defaultCharset()));
 
-        } else if (TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass() == columnTypeClass) {
+        } else if (columnTypeClass == TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass()) {
           if (cell != null && cell.length > BIT_LENGTH) {
             return new BooleanColumn(Boolean.valueOf(Bytes.toString(cell)));
           }
           return new BooleanColumn(cell == null ? null : Bytes.toBoolean(cell));
 
-        } else if (TypeInfos.INT_TYPE_INFO.getTypeClass() == columnTypeClass ||
-            TypeInfos.SHORT_TYPE_INFO.getTypeClass() == columnTypeClass) {
+        } else if (columnTypeClass == TypeInfos.INT_TYPE_INFO.getTypeClass() ||
+                columnTypeClass == TypeInfos.SHORT_TYPE_INFO.getTypeClass()) {
           return new LongColumn(cell == null ? null : Integer.valueOf(Bytes.toString(cell)));
 
-        } else if (columnTypeClass == TypeInfos.LONG_TYPE_INFO.getTypeClass()
-            || columnTypeClass == TypeInfos.BIG_INTEGER_TYPE_INFO.getTypeClass()) {
+        } else if (columnTypeClass == TypeInfos.LONG_TYPE_INFO.getTypeClass() ||
+                columnTypeClass == TypeInfos.BIG_INTEGER_TYPE_INFO.getTypeClass()) {
           return new LongColumn(cell == null ? null : Long.valueOf(Bytes.toString(cell)));
 
-        } else if (columnTypeClass == TypeInfos.DOUBLE_TYPE_INFO.getTypeClass()
-            || columnTypeClass == TypeInfos.FLOAT_TYPE_INFO.getTypeClass()) {
+        } else if (columnTypeClass == TypeInfos.DOUBLE_TYPE_INFO.getTypeClass() ||
+                columnTypeClass == TypeInfos.FLOAT_TYPE_INFO.getTypeClass()) {
           return new DoubleColumn(cell == null ? null : Double.valueOf(Bytes.toString(cell)));
 
         } else if (columnTypeClass == TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass() ||

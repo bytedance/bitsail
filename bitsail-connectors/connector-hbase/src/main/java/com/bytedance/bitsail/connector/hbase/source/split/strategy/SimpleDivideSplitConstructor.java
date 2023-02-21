@@ -9,11 +9,7 @@ import com.bytedance.bitsail.connector.hbase.option.HBaseReaderOptions;
 import com.bytedance.bitsail.connector.hbase.source.split.HBaseSourceSplit;
 
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.ResultScanner;
-import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.client.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +26,6 @@ public class SimpleDivideSplitConstructor {
   private final transient Connection connection;
   private List<String> columnNames;
   private Set<String> columnFamilies;
-  private byte[] minRowKey;
-  private byte[] maxRowKey;
 
   public SimpleDivideSplitConstructor(BitSailConfiguration jobConfig) throws IOException {
     this.jobConf = jobConfig;
@@ -50,48 +44,23 @@ public class SimpleDivideSplitConstructor {
             .forEach(column -> this.columnFamilies.add(column.split(":")[0]));
 
     this.connection = HBaseHelper.getHbaseConnection(hbaseConfig);
-
-    getSplitRanges();
-
-    // TODO
-    // get SplitConfig
   }
 
   public List<HBaseSourceSplit> construct() throws IOException {
-    // TODO
-    // Allow user to specify split num in the split config?
-
     List<HBaseSourceSplit> splits = new ArrayList<>();
-    HBaseSourceSplit split = new HBaseSourceSplit(0, this.minRowKey, this.maxRowKey);
-    splits.add(split);
-    return splits;
-  }
 
-  private void getSplitRanges() throws IOException {
-    Scan scan = new Scan();
-    this.columnFamilies.forEach(cf -> scan.addFamily(Bytes.toBytes(cf)));
-    ResultScanner resultScanner = this.connection.getTable(TableName.valueOf(this.tableName)).getScanner(scan);
-
-    try {
-      Result curResult = resultScanner.next();
-      Result lastResult = null;
-      this.minRowKey = new byte[0];
-      this.maxRowKey = new byte[0];
-      int count = 1;
-      while (curResult != null) {
-        if (count == 1) {
-          this.minRowKey = curResult.getRow();
-        }
-        lastResult = curResult;
-        curResult = resultScanner.next();
-        count++;
-      }
-      this.maxRowKey = lastResult.getRow();
-
-    } catch (Exception e) {
-      throw new IOException("Failed to get row key from table " + tableName, e);
-    } finally {
-      resultScanner.close();
+    RegionLocator regionLocator = connection.getRegionLocator(TableName.valueOf(tableName));
+    byte[][] startKeys = regionLocator.getStartKeys();
+    byte[][] endKeys = regionLocator.getEndKeys();
+    if (startKeys.length != endKeys.length) {
+      throw new IOException("Failed to create Splits for HBase table {}. HBase start keys and end keys not equal." + tableName);
     }
+
+    int i = 0;
+    while (i < startKeys.length) {
+      splits.add(new HBaseSourceSplit(i, startKeys[i], endKeys[i]));
+      i++;
+    }
+    return splits;
   }
 }
