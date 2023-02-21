@@ -17,6 +17,7 @@
 package com.bytedance.bitsail.test.e2e.executor.flink;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.configuration.BitSailSystemConfiguration;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.test.e2e.base.transfer.TransferableFile;
@@ -31,10 +32,9 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerLoggerFactory;
+import sun.awt.OSInfo;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Stream;
@@ -51,11 +51,6 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
   protected BitSailConfiguration conf;
 
   /**
-   * Flink dir in test container.
-   */
-  protected String flinkRootDir;
-
-  /**
    * Flink docker.
    */
   protected GenericContainer<?> executor;
@@ -64,7 +59,6 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
   public void configure(BitSailConfiguration executorConf) {
     super.configure(executorConf);
     this.conf = executorConf;
-    this.flinkRootDir = getFlinkRootDir();
   }
 
   @Override
@@ -72,7 +66,6 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
     String flinkDockerImage = getFlinkDockerImage();
 
     List<String> initCommands = Lists.newArrayList(
-        "chmod 777 " + Paths.get(executorRootDir, "bin", "bitsail").toAbsolutePath(),
         "echo " + EXECUTOR_READY_MSG,
         "while true; do sleep 5; done"
     );
@@ -81,11 +74,13 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
         .withNetworkAliases(getContainerName())
         .withLogConsumer(new Slf4jLogConsumer(DockerLoggerFactory.getLogger(flinkDockerImage)).withSeparateOutputStreams())
         .withStartupAttempts(1)
-        .withWorkingDirectory(executorRootDir)
+        .withWorkingDirectory(EXECUTOR_ROOT_DIR.toAbsolutePath().toString())
         .withCommand("bash", "-c", String.join(" ;", initCommands))
         .waitingFor(new LogMessageWaitStrategy()
-        .withRegEx(".*" + EXECUTOR_READY_MSG + ".*")
-        .withStartupTimeout(Duration.ofSeconds(EXECUTOR_READY_TIMEOUT)));
+            .withRegEx(".*" + EXECUTOR_READY_MSG + ".*")
+            .withStartupTimeout(Duration.ofSeconds(EXECUTOR_READY_TIMEOUT)))
+        .withEnv(BitSailSystemConfiguration.BITSAIL_ENV_CONF_NAME, "bitsail-e2e.conf")
+        .withCreateContainerCmdModifier(cmd -> cmd.withPlatform(OSInfo.getOSType().name()));
 
     for (TransferableFile file : transferableFiles) {
       copyToContainer(executor, file);
@@ -97,11 +92,11 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
 
     String commands = String.join(" ", getExecCommand());
     LOG.info("Begin test: [{}], Container: [{}]\n"
-        + "================ Test  Conf ================\n"
-        + conf.desensitizedBeautify() + "\n"
-        + "=============== Test Command ===============\n"
-        + commands + "\n"
-        + "============================================\n",
+            + "================ Test  Conf ================\n"
+            + conf.desensitizedBeautify() + "\n"
+            + "=============== Test Command ===============\n"
+            + commands + "\n"
+            + "============================================\n",
         testId, getContainerName());
 
     Container.ExecResult result = executor.execInContainer("bash", "-c", commands);
@@ -111,23 +106,12 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
     int exitCode = result.getExitCode();
 
     LOG.info("Finish test : [{}], Container: [{}]\n"
-        + "================== STDOUT ==================\n"
-        + "{}\n"
-        + "================== STDERR ==================\n"
-        + "{}\n"
-        + "============================================\n",
+            + "================== STDOUT ==================\n"
+            + "{}\n"
+            + "================== STDERR ==================\n"
+            + "{}\n"
+            + "============================================\n",
         testId, getContainerName(), stdOut == null ? "null" : stdOut, stdErr == null ? "null" : stdErr);
-
-    if (exitCode != 0) {
-      Path flinkLogPath = Paths.get(flinkRootDir, "log", "flink-*-client-*.log").toAbsolutePath();
-      result = executor.execInContainer("bash", "-c", "cat " + flinkLogPath);
-
-      LOG.error("Job exited with code {}, will print the client log now:\n"
-          + "================== CLIENT LOG ==================\n"
-          + "{}\n"
-          + "================================================\n",
-          exitCode, result.getStdout());
-    }
 
     return exitCode;
   }
@@ -155,13 +139,6 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
   protected abstract String getFlinkDockerImage();
 
   /**
-   * Initialize the root dir of flink in test docker.
-   */
-  protected String getFlinkRootDir() {
-    return "/opt/flink";
-  }
-
-  /**
    * Commands for running bitsail e2e test.
    */
   protected List<String> getExecCommand() {
@@ -170,7 +147,7 @@ public abstract class AbstractFlinkExecutor extends AbstractExecutor {
         "--engine flink",
         "--execution-mode run",
         "--deployment-mode local",
-        "--conf " + Paths.get(executorRootDir, "/jobConf.json")
+        "--conf " + EXECUTOR_ROOT_DIR.resolve("jobConf.json").toAbsolutePath()
     );
   }
 }

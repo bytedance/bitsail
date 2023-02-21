@@ -32,7 +32,6 @@ import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerLoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Stream;
@@ -62,9 +61,6 @@ public class GenericExecutor extends AbstractExecutor {
   @Override
   public void configure(BitSailConfiguration executorConf) {
     this.conf = executorConf;
-    this.coreModules = setting.getCoreModules();
-    this.clientModules = setting.getClientModules();
-    super.configure(executorConf);
   }
 
   @Override
@@ -75,7 +71,6 @@ public class GenericExecutor extends AbstractExecutor {
   @Override
   public void init() {
     List<String> initCommands = Lists.newArrayList(
-        "chmod 777 " + Paths.get(executorRootDir, "bin", "bitsail").toAbsolutePath(),
         "echo " + EXECUTOR_READY_MSG,
         "while true; do sleep 5; done"
     );
@@ -85,7 +80,7 @@ public class GenericExecutor extends AbstractExecutor {
         .withLogConsumer(new Slf4jLogConsumer(
             DockerLoggerFactory.getLogger(setting.getExecutorImage())).withSeparateOutputStreams())
         .withStartupAttempts(1)
-        .withWorkingDirectory(executorRootDir)
+        .withWorkingDirectory(EXECUTOR_ROOT_DIR.toAbsolutePath().toString())
         .withCommand("bash", "-c", String.join(" ;", initCommands))
         .waitingFor(new LogMessageWaitStrategy()
             .withRegEx(".*" + EXECUTOR_READY_MSG + ".*")
@@ -142,6 +137,16 @@ public class GenericExecutor extends AbstractExecutor {
   }
 
   @Override
+  public String getClientEngineModule() {
+    return setting.getClientModule();
+  }
+
+  @Override
+  public String getCoreEngineModule() {
+    return setting.getCoreModule();
+  }
+
+  @Override
   public void close() throws IOException {
     if (executor != null) {
       executor.stop();
@@ -156,23 +161,5 @@ public class GenericExecutor extends AbstractExecutor {
     BitSailConfiguration globalConf = setting.getGlobalJobConf();
     executorConf.merge(globalConf, true);
     super.addJobConf(executorConf);
-  }
-
-  @Override
-  protected void addEngineLibs(String buildVersion) {
-    super.addEngineLibs(buildVersion);
-
-    // additional files
-    List<TransferableFile> additionalFiles = setting.getAdditionalFiles();
-    if (CollectionUtils.isNotEmpty(additionalFiles)) {
-      additionalFiles.forEach(tf -> {
-        String relativePath = tf.getHostPath();
-        String absolutePath = Paths.get(localRootDir, relativePath).toAbsolutePath().toString();
-        tf.setHostPath(absolutePath);
-      });
-      transferableFiles.addAll(additionalFiles);
-    }
-
-    LOG.info("Successfully add libs for {}", setting.getExecutorName());
   }
 }

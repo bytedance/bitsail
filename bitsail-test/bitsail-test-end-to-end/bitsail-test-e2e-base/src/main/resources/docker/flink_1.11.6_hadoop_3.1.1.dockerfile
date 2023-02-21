@@ -26,3 +26,7 @@ ENV COMMONS_CLI_URL=https://repo1.maven.org/maven2/commons-cli/commons-cli/1.5.0
 
 RUN wget -nv -O /opt/flink/lib/flink-shaded-hadoop-3-uber.jar "${HADOOP_UBER_URL}";
 RUN wget -nv -O /opt/flink/lib/commons-cli.jar "${COMMONS_CLI_URL}";
+
+RUN rm /opt/flink/conf/log4j-cli.properties
+RUN cp /opt/flink/conf/log4j-console.properties /opt/flink/conf/log4j-cli.properties
+RUN cp /opt/flink/conf/log4j-console.properties /opt/flink/conf/log4j.properties

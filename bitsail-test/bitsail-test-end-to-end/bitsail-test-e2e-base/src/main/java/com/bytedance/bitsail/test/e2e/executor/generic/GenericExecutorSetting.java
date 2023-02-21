@@ -54,11 +54,11 @@ public class GenericExecutorSetting {
   @JsonProperty(value = "executor-image", required = true)
   private String executorImage;
 
-  @JsonProperty("client-modules")
-  private List<String> clientModules;
+  @JsonProperty("client-module")
+  private String clientModule;
 
-  @JsonProperty("core-modules")
-  private List<String> coreModules;
+  @JsonProperty("core-module")
+  private String coreModule;
 
   @JsonProperty("additional-files")
   @JsonDeserialize(using = TransferableFileDeserializer.class)
@@ -82,6 +82,7 @@ public class GenericExecutorSetting {
 
   /**
    * Initialize a {@link GenericExecutorSetting} from setting files.
+   *
    * @param settingFilePath An executor setting file.
    */
   public static GenericExecutorSetting initFromFile(String settingFilePath) {
@@ -98,7 +99,8 @@ public class GenericExecutorSetting {
   static class TransferableFileDeserializer extends JsonDeserializer<List<TransferableFile>> {
     @Override
     public List<TransferableFile> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-      return p.readValueAs(new TypeReference<List<TransferableFile>>(){});
+      return p.readValueAs(new TypeReference<List<TransferableFile>>() {
+      });
     }
   }
 }

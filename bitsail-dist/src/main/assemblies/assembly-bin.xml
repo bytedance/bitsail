@@ -82,28 +82,12 @@
     <fileSets>
         <!--  archive  -->
         <fileSet>
-            <directory>src/main/archive/bin/</directory>
+            <directory>src/main/resources</directory>
             <fileMode>755</fileMode>
             <includes>
                 <include>*</include>
             </includes>
-            <outputDirectory>bin</outputDirectory>
-        </fileSet>
-
-        <fileSet>
-            <directory>src/main/resources/</directory>
-            <includes>
-                <include>*</include>
-            </includes>
-            <outputDirectory>conf</outputDirectory>
-        </fileSet>
-
-        <fileSet>
-            <directory>src/main/archive/examples</directory>
-            <includes>
-                <include>**</include>
-            </includes>
-            <outputDirectory>examples</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
 
         <fileSet>
