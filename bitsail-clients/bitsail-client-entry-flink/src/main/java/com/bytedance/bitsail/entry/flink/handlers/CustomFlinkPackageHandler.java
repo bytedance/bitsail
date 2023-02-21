@@ -102,6 +102,9 @@ public class CustomFlinkPackageHandler {
    * https://nightlies.apache.org/flink/flink-docs-release-1.11/monitoring/historyserver.html
    */
   static void processHistoryServer(FlinkCommandArgs flinkRunCommandArgs, Configuration flinkConfiguration) {
+    if (!flinkRunCommandArgs.isHistoryServerEnable()) {
+      return;
+    }
     flinkConfiguration.set(JobManagerOptions.ARCHIVE_DIR, flinkRunCommandArgs.getJobmanagerArchiveFsDir());
     flinkConfiguration.set(HistoryServerOptions.HISTORY_SERVER_WEB_ADDRESS, flinkRunCommandArgs.getHistoryServerWebAddress());
     flinkConfiguration.set(HistoryServerOptions.HISTORY_SERVER_WEB_PORT, flinkRunCommandArgs.getHistoryServerWebPort());

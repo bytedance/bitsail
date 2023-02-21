@@ -24,9 +24,11 @@ import java.util.List;
  * Created 2022/8/8
  */
 public interface DeploymentSupplier {
-  void addDeploymentMode(List<String> flinkCommands);
+  String ENTRY_JAR_NAME = "bitsail-core.jar";
 
-  void addRunDeploymentCommands(BaseCommandArgs baseCommandArgs);
+  void addRunProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands);
 
-  void addStopDeploymentCommands(BaseCommandArgs baseCommandArgs);
+  void addRunJarAndJobConfCommands(BaseCommandArgs baseCommandArgs, List<String> flinkCommands);
+
+  void addStopProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands);
 }

@@ -20,7 +20,6 @@ import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 import com.bytedance.bitsail.client.api.command.CommandAction;
 import com.bytedance.bitsail.client.api.command.CommandArgsParser;
 import com.bytedance.bitsail.client.api.engine.EngineRunner;
-import com.bytedance.bitsail.client.api.utils.PackageResolver;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.configuration.ConfigParser;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
@@ -53,7 +52,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_KUBERNETES_APPLICATION;
 import static com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver.ENV_PROP_FLINK_CONF_DIR;
 
 /**
@@ -61,8 +59,6 @@ import static com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver.ENV_P
  */
 public class FlinkEngineRunner implements EngineRunner {
   private static final Logger LOG = LoggerFactory.getLogger(FlinkEngineRunner.class);
-
-  private static final String ENTRY_JAR_NAME = "bitsail-core.jar";
 
   private DeploymentSupplierFactory deploymentSupplierFactory;
 
@@ -143,8 +139,9 @@ public class FlinkEngineRunner implements EngineRunner {
 
     flinkCommands.add(flinkDir + "/bin/flink");
     flinkCommands.add(flinkRunCommandArgs.getExecutionMode());
-    deploymentSupplier.addDeploymentMode(flinkCommands);
-    deploymentSupplier.addRunDeploymentCommands(baseCommandArgs);
+    flinkCommands.add("-t");
+    flinkCommands.add(flinkRunCommandArgs.getDeploymentMode());
+    deploymentSupplier.addRunProperties(baseCommandArgs, flinkCommands);
 
     FlinkRunnerSavepointLoader.loadSavepointPath(sysConfiguration,
         jobConfiguration,
@@ -171,26 +168,7 @@ public class FlinkEngineRunner implements EngineRunner {
       flinkCommands.add("-D");
       flinkCommands.add(StringUtils.trim(property.getKey()) + "=" + StringUtils.trim(property.getValue()));
     }
-
-    /*
-     * Customize path of BitSail JAR file for Kubernetes application mode, because Kubernetes
-     * application mode bundles BitSail JAR file together with the custom image and runs the user
-     * code's main() method on the cluster. Programmed path for
-     * BitSail JAR: local:///opt/flink/usrlibs/bitsail-core.jar
-     */
-    if (DEPLOYMENT_KUBERNETES_APPLICATION.equalsIgnoreCase(flinkRunCommandArgs.getDeploymentMode())) {
-      flinkCommands.add("local:///opt/flink/usrlibs/" + ENTRY_JAR_NAME);
-    } else {
-      flinkCommands.add(PackageResolver.getLibraryDir().resolve(ENTRY_JAR_NAME).toString());
-    }
-    if (StringUtils.isNotBlank(baseCommandArgs.getJobConf())) {
-      flinkCommands.add("-xjob_conf");
-      flinkCommands.add(baseCommandArgs.getJobConf());
-    }
-    if (StringUtils.isNotBlank(baseCommandArgs.getJobConfInBase64())) {
-      flinkCommands.add("-xjob_conf_in_base64");
-      flinkCommands.add(baseCommandArgs.getJobConfInBase64());
-    }
+    deploymentSupplier.addRunJarAndJobConfCommands(baseCommandArgs, flinkCommands);
     flinkProcBuilder.command(flinkCommands);
   }
 
@@ -209,8 +187,9 @@ public class FlinkEngineRunner implements EngineRunner {
 
     flinkCommands.add(flinkDir + "/bin/flink");
     flinkCommands.add(flinkStopCommandArgs.getExecutionMode());
-    deploymentSupplier.addDeploymentMode(flinkCommands);
-    deploymentSupplier.addStopDeploymentCommands(baseCommandArgs);
+    flinkCommands.add("-t");
+    flinkCommands.add(flinkStopCommandArgs.getDeploymentMode());
+    deploymentSupplier.addStopProperties(baseCommandArgs, flinkCommands);
 
     flinkCommands.add(flinkStopCommandArgs.getJobId());
 

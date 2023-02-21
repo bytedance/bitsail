@@ -390,6 +390,7 @@ bash ./bin/bitsail run \
    -p kubernetes.container.image=<CustomImage> \
    -p kubernetes.jobmanager.cpu=0.25 \
    -p kubernetes.taskmanager.cpu=0.5 \
+   --historyserver.enable true \
    --jobmanager.archive.fs.dir hdfs:///completed-jobs/ \
    --historyserver.web.address 0.0.0.0 \
    --historyserver.web.port 8082 \

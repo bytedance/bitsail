@@ -19,15 +19,17 @@ package com.bytedance.bitsail.entry.flink.deployment.kubernetes;
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs.KUBERNETES_CLUSTER_ID;
 import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_KUBERNETES_APPLICATION;
+import static com.bytedance.bitsail.entry.flink.deployment.kubernetes.KubernetesDeploymentSupplier.KUBERNETES_CLUSTER_ID;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class KubernetesDeploymentSupplierTest {
   FlinkCommandArgs flinkRunCommandArgs;
@@ -45,14 +47,16 @@ public class KubernetesDeploymentSupplierTest {
   public void testAddRunDeploymentCommands() {
     flinkRunCommandArgs.setDeploymentMode(DEPLOYMENT_KUBERNETES_APPLICATION);
     flinkRunCommandArgs.setKubernetesClusterId("testClusterId");
+    baseCommandArgs.setJobConfInBase64("test");
     final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs);
-
-    deploymentSupplier.addDeploymentMode(flinkCommands);
-    deploymentSupplier.addRunDeploymentCommands(baseCommandArgs);
-    assertEquals(flinkCommands.size(), 2);
-    assertEquals(flinkCommands.get(1), DEPLOYMENT_KUBERNETES_APPLICATION);
-
-    assertEquals(baseCommandArgs.getProperties().size(), 1);
+    deploymentSupplier.addRunProperties(baseCommandArgs, flinkCommands);
+    deploymentSupplier.addRunJarAndJobConfCommands(baseCommandArgs, flinkCommands);
+    assertEquals(ImmutableList.of(
+        "local:///opt/flink/usrlibs/bitsail-core.jar",
+        "-xjob_conf_in_base64",
+        "test"
+    ), flinkCommands);
+    assertEquals(baseCommandArgs.getProperties().get(KUBERNETES_CLUSTER_ID), "testClusterId");
   }
 
   @Test
@@ -60,10 +64,8 @@ public class KubernetesDeploymentSupplierTest {
     flinkRunCommandArgs.setDeploymentMode(DEPLOYMENT_KUBERNETES_APPLICATION);
     flinkRunCommandArgs.setKubernetesClusterId("testClusterId");
     final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs);
-    deploymentSupplier.addDeploymentMode(flinkCommands);
-    deploymentSupplier.addStopDeploymentCommands(baseCommandArgs);
-    assertEquals(flinkCommands.size(), 2);
-    assertEquals(flinkCommands.get(1), DEPLOYMENT_KUBERNETES_APPLICATION);
+    deploymentSupplier.addStopProperties(baseCommandArgs, flinkCommands);
+    assertTrue(flinkCommands.isEmpty());
 
     assertEquals(baseCommandArgs.getProperties().size(), 1);
     assertEquals(baseCommandArgs.getProperties().get(KUBERNETES_CLUSTER_ID), "testClusterId");

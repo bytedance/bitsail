@@ -22,13 +22,14 @@ import com.beust.jcommander.Parameter;
 import lombok.Getter;
 import lombok.Setter;
 
+import static com.bytedance.bitsail.entry.flink.deployment.kubernetes.KubernetesDeploymentSupplier.KUBERNETES_CLUSTER_ID;
+
 /**
  * Created 2022/8/5
  */
 @Getter
 @Setter
 public class FlinkCommandArgs implements CommandArgs {
-  public static final String KUBERNETES_CLUSTER_ID = "kubernetes.cluster-id";
   public static final String JOB_ID = "job-id";
   private static final String JOBMANAGER_ARCHIVE_FS_DIR = "jobmanager.archive.fs.dir";
   private static final String HISTORYSERVER_WEB_ADDRESS = "historyserver.web.address";
@@ -73,6 +74,9 @@ public class FlinkCommandArgs implements CommandArgs {
   @Parameter(names = "--" + JOB_ID,
           description = "The job id of running job")
   private String jobId;
+
+  @Parameter(names = "--historyserver.enable", description = "Enable history server or not.")
+  private boolean historyServerEnable = false;
 
   @Parameter(names = "--" + JOBMANAGER_ARCHIVE_FS_DIR,
       description = "Directory to upload completed jobs to. Add this directory to the list of monitored directories " +

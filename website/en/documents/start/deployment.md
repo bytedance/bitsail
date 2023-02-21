@@ -4,7 +4,7 @@ order: 1
 
 # Deployment Guide
 
-English | [简体中文](../../../zh/documents/start/config.md)
+English | [简体中文](../../../zh/documents/start/deployment.md)
 
 -----
 
@@ -249,7 +249,7 @@ bash ./bin/bitsail run \
    --target kubernetes-application \
    --deployment-mode kubernetes-application \
    --execution-mode run-application \
-   -p kubernetes.kubernetes.jobmanager.service-account=<self-defined-service-account> \
+   -p kubernetes.jobmanager.service-account=<self-defined-service-account> \
    -p kubernetes.container.image=<CustomImage> \
    -p kubernetes.jobmanager.cpu=0.25 \
    -p kubernetes.taskmanager.cpu=0.5 \
@@ -382,10 +382,11 @@ bash ./bin/bitsail run \
    --target kubernetes-application \
    --deployment-mode kubernetes-application \
    --execution-mode run-application \
-   -p kubernetes.kubernetes.jobmanager.service-account=<self-defined-service-account> \
+   -p kubernetes.jobmanager.service-account=<self-defined-service-account> \
    -p kubernetes.container.image=<CustomImage> \
    -p kubernetes.jobmanager.cpu=0.25 \
    -p kubernetes.taskmanager.cpu=0.5 \
+   --historyserver.enable true \
    --jobmanager.archive.fs.dir hdfs:///completed-jobs/ \
    --historyserver.web.address 0.0.0.0 \
    --historyserver.web.port 8082 \

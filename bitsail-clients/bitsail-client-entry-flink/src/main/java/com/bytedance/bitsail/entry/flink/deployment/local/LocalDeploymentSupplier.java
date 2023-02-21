@@ -17,6 +17,7 @@
 package com.bytedance.bitsail.entry.flink.deployment.local;
 
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
+import com.bytedance.bitsail.client.api.utils.PackageResolver;
 import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
 
@@ -36,7 +37,7 @@ public class LocalDeploymentSupplier implements DeploymentSupplier {
   }
 
   @Override
-  public void addDeploymentMode(List<String> flinkCommands) {
+  public void addRunProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
     String jobManagerAddress = flinkCommandArgs.getJobManagerAddress();
     if (StringUtils.isNotEmpty(jobManagerAddress)) {
       flinkCommands.add("-m");
@@ -47,10 +48,19 @@ public class LocalDeploymentSupplier implements DeploymentSupplier {
   }
 
   @Override
-  public void addRunDeploymentCommands(BaseCommandArgs baseCommandArgs) {
+  public void addRunJarAndJobConfCommands(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
+    flinkCommands.add(PackageResolver.getLibraryDir().resolve(ENTRY_JAR_NAME).toString());
+    if (StringUtils.isNotBlank(baseCommandArgs.getJobConf())) {
+      flinkCommands.add("-xjob_conf");
+      flinkCommands.add(baseCommandArgs.getJobConf());
+    }
+    if (StringUtils.isNotBlank(baseCommandArgs.getJobConfInBase64())) {
+      flinkCommands.add("-xjob_conf_in_base64");
+      flinkCommands.add(baseCommandArgs.getJobConfInBase64());
+    }
   }
 
   @Override
-  public void addStopDeploymentCommands(BaseCommandArgs baseCommandArgs) {
+  public void addStopProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
   }
 }
