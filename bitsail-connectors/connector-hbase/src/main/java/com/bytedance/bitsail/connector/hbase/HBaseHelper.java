@@ -35,14 +35,14 @@ import java.security.PrivilegedAction;
 import java.util.Map;
 import java.util.Objects;
 
-public class HBaseHelper implements AutoCloseable {
+public class HBaseHelper {
   private static final Logger LOG = LoggerFactory.getLogger(HBaseHelper.class);
 
   /**
    * Get connection with hbase.
    * @param hbaseConfigMap HBase configuration.
    */
-  public static Connection getHbaseConnection(Map<String, Object> hbaseConfigMap) {
+  public Connection getHbaseConnection(Map<String, Object> hbaseConfigMap) {
     Preconditions.checkState(MapUtils.isNotEmpty(hbaseConfigMap), "HBaseConfig cannot be empty!");
 
     if (KerberosAuthenticator.openKerberos(hbaseConfigMap)) {
@@ -63,7 +63,7 @@ public class HBaseHelper implements AutoCloseable {
    * @param hbaseConfigMap User defined hbase configurations.
    * @return A hadoop configuration.
    */
-  public static Configuration getConfig(Map<String, Object> hbaseConfigMap) {
+  public Configuration getConfig(Map<String, Object> hbaseConfigMap) {
     Configuration hbaseConfiguration = HBaseConfiguration.create();
     if (MapUtils.isEmpty(hbaseConfigMap)) {
       return hbaseConfiguration;
@@ -80,14 +80,14 @@ public class HBaseHelper implements AutoCloseable {
   /**
    * Close mutator.
    */
-  public static void closeBufferedMutator(BufferedMutator bufferedMutator) {
+  public void closeBufferedMutator(BufferedMutator bufferedMutator) {
     closeWithException(bufferedMutator);
   }
 
   /**
    * Close hbase connection.
    */
-  public static void closeConnection(Connection hbaseConnection) {
+  public void closeConnection(Connection hbaseConnection) {
     closeWithException(hbaseConnection);
   }
 
@@ -96,7 +96,7 @@ public class HBaseHelper implements AutoCloseable {
    * @param hbaseConfigMap HBase configuration.
    * @return Connection with hbase.
    */
-  private static Connection getConnectionWithKerberos(Map<String, Object> hbaseConfigMap) {
+  private Connection getConnectionWithKerberos(Map<String, Object> hbaseConfigMap) {
     try {
       UserGroupInformation ugi = KerberosAuthenticator.getUgi(hbaseConfigMap);
       return ugi.doAs((PrivilegedAction<Connection>) () -> {
@@ -116,7 +116,7 @@ public class HBaseHelper implements AutoCloseable {
   /**
    * Close an object and throw exception if failed to close.
    */
-  private static void closeWithException(Closeable closeable) {
+  private void closeWithException(Closeable closeable) {
     try {
       if (Objects.nonNull(closeable)) {
         closeable.close();
@@ -124,10 +124,5 @@ public class HBaseHelper implements AutoCloseable {
     } catch (Exception e) {
       throw new RuntimeException("Failed to close.", e);
     }
-  }
-
-  @Override
-  public void close() throws Exception {
-
   }
 }

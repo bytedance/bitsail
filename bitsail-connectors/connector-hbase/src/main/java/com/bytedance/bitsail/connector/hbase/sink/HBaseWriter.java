@@ -31,12 +31,10 @@ import com.bytedance.bitsail.connector.hbase.error.HBasePluginErrorCode;
 import com.bytedance.bitsail.connector.hbase.option.HBaseWriterOptions;
 import com.bytedance.bitsail.connector.hbase.sink.function.FunctionParser;
 import com.bytedance.bitsail.connector.hbase.sink.function.FunctionTree;
-import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringUtils;
-import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.BufferedMutator;
@@ -78,7 +76,6 @@ public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   protected List<String> rowKeyColumns = Lists.newArrayList();
   protected List<Integer> rowKeyColumnIndex = Lists.newArrayList();
   private Map<String, Object> hbaseConf;
-  private RowTypeInfo rowTypeInfo;
   private boolean openUserKerberos = false;
   private boolean enableKerberos = false;
   private transient Connection connection;
@@ -128,7 +125,8 @@ public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     timeMillisecondFormatThreadLocal = new ThreadLocal();
 
     try {
-      org.apache.hadoop.conf.Configuration hbaseConfiguration = HBaseHelper.getConfig(hbaseConf);
+      HBaseHelper hbasehelper = new HBaseHelper();
+      org.apache.hadoop.conf.Configuration hbaseConfiguration = hbasehelper.getConfig(hbaseConf);
       connection = ConnectionFactory.createConnection(hbaseConfiguration);
 
       bufferedMutator = connection.getBufferedMutator(
@@ -136,8 +134,9 @@ public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
               .pool(HTable.getDefaultExecutor(hbaseConfiguration))
               .writeBufferSize(writeBufferSize));
     } catch (Exception e) {
-      HBaseHelper.closeBufferedMutator(bufferedMutator);
-      HBaseHelper.closeConnection(connection);
+      HBaseHelper hbasehelper = new HBaseHelper();
+      hbasehelper.closeBufferedMutator(bufferedMutator);
+      hbasehelper.closeConnection(connection);
       throw new IllegalArgumentException(e);
     }
 
@@ -250,8 +249,9 @@ public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
       timeMillisecondFormatThreadLocal.remove();
     }
 
-    HBaseHelper.closeBufferedMutator(bufferedMutator);
-    HBaseHelper.closeConnection(connection);
+    HBaseHelper hbasehelper = new HBaseHelper();
+    hbasehelper.closeBufferedMutator(bufferedMutator);
+    hbasehelper.closeConnection(connection);
   }
 
   protected String recordConvertDetailErrorMessage(int pos, Row row) {
@@ -287,10 +287,10 @@ public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
       KerberosAuthenticator.addHBaseKerberosConf(hbaseConf);
     }
 
-    List<ColumnInfo> columns = writerConfig.getNecessaryOption(HBaseWriterOptions.COLUMNS, HBasePluginErrorCode.REQUIRED_VALUE);
+    List<ColumnInfo> columns = writerConfig.getNecessaryOption(
+        HBaseWriterOptions.COLUMNS, HBasePluginErrorCode.REQUIRED_VALUE);
     columnNames = columns.stream().map(ColumnInfo::getName).collect(Collectors.toList());
     columnTypes = columns.stream().map(ColumnInfo::getType).collect(Collectors.toList());
-    rowTypeInfo = NativeFlinkTypeInfoUtil.getRowTypeInformation(columns, typeInfoConverter);
   }
 
   private void sleepRandomTime() {

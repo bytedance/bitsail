@@ -61,43 +61,46 @@ public class HBaseDeserializationFormat implements DeserializationFormat<byte[][
         Row row = new Row(typeInfos.length);
         for (int i = 0; i < row.getArity(); i++) {
           TypeInfo<?> typeInfo = typeInfos[i];
-          Column column = deserializeValue(typeInfo, rowCell[i]);
-          row.setField(i, column);
+          row.setField(i, deserializeValue(typeInfo, rowCell[i]));
         }
         return row;
       }
 
-      private Column deserializeValue(TypeInfo<?> typeInfo, byte[] cell) throws BitSailException {
+      private Object deserializeValue(TypeInfo<?> typeInfo, byte[] cell) throws BitSailException {
+        if (cell == null) {
+          return null;
+        }
+
         Class<?> columnTypeClass = typeInfo.getTypeClass();
 
         if (columnTypeClass == TypeInfos.STRING_TYPE_INFO.getTypeClass()) {
-          return new StringColumn(cell == null ? null : new String(cell, Charset.defaultCharset()));
+          return new String(cell, Charset.defaultCharset());
 
         } else if (columnTypeClass == TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass()) {
-          if (cell != null && cell.length > BIT_LENGTH) {
-            return new BooleanColumn(Boolean.valueOf(Bytes.toString(cell)));
+          if (cell.length > BIT_LENGTH) {
+            return Boolean.valueOf(Bytes.toString(cell));
           }
-          return new BooleanColumn(cell == null ? null : Bytes.toBoolean(cell));
+          return Bytes.toBoolean(cell);
 
         } else if (columnTypeClass == TypeInfos.INT_TYPE_INFO.getTypeClass() ||
                 columnTypeClass == TypeInfos.SHORT_TYPE_INFO.getTypeClass()) {
-          return new LongColumn(cell == null ? null : Integer.valueOf(Bytes.toString(cell)));
+          return Integer.valueOf(Bytes.toString(cell));
 
         } else if (columnTypeClass == TypeInfos.LONG_TYPE_INFO.getTypeClass() ||
                 columnTypeClass == TypeInfos.BIG_INTEGER_TYPE_INFO.getTypeClass()) {
-          return new LongColumn(cell == null ? null : Long.valueOf(Bytes.toString(cell)));
+          return Long.valueOf(Bytes.toString(cell));
 
         } else if (columnTypeClass == TypeInfos.DOUBLE_TYPE_INFO.getTypeClass() ||
                 columnTypeClass == TypeInfos.FLOAT_TYPE_INFO.getTypeClass()) {
-          return new DoubleColumn(cell == null ? null : Double.valueOf(Bytes.toString(cell)));
+          return Double.valueOf(Bytes.toString(cell));
 
         } else if (columnTypeClass == TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass() ||
             columnTypeClass == TypeInfos.SQL_TIME_TYPE_INFO.getTypeClass() ||
             columnTypeClass == TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass()) {
-          return new DateColumn(cell == null ? null : Long.valueOf(Bytes.toString(cell)));
+          return Long.valueOf(Bytes.toString(cell));
 
         } else if (columnTypeClass == BasicArrayTypeInfo.BINARY_TYPE_INFO.getTypeClass()) {
-          return new BytesColumn(cell);
+          return cell;
 
         } else {
           throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_COLUMN_TYPE,

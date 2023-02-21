@@ -24,7 +24,7 @@ public class SimpleDivideSplitConstructor {
   private Map<String, Object> hbaseConfig;
   private static final String ROW_KEY = "rowkey";
   private final transient Connection connection;
-  private List<String> columnNames;
+  private final List<String> columnNames;
   private Set<String> columnFamilies;
 
   public SimpleDivideSplitConstructor(BitSailConfiguration jobConfig) throws IOException {
@@ -43,7 +43,8 @@ public class SimpleDivideSplitConstructor {
                     "Invalid column names, it should be [ColumnFamily:Column] format"))
             .forEach(column -> this.columnFamilies.add(column.split(":")[0]));
 
-    this.connection = HBaseHelper.getHbaseConnection(hbaseConfig);
+    HBaseHelper hbaseHelper = new HBaseHelper();
+    this.connection = hbaseHelper.getHbaseConnection(hbaseConfig);
   }
 
   public List<HBaseSourceSplit> construct() throws IOException {

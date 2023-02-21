@@ -123,7 +123,8 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
             "Invalid column names, it should be [ColumnFamily:Column] format"))
         .forEach(column -> this.columnFamilies.add(column.split(":")[0]));
 
-    this.connection = HBaseHelper.getHbaseConnection(this.hbaseConfig);
+    HBaseHelper hbasehelper = new HBaseHelper();
+    this.connection = hbasehelper.getHbaseConnection(this.hbaseConfig);
     LOG.info("HBase source reader {} has connection created.", subTaskId);
 
     this.splits = new ConcurrentLinkedDeque<>();

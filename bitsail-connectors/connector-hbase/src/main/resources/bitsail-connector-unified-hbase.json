@@ -1,7 +1,8 @@
 {
   "name": "bitsail-connector-unified-hbase",
   "classes": [
-    "com.bytedance.bitsail.connector.hbase.source.HBaseSource"
+    "com.bytedance.bitsail.connector.hbase.source.HBaseSource",
+    "com.bytedance.bitsail.connector.hbase.source.HBaseSink"
   ],
   "libs": [
     "connector-hbase-${version}.jar"
