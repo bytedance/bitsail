@@ -57,8 +57,7 @@ public class BinlogOffset implements Serializable {
   }
 
   public static BinlogOffset createFromJobConf(BitSailConfiguration jobConf) {
-    String rawOffsetType = jobConf.getNecessaryOption(
-        BinlogReaderOptions.INITIAL_OFFSET_TYPE, BinlogReaderErrorCode.REQUIRED_VALUE).toUpperCase().trim();
+    String rawOffsetType = jobConf.get(BinlogReaderOptions.INITIAL_OFFSET_TYPE).toUpperCase().trim();
     BinlogOffsetType offsetType = BinlogOffsetType.valueOf(rawOffsetType);
     switch (offsetType) {
       case LATEST:

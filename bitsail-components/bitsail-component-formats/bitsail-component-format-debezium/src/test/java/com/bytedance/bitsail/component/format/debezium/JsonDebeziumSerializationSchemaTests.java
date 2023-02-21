@@ -14,32 +14,17 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.kafka.model;
+package com.bytedance.bitsail.component.format.debezium;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.ToString;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
-import java.util.Map;
+import org.junit.Test;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@Builder
-@NoArgsConstructor
-@ToString(of = {"key", "value", "partitionId"})
-public class KafkaRecord {
-  private String key;
-  @NonNull
-  private Object value;
-
-  private Integer partitionId;
-
-  private Long timestamp;
-
-  private Map<String, String> headers;
+public class JsonDebeziumSerializationSchemaTests {
+  @Test
+  public void testSerializer() {
+    //TODO: Add UT
+    BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
+    JsonDebeziumSerializationSchema serializationSchema = new JsonDebeziumSerializationSchema(jobConf);
+  }
 }

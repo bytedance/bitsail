@@ -14,32 +14,13 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.kafka.model;
+package com.bytedance.bitsail.connector.cdc.mysql.source.reader;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.ToString;
+import org.junit.Test;
 
-import java.util.Map;
+public class MysqlBinlogSourceReaderTest {
+  @Test
+  public void testReader() {
 
-@Getter
-@Setter
-@AllArgsConstructor
-@Builder
-@NoArgsConstructor
-@ToString(of = {"key", "value", "partitionId"})
-public class KafkaRecord {
-  private String key;
-  @NonNull
-  private Object value;
-
-  private Integer partitionId;
-
-  private Long timestamp;
-
-  private Map<String, String> headers;
+  }
 }
