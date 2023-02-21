@@ -1,5 +1,12 @@
+---
+order: 3
+---
+
 # Job Configuration Guide
+
 English | [简体中文](../../../zh/documents/start/config.md)
+
+-----
 
 ***BitSail*** script configuration is managed by JSON structure, follow scripts show the complete structure:
 
@@ -73,6 +80,15 @@ Dirty record setting:(Only in batch mode)
 | max_dirty_records_stored_num      | FALSE    | 50      | Every task collect size for dirty record.                                                                                         | 50      |
 | dirty_records_count_threshold     | FALSE    | -1      | The threshold of the total dirty records, if dirty records bigger than the threshold, job will fail in final                      | -1      |
 | dirty_record_percentage_threshold | FALSE    | -1      | The percent threshold of the total dirty records, if dirty records percent bigger than the threshold,     job will fail in final. | -1      |
+
+Flow control setting:
+
+| Parameter name                         | Required | Default | Description                                                                        | Example |
+|----------------------------------------|----------|---------|------------------------------------------------------------------------------------|---------|
+| reader_transport_channel_speed_byte    | FALSE    | -1      | This param controls the traffic of a single concurrent reading, X bytes per second | 10      |
+| reader_transport_channel_speed_record  | FALSE    | -1      | This param controls the speed of a single concurrent reading, X rows per second    | 10      |
+| writer_transport_channel_speed_byte    | FALSE    | -1      | This param controls the traffic of a single concurrent writing, Y bytes per second | 10      |
+| writer_transport_channel_speed_record  | FALSE    | -1      | This param controls the speed of a single concurrent writing, Y rows per second    | 10      |
 
 ## Reader Module
 

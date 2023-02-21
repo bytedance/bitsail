@@ -1,7 +1,12 @@
 ---
-order: 4
+order: 6
 ---
+
 # Team
+
+English | [简体中文](../../zh/community/team.md)
+
+-----
 
 ## Contributors
 

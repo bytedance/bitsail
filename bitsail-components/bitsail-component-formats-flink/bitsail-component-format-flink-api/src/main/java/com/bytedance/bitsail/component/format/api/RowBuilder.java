@@ -33,18 +33,9 @@ public interface RowBuilder<T> extends Serializable {
    *
    * @throws BitSailException
    */
-  void build(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo) throws BitSailException;
+  void build(T value, Row reuse, RowTypeInfo rowTypeInfo) throws BitSailException;
 
-  default void build(T value, Row reuse, String mandatoryEncoding, RowTypeInfo rowTypeInfo, int[] fieldIndexes) throws BitSailException {
-    build(value, reuse, mandatoryEncoding, rowTypeInfo);
-  }
-
-  /**
-   * @param value       Raw data to transform to 'bitsail rows'.
-   * @param reuse       The transformed `bitsail row`.
-   * @param rowTypeInfo Determine the format (field name, data types) of the transformed row.
-   */
-  default void build(T value, Row reuse, RowTypeInfo rowTypeInfo) throws BitSailException {
-    build(value, reuse, "UTF-8", rowTypeInfo);
+  default void build(T value, Row reuse, RowTypeInfo rowTypeInfo, int[] fieldIndexes) throws BitSailException {
+    build(value, reuse, rowTypeInfo);
   }
 }

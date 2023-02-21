@@ -17,7 +17,6 @@
 package com.bytedance.bitsail.flink.core.execution.configurer;
 
 import com.bytedance.bitsail.base.runtime.RuntimePlugin;
-import com.bytedance.bitsail.flink.core.FlinkJobMode;
 
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -31,11 +30,10 @@ import java.util.stream.Collectors;
 public class BitSailRuntimePluginConfigurer {
   private static final Logger LOG = LoggerFactory.getLogger(BitSailRuntimePluginConfigurer.class);
 
-  private final FlinkJobMode flinkJobMode;
+  private List<Class<?>> runtimePlugins;
 
   public List<RuntimePlugin> getRuntimePlugins() {
-    List<Class> runtimePluginClasses = flinkJobMode.getRuntimePluginClasses();
-    return runtimePluginClasses.stream().map(pluginClass -> {
+    return runtimePlugins.stream().map(pluginClass -> {
       try {
         return (RuntimePlugin) pluginClass.newInstance();
       } catch (Exception e) {

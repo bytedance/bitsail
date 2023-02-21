@@ -35,7 +35,7 @@ public class FlinkJobModeTest {
     FlinkJobMode streamingMode = FlinkJobMode.STREAMING;
     assertEquals(streamingMode.getRestartStrategy(), RestartStrategy.FAILURE_RATE_RESTART);
 
-    List<Class> runtimePluginList = streamingMode.getRuntimePluginClasses();
+    List<Class<?>> runtimePluginList = streamingMode.getRuntimePluginClasses();
     assertEquals(runtimePluginList.size(), 1);
     assertEquals(runtimePluginList.get(0), JobProgressPlugin.class);
     StreamExecutionEnvironment executionEnvironment = streamingMode.getStreamExecutionEnvironment(BitSailConfiguration.newDefault());
@@ -47,7 +47,7 @@ public class FlinkJobModeTest {
     FlinkJobMode batchMode = FlinkJobMode.BATCH;
     assertEquals(batchMode.getRestartStrategy(), RestartStrategy.FIXED_DELAY_RESTART);
 
-    List<Class> runtimePluginList = batchMode.getRuntimePluginClasses();
+    List<Class<?>> runtimePluginList = batchMode.getRuntimePluginClasses();
     assertEquals(runtimePluginList.size(), 2);
     assertEquals(runtimePluginList.get(0), JobProgressPlugin.class);
     StreamExecutionEnvironment executionEnvironment = batchMode.getStreamExecutionEnvironment(BitSailConfiguration.newDefault());

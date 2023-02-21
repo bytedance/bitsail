@@ -54,13 +54,20 @@ public class CommittableStateSerializerTest {
 
   public static class StringBinarySerializer implements BinarySerializer<String> {
 
+    private static final int VERSION = 1;
+
+    @Override
+    public int getVersion() {
+      return VERSION;
+    }
+
     @Override
     public byte[] serialize(String obj) throws IOException {
       return obj.getBytes();
     }
 
     @Override
-    public String deserialize(byte[] serialized) throws IOException {
+    public String deserialize(int version, byte[] serialized) throws IOException {
       return new String(serialized);
     }
   }

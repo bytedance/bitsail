@@ -30,7 +30,7 @@ public interface BinlogSplitReader<T> extends Serializable {
 
   T poll();
 
-  boolean hasNext() throws Exception;
+  boolean hasNext();
 
   boolean isCompleted();
 }

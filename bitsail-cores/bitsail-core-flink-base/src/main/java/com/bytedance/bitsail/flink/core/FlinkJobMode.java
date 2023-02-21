@@ -89,9 +89,9 @@ public enum FlinkJobMode {
   /**
    * should be subclass of {@link RuntimePlugin}
    */
-  private final List<Class> runtimePluginClasses;
+  private final List<Class<?>> runtimePluginClasses;
 
-  FlinkJobMode(String jobName, RestartStrategy restartStrategy, Class... runtimePluginClasses) {
+  FlinkJobMode(String jobName, RestartStrategy restartStrategy, Class<?>... runtimePluginClasses) {
     this.jobName = jobName;
     this.restartStrategy = restartStrategy;
     this.runtimePluginClasses = Arrays.asList(runtimePluginClasses);

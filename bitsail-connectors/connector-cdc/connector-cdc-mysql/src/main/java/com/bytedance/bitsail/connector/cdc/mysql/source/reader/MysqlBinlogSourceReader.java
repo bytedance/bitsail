@@ -18,14 +18,36 @@ package com.bytedance.bitsail.connector.cdc.mysql.source.reader;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.connector.cdc.mysql.source.debezium.DebeziumHelper;
 import com.bytedance.bitsail.connector.cdc.mysql.source.debezium.MysqlBinlogSplitReader;
+import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
 import com.bytedance.bitsail.connector.cdc.source.reader.BinlogSourceReader;
 import com.bytedance.bitsail.connector.cdc.source.reader.BinlogSplitReader;
+import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class MysqlBinlogSourceReader extends BinlogSourceReader {
 
   public MysqlBinlogSourceReader(BitSailConfiguration jobConf, Context readerContext) {
     super(jobConf, readerContext);
+  }
+
+  @Override
+  public List<BinlogSplit> snapshotState(long checkpointId) {
+    // store the latest offset
+    Map<String, String> readerOffset = this.reader.getOffset();
+    BinlogOffset offset = DebeziumHelper.convertDbzOffsetToBinlogOffset(readerOffset);
+    List<BinlogSplit> splits = new ArrayList<>();
+    BinlogSplit split = BinlogSplit.builder()
+        .splitId("binlog-0")
+        .beginOffset(offset)
+        .endOffset(BinlogOffset.boundless())
+        .build();
+    splits.add(split);
+    return splits;
   }
 
   @Override

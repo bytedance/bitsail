@@ -28,7 +28,6 @@ import java.io.Serializable;
  * Created 2022/6/14
  */
 public class DelegateSimpleVersionedSerializer<T> implements SimpleVersionedSerializer<T>, Serializable {
-  private static final int VERSION = -1;
 
   private final BinarySerializer<T> serializer;
 
@@ -43,7 +42,7 @@ public class DelegateSimpleVersionedSerializer<T> implements SimpleVersionedSeri
 
   @Override
   public int getVersion() {
-    return VERSION;
+    return this.serializer.getVersion();
   }
 
   @Override
@@ -53,6 +52,6 @@ public class DelegateSimpleVersionedSerializer<T> implements SimpleVersionedSeri
 
   @Override
   public T deserialize(int version, byte[] serialized) throws IOException {
-    return serializer.deserialize(serialized);
+    return serializer.deserialize(version, serialized);
   }
 }

@@ -21,6 +21,7 @@ import com.bytedance.bitsail.common.exception.CommonErrorCode;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -101,6 +102,10 @@ public class DateColumn extends Column {
       LocalDateTime localDateTime = ((LocalDateTime) getRawData());
       return new Date(localDateTime.atZone(ZoneOffset.systemDefault())
           .toInstant().toEpochMilli());
+    }
+    if (getRawData() instanceof LocalTime) {
+      LocalTime localTime = ((LocalTime) getRawData());
+      return new Time(localTime.getHour(), localTime.getMinute(), localTime.getSecond());
     }
     return new Date((Long) this.getRawData());
   }

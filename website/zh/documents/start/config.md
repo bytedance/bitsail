@@ -1,6 +1,12 @@
+---
+order: 3
+---
+
 # 任务配置说明
 
-[English](../../../en/documents/start/config.md) | 简体中文
+[English](../../../en/documents/start/deployment.md) | 简体中文
+
+-----
 
 ***BitSail*** 完整配置脚本是由一个 JSON 组成的，完整示意结构如下所示：
 
@@ -75,6 +81,15 @@
 | max_dirty_records_stored_num      | FALSE | 50  | 每个task级别脏数据的收集数量，默认为50条                    | 50  |
 | dirty_records_count_threshold     | FALSE | -1  | 整体脏数据的阈值设置，如果在传输结束后发现脏数据多于该设置，作业失败。        | -1  |
 | dirty_record_percentage_threshold | FALSE | -1  | 整体脏数据占整体传输数据的比例，如果传输结束后发现脏数据的比例大于该阈值，作业失败。 | -1  |
+
+流控配置： 任务的流控配置
+
+| 参数名称                               | 是否必须 | 默认值 | 参数含义                  | 示例 |
+|---------------------------------------|---------|------|--------------------------|-----|
+| reader_transport_channel_speed_byte   | FALSE   | -1   | 控制单并发读的流量, X字节/S  | 10  |
+| reader_transport_channel_speed_record | FALSE   | -1   | 控制单并发读的速度, X条/S    | 10  |
+| writer_transport_channel_speed_byte   | FALSE   | -1   | 控制单并发写的流量, Y字节/S  | 10  |
+| writer_transport_channel_speed_record | FALSE   | -1   | 控制单并发写的速度, Y条/S    | 10  |
 
 ## Reader 模块
 

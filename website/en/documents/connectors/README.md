@@ -19,6 +19,7 @@ dir:
 - [HBase connector](hbase/hbase.md)
 - [Hive connector](hive/hive.md)
 - [Hudi connector](hudi/hudi.md)
+- [LocalFileSystem connector](localfilesystem/localfilesystem.md)
 - [JDBC connector](jdbc/jdbc.md)
 - [Kafka connector](kafka/kafka.md)
 - [Kudu connector](kudu/kudu.md)

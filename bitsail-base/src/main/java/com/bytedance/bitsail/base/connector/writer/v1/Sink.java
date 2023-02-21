@@ -18,7 +18,7 @@ package com.bytedance.bitsail.base.connector.writer.v1;
 
 import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
-import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
+import com.bytedance.bitsail.base.serializer.SimpleVersionedBinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
@@ -73,13 +73,13 @@ public interface Sink<InputT, CommitT extends Serializable, WriterStateT extends
    * @return A serializer which convert committable object to byte array.
    */
   default BinarySerializer<CommitT> getCommittableSerializer() {
-    return new SimpleBinarySerializer<CommitT>();
+    return new SimpleVersionedBinarySerializer<CommitT>();
   }
 
   /**
    * @return A serializer which convert state object to byte array.
    */
   default BinarySerializer<WriterStateT> getWriteStateSerializer() {
-    return new SimpleBinarySerializer<WriterStateT>();
+    return new SimpleVersionedBinarySerializer<WriterStateT>();
   }
 }
