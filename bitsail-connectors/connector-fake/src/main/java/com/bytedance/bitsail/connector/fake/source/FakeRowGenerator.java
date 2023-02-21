@@ -81,11 +81,7 @@ public class FakeRowGenerator {
         row.setField(index, null);
       } else {
         Object constantValue = this.columnInfos.get(index).getDefaultValue();
-        if (Objects.isNull(constantValue)) {
-          row.setField(index, fakeRawValue(typeInfo));
-        } else {
-          row.setField(index, constantRawValue(typeInfo, constantValue.toString()));
-        }
+        row.setField(index, fakeRawValue(typeInfo, constantValue == null ? null : constantValue.toString()));
       }
     }
     return row;
@@ -103,114 +99,78 @@ public class FakeRowGenerator {
   }
 
   @SuppressWarnings("checkstyle:MagicNumber")
-  private Object fakeRawValue(TypeInfo<?> typeInfo) {
+  private Object fakeRawValue(TypeInfo<?> typeInfo, String constantValue) {
 
     if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
       if (CollectionUtils.isNotEmpty(typeInfo.getTypeProperties()) && typeInfo.getTypeProperties().contains(TypeProperty.UNIQUE)) {
+        if (!Objects.isNull(constantValue)) {
+          throw new RuntimeException("unique and defaultValue can't be specified at the same time");
+        }
         return snowflakeIdGenerator.nextId();
       } else {
+        if (!Objects.isNull(constantValue)) {
+          return Long.valueOf(constantValue).longValue();
+        }
         return faker.number().randomNumber();
       }
     } else if (TypeInfos.INT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (!Objects.isNull(constantValue)) {
+        return Long.valueOf(constantValue).intValue();
+      }
       return Long.valueOf(faker.number().randomNumber()).intValue();
 
     } else if (TypeInfos.SHORT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (!Objects.isNull(constantValue)) {
+        return Long.valueOf(constantValue).shortValue();
+      }
       return Long.valueOf(faker.number().randomNumber()).shortValue();
 
     } else if (TypeInfos.STRING_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (!Objects.isNull(constantValue)) {
+        return constantValue;
+      }
       return faker.name().fullName();
 
     } else if (TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (!Objects.isNull(constantValue)) {
+        return Boolean.valueOf(constantValue).booleanValue();
+      }
       return faker.bool().bool();
 
     } else if (TypeInfos.DOUBLE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (!Objects.isNull(constantValue)) {
+        return Double.valueOf(constantValue).doubleValue();
+      }
       return faker.number().randomDouble(5, lower, upper);
 
     } else if (TypeInfos.FLOAT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (!Objects.isNull(constantValue)) {
+        return Double.valueOf(constantValue).floatValue();
+      }
       return Double.valueOf(faker.number().randomDouble(5, lower, upper)).floatValue();
 
     } else if (TypeInfos.BIG_DECIMAL_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (!Objects.isNull(constantValue)) {
+        return BigDecimal.valueOf(Double.valueOf(constantValue));
+      }
       return new BigDecimal(faker.number().randomDouble(5, lower, upper));
 
     } else if (TypeInfos.BIG_INTEGER_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (!Objects.isNull(constantValue)) {
+        return BigInteger.valueOf(Long.valueOf(constantValue));
+      }
       return new BigInteger(String.valueOf(faker.number().randomNumber()));
 
     } else if (BasicArrayTypeInfo.BINARY_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (!Objects.isNull(constantValue)) {
+        return constantValue.getBytes();
+      }
       return faker.name().fullName().getBytes();
 
     } else if (TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return new java.sql.Date(faker.date().between(fromTimestamp, toTimestamp).getTime());
-
-    } else if (TypeInfos.SQL_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return new Time(faker.date().between(fromTimestamp, toTimestamp).getTime());
-
-    } else if (TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return new Timestamp(faker.date().between(fromTimestamp, toTimestamp).getTime());
-
-    } else if (TypeInfos.LOCAL_DATE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return faker.date().between(fromTimestamp, toTimestamp).toLocalDateTime().toLocalDate();
-
-    } else if (TypeInfos.LOCAL_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return faker.date().between(fromTimestamp, toTimestamp).toLocalDateTime().toLocalTime();
-
-    } else if (TypeInfos.LOCAL_DATE_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return faker.date().between(fromTimestamp, toTimestamp).toLocalDateTime();
-
-    } else if (TypeInfos.VOID_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return null;
-    }
-
-    if (typeInfo instanceof ListTypeInfo) {
-      ListTypeInfo<?> listTypeInfo = (ListTypeInfo<?>) typeInfo;
-      return Lists.newArrayList(fakeRawValue(listTypeInfo.getElementTypeInfo()));
-    }
-
-    if (typeInfo instanceof MapTypeInfo) {
-      MapTypeInfo<?, ?> mapTypeInfo = (MapTypeInfo<?, ?>) typeInfo;
-      Map<Object, Object> mapRawValue = Maps.newHashMap();
-      mapRawValue.put(fakeRawValue(mapTypeInfo.getKeyTypeInfo()), fakeRawValue(mapTypeInfo.getValueTypeInfo()));
-      return mapRawValue;
-    }
-    throw new RuntimeException("Unsupported type " + typeInfo);
-  }
-
-  @SuppressWarnings("checkstyle:MagicNumber")
-  private Object constantRawValue(TypeInfo<?> typeInfo, String constantValue) {
-
-    if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      if (CollectionUtils.isNotEmpty(typeInfo.getTypeProperties()) && typeInfo.getTypeProperties().contains(TypeProperty.UNIQUE)) {
-        throw new RuntimeException("unique and defaultValue can't be specified at the same time");
-      } else {
-        return Long.valueOf(constantValue).longValue();
+      if (Objects.isNull(constantValue)) {
+        return new java.sql.Date(faker.date().between(fromTimestamp, toTimestamp).getTime());
       }
-    } else if (TypeInfos.INT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return Long.valueOf(constantValue).intValue();
-
-    } else if (TypeInfos.SHORT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return Long.valueOf(constantValue).shortValue();
-
-    } else if (TypeInfos.STRING_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return constantValue;
-
-    } else if (TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return Boolean.valueOf(constantValue).booleanValue();
-
-    } else if (TypeInfos.DOUBLE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return Double.valueOf(constantValue).doubleValue();
-
-    } else if (TypeInfos.FLOAT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return Double.valueOf(constantValue).floatValue();
-
-    } else if (TypeInfos.BIG_DECIMAL_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return BigDecimal.valueOf(Double.valueOf(constantValue));
-
-    } else if (TypeInfos.BIG_INTEGER_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return BigInteger.valueOf(Long.valueOf(constantValue));
-
-    } else if (BasicArrayTypeInfo.BINARY_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-      return constantValue.getBytes();
-
-    } else if (TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
       if (constantValue.equalsIgnoreCase("now")) {
         return new java.sql.Date(System.currentTimeMillis());
       } else {
@@ -218,6 +178,9 @@ public class FakeRowGenerator {
       }
 
     } else if (TypeInfos.SQL_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (Objects.isNull(constantValue)) {
+        return new Time(faker.date().between(fromTimestamp, toTimestamp).getTime());
+      }
       if (constantValue.equalsIgnoreCase("now")) {
         return new Time(System.currentTimeMillis());
       } else {
@@ -225,6 +188,9 @@ public class FakeRowGenerator {
       }
 
     } else if (TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (Objects.isNull(constantValue)) {
+        return new Timestamp(faker.date().between(fromTimestamp, toTimestamp).getTime());
+      }
       if (constantValue.equalsIgnoreCase("now")) {
         return new Timestamp(System.currentTimeMillis());
       } else {
@@ -232,6 +198,9 @@ public class FakeRowGenerator {
       }
 
     } else if (TypeInfos.LOCAL_DATE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (Objects.isNull(constantValue)) {
+        return faker.date().between(fromTimestamp, toTimestamp).toLocalDateTime().toLocalDate();
+      }
       if (constantValue.equalsIgnoreCase("now")) {
         return LocalDate.now();
       } else {
@@ -239,6 +208,9 @@ public class FakeRowGenerator {
       }
 
     } else if (TypeInfos.LOCAL_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (Objects.isNull(constantValue)) {
+        return faker.date().between(fromTimestamp, toTimestamp).toLocalDateTime().toLocalTime();
+      }
       if (constantValue.equalsIgnoreCase("now")) {
         return LocalTime.now();
       } else {
@@ -246,6 +218,9 @@ public class FakeRowGenerator {
       }
 
     } else if (TypeInfos.LOCAL_DATE_TIME_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      if (Objects.isNull(constantValue)) {
+        return faker.date().between(fromTimestamp, toTimestamp).toLocalDateTime();
+      }
       if (constantValue.equalsIgnoreCase("now")) {
         return LocalDateTime.now();
       } else if (constantValue.contains(":")) {
@@ -261,19 +236,27 @@ public class FakeRowGenerator {
 
     if (typeInfo instanceof ListTypeInfo) {
       ListTypeInfo<?> listTypeInfo = (ListTypeInfo<?>) typeInfo;
-      return Lists.newArrayList(constantRawValue(listTypeInfo.getElementTypeInfo(), constantValue));
+      return Lists.newArrayList(fakeRawValue(listTypeInfo.getElementTypeInfo(), constantValue));
     }
 
     if (typeInfo instanceof MapTypeInfo) {
       MapTypeInfo<?, ?> mapTypeInfo = (MapTypeInfo<?, ?>) typeInfo;
       Map<Object, Object> mapRawValue = Maps.newHashMap();
-      String[] kv = constantValue.split("_:_");
-      if (kv.length < 2) {
-        throw new IllegalArgumentException("defualt value of MapType requires key and value with _:_ as splitor");
+      if (Objects.isNull(constantValue)) {
+        mapRawValue.put(fakeRawValue(mapTypeInfo.getKeyTypeInfo(), null), fakeRawValue(mapTypeInfo.getValueTypeInfo(), null));
+        return mapRawValue;
+      } else {
+        String[] kv = constantValue.split("_:_");
+        if (kv.length < 2) {
+          throw new IllegalArgumentException("defualt value of MapType requires key and value with _:_ as splitor");
+        }
+        mapRawValue.put(fakeRawValue(mapTypeInfo.getKeyTypeInfo(), kv[0]), fakeRawValue(mapTypeInfo.getValueTypeInfo(), kv[1]));
+        return mapRawValue;
       }
-      mapRawValue.put(constantRawValue(mapTypeInfo.getKeyTypeInfo(), kv[0]), constantRawValue(mapTypeInfo.getValueTypeInfo(), kv[1]));
-      return mapRawValue;
+
     }
     throw new RuntimeException("Unsupported type " + typeInfo);
   }
+
+
 }
