@@ -84,12 +84,12 @@ order: 3
 
 流控配置： 任务的流控配置
 
-| 参数名称                            | 是否必须  | 默认值 | 参数含义                                        | 示例  |
-|-----------------------------------|-------|-----|--------------------------------------------|-----|
-| reader_transport_channel_speed_byte  | FALSE | -1  | 控制单并发读的流量, X字节/S | 10  |
-| reader_transport_channel_speed_record | FALSE | -1  | 控制单并发读的速度, X条/S | 10  |
-| writer_transport_channel_speed_byte | FALSE | -1  | 控制单并发写的流量, Y字节/S | 10  |
-| writer_transport_channel_speed_record | FALSE | -1  | 控制单并发写的速度, Y条/S | 10  |
+| 参数名称                               | 是否必须 | 默认值 | 参数含义                  | 示例 |
+|---------------------------------------|--------|------ |-------------------------|-----|
+| reader_transport_channel_speed_byte   | FALSE  | -1    | 控制单并发读的流量, X字节/S | 10  |
+| reader_transport_channel_speed_record | FALSE  | -1    | 控制单并发读的速度, X条/S   | 10  |
+| writer_transport_channel_speed_byte   | FALSE  | -1    | 控制单并发写的流量, Y字节/S | 10  |
+| writer_transport_channel_speed_record | FALSE  | -1    | 控制单并发写的速度, Y条/S   | 10  |
 
 ## Reader 模块
 

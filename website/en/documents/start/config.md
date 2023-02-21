@@ -83,12 +83,12 @@ Dirty record setting:(Only in batch mode)
 
 Flow control setting:
 
-| Parameter name                         | Required  | Default | Description                 | Example  |
-|-----------------------------------|-------|-----|--------------------------------------------|-----|
-| reader_transport_channel_speed_byte  | FALSE | -1  | This param controls the traffic of a single concurrent reading, X bytes per second | 10  |
-| reader_transport_channel_speed_record | FALSE | -1  | This param controls the speed of a single concurrent reading, X rows per second | 10  |
-| writer_transport_channel_speed_byte | FALSE | -1  | This param controls the traffic of a single concurrent writing, Y bytes per second | 10  |
-| writer_transport_channel_speed_record | FALSE | -1  | This param controls the speed of a single concurrent writing, Y rows per second | 10  |
+| Parameter name                         | Required | Default | Description                                                                        | Example |
+|----------------------------------------|----------|---------|------------------------------------------------------------------------------------|---------|
+| reader_transport_channel_speed_byte    | FALSE    | -1      | This param controls the traffic of a single concurrent reading, X bytes per second | 10      |
+| reader_transport_channel_speed_record  | FALSE    | -1      | This param controls the speed of a single concurrent reading, X rows per second    | 10      |
+| writer_transport_channel_speed_byte    | FALSE    | -1      | This param controls the traffic of a single concurrent writing, Y bytes per second | 10      |
+| writer_transport_channel_speed_record  | FALSE    | -1      | This param controls the speed of a single concurrent writing, Y rows per second    | 10      |
 
 ## Reader Module
 
