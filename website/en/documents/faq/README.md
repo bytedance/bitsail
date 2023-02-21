@@ -134,3 +134,31 @@ dir:
 27. **How do incremental updates work?**
 
 > There is a set of CDC mechanism in Byte, which sends all the full data and incremental data into the Message Queue, and the BitSail engine directly connects to the Message Queue to combine the full data and the incremental data.
+
+28. **How to deploy bitsail in hive2.x or hive3.x?**
+
+> BitSail uses a shaded module, namely bitsail-shaded-hive, to import hive dependencies.
+> By default, BitSail uses **3.1.0** as hive version.
+> Therefore, if you want to deploy BitSail in different hive environment, you can modify the `hive.version` property in [bitsail-shaded-hive](https://github.com/bytedance/bitsail/blob/master/bitsail-shade/bitsail-shaded-hive/pom.xml).
+> 
+> ![](../../../images/change-hive-version.png)
+
+29. **Does BitSail support JDK 11？**
+
+> Currently, BitSail only support JDK 8.
+
+30. **Tests failed when running integration tests or E2E tests locally?**
+
+> BitSail uses docker to construct data sources for integration tests and E2E tests. Therefore, please make sure docker is installed before run these two kinds of tests.
+>
+> If tests still failed after docker is installed, please open an issue for help.
+
+31. **How to test hadoop related connector (_e.g._, hive) locally, if there is no hadoop environment?**
+
+> After building BitSail project with [build.sh](https://github.com/bytedance/bitsail/blob/master/build.sh) script, all the libs and scripts are packaged into `output` folder.
+> 
+> To test hadoop related connector (_e.g._, hive) locally, please download the following two jars into  `output/embedded/flink/lib`.
+> - [flink-shaded-hadoop-3-uber.jar](https://repository.cloudera.com/artifactory/cloudera-repos/org/apache/flink/flink-shaded-hadoop-3-uber/3.1.1.7.2.9.0-173-9.0/flink-shaded-hadoop-3-uber-3.1.1.7.2.9.0-173-9.0.jar)
+> - [commons-cli](https://repo1.maven.org/maven2/commons-cli/commons-cli/1.5.0/commons-cli-1.5.0.jar)
+>
+> Then you can submit test job in `output` folder.

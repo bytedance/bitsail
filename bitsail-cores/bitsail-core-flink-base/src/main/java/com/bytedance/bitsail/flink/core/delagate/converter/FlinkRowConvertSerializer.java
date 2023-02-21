@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ import com.bytedance.bitsail.common.column.ListColumn;
 import com.bytedance.bitsail.common.column.MapColumn;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
-import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 
@@ -49,18 +49,13 @@ import static com.bytedance.bitsail.common.typeinfo.TypeInfos.STRING_TYPE_INFO;
  * Created 2022/6/21
  */
 public class FlinkRowConvertSerializer implements RowSerializer<Row> {
-
-  private final List<ColumnInfo> columns;
-
-  private final TypeInfo<?>[] typeInfos;
+  private final RowTypeInfo rowTypeInfo;
 
   private final BitSailConfiguration commonConfiguration;
 
-  public FlinkRowConvertSerializer(TypeInfo<?>[] typeInfos,
-                                   List<ColumnInfo> columns,
+  public FlinkRowConvertSerializer(RowTypeInfo rowTypeInfo,
                                    BitSailConfiguration commonConfiguration) {
-    this.columns = columns;
-    this.typeInfos = typeInfos;
+    this.rowTypeInfo = rowTypeInfo;
     this.commonConfiguration = commonConfiguration;
   }
 
@@ -70,16 +65,16 @@ public class FlinkRowConvertSerializer implements RowSerializer<Row> {
     int arity = ArrayUtils.getLength(fields);
     Row flinkRow = new Row(org.apache.flink.types.RowKind.fromByteValue(row.getKind().toByteValue()), arity);
     for (int index = 0; index < arity; index++) {
-      TypeInfo<?> typeInfo = typeInfos[index];
+      TypeInfo<?> typeInfo = rowTypeInfo.getTypeInfos()[index];
       Object field = row.getField(index);
       if (field instanceof Column) {
-        field = deserializeColumn((Column) field, typeInfo, columns.get(index).getName());
+        field = deserializeColumn((Column) field, typeInfo, rowTypeInfo.getFieldNames()[index]);
       } else {
         if (!compareValueTypeInfo(field, typeInfo)) {
           //todo transform
           throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
               String.format("column %s type info %s not match with value type %s.",
-                  columns.get(index).getName(), typeInfo, field.getClass()));
+                  rowTypeInfo.getFieldNames()[index], typeInfo, field.getClass()));
         }
       }
       flinkRow.setField(index, field);
@@ -135,9 +130,9 @@ public class FlinkRowConvertSerializer implements RowSerializer<Row> {
     int arity = serialized.getArity();
     Object[] fields = new Object[arity];
     for (int index = 0; index < arity; index++) {
-      TypeInfo<?> typeInfo = typeInfos[index];
+      TypeInfo<?> typeInfo = rowTypeInfo.getTypeInfos()[index];
       Object field = serialized.getField(index);
-      String name = columns.get(index).getName();
+      String name = rowTypeInfo.getFieldNames()[index];
       if (field instanceof Column) {
         fields[index] = deserializeColumn((Column) field, typeInfo, name);
       } else {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,8 @@ import com.bytedance.bitsail.base.metrics.MetricManager;
 import com.bytedance.bitsail.base.metrics.manager.BitSailMetricManager;
 import com.bytedance.bitsail.base.metrics.manager.CallTracer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.common.option.ReaderOptions;
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.util.Pair;
 import com.bytedance.bitsail.core.flink.bridge.reader.delegate.operator.DelegateSourceReaderContext;
 import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConvertSerializer;
@@ -42,7 +40,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.bytedance.bitsail.base.constants.BaseMetricsNames.RECORD_INVOKE_LATENCY;
 
@@ -53,9 +50,7 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
       com.bytedance.bitsail.base.connector.reader.v1.SourceReader<T, SplitT>> sourceReaderFunction;
   private final DelegateSourceReaderContext sourceReaderContext;
   private final BitSailConfiguration commonConfiguration;
-  private final TypeInfo<?>[] sourceTypeInfos;
-  private final String[] fieldNames;
-  private final List<ColumnInfo> columnInfos;
+  private final RowTypeInfo rowTypeInfo;
   private final String readerName;
 
   private transient com.bytedance.bitsail.base.connector.reader.v1.SourceReader<T, SplitT> sourceReader;
@@ -72,7 +67,7 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
           com.bytedance.bitsail.base.connector.reader.v1.SourceReader<T, SplitT>> sourceReaderFunction,
       SourceReaderContext sourceReaderContext,
       String readerName,
-      TypeInfo<?>[] typeInfos,
+      RowTypeInfo rowTypeInfo,
       BitSailConfiguration commonConfiguration,
       BitSailConfiguration readerConfiguration,
       AbstractDirtyCollector dirtyCollector,
@@ -81,12 +76,7 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
     this.sourceReaderContext = (DelegateSourceReaderContext) sourceReaderContext;
     this.commonConfiguration = commonConfiguration;
     this.readerName = readerName;
-    this.sourceTypeInfos = typeInfos;
-    this.columnInfos = readerConfiguration.get(ReaderOptions.BaseReaderOptions.COLUMNS);
-    this.fieldNames = columnInfos.stream()
-        .map(ColumnInfo::getName)
-        .collect(Collectors.toList())
-        .toArray(new String[] {});
+    this.rowTypeInfo = rowTypeInfo;
 
     this.metricManager = new BitSailMetricManager(commonConfiguration,
         "input",
@@ -106,13 +96,8 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
     com.bytedance.bitsail.base.connector.reader.v1.SourceReader.Context context =
         new com.bytedance.bitsail.base.connector.reader.v1.SourceReader.Context() {
           @Override
-          public TypeInfo<?>[] getTypeInfos() {
-            return sourceTypeInfos;
-          }
-
-          @Override
-          public String[] getFieldNames() {
-            return fieldNames;
+          public RowTypeInfo getRowTypeInfo() {
+            return rowTypeInfo;
           }
 
           @Override
@@ -129,8 +114,7 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
         .apply(context);
     this.available = new CompletableFuture<>();
     this.flinkRowConvertSerializer = new FlinkRowConvertSerializer(
-        sourceTypeInfos,
-        columnInfos,
+        rowTypeInfo,
         commonConfiguration);
     if (this.messenger instanceof RuntimeContextInjectable) {
       ((RuntimeContextInjectable) messenger).setRuntimeContext(sourceReaderContext.getRuntimeContext());

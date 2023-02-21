@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,16 @@
 
 package com.bytedance.bitsail.connector.doris.sink;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
+@Data
 public class DorisWriterState implements Serializable {
-  //TODO support 2PC commit
+  String labelPrefix;
+
+  public DorisWriterState(String labelPrefix) {
+    this.labelPrefix = labelPrefix;
+  }
+
 }

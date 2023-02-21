@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.bytedance.bitsail.connector.doris.sink;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.connector.doris.option.DorisWriterOptions;
 import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
 import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
@@ -48,6 +49,9 @@ public class DorisSinkITCase {
     jobConf.set(DorisWriterOptions.PASSWORD, "password");
     jobConf.set(DorisWriterOptions.DB_NAME, "test_db");
     jobConf.set(DorisWriterOptions.TABLE_NAME, "test_table");
-    jobConf.set(DorisWriterOptions.TABLE_MODEL, "unique");
+    jobConf.set(CommonOptions.CheckPointOptions.CHECKPOINT_ENABLE, true);
+    jobConf.set(CommonOptions.CheckPointOptions.CHECKPOINT_INTERVAL, 5000L);
+    jobConf.set(DorisWriterOptions.SINK_ENABLE_2PC, false);
+    jobConf.set(DorisWriterOptions.SINK_LABEL_PREFIX, "bitsail-doris");
   }
 }

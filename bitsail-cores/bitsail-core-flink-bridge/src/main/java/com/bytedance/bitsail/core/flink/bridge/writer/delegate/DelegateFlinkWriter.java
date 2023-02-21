@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfoUtils;
 import com.bytedance.bitsail.common.util.Pair;
 import com.bytedance.bitsail.core.flink.bridge.serializer.DelegateSimpleVersionedSerializer;
@@ -82,10 +82,9 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
   private final BitSailConfiguration writerConfiguration;
   private final BitSailConfiguration commonConfiguration;
   private final FlinkRowConvertSerializer flinkRowConvertSerializer;
-  private final TypeInfo<?>[] typeInfos;
+  private final RowTypeInfo rowTypeInfo;
   private transient Writer<InputT, CommitT, WriterStateT> writer;
   private transient ListState<WriterStateT> writeState;
-  private final DelegateSimpleVersionedSerializer<WriterStateT> writeStateSerializer;
   private boolean endOfInput = false;
 
   @Setter
@@ -102,6 +101,7 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
   public DelegateFlinkWriter(BitSailConfiguration commonConfiguration,
                              BitSailConfiguration writerConfiguration,
                              Sink<InputT, CommitT, WriterStateT> sink,
+                             RowTypeInfo upstreamRowTypeInfo,
                              boolean isCheckpointingEnabled) {
     super();
     this.isCheckpointingEnabled = isCheckpointingEnabled;
@@ -110,18 +110,16 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
     this.sink = sink;
 
     List<ColumnInfo> columnInfos = writerConfiguration.get(WriterOptions.BaseWriterOptions.COLUMNS);
-    this.typeInfos = TypeInfoUtils
-        .getTypeInfos(sink.createTypeInfoConverter(),
-            columnInfos);
+    if (CollectionUtils.isEmpty(columnInfos)) {
+      this.rowTypeInfo = upstreamRowTypeInfo;
+    } else {
+      this.rowTypeInfo = TypeInfoUtils
+          .getRowTypeInfo(sink.createTypeInfoConverter(), columnInfos);
+    }
 
     this.flinkRowConvertSerializer = new FlinkRowConvertSerializer(
-        typeInfos,
-        columnInfos,
+        this.rowTypeInfo,
         this.commonConfiguration);
-
-    this.writeStateSerializer = DelegateSimpleVersionedSerializer
-        .delegate(sink.getWriteStateSerializer());
-
   }
 
   @Override
@@ -151,16 +149,18 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
   @Override
   public void initializeState(StateInitializationContext context) throws Exception {
     super.initializeState(context);
-    ListState<byte[]> rawWriteState = context
+    ListState<byte[]> binaryWriterState = context
         .getOperatorStateStore()
         .getListState(WRITE_STATES_DESCRIPTOR);
 
-    writeState = new SimpleVersionedListState<>(rawWriteState, writeStateSerializer);
+    writeState = new SimpleVersionedListState<>(binaryWriterState,
+        DelegateSimpleVersionedSerializer
+            .delegate(sink.getWriteStateSerializer()));
     Writer.Context<WriterStateT> writeSinkContext = new Writer.Context<WriterStateT>() {
 
       @Override
-      public TypeInfo<?>[] getTypeInfos() {
-        return typeInfos;
+      public RowTypeInfo getRowTypeInfo() {
+        return rowTypeInfo;
       }
 
       @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ public class FileMappingTypeInfoReader implements Serializable {
   }
 
   private void read() throws IOException {
-    URL resource = FileMappingTypeInfoReader.class.getResource("/" + converterFileName);
+    URL resource = Thread.currentThread().getContextClassLoader().getResource(converterFileName);
     if (Objects.isNull(resource)) {
       throw new IllegalArgumentException(String.format("Resource for the column converter %s not found in classpath.", converterFileName));
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 import com.bytedance.bitsail.component.format.csv.error.CsvFormatErrorCode;
@@ -64,8 +65,7 @@ public class CsvDeserializationSchema implements DeserializationSchema<byte[], R
   private final transient DeserializationConverter<CSVRecord, Row> typeInfoConverter;
 
   public CsvDeserializationSchema(BitSailConfiguration deserializationConfiguration,
-                                  TypeInfo<?>[] typeInfos,
-                                  String[] fieldNames) {
+                                  RowTypeInfo rowTypeInfo) {
     this.deserializationConfiguration = deserializationConfiguration;
     this.csvDelimiter = deserializationConfiguration.get(CsvReaderOptions.CSV_DELIMITER);
     this.csvMultiDelimiterReplaceChar = deserializationConfiguration.get(CsvReaderOptions.CSV_MULTI_DELIMITER_REPLACER);
@@ -87,7 +87,7 @@ public class CsvDeserializationSchema implements DeserializationSchema<byte[], R
     this.localTimeFormatter = DateTimeFormatter
         .ofPattern(deserializationConfiguration.get(CommonOptions.DateFormatOptions.TIME_PATTERN));
 
-    this.typeInfoConverter = createConverters(typeInfos, fieldNames);
+    this.typeInfoConverter = createConverters(rowTypeInfo.getTypeInfos(), rowTypeInfo.getFieldNames());
     this.convertErrorColumnAsNull = deserializationConfiguration.get(CsvReaderOptions.CONVERT_ERROR_COLUMN_AS_NULL);
 
   }
@@ -96,8 +96,17 @@ public class CsvDeserializationSchema implements DeserializationSchema<byte[], R
   public Row deserialize(byte[] message) {
     CSVRecord csvRecord;
     try {
-      CSVParser parser = CSVParser.parse(new String(message), csvFormat);
-      csvRecord =  parser.getRecords().get(0);
+      String inputStr = new String(message);
+      String csvMultiDelimiterReplaceString = csvMultiDelimiterReplaceChar.toString();
+      if ((csvDelimiter.length() > 1) && inputStr.contains(csvMultiDelimiterReplaceString)) {
+        throw new BitSailException(CsvFormatErrorCode.CSV_FORMAT_SCHEMA_PARSE_FAILED,
+            String.format("Input row contains '%c', the csv_multi_delimiter_replace_char option should be set to other character e.g. '⊙'.",
+                csvMultiDelimiterReplaceChar));
+      } else if (csvDelimiter.length() > 1) {
+        inputStr = inputStr.replace(csvDelimiter, csvMultiDelimiterReplaceString);
+      }
+      CSVParser parser = CSVParser.parse(inputStr, csvFormat);
+      csvRecord = parser.getRecords().get(0);
     } catch (Exception e) {
       throw BitSailException.asBitSailException(CsvFormatErrorCode.CSV_FORMAT_SCHEMA_PARSE_FAILED, e);
     }
@@ -147,8 +156,8 @@ public class CsvDeserializationSchema implements DeserializationSchema<byte[], R
     return wrapperCreateConverter(typeInfo);
   }
 
-  private DeserializationConverter<String, Object>  wrapperCreateConverter(TypeInfo<?> typeInfo) {
-    DeserializationConverter<String, Object>  typeInfoConverter =
+  private DeserializationConverter<String, Object> wrapperCreateConverter(TypeInfo<?> typeInfo) {
+    DeserializationConverter<String, Object> typeInfoConverter =
         createTypeInfoConverter(typeInfo);
     return (field) -> {
       if (field == null) {
@@ -167,7 +176,7 @@ public class CsvDeserializationSchema implements DeserializationSchema<byte[], R
     };
   }
 
-  private DeserializationConverter<String, Object>  createTypeInfoConverter(TypeInfo<?> typeInfo) {
+  private DeserializationConverter<String, Object> createTypeInfoConverter(TypeInfo<?> typeInfo) {
     Class<?> typeClass = typeInfo.getTypeClass();
 
     if (typeClass == TypeInfos.VOID_TYPE_INFO.getTypeClass()) {

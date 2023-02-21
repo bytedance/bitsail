@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,10 @@ import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverte
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfoUtils;
 import com.bytedance.bitsail.common.util.Preconditions;
-import com.bytedance.bitsail.component.format.hbase.HBaseDeserializationFormat;
 import com.bytedance.bitsail.connector.hadoop.source.HadoopInputFormatCommonBasePlugin;
 import com.bytedance.bitsail.connector.hbase.HBaseHelper;
 import com.bytedance.bitsail.connector.hbase.error.HBasePluginErrorCode;
+import com.bytedance.bitsail.connector.hbase.format.HBaseDeserializationFormat;
 import com.bytedance.bitsail.connector.hbase.option.HBaseReaderOptions;
 import com.bytedance.bitsail.connector.hbase.source.split.RegionSplit;
 import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;

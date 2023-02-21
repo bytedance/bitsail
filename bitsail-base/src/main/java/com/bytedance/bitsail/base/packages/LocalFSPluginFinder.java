@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -31,7 +32,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -41,11 +41,9 @@ public class LocalFSPluginFinder implements PluginFinder {
   private static final String DEFAULT_PLUGIN_FINDER_NAME = "localFS";
   private List<PluginStore> pluginStores;
   private URLClassLoader pluginClassloader;
-  private Set<URL> foundedPlugins;
 
   @Override
   public void configure(BitSailConfiguration commonConfiguration) {
-    this.foundedPlugins = Sets.newHashSet();
 
     String frameworkBaseDir = commonConfiguration
         .getUnNecessaryOption(CommonOptions.JOB_PLUGIN_ROOT_PATH, getFrameworkEntryDir().toString());
@@ -55,8 +53,7 @@ public class LocalFSPluginFinder implements PluginFinder {
 
     Path frameworkBaseDirPath = Paths.get(frameworkBaseDir);
 
-    pluginStores = new ArrayList<>();
-    pluginStores.add(PluginStore.builder()
+    addPluginStore(PluginStore.builder()
         .pluginBaseDirPath(frameworkBaseDirPath.resolve(pluginDirName))
         .pluginMappingBaseDirPath(frameworkBaseDirPath.resolve(pluginMappingDirName))
         .build());
@@ -64,13 +61,24 @@ public class LocalFSPluginFinder implements PluginFinder {
     String engineDirName = commonConfiguration.get(CommonOptions.JOB_ENGINE_DIR_NAME);
     String engineMappingDirName = commonConfiguration.get(CommonOptions.JOB_ENGINE_MAPPING_DIR_NAME);
 
-    pluginStores.add(PluginStore.builder()
+    addPluginStore(PluginStore.builder()
         .pluginBaseDirPath(frameworkBaseDirPath.resolve(engineDirName))
         .pluginMappingBaseDirPath(frameworkBaseDirPath.resolve(engineMappingDirName))
         .build());
 
-    this.pluginClassloader = (URLClassLoader) Thread.currentThread()
-        .getContextClassLoader();
+    setPluginClassloader(URLClassLoader.newInstance(new URL[] {}, Thread.currentThread()
+        .getContextClassLoader()));
+  }
+
+  public void addPluginStore(PluginStore pluginStore) {
+    if (pluginStores == null) {
+      pluginStores = Lists.newArrayList();
+    }
+    pluginStores.add(pluginStore);
+  }
+
+  public void setPluginClassloader(URLClassLoader classloader) {
+    pluginClassloader = classloader;
   }
 
   @Override
@@ -113,12 +121,11 @@ public class LocalFSPluginFinder implements PluginFinder {
     }
 
     tryAddPluginToClassloader(pluginClassloader, pluginUrls);
-    foundedPlugins.addAll(pluginUrls);
   }
 
   @Override
   public Set<URL> getFoundedPlugins() {
-    return foundedPlugins;
+    return Sets.newHashSet(pluginClassloader.getURLs());
   }
 
   @Override
@@ -134,9 +141,9 @@ public class LocalFSPluginFinder implements PluginFinder {
 
       for (URL pluginUrl : pluginUrls) {
         addUrlMethod.invoke(classloader, pluginUrl);
+        LOG.info("Plugin class loader add plugin url: {}.", pluginUrl);
       }
 
-      LOG.debug("Plugin class loader's url: {}.", classloader.getURLs());
     } catch (Exception e) {
       //ignore
     }

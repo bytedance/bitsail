@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,13 +53,22 @@ public class ColumnFlinkTypeInfoUtil {
     return new RowTypeInfo(fieldTypes, fieldNames);
   }
 
-  public static RowTypeInfo getRowTypeInformation(TypeInfo<?>[] typeInfos) {
+  public static RowTypeInfo getRowTypeInformation(com.bytedance.bitsail.common.typeinfo.RowTypeInfo rowTypeInfo) {
 
-    TypeInformation<?>[] fieldTypes = new TypeInformation[typeInfos.length];
-    for (int index = 0; index < typeInfos.length; index++) {
-      fieldTypes[index] = toColumnFlinkTypeInformation(typeInfos[index]);
+    TypeInformation<?>[] fieldTypes = new TypeInformation[rowTypeInfo.getTypeInfos().length];
+    for (int index = 0; index < rowTypeInfo.getTypeInfos().length; index++) {
+      fieldTypes[index] = toColumnFlinkTypeInformation(rowTypeInfo.getTypeInfos()[index]);
     }
-    return new RowTypeInfo(fieldTypes);
+    return new RowTypeInfo(fieldTypes, rowTypeInfo.getFieldNames());
+  }
+
+  public static com.bytedance.bitsail.common.typeinfo.RowTypeInfo getRowTypeInfo(RowTypeInfo rowTypeInfo) {
+
+    TypeInfo<?>[] fieldTypes = new TypeInfo[rowTypeInfo.getFieldTypes().length];
+    for (int index = 0; index < rowTypeInfo.getFieldTypes().length; index++) {
+      fieldTypes[index] = toTypeInfo(rowTypeInfo.getFieldTypes()[index]);
+    }
+    return new com.bytedance.bitsail.common.typeinfo.RowTypeInfo(rowTypeInfo.getFieldNames(), fieldTypes);
   }
 
   private static TypeInformation<?> toColumnFlinkTypeInformation(TypeInfo<?> typeInfo) {
@@ -78,5 +87,22 @@ public class ColumnFlinkTypeInfoUtil {
     }
 
     return TypeInfoColumnBridge.bridgeTypeInfo(typeInfo);
+  }
+
+  private static TypeInfo<?> toTypeInfo(TypeInformation<?> typeInformation) {
+    if (typeInformation instanceof MapColumnTypeInfo) {
+      MapColumnTypeInfo<?, ?> mapTypeInfo = (MapColumnTypeInfo<?, ?>) typeInformation;
+      TypeInformation<?> keyTypeInfo = mapTypeInfo.getKeyTypeInfo();
+      TypeInformation<?> valueTypeInfo = mapTypeInfo.getValueTypeInfo();
+      return new com.bytedance.bitsail.common.typeinfo.MapTypeInfo<>(toTypeInfo(keyTypeInfo),
+          toTypeInfo(valueTypeInfo));
+    }
+
+    if (typeInformation instanceof ListColumnTypeInfo) {
+      ListColumnTypeInfo<?> listTypeInfo = (ListColumnTypeInfo<?>) typeInformation;
+      return new com.bytedance.bitsail.common.typeinfo.ListTypeInfo<>(toTypeInfo(listTypeInfo.getElementTypeInfo()));
+    }
+
+    return TypeInfoColumnBridge.bridgeTypeInformation(typeInformation);
   }
 }

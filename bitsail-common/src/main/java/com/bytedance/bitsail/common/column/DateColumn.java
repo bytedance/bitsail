@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.bytedance.bitsail.common.exception.CommonErrorCode;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -101,6 +102,10 @@ public class DateColumn extends Column {
       LocalDateTime localDateTime = ((LocalDateTime) getRawData());
       return new Date(localDateTime.atZone(ZoneOffset.systemDefault())
           .toInstant().toEpochMilli());
+    }
+    if (getRawData() instanceof LocalTime) {
+      LocalTime localTime = ((LocalTime) getRawData());
+      return new Time(localTime.getHour(), localTime.getMinute(), localTime.getSecond());
     }
     return new Date((Long) this.getRawData());
   }

@@ -12,6 +12,7 @@ on:
       - 'NOTICE'
       - 'package.json'
       - 'yarn.lock'
+      - 'tools/release'
 
   pull_request:
     branches: [ "master" ]
@@ -22,6 +23,7 @@ on:
       - 'NOTICE'
       - 'package.json'
       - 'yarn.lock'
+      - 'tools/release'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -41,14 +43,14 @@ jobs:
       - name: Check License Header
         uses: apache/skywalking-eyes/header@main
 
-  # This workflow contains a single job called "unit-test"
-  unit-test:
-    name: Unit Test
+  # This workflow compile the project on Windows without running any test
+  compile:
+    name: Compile
     # The type of runner that the job will run on
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ windows-latest ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - run: git config --global core.longpaths true
@@ -59,10 +61,35 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
           architecture: x64
+          cache: 'maven'
+
+      - name: Compile
+        run:
+          mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=true
+
+  # This workflow contains a single job called "unit-test"
+  unit-test:
+    name: Unit Test
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - run: git config --global core.longpaths true
+      - uses: actions/checkout@v3
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          architecture: x64
+          cache: 'maven'
 
       - name: Maven Verify Unit Test
         run:
-          mvn clean verify -pl bitsail-dist -am -U -DskipUT=false -DskipITCase=true
+          mvn clean verify -pl bitsail-dist -am -DskipUT=false -DskipITCase=true
 
     # This workflow contains a single job called "integration-tests"
   integration-tests:
@@ -82,7 +109,7 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
           architecture: x64
-
+          cache: 'maven'
       - name: Maven Verify Integration Test
         run:
-          mvn clean verify -pl bitsail-dist -am -U -DskipUT=true -DskipITCase=false
+          mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=false

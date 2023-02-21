@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.bytedance.bitsail.flink.core.execution.configurer;
 
 import com.bytedance.bitsail.base.runtime.RuntimePlugin;
-import com.bytedance.bitsail.flink.core.FlinkJobMode;
 
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -31,11 +30,10 @@ import java.util.stream.Collectors;
 public class BitSailRuntimePluginConfigurer {
   private static final Logger LOG = LoggerFactory.getLogger(BitSailRuntimePluginConfigurer.class);
 
-  private final FlinkJobMode flinkJobMode;
+  private List<Class<?>> runtimePlugins;
 
   public List<RuntimePlugin> getRuntimePlugins() {
-    List<Class> runtimePluginClasses = flinkJobMode.getRuntimePluginClasses();
-    return runtimePluginClasses.stream().map(pluginClass -> {
+    return runtimePlugins.stream().map(pluginClass -> {
       try {
         return (RuntimePlugin) pluginClass.newInstance();
       } catch (Exception e) {

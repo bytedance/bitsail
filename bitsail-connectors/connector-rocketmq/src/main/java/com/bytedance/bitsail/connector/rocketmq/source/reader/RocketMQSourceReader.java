@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,8 +82,7 @@ public class RocketMQSourceReader implements SourceReader<Row, RocketMQSplit> {
     this.finishedRocketMQSplits = Sets.newHashSet();
     this.deserializationSchema = new RocketMQDeserializationSchema(
         readerConfiguration,
-        context.getTypeInfos(),
-        context.getFieldNames());
+        context.getRowTypeInfo());
     this.noMoreSplits = false;
 
     cluster = readerConfiguration.get(RocketMQSourceOptions.CLUSTER);

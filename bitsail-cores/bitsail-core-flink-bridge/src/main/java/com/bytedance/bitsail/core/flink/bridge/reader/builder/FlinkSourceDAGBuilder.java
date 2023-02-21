@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ import com.bytedance.bitsail.flink.core.plugins.InputAdapter;
 import com.bytedance.bitsail.flink.core.reader.FlinkDataReaderDAGBuilder;
 import com.bytedance.bitsail.flink.core.util.AccumulatorRestorer;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -189,4 +190,8 @@ public class FlinkSourceDAGBuilder<T, SplitT extends SourceSplit, StateT extends
     return source.createTypeInfoConverter();
   }
 
+  @VisibleForTesting
+  public DelegateFlinkSource getDelegateFlinkSource() {
+    return this.delegateFlinkSource;
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,12 +39,14 @@ import com.bytedance.bitsail.core.flink.bridge.writer.delegate.DelegateFlinkComm
 import com.bytedance.bitsail.core.flink.bridge.writer.delegate.DelegateFlinkWriter;
 import com.bytedance.bitsail.flink.core.execution.FlinkExecutionEnviron;
 import com.bytedance.bitsail.flink.core.runtime.messenger.impl.FlinkAccumulatorStatisticsMessenger;
+import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
 import com.bytedance.bitsail.flink.core.util.AccumulatorRestorer;
 import com.bytedance.bitsail.flink.core.writer.FlinkDataWriterDAGBuilder;
 
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,6 +115,8 @@ public class FlinkWriterBuilder<InputT, CommitT extends Serializable, WriterStat
         commonConfiguration,
         writerConfiguration,
         sink,
+        //todo in future will be replaced into native flink type info.
+        ColumnFlinkTypeInfoUtil.getRowTypeInfo((RowTypeInfo) source.getType()),
         isCheckpointingEnabled);
     flinkWriter.setMessenger(messenger);
     flinkWriter.setDirtyCollector(dirtyCollector);
@@ -133,8 +137,7 @@ public class FlinkWriterBuilder<InputT, CommitT extends Serializable, WriterStat
               getWriterCommitterOperatorName(),
               TypeInformation.of(new TypeHint<CommittableMessage<CommitT>>() {
               }),
-              DelegateFlinkCommitter.of(committer.get(),
-                  sink.getCommittableSerializer(), isBatchMode, isCheckpointingEnabled))
+              new DelegateFlinkCommitter<>(sink, isBatchMode, isCheckpointingEnabled))
           .uid(getWriterCommitterOperatorName())
           .name(getWriterCommitterOperatorName())
           .setParallelism(writerParallelism);

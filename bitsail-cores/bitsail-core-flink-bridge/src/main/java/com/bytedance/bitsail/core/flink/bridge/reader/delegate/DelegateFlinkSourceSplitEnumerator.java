@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,9 +142,10 @@ public class DelegateFlinkSourceSplitEnumerator<SplitT extends SourceSplit,
     if (sourceEvent instanceof DelegateSourceEvent) {
       coordinator.handleSourceEvent(subtaskId,
           ((DelegateSourceEvent) sourceEvent).getSourceEvent());
+      return;
     }
     throw BitSailException.asBitSailException(CommonErrorCode.RUNTIME_ERROR,
-        "Source event in not instanceof delegate source event, it's always runtime bug.");
+         "Source event in not instanceof delegate source event, it's always runtime bug.");
   }
 
   @Override

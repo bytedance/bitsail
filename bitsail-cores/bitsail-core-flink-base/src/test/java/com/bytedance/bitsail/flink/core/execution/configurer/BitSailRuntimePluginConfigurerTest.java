@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,11 +30,11 @@ public class BitSailRuntimePluginConfigurerTest {
   @Test
   public void testGetRuntimePlugins() {
     BitSailRuntimePluginConfigurer pluginConfigurer =
-        new BitSailRuntimePluginConfigurer(FlinkJobMode.BATCH);
+        new BitSailRuntimePluginConfigurer(FlinkJobMode.BATCH.getRuntimePluginClasses());
     List<RuntimePlugin> pluginList = pluginConfigurer.getRuntimePlugins();
     assertEquals(pluginList.size(), 2);
 
-    pluginConfigurer = new BitSailRuntimePluginConfigurer(FlinkJobMode.STREAMING);
+    pluginConfigurer = new BitSailRuntimePluginConfigurer(FlinkJobMode.STREAMING.getRuntimePluginClasses());
     pluginList = pluginConfigurer.getRuntimePlugins();
     assertEquals(pluginList.size(), 1);
   }

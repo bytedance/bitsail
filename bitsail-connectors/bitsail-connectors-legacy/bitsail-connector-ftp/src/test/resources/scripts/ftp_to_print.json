@@ -15,6 +15,7 @@
       "success_file_path": "/upload/_SUCCESS",
       "content_type": "csv",
       "skip_first_line": true,
+      "charset": "utf-8",
       "columns": [
         {
           "name": "c0",

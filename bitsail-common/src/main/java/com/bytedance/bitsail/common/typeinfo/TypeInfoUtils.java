@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class TypeInfoUtils {
 
@@ -52,5 +53,17 @@ public class TypeInfoUtils {
       fieldTypes[index] = typeInfo;
     }
     return fieldTypes;
+  }
+
+  public static RowTypeInfo getRowTypeInfo(TypeInfoConverter converter, List<ColumnInfo> columnInfos) {
+    if (Objects.isNull(columnInfos)) {
+      throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR, "The columns option should not be null.");
+    }
+    String[] fieldNames = columnInfos
+        .stream()
+        .map(ColumnInfo::getName)
+        .collect(Collectors.toList()).toArray(new String[] {});
+
+    return new RowTypeInfo(fieldNames, getTypeInfos(converter, columnInfos));
   }
 }

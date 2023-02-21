@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,11 +38,11 @@ public class DefaultComponentBuilderLoader<T> implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultComponentBuilderLoader.class);
   private final Class<T> clazz;
   private final Map<String, T> components = Maps.newHashMap();
-  private volatile boolean loaded;
   private final ClassLoader classLoader;
+  private volatile boolean loaded;
 
   public DefaultComponentBuilderLoader(Class<T> clazz) {
-    this(clazz, DefaultComponentBuilderLoader.class.getClassLoader());
+    this(clazz, Thread.currentThread().getContextClassLoader());
   }
 
   public DefaultComponentBuilderLoader(Class<T> clazz, ClassLoader classLoader) {

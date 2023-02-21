@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2022 Bytedance Ltd. and/or its affiliates.
+  ~ Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -41,12 +41,20 @@
         <maven.deploy.skip>false</maven.deploy.skip>
         <skipITCase>true</skipITCase>
         <skipUT>false</skipUT>
+        <enforcer.skip>false</enforcer.skip>
+        <skipCheckStyle>false</skipCheckStyle>
         <maven.complie.plugin.version>3.10.1</maven.complie.plugin.version>
+        <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
         <maven.source.plugin.version>3.1.0</maven.source.plugin.version>
         <maven.shade.plugin.version>3.2.4</maven.shade.plugin.version>
         <maven.checkstyle.plugin.version>3.1.2</maven.checkstyle.plugin.version>
         <maven.failsafe.plugin.version>2.22.2</maven.failsafe.plugin.version>
+        <maven.jacoco.plugin.version>0.8.1</maven.jacoco.plugin.version>
+        <maven.flatten.plugin.version>1.2.7</maven.flatten.plugin.version>
+        <maven.enforcer.plugin.version>3.0.0-M2</maven.enforcer.plugin.version>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.source.encoding>UTF-8</project.source.encoding>
         <project.build.source.encoding>UTF-8</project.build.source.encoding>
@@ -54,7 +62,7 @@
         <main.basedir>${project.basedir}</main.basedir>
 
         <!--    project version    -->
-        <revision>0.1.0-SNAPSHOT</revision>
+        <revision>0.2.0-SNAPSHOT</revision>
         <flink.version>1.11.6</flink.version>
         <scala.version>2.11.12</scala.version>
         <scala.binary.version>2.11</scala.binary.version>
@@ -72,6 +80,7 @@
         <powermock.version>2.0.0-beta.5</powermock.version>
         <commons.lang3.version>3.3.2</commons.lang3.version>
         <commons.io.version>2.4</commons.io.version>
+        <commons.net.version>3.6</commons.net.version>
         <commons.pool2.version>2.4.2</commons.pool2.version>
         <common.collections>3.2.2</common.collections>
         <commons.collections4>4.2</commons.collections4>
@@ -85,26 +94,18 @@
         <typesafe.config.version>1.3.0</typesafe.config.version>
         <httpclient.version>4.5.3</httpclient.version>
         <httpcore.version>4.4.12</httpcore.version>
-        <guava.version>15.0</guava.version>
+        <guava.version>19.0</guava.version>
         <avro.version>1.10.0</avro.version>
         <mertric.core.version>4.0.1</mertric.core.version>
         <common.logging.version>1.2</common.logging.version>
         <!--   connector dependency package version     -->
-        <hive.version>3.1.0</hive.version>
-        <hudi.version>0.11.1</hudi.version>
-        <thrift.version>0.9.3</thrift.version>
-        <hadoop.version>3.1.1</hadoop.version>
-        <hbase.version>2.4.13</hbase.version>
-        <kafka.clients.version>1.0.1</kafka.clients.version>
-        <elasticsearch.version>7.5.1</elasticsearch.version>
-        <mongo.version>3.11.0</mongo.version>
-        <jedis.version>4.2.2</jedis.version>
-        <kudu.version>1.16.0</kudu.version>
-        <rocketmq.version>4.9.2</rocketmq.version>
         <snappy.version>1.1.2.6</snappy.version>
         <parquet.hadoop.version>1.8.3</parquet.hadoop.version>
 
         <!--   enforce dependency     -->
+        <curator.version>2.6.0</curator.version>
+        <ant.version>1.9.6</ant.version>
+        <servlet.api.version>2.5</servlet.api.version>
     </properties>
 
     <dependencyManagement>
@@ -243,6 +244,12 @@
             </dependency>
 
             <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${commons.net.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.esotericsoftware.yamlbeans</groupId>
                 <artifactId>yamlbeans</artifactId>
                 <version>${yaml.version}</version>
@@ -351,217 +358,6 @@
                 <artifactId>system-rules</artifactId>
                 <version>${system.rule.version}</version>
                 <scope>test</scope>
-            </dependency>
-
-            <!-- Hive -->
-            <dependency>
-                <groupId>org.apache.hive</groupId>
-                <artifactId>hive-jdbc</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.xerial.snappy</groupId>
-                        <artifactId>snappy-java</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>asm</groupId>
-                        <artifactId>asm</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>asm</groupId>
-                        <artifactId>asm-commons</artifactId>
-                    </exclusion>
-                </exclusions>
-                <version>${hive.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.hive</groupId>
-                <artifactId>hive-service</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.xerial.snappy</groupId>
-                        <artifactId>snappy-java</artifactId>
-                    </exclusion>
-                </exclusions>
-                <version>${hive.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.hive</groupId>
-                <artifactId>hive-exec</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.xerial.snappy</groupId>
-                        <artifactId>snappy-java</artifactId>
-                    </exclusion>
-                </exclusions>
-                <version>${hive.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.thrift</groupId>
-                <artifactId>libthrift</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                </exclusions>
-                <version>${thrift.version}</version>
-            </dependency>
-
-            <!-- Hadoop -->
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-common</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>asm</groupId>
-                        <artifactId>asm</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-cli</groupId>
-                        <artifactId>commons-cli</artifactId>
-                    </exclusion>
-                </exclusions>
-                <scope>provided</scope>
-                <version>${hadoop.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-hdfs</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>redis.clients</groupId>
-                        <artifactId>jedis</artifactId>
-                    </exclusion>
-                </exclusions>
-                <scope>provided</scope>
-                <version>${hadoop.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-mapreduce-client-core</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.squareup.okio</groupId>
-                        <artifactId>okio</artifactId>
-                    </exclusion>
-                </exclusions>
-                <scope>compile</scope>
-                <version>${hadoop.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-mapreduce-client-common</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.squareup.okio</groupId>
-                        <artifactId>okio</artifactId>
-                    </exclusion>
-                </exclusions>
-                <scope>compile</scope>
-                <version>${hadoop.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-client</artifactId>
-                <scope>provided</scope>
-                <version>${hadoop.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-annotations</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                </exclusions>
-                <scope>provided</scope>
-                <version>${hadoop.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-yarn-common</artifactId>
-                <scope>provided</scope>
-                <version>${hadoop.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-yarn-server-common</artifactId>
-                <scope>provided</scope>
-                <version>${hadoop.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-yarn-api</artifactId>
-                <scope>provided</scope>
-                <version>${hadoop.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-yarn-client</artifactId>
-                <scope>provided</scope>
-                <version>${hadoop.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-yarn-registry</artifactId>
-                <scope>provided</scope>
-                <version>${hadoop.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-yarn-server-resourcemanager</artifactId>
-                <scope>provided</scope>
-                <version>${hadoop.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-auth</artifactId>
-                <scope>provided</scope>
-                <version>${hadoop.version}</version>
             </dependency>
 
             <!-- Flink -->
@@ -675,6 +471,13 @@
 
             <dependency>
                 <groupId>org.apache.flink</groupId>
+                <artifactId>flink-avro</artifactId>
+                <version>${flink.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
                 <artifactId>flink-table-common</artifactId>
                 <version>${flink.version}</version>
                 <scope>provided</scope>
@@ -754,12 +557,6 @@
                     </exclusion>
                 </exclusions>
                 <version>${parquet.hadoop.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka-clients</artifactId>
-                <version>${kafka.clients.version}</version>
             </dependency>
 
             <!--     dependency conflict     -->
@@ -990,6 +787,66 @@
                 <artifactId>jackson-mapper-asl</artifactId>
                 <version>1.9.2</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-jaxrs</artifactId>
+                <version>1.9.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-xc</artifactId>
+                <version>1.9.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro</artifactId>
+                <version>${avro.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-framework</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-client</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-recipes</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant</artifactId>
+                <version>${ant.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>${servlet.api.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-compiler</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-reflect</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1094,8 +951,6 @@
                                         <exclude>org.apache.flink:flink-runtime_${scala.binary.version}</exclude>
                                         <exclude>org.apache.flink:flink-streaming-java_${scala.binary.version}</exclude>
                                         <exclude>org.apache.flink:force-shading</exclude>
-                                        <exclude>org.apache.hadoop:hadoop-client</exclude>
-                                        <exclude>org.apache.hadoop:hadoop-common</exclude>
                                     </excludes>
                                 </artifactSet>
                                 <transformers>
@@ -1113,6 +968,7 @@
                     <artifactId>maven-checkstyle-plugin</artifactId>
                     <version>${maven.checkstyle.plugin.version}</version>
                     <configuration>
+                        <skip>${skipCheckStyle}</skip>
                         <configLocation>/tools/maven/checkstyle.xml</configLocation>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
                         <encoding>UTF-8</encoding>
@@ -1133,6 +989,17 @@
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.complie.plugin.version}</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>${project.source.encoding}</encoding>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -1173,7 +1040,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.1</version>
+                <version>${maven.jacoco.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -1235,11 +1102,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M2</version>
+                <version>${maven.enforcer.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>enforce</id>
                         <configuration>
+                            <skip>${enforcer.skip}</skip>
                             <rules>
                                 <dependencyConvergence/>
                                 <bannedDependencies>
@@ -1259,7 +1127,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.2.7</version>
+                <version>${maven.flatten.plugin.version}</version>
                 <configuration>
                     <updatePomFile>true</updatePomFile>
                     <flattenMode>resolveCiFriendliesOnly</flattenMode>

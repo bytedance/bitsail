@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ public enum TtlType {
   SECOND(1);
 
   @Getter
-  int containSeconds;
+  final int containSeconds;
 
   TtlType(int containSeconds) {
     this.containSeconds = containSeconds;

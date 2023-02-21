@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import com.bytedance.bitsail.connector.redis.core.api.FailureHandler;
 import com.bytedance.bitsail.connector.redis.core.api.PipelineProcessor;
 import com.bytedance.bitsail.connector.redis.core.api.SplitPolicy;
 import com.bytedance.bitsail.connector.redis.core.jedis.JedisCommand;
-import com.bytedance.bitsail.connector.redis.core.jedis.JedisPluginErrorCode;
+import com.bytedance.bitsail.connector.redis.error.JedisPluginErrorCode;
 import com.bytedance.bitsail.connector.redis.error.RedisUnexpectedException;
 
 import com.github.rholder.retry.RetryException;

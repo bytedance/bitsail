@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.BasicTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 import com.bytedance.bitsail.connector.clickhouse.error.ClickhouseErrorCode;
@@ -39,11 +40,11 @@ public class ClickhouseRowDeserializer {
   private final List<FiledConverter> converters;
   private final int fieldSize;
 
-  public ClickhouseRowDeserializer(TypeInfo<?>[] typeInfos) {
-    this.fieldSize = typeInfos.length;
+  public ClickhouseRowDeserializer(RowTypeInfo rowTypeInfo) {
+    this.fieldSize = rowTypeInfo.getTypeInfos().length;
     this.converters = new ArrayList<>();
     for (int i = 0; i < fieldSize; ++i) {
-      converters.add(initFieldConverter(i + 1, typeInfos[i]));
+      converters.add(initFieldConverter(i + 1, rowTypeInfo.getTypeInfos()[i]));
     }
   }
 

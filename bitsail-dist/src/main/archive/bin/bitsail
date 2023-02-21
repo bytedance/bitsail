@@ -1,5 +1,5 @@
 #
-# Copyright 2022 Bytedance Ltd. and/or its affiliates.
+# Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,4 +37,4 @@ if [ -n "$HADOOP_HOME" ]; then
 fi
 export BITSAIL_HOME=${BITSAIL_HOME}
 
-exec java -cp ${HADOOP_CLASSPATH}:${BITSAIL_CLIENT_CLASSPATH}/*:${BITSAIL_CONF_DIR}/* com.bytedance.bitsail.client.entry.Entry ${args}
+exec java -cp ${BITSAIL_CLIENT_CLASSPATH}/*:${HADOOP_CLASSPATH}:${BITSAIL_CONF_DIR}/* com.bytedance.bitsail.client.entry.Entry ${args}

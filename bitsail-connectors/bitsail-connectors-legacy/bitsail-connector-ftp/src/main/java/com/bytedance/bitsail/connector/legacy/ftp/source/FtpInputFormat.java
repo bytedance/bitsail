@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ public class FtpInputFormat extends InputFormatPlugin<Row, InputSplit> implement
   protected FtpConfig ftpConfig;
   protected String successFilePath;
   protected long fileSize;
+  private String charset;
 
   @Override
   public void initPlugin() throws Exception {
@@ -75,11 +76,13 @@ public class FtpInputFormat extends InputFormatPlugin<Row, InputSplit> implement
     List<ColumnInfo> columnInfos = inputSliceConfig.getNecessaryOption(FtpReaderOptions.COLUMNS, FtpInputFormatErrorCode.REQUIRED_VALUE);
     this.rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(createTypeInfoConverter(), columnInfos);
     log.info("Row Type Info: " + rowTypeInfo);
+
+    this.charset = inputSliceConfig.get(FtpReaderOptions.CHARSET);
   }
 
   @Override
   public Row buildRow(Row reuse, String mandatoryEncoding) throws BitSailException {
-    rowBuilder.build(line, reuse, mandatoryEncoding, rowTypeInfo);
+    rowBuilder.build(line, reuse, rowTypeInfo);
     return reuse;
   }
 
@@ -177,7 +180,7 @@ public class FtpInputFormat extends InputFormatPlugin<Row, InputSplit> implement
       this.br = new FtpSeqBufferedReader(ftpHandler, paths.iterator());
       this.br.setFromLine(0);
     }
-    br.setCharsetName("utf-8");
+    br.setCharsetName(charset);
   }
 
   @Override

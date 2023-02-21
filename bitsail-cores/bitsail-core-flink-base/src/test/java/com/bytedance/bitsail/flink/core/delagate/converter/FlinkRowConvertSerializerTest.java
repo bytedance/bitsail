@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfoUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -56,11 +57,8 @@ public class FlinkRowConvertSerializerTest {
     );
     TypeInfoConverter converter = new BitSailTypeInfoConverter();
     BitSailConfiguration conf = BitSailConfiguration.newDefault();
-    TypeInfo<?>[] typeInfos = new TypeInfo<?>[columns.size()];
-    for (int index = 0; index < columns.size(); index++) {
-      typeInfos[index] = converter.fromTypeString(columns.get(index).getType());
-    }
-    flinkRowConvertSerializer = new FlinkRowConvertSerializer(typeInfos, columns, conf);
+    RowTypeInfo rowTypeInfo = TypeInfoUtils.getRowTypeInfo(converter, columns);
+    flinkRowConvertSerializer = new FlinkRowConvertSerializer(rowTypeInfo, conf);
   }
 
   @Test

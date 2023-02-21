@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public class ProgramFactory {
     pluginFinder.loadPlugin(engineName);
 
     DefaultComponentBuilderLoader<Program> loader =
-        new DefaultComponentBuilderLoader<>(Program.class, pluginFinder.getClassloader());
+        new DefaultComponentBuilderLoader<>(Program.class);
 
     return loader.loadComponent(engineName, true);
   }

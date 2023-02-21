@@ -4,7 +4,7 @@ order: 1
 
 <!--
 
-Copyright 2022 Bytedance Ltd. and/or its affiliates.
+Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
          
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -218,6 +218,12 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
   </tr>
   <tr>
     <td>RocketMQ</td>
+    <td>-</td>
+    <td> </td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>SelectDB</td>
     <td>-</td>
     <td> </td>
     <td>✅</td>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,4 @@ public class RedisConstants {
    * connector name
    */
   public static final String REDIS_CONNECTOR_NAME = "redis";
-
-  /**
-   * column size in sorted_set or hash
-   */
-  public static final int SORTED_SET_OR_HASH_COLUMN_SIZE = 3;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,20 @@ package com.bytedance.bitsail.core.api.interceptor;
 
 import com.bytedance.bitsail.base.component.DefaultComponentBuilderLoader;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.core.api.command.CoreCommandArgs;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.List;
 
 public class ConfigInterceptorHelper {
 
-  public static void intercept(BitSailConfiguration globalConfiguration) {
+  private static final Logger LOG = LoggerFactory.getLogger(ConfigInterceptorHelper.class);
+
+  public static void intercept(BitSailConfiguration globalConfiguration, CoreCommandArgs coreCommandArgs) {
     DefaultComponentBuilderLoader<ConfigInterceptor> loader =
         new DefaultComponentBuilderLoader<>(ConfigInterceptor.class);
 
@@ -34,7 +39,8 @@ public class ConfigInterceptorHelper {
     interceptors.sort(Comparator.comparingInt(ConfigInterceptor::order));
     for (ConfigInterceptor interceptor : interceptors) {
       if (interceptor.accept(globalConfiguration)) {
-        interceptor.intercept(globalConfiguration);
+        LOG.info("Interceptor accepted: {} for the config.", interceptor.getComponentName());
+        interceptor.intercept(globalConfiguration, coreCommandArgs);
       }
     }
   }

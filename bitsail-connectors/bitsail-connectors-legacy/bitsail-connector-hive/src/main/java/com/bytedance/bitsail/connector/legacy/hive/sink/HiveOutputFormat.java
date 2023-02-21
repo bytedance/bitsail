@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ package com.bytedance.bitsail.connector.legacy.hive.sink;
 import com.bytedance.bitsail.base.execution.ProcessResult;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.exception.FrameworkErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.type.filemapping.HiveTypeInfoConverter;
 import com.bytedance.bitsail.common.util.JsonSerializer;
@@ -38,6 +38,7 @@ import com.bytedance.bitsail.conversion.hive.option.HiveConversionOptions;
 
 import com.bytedance.bitsail.shaded.hive.client.HiveMetaClientUtil;
 
+import com.google.common.collect.Lists;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -160,7 +161,6 @@ public class HiveOutputFormat<E extends Row> extends FileOutputFormatPlugin<E> {
     hiveWritableExtractorType =
         HiveWritableExtractorType.valueOf(outputSliceConfig.get(HiveConversionOptions.WRITABLE_EXTRACTOR_TYPE).toUpperCase());
     partition = outputSliceConfig.getNecessaryOption(HiveWriterOptions.PARTITION, HiveParqueFormatErrorCode.REQUIRED_VALUE);
-    columns = outputSliceConfig.get(WriterOptions.BaseWriterOptions.COLUMNS);
 
     boolean dateTypeToStringAsLong = outputSliceConfig.get(HiveWriterOptions.DATE_TO_STRING_AS_LONG);
 
@@ -397,6 +397,19 @@ public class HiveOutputFormat<E extends Row> extends FileOutputFormatPlugin<E> {
       hiveSerdeParameter = HiveMetaClientUtil.getSerdeParameters(hiveConf, db, table);
       columnMapping = HiveMetaClientUtil.getColumnMapping(hiveTableSchema);
       LOG.info("fetch column mapping from hive metastore:\n {}", columnMapping);
+      if (outputSliceConfig.fieldExists(HiveWriterOptions.COLUMNS)) {
+        columns = outputSliceConfig.getNecessaryOption(
+            HiveWriterOptions.COLUMNS, FrameworkErrorCode.REQUIRED_VALUE);
+        LOG.info("Use columns from configuration: {}.", columns);
+      } else {
+        columns = Lists.newArrayList();
+        String[] fieldNames = hiveTableSchema.getFirst().split(",");
+        String[] fieldTypes = hiveTableSchema.getSecond().split(":");
+        for (int i = 0; i < fieldNames.length; i++) {
+          columns.add(new ColumnInfo(fieldNames[i], fieldTypes[i]));
+        }
+        LOG.info("Use columns from hive metadata: {}.", columns);
+      }
     } catch (TException e) {
       LOG.error("Get hive table " + db + "." + table + " schema failed.", e);
       throw new IOException("Get hive table " + db + "." + table + " schema failed.", e);

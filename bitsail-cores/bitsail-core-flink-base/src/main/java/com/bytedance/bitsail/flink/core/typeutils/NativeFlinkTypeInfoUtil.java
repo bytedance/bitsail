@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,15 +57,15 @@ public class NativeFlinkTypeInfoUtil {
     return new RowTypeInfo(fieldTypes, fieldNames);
   }
 
-  public static TypeInformation<Row> getRowTypeInformation(TypeInfo<?>[] typeInfos) {
+  public static TypeInformation<Row> getRowTypeInformation(com.bytedance.bitsail.common.typeinfo.RowTypeInfo rowTypeInfo) {
 
-    TypeInformation<?>[] fieldTypes = new TypeInformation[typeInfos.length];
+    TypeInformation<?>[] fieldTypes = new TypeInformation[rowTypeInfo.getTypeInfos().length];
 
-    for (int index = 0; index < typeInfos.length; index++) {
-      fieldTypes[index] = toNativeFlinkTypeInformation(typeInfos[index]);
+    for (int index = 0; index < rowTypeInfo.getTypeInfos().length; index++) {
+      fieldTypes[index] = toNativeFlinkTypeInformation(rowTypeInfo.getTypeInfos()[index]);
     }
 
-    return new RowTypeInfo(fieldTypes);
+    return new RowTypeInfo(fieldTypes, rowTypeInfo.getFieldNames());
   }
 
   private static TypeInformation<?> toNativeFlinkTypeInformation(TypeInfo<?> typeInfo) {
@@ -86,7 +86,7 @@ public class NativeFlinkTypeInfoUtil {
     return TypeInfoNativeBridge.bridgeTypeInformation(typeInfo);
   }
 
-  public static TypeInfo<?>[] toTypeInfos(TypeInformation<?> typeInformation) {
+  public static com.bytedance.bitsail.common.typeinfo.RowTypeInfo toRowTypeInfo(TypeInformation<?> typeInformation) {
     if (typeInformation instanceof RowTypeInfo) {
       RowTypeInfo rowTypeInfo = (RowTypeInfo) typeInformation;
       TypeInformation<?>[] fieldTypes = rowTypeInfo.getFieldTypes();
@@ -94,7 +94,7 @@ public class NativeFlinkTypeInfoUtil {
       for (int index = 0; index < fieldTypes.length; index++) {
         typeInfos[index] = toTypeInfo(fieldTypes[index]);
       }
-      return typeInfos;
+      return new com.bytedance.bitsail.common.typeinfo.RowTypeInfo(rowTypeInfo.getFieldNames(), typeInfos);
     }
 
     throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,

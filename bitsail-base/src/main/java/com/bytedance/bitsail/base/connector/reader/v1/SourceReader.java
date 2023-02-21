@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.bytedance.bitsail.base.connector.reader.v1;
 
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 
 import java.io.Serializable;
 import java.util.List;
@@ -62,9 +62,7 @@ public interface SourceReader<T, SplitT extends SourceSplit> extends Serializabl
 
   interface Context {
 
-    TypeInfo<?>[] getTypeInfos();
-
-    String[] getFieldNames();
+    RowTypeInfo getRowTypeInfo();
 
     int getIndexOfSubtask();
 

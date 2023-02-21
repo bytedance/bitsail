@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,4 +28,12 @@ public interface PrintWriterOptions {
   ConfigOption<Integer> BATCH_SIZE =
       key(WRITER_PREFIX + "batch_size")
           .defaultValue(10);
+
+  ConfigOption<Boolean> SAMPLE_WRITE =
+      key(WRITER_PREFIX + "sample_write")
+          .defaultValue(false);
+
+  ConfigOption<Integer> SAMPLE_LIMIT =
+      key(WRITER_PREFIX + "sample_limit")
+          .defaultValue(5);
 }

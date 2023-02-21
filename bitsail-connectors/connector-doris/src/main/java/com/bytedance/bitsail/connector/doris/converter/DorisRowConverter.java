@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,8 @@ public class DorisRowConverter implements Serializable {
 
   /**
    * Convert data from {@link Row}
-   * @param row record from bitsail row
+   *
+   * @param row   record from bitsail row
    * @param index the field index
    * @return java type value.
    */

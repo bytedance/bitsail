@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,6 @@ import java.io.Serializable;
 public class DelegateFlinkSourceSplitSerializer<SplitT extends SourceSplit>
     implements SimpleVersionedSerializer<DelegateFlinkSourceSplit<SplitT>>, Serializable {
 
-  private static final int VERSION = 0;
-
   private BinarySerializer<SplitT> splitBinarySerializer;
 
   public DelegateFlinkSourceSplitSerializer(BinarySerializer<SplitT> splitBinarySerializer) {
@@ -38,7 +36,7 @@ public class DelegateFlinkSourceSplitSerializer<SplitT extends SourceSplit>
 
   @Override
   public int getVersion() {
-    return VERSION;
+    return this.splitBinarySerializer.getVersion();
   }
 
   @Override
@@ -48,7 +46,7 @@ public class DelegateFlinkSourceSplitSerializer<SplitT extends SourceSplit>
 
   @Override
   public DelegateFlinkSourceSplit<SplitT> deserialize(int version, byte[] serialized) throws IOException {
-    SplitT deserialize = splitBinarySerializer.deserialize(serialized);
+    SplitT deserialize = splitBinarySerializer.deserialize(version, serialized);
     return new DelegateFlinkSourceSplit<>(deserialize);
   }
 }

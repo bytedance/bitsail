@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,19 @@
 
 package com.bytedance.bitsail.connector.doris.committer;
 
-import com.bytedance.bitsail.connector.doris.config.DorisOptions;
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-@AllArgsConstructor
 public class DorisCommittable implements Serializable {
-  //TODO support 2PC commit
-  public DorisOptions dorisOptions;
+  private final String hostPort;
+  private final String db;
+  private final long txnID;
+
+  public DorisCommittable(String hostPort, String db, long txnID) {
+    this.hostPort = hostPort;
+    this.db = db;
+    this.txnID = txnID;
+  }
 }

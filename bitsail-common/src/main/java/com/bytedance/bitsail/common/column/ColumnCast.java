@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
+import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,6 +41,7 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Deprecated
 public final class ColumnCast {
@@ -59,7 +61,7 @@ public final class ColumnCast {
   private static ZoneId dateTimeZone;
   private static volatile boolean enabled = false;
 
-  public static void initColumnCast(BitSailConfiguration commonConfiguration) {
+  public static synchronized void initColumnCast(BitSailConfiguration commonConfiguration) {
     if (enabled) {
       return;
     }
@@ -77,14 +79,14 @@ public final class ColumnCast {
         .TIME_PATTERN);
     encoding = commonConfiguration.get(CommonOptions.DateFormatOptions.COLUMN_ENCODING);
 
-    formatters = Lists.newArrayList();
+    formatters = Lists.newCopyOnWriteArrayList();
     dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimePattern);
     dateFormatter = DateTimeFormatter.ofPattern(datePattern);
     timeFormatter = DateTimeFormatter.ofPattern(timePattern);
-    commonConfiguration.get(CommonOptions.DateFormatOptions.EXTRA_FORMATS)
-        .forEach(pattern -> formatters.add(DateTimeFormatter.ofPattern(pattern)));
     formatters.add(dateTimeFormatter);
     formatters.add(dateFormatter);
+    commonConfiguration.get(CommonOptions.DateFormatOptions.EXTRA_FORMATS)
+        .forEach(pattern -> formatters.add(DateTimeFormatter.ofPattern(pattern)));
     enabled = true;
   }
 
@@ -98,18 +100,7 @@ public final class ColumnCast {
     for (DateTimeFormatter formatter : formatters) {
       try {
         TemporalAccessor parse = formatter.parse(dateStr);
-        LocalDateTime localDateTime = null;
-        LocalDate localDate = LocalDate.from(parse);
-        if (parse.isSupported(ChronoField.HOUR_OF_DAY)
-            || parse.isSupported(ChronoField.HOUR_OF_DAY)
-            || parse.isSupported(ChronoField.MINUTE_OF_HOUR)
-            || parse.isSupported(ChronoField.SECOND_OF_MINUTE)
-            || parse.isSupported(ChronoField.MICRO_OF_SECOND)) {
-          localDateTime = LocalDateTime.of(localDate, LocalTime.from(parse));
-        } else {
-          localDateTime = localDate.atStartOfDay();
-        }
-        return Date.from(localDateTime.atZone(dateTimeZone).toInstant());
+        return fromTemporalAccessor(parse);
       } catch (Exception e) {
         LOG.debug("Formatter = {} parse string {} failed.", formatter, dateStr, e);
         //ignore
@@ -118,25 +109,84 @@ public final class ColumnCast {
     throw new IllegalArgumentException(String.format("String [%s] can't be parse by all formatter.", dateStr));
   }
 
+  private static Date fromTemporalAccessor(TemporalAccessor temporalAccessor) {
+    LocalDate localDate = null;
+    LocalTime localTime = null;
+
+    if (temporalAccessor.isSupported(ChronoField.YEAR_OF_ERA)
+        && temporalAccessor.isSupported(ChronoField.MONTH_OF_YEAR)
+        && temporalAccessor.isSupported(ChronoField.DAY_OF_MONTH)) {
+      localDate = LocalDate.of(
+          temporalAccessor.get(ChronoField.YEAR_OF_ERA),
+          temporalAccessor.get(ChronoField.MONTH_OF_YEAR),
+          temporalAccessor.get(ChronoField.DAY_OF_MONTH));
+    }
+    if (temporalAccessor.isSupported(ChronoField.HOUR_OF_DAY)
+        && temporalAccessor.isSupported(ChronoField.MINUTE_OF_HOUR)
+        && temporalAccessor.isSupported(ChronoField.SECOND_OF_MINUTE)) {
+      localTime = LocalTime.of(
+          temporalAccessor.get(ChronoField.HOUR_OF_DAY),
+          temporalAccessor.get(ChronoField.MINUTE_OF_HOUR),
+          temporalAccessor.get(ChronoField.SECOND_OF_MINUTE),
+          temporalAccessor.get(ChronoField.NANO_OF_SECOND)
+      );
+    }
+    if (Objects.nonNull(localDate)) {
+      LocalDateTime localDateTime;
+      if (Objects.nonNull(localTime)) {
+        localDateTime = LocalDateTime.of(localDate, localTime);
+      } else {
+        localDateTime = localDate.atStartOfDay();
+      }
+      return Date.from(localDateTime.atZone(dateTimeZone).toInstant());
+    }
+    if (Objects.nonNull(localTime)) {
+      return new Time(
+          localTime.getHour(),
+          localTime.getMinute(),
+          localTime.getSecond()
+      );
+    }
+    throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
+        String.format("Temporal %s can't convert to date.", temporalAccessor));
+  }
+
   public static String date2String(final DateColumn column) {
     checkState();
     if (null == column.asDate()) {
       return null;
     }
-    Date date = column.asDate();
-    OffsetDateTime offsetDateTime = Instant.ofEpochMilli(date.toInstant().toEpochMilli())
-        .atZone(dateTimeZone).toOffsetDateTime();
-
-    switch (column.getSubType()) {
-      case DATE:
-        return dateFormatter.format(offsetDateTime);
-      case TIME:
-        return timeFormatter.format(offsetDateTime);
-      case DATETIME:
-        return dateTimeFormatter.format(offsetDateTime);
-      default:
-        throw BitSailException
-            .asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT, "");
+    DateColumn.DateType subType = column.getSubType();
+    if (DateColumn.DateType.DATE.equals(subType)
+        || DateColumn.DateType.TIME.equals(subType)
+        || DateColumn.DateType.DATETIME.equals(subType)) {
+      Date date = column.asDate();
+      OffsetDateTime offsetDateTime = Instant.ofEpochMilli(date.toInstant().toEpochMilli())
+          .atZone(dateTimeZone).toOffsetDateTime();
+      switch (subType) {
+        case DATE:
+          return dateFormatter.format(offsetDateTime);
+        case TIME:
+          return timeFormatter.format(offsetDateTime);
+        case DATETIME:
+          return dateTimeFormatter.format(offsetDateTime);
+        default:
+          throw BitSailException
+              .asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT, "");
+      }
+    } else {
+      Object rawData = column.getRawData();
+      switch (subType) {
+        case LOCAL_DATE:
+          return dateFormatter.format(((LocalDate) rawData).atStartOfDay().atZone(dateTimeZone));
+        case LOCAL_TIME:
+          return timeFormatter.format((LocalTime) rawData);
+        case LOCAL_DATE_TIME:
+          return dateTimeFormatter.format(((LocalDateTime) rawData).atZone(dateTimeZone));
+        default:
+          throw BitSailException
+              .asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT, "");
+      }
     }
   }
 

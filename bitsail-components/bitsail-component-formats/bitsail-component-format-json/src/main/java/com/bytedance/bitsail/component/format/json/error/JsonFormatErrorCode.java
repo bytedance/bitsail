@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import com.bytedance.bitsail.common.exception.ErrorCode;
 public enum JsonFormatErrorCode implements ErrorCode {
 
   JSON_FORMAT_SCHEMA_PARSE_FAILED("JSON-Format-1", "JSOM format parse byte array failed."),
-  JSON_FORMAT_COVERT_FAILED("JSON-Format-1", "JSOM format covert failed.");
+  JSON_FORMAT_COVERT_FAILED("JSON-Format-2", "JSOM format covert failed.");
 
   public String code;
   public String description;

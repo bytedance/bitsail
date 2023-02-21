@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import com.bytedance.bitsail.base.format.DeserializationSchema;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.component.format.csv.CsvDeserializationSchema;
-import com.bytedance.bitsail.component.format.json.JsonDeserializationSchema;
+import com.bytedance.bitsail.component.format.json.JsonRowDeserializationSchema;
 import com.bytedance.bitsail.connector.ftp.core.config.FtpConfig;
 import com.bytedance.bitsail.connector.ftp.error.FtpErrorCode;
 
@@ -30,13 +30,11 @@ public class DeserializationSchemaFactory {
     if (ftpConfig.getContentType() == FtpConfig.ContentType.CSV) {
       return new CsvDeserializationSchema(
           jobConf,
-          context.getTypeInfos(),
-          context.getFieldNames());
+          context.getRowTypeInfo());
     } else if (ftpConfig.getContentType() == FtpConfig.ContentType.JSON) {
-      return new JsonDeserializationSchema(
+      return new JsonRowDeserializationSchema(
           jobConf,
-          context.getTypeInfos(),
-          context.getFieldNames());
+          context.getRowTypeInfo());
     } else {
       throw BitSailException.asBitSailException(FtpErrorCode.CONTENT_TYPE_NOT_SUPPORTED,
           "Content type only supports JSON and CSV");

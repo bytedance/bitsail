@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import com.bytedance.bitsail.common.column.ColumnCast;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.flink.core.legacy.connector.Pluggable;
 import com.bytedance.bitsail.flink.core.parser.RowBytesParser;
 import com.bytedance.bitsail.flink.core.runtime.RuntimeContextInjectable;
@@ -138,8 +137,8 @@ public abstract class AdapterPlugin extends RichFlatMapFunction<Row, Row> implem
   }
 
   private RowTypeInfo getCustomTypeInfoFromFlink() {
-    TypeInfo<?>[] typeInfos = NativeFlinkTypeInfoUtil.toTypeInfos(flinkRowTypeInfo);
-    return ColumnFlinkTypeInfoUtil.getRowTypeInformation(typeInfos);
+    com.bytedance.bitsail.common.typeinfo.RowTypeInfo rowTypeInfo = NativeFlinkTypeInfoUtil.toRowTypeInfo(flinkRowTypeInfo);
+    return ColumnFlinkTypeInfoUtil.getRowTypeInformation(rowTypeInfo);
   }
 
   public abstract Row transform(Row outputRow, Row inputRow) throws BitSailException;

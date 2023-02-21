@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import com.bytedance.bitsail.base.messenger.Messenger;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.ReaderOptions;
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfoUtils;
 import com.bytedance.bitsail.core.flink.bridge.serializer.DelegateFlinkSourceSplitSerializer;
 import com.bytedance.bitsail.core.flink.bridge.serializer.DelegateSimpleVersionedSerializer;
@@ -49,7 +49,7 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
 
   private final BitSailConfiguration commonConfiguration;
   private final BitSailConfiguration readerConfiguration;
-  private final TypeInfo<?>[] typeInfos;
+  private final RowTypeInfo rowTypeInfo;
   private final AbstractDirtyCollector dirtyCollector;
   private final Messenger messenger;
 
@@ -63,9 +63,9 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
     this.readerConfiguration = readerConfiguration;
     List<ColumnInfo> columnInfos = readerConfiguration
         .get(ReaderOptions.BaseReaderOptions.COLUMNS);
-    this.typeInfos = TypeInfoUtils
-        .getTypeInfos(source.createTypeInfoConverter(),
-            columnInfos);
+
+    this.rowTypeInfo = TypeInfoUtils
+        .getRowTypeInfo(source.createTypeInfoConverter(), columnInfos);
     this.dirtyCollector = dirtyCollector;
     this.messenger = messenger;
   }
@@ -81,7 +81,7 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
         source::createReader,
         readerContext,
         source.getReaderName(),
-        typeInfos,
+        rowTypeInfo,
         commonConfiguration,
         readerConfiguration,
         dirtyCollector,
@@ -114,6 +114,6 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
 
   @Override
   public TypeInformation<T> getProducedType() {
-    return (TypeInformation<T>) NativeFlinkTypeInfoUtil.getRowTypeInformation(typeInfos);
+    return (TypeInformation<T>) NativeFlinkTypeInfoUtil.getRowTypeInformation(rowTypeInfo);
   }
 }

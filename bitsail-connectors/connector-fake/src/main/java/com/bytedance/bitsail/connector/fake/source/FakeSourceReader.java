@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package com.bytedance.bitsail.connector.fake.source;
 import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.connector.base.source.SimpleSourceReaderBase;
 import com.bytedance.bitsail.connector.fake.option.FakeReaderOptions;
 
@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
 
   private final BitSailConfiguration readerConfiguration;
-  private final TypeInfo<?>[] typeInfos;
+  private final RowTypeInfo rowTypeInfo;
 
   private final transient int totalCount;
   private final transient RateLimiter fakeGenerateRate;
@@ -40,7 +40,7 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
 
   public FakeSourceReader(BitSailConfiguration readerConfiguration, Context context) {
     this.readerConfiguration = readerConfiguration;
-    this.typeInfos = context.getTypeInfos();
+    this.rowTypeInfo = context.getRowTypeInfo();
     this.totalCount = readerConfiguration.get(FakeReaderOptions.TOTAL_COUNT);
     this.fakeGenerateRate = RateLimiter.create(readerConfiguration.get(FakeReaderOptions.RATE));
     this.counter = new AtomicLong();
@@ -50,7 +50,7 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
   @Override
   public void pollNext(SourcePipeline<Row> pipeline) throws Exception {
     fakeGenerateRate.acquire();
-    pipeline.output(fakeRowGenerator.fakeOneRecord(typeInfos));
+    pipeline.output(fakeRowGenerator.fakeOneRecord(rowTypeInfo.getTypeInfos()));
   }
 
   @Override

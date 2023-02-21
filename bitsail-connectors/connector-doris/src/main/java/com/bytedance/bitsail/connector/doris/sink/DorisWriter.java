@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import com.bytedance.bitsail.connector.doris.sink.proxy.DorisReplaceProxy;
 import com.bytedance.bitsail.connector.doris.sink.proxy.DorisUpsertProxy;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,14 +45,7 @@ public class DorisWriter<InputT extends Row> implements Writer<InputT, DorisComm
 
   public DorisWriter(BitSailConfiguration writerConfiguration, DorisOptions dorisOptions, DorisExecutionOptions dorisExecutionOptions) {
     this.writerConfiguration = writerConfiguration;
-    if (dorisOptions.getTableModel() != DorisOptions.TableModel.UNIQUE) {
-      // pipelined validate the options
-      // 1. we only support UNIQUE table now.
-      throw BitSailException.asBitSailException(DorisErrorCode.UNSUPPORTED_TABLE_MODEL,
-          String.format("Unsupported table model: [%s]," + " Currently we only support [UNIQUE] table writing",
-              dorisOptions.getTableModel())
-      );
-    }
+
     switch (dorisExecutionOptions.getWriterMode()) {
       case STREAMING_UPSERT:
       case BATCH_UPSERT:
@@ -63,9 +57,6 @@ public class DorisWriter<InputT extends Row> implements Writer<InputT, DorisComm
         }
         writeModeProxy = new DorisReplaceProxy(dorisExecutionOptions, dorisOptions);
         break;
-      case STREAMING_TWO_PC:
-        //TODO implement 2PC write mode
-        throw new BitSailException(DorisErrorCode.PROXY_INIT_FAILED, "2PC commit is not supported currently");
       default:
         throw new BitSailException(DorisErrorCode.PROXY_INIT_FAILED, "Write mode is not valid");
     }
@@ -81,6 +72,9 @@ public class DorisWriter<InputT extends Row> implements Writer<InputT, DorisComm
   public void write(InputT in) throws IOException {
     String dorisRecord;
     dorisRecord = this.serializer.serialize(in);
+    if (StringUtils.isEmpty(dorisRecord)) {
+      return;
+    }
     writeModeProxy.write(dorisRecord);
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,29 +19,20 @@ package com.bytedance.bitsail.connector.rocketmq.format;
 import com.bytedance.bitsail.base.format.DeserializationSchema;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
-import com.bytedance.bitsail.component.format.json.JsonDeserializationSchema;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
+import com.bytedance.bitsail.component.format.json.JsonRowDeserializationSchema;
 
 public class RocketMQDeserializationSchema implements DeserializationSchema<byte[], Row> {
 
   private BitSailConfiguration deserializationConfiguration;
 
-  private TypeInfo<?>[] typeInfos;
-
-  private String[] fieldNames;
-
-  private transient JsonDeserializationSchema deserializationSchema;
+  private transient JsonRowDeserializationSchema deserializationSchema;
 
   public RocketMQDeserializationSchema(BitSailConfiguration deserializationConfiguration,
-                                       TypeInfo<?>[] typeInfos,
-                                       String[] fieldNames) {
+                                       RowTypeInfo rowTypeInfo) {
     this.deserializationConfiguration = deserializationConfiguration;
-    this.typeInfos = typeInfos;
-    this.fieldNames = fieldNames;
     //todo spi.
-    this.deserializationSchema = new JsonDeserializationSchema(deserializationConfiguration,
-        typeInfos,
-        fieldNames);
+    this.deserializationSchema = new JsonRowDeserializationSchema(deserializationConfiguration, rowTypeInfo);
   }
 
   @Override

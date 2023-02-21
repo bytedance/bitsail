@@ -133,3 +133,28 @@ dir:
 27. **增量更新是怎么做的？**
 
 > 字节内部有一套CDC的机制，将全量数据和增量数据全部都打到Message Queue里面，BitSail引擎直接对接Message Queue，做全量和增量的结合。
+
+28. **如何在hive2.x或者hive3.x的环境中部署BitSail?**
+
+> BitSail使用`bitsail-shaded-hive`模块来管理hive依赖，在其中使用**3.1.0**作为默认hive版本。
+> 因此，用户如果想在其他版本的hive环境中部署和使用BitSail，需要先修改 [bitsail-shaded-hive](https://github.com/bytedance/bitsail/blob/master/bitsail-shade/bitsail-shaded-hive/pom.xml) 中的hive版本信息（如图所示）。
+>
+> ![](../../../images/change-hive-version.png)
+
+29. **目前是否支持JDK 11？**
+
+> 目前BitSail仅支持JDK 8。
+
+30. **本地运行集成测试（ITCase）或者E2E测试出错？**
+
+> 因为集成测试和E2E测试依赖docker构建数据源，所以需要预先在本地安装docker。如果确认本地已安装docker，请通过issue来反馈您的问题。
+
+
+31. **如何在没有hadoop的本地环境进行hadoop相关数据源的测试？**
+
+> 通过 [build.sh](https://github.com/bytedance/bitsail/blob/master/build.sh) 脚本构建BitSail项目后，会将可运行产物打包在项目的`output`目录下。
+> 为了进行hadoop相关数据源（例如hive）的测试，需要将以下两个依赖包下载到 `output/embedded/flink/lib` 目录下。
+> - [flink-shaded-hadoop-3-uber.jar](https://repository.cloudera.com/artifactory/cloudera-repos/org/apache/flink/flink-shaded-hadoop-3-uber/3.1.1.7.2.9.0-173-9.0/flink-shaded-hadoop-3-uber-3.1.1.7.2.9.0-173-9.0.jar)
+> - [commons-cli](https://repo1.maven.org/maven2/commons-cli/commons-cli/1.5.0/commons-cli-1.5.0.jar)
+> 
+> 下载完成后，即可在output目录提交测试任务。

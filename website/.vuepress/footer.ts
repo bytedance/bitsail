@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ export const cnFooter = `
       </div>
     </div>
     <div style="padding: 20px; color: white;">
-      Apache LICENSE 2.0 Licensed, Copyright 2018-2022 BitSail All Rights Reserved
+      Apache LICENSE 2.0 Licensed, Copyright 2018-2023 BitSail All Rights Reserved
     </div>
   </div>
 `;
@@ -79,7 +79,7 @@ export const enFooter = `
       </div>
     </div>
     <div style="padding: 20px; color: white;">
-      Apache LICENSE 2.0 Licensed, Copyright 2018-2022 BitSail All Rights Reserved
+    Apache LICENSE 2.0 Licensed, Copyright 2022-2023 BitSail All Rights Reserved
     </div>
   </div>
 `;

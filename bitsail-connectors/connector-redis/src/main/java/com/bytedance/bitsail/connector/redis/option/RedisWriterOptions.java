@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,9 +60,12 @@ public interface RedisWriterOptions extends WriterOptions.BaseWriterOptions {
       key(WRITER_PREFIX + "ttl_type")
           .defaultValue("DAY");
 
-  ConfigOption<Integer> WRITE_BATCH_INTERVAL =
+  @SuppressWarnings("checkstyle:MagicNumber")
+  ConfigOption<Integer> WRITE_BATCH_SIZE =
       key(WRITER_PREFIX + "write_batch_interval")
-          .defaultValue(50);
+          .defaultValue(50)
+          .withAlias(WRITER_PREFIX + "write_batch_interval");
+
 
   /**
    * Data type to insert into redis.

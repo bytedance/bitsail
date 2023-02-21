@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,8 @@ public abstract class AbstractDirtyCollector implements Closeable, Serializable 
    */
   private int dirtyCount;
 
+  private final boolean allowed;
+
   public AbstractDirtyCollector(BitSailConfiguration jobConf,
                                 int taskId) {
     this.jobConf = jobConf;
@@ -68,6 +70,8 @@ public abstract class AbstractDirtyCollector implements Closeable, Serializable 
 
     this.dirtySampleRatio = jobConf.get(CommonOptions.DirtyRecordOptions.DIRTY_SAMPLE_RATIO);
     this.dirtySampleRandom = new Random();
+
+    this.allowed = jobConf.get(CommonOptions.DirtyRecordOptions.DIRTY_RECORD_SKIP_ENABLED);
   }
 
   /**
@@ -78,6 +82,13 @@ public abstract class AbstractDirtyCollector implements Closeable, Serializable 
    * @param processingTime Processing timestamp for the record.
    */
   public void collectDirty(Object dirtyObj, Throwable e, long processingTime) {
+    if (!allowed) {
+      throw new RuntimeException(
+          String.format("Found dirty data but not allowed. " +
+                  "Please enable skip dirty record by adding user defined config %s=true. \n Dirty record: %s , \n Exception message: %s",
+              CommonOptions.DirtyRecordOptions.DIRTY_RECORD_SKIP_ENABLED.key(),
+              dirtyObj.toString(), e.getMessage()), e);
+    }
     if (isRunning && shouldSample() && !Objects.isNull(dirtyObj)) {
       try {
         collect(dirtyObj, e, processingTime);

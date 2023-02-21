@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,5 +88,8 @@ public interface FtpReaderOptions extends ReaderOptions.BaseReaderOptions {
       key(READER_PREFIX + "connect_pattern")
           .defaultValue("PASV");
 
+  ConfigOption<String> CHARSET =
+      key(READER_PREFIX + "charset")
+          .defaultValue("utf-8");
 }
 
