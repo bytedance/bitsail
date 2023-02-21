@@ -100,7 +100,6 @@ public class FakeRowGenerator {
 
   @SuppressWarnings("checkstyle:MagicNumber")
   private Object fakeRawValue(TypeInfo<?> typeInfo, String constantValue) {
-
     if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
       if (CollectionUtils.isNotEmpty(typeInfo.getTypeProperties()) && typeInfo.getTypeProperties().contains(TypeProperty.UNIQUE)) {
         if (!Objects.isNull(constantValue)) {
@@ -257,6 +256,5 @@ public class FakeRowGenerator {
     }
     throw new RuntimeException("Unsupported type " + typeInfo);
   }
-
 
 }
