@@ -35,6 +35,13 @@
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-base</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
         <!-- Kafka -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
