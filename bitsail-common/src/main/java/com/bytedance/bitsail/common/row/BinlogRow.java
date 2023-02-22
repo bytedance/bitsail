@@ -17,76 +17,16 @@
 package com.bytedance.bitsail.common.row;
 
 /**
- * Intermedia data structure of binlog row.
+ * Binlog row properties.
  */
 @SuppressWarnings("checkstyle:MagicNumber")
-public class BinlogRow extends Row {
-  private static final int ROW_SIZE = 7;
-  private static final int DATABASE_INDEX = 0;
-  private static final int TABLE_INDEX = 1;
-  private static final int KEY_INDEX = 2;
-  private static final int TIMESTAMP_INDEX = 3;
-  private static final int DDL_FLAG_INDEX = 4;
-  private static final int VERSION_INDEX = 5;
-  private static final int VALUE_INDEX = 6;
-
-  public BinlogRow() {
-    super(ROW_SIZE);
-  }
-
-  public void setDatabase(String db) {
-    setField(DATABASE_INDEX, db);
-  }
-
-  public String getDatabase() {
-    return getString(DATABASE_INDEX);
-  }
-
-  public void setTable(String table) {
-    setField(TABLE_INDEX, table);
-  }
-
-  public String getTable() {
-    return getString(TABLE_INDEX);
-  }
-
-  public void setKey(String key) {
-    setField(KEY_INDEX, key);
-  }
-
-  public String getKey() {
-    return getString(KEY_INDEX);
-  }
-
-  public void setTimestamp(String ts) {
-    setField(TIMESTAMP_INDEX, ts);
-  }
-
-  public String getTimestamp() {
-    return getString(TIMESTAMP_INDEX);
-  }
-
-  public void setDDL(boolean isDDL) {
-    setField(DDL_FLAG_INDEX, isDDL);
-  }
-
-  public boolean getDDL() {
-    return getBoolean(DDL_FLAG_INDEX);
-  }
-
-  public void setVersion(int version) {
-    setField(VERSION_INDEX, version);
-  }
-
-  public int getVersion() {
-    return getInt(VERSION_INDEX);
-  }
-
-  public void setValue(byte[] value) {
-    setField(VALUE_INDEX, value);
-  }
-
-  public byte[] getValue() {
-    return getBinary(VALUE_INDEX);
-  }
+public class BinlogRow {
+  public static final int ROW_SIZE = 7;
+  public static final int DATABASE_INDEX = 0;
+  public static final int TABLE_INDEX = 1;
+  public static final int KEY_INDEX = 2;
+  public static final int TIMESTAMP_INDEX = 3;
+  public static final int DDL_FLAG_INDEX = 4;
+  public static final int VERSION_INDEX = 5;
+  public static final int VALUE_INDEX = 6;
 }
