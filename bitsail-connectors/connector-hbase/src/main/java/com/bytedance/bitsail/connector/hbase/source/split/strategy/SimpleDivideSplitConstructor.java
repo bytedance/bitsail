@@ -25,7 +25,9 @@ import com.bytedance.bitsail.connector.hbase.option.HBaseReaderOptions;
 import com.bytedance.bitsail.connector.hbase.source.split.HBaseSourceSplit;
 
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.RegionLocator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

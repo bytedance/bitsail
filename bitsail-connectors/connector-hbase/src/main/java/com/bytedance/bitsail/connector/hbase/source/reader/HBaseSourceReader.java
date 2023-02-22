@@ -25,7 +25,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.constants.Constants;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.hbase.HBaseHelper;
 import com.bytedance.bitsail.connector.hbase.error.HBasePluginErrorCode;
@@ -43,9 +43,8 @@ import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.mapred.JobConf;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +81,7 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
   private boolean hasNoMoreSplits = false;
   private int totalSplitNum = 0;
   private final Deque<HBaseSourceSplit> splits;
-  private final TypeInfo<?>[] typeInfos;
+  private final RowTypeInfo rowTypeInfo;
 
   private final List<String> columnNames;
   private final Set<String> columnFamilies;
@@ -111,7 +110,7 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
     this.hbaseConfig = jobConf.get(HBaseReaderOptions.HBASE_CONF);
     this.tableName = jobConf.get(HBaseReaderOptions.TABLE);
     this.columnFamilies = new LinkedHashSet<>();
-    this.typeInfos = readerContext.getTypeInfos();
+    this.rowTypeInfo = readerContext.getRowTypeInfo();
     List<ColumnInfo> columnInfos = jobConf.getNecessaryOption(
         HBaseReaderOptions.COLUMNS, HBasePluginErrorCode.REQUIRED_VALUE);
 
@@ -130,7 +129,7 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
     this.splits = new ConcurrentLinkedDeque<>();
     this.namesMap = Maps.newConcurrentMap();
     this.deserializationFormat = new HBaseDeserializationFormat(jobConf);
-    this.deserializationSchema = this.deserializationFormat.createRuntimeDeserializationSchema(this.typeInfos);
+    this.deserializationSchema = this.deserializationFormat.createRuntimeDeserializationSchema(this.rowTypeInfo.getTypeInfos());
 
     LOG.info("HBase source reader {} is initialized.", subTaskId);
   }

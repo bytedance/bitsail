@@ -37,23 +37,6 @@
     <dependencies>
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-hadoop</artifactId>
-            <version>${revision}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.tukaani</groupId>
-                    <artifactId>xz</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>htrace-core4</artifactId>
-                    <groupId>org.apache.htrace</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-component-security-kerberos</artifactId>
             <version>${revision}</version>
             <scope>compile</scope>
