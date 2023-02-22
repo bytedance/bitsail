@@ -19,29 +19,20 @@ package com.bytedance.bitsail.connector.kafka.format;
 import com.bytedance.bitsail.base.format.DeserializationSchema;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
-import com.bytedance.bitsail.component.format.json.JsonDeserializationSchema;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
+import com.bytedance.bitsail.component.format.json.JsonRowDeserializationSchema;
 
 public class KafkaDeserializationSchema implements DeserializationSchema<byte[], Row> {
 
   private BitSailConfiguration deserializationConfiguration;
 
-  private TypeInfo<?>[] typeInfos;
-
-  private String[] fieldNames;
-
-  private transient JsonDeserializationSchema deserializationSchema;
+  private transient JsonRowDeserializationSchema deserializationSchema;
 
   public KafkaDeserializationSchema(BitSailConfiguration deserializationConfiguration,
-                                    TypeInfo<?>[] typeInfos,
-                                    String[] fieldNames) {
+                                    RowTypeInfo rowTypeInfo) {
     this.deserializationConfiguration = deserializationConfiguration;
-    this.typeInfos = typeInfos;
-    this.fieldNames = fieldNames;
     //todo spi.
-    this.deserializationSchema = new JsonDeserializationSchema(deserializationConfiguration,
-        typeInfos,
-        fieldNames);
+    this.deserializationSchema = new JsonRowDeserializationSchema(deserializationConfiguration, rowTypeInfo);
   }
 
   @Override
