@@ -289,6 +289,13 @@
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-kafka</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
             <artifactId>connector-cdc-mysql</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>

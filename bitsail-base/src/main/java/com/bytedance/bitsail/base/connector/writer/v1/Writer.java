@@ -16,7 +16,7 @@
 
 package com.bytedance.bitsail.base.connector.writer.v1;
 
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -73,7 +73,7 @@ public interface Writer<InputT, CommT, WriterStateT> extends Serializable, Close
 
   interface Context<WriterStateT> extends Serializable {
 
-    TypeInfo<?>[] getTypeInfos();
+    RowTypeInfo getRowTypeInfo();
 
     int getIndexOfSubTaskId();
 

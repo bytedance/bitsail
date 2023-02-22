@@ -17,7 +17,9 @@
 package com.bytedance.bitsail.connector.cdc.mysql.source.debezium;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.row.BinlogRow;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.component.format.debezium.JsonDebeziumSerializationSchema;
 import com.bytedance.bitsail.connector.cdc.mysql.source.config.MysqlConfig;
 import com.bytedance.bitsail.connector.cdc.source.reader.BinlogSplitReader;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
@@ -46,6 +48,8 @@ import io.debezium.relational.TableId;
 import io.debezium.schema.TopicSelector;
 import io.debezium.util.Clock;
 import io.debezium.util.SchemaNameAdjuster;
+import org.apache.kafka.connect.data.Field;
+import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,8 +72,6 @@ import java.util.concurrent.TimeUnit;
 public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
 
   private static final Logger LOG = LoggerFactory.getLogger(MysqlBinlogSplitReader.class);
-
-  public static final int ROW_SIZE = 5;
 
   private boolean isRunning;
 
@@ -108,6 +110,8 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
 
   private final int subtaskId;
 
+  private final JsonDebeziumSerializationSchema serializer;
+
   public MysqlBinlogSplitReader(BitSailConfiguration jobConf, int subtaskId) {
     this.mysqlConfig = MysqlConfig.fromBitSailConf(jobConf);
     this.schemaNameAdjuster = SchemaNameAdjuster.create();
@@ -117,6 +121,7 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
     ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("mysql-binlog-reader-" + this.subtaskId).build();
     this.executorService = Executors.newSingleThreadExecutor(threadFactory);
     this.offset = new HashMap<>();
+    this.serializer = new JsonDebeziumSerializationSchema(jobConf);
   }
 
   public void readSplit(BinlogSplit split) {
@@ -253,14 +258,17 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
   public Row poll() {
     SourceRecord record = this.recordIterator.next();
     this.offset = record.sourceOffset();
-    LOG.info("OFFSET:" + record.sourceOffset());
-    LOG.info("Record: " + record.toString());
-    //LOG.info("poll one record {}", record.value());
-
-    Row result = new Row(2);
-    result.setField(0, record.timestamp());
-    result.setField(1, record.value());
-    // TODO: Build BitSail row and return
+    byte[] serialized = this.serializer.serialize(record);
+    Struct val = (Struct) record.value();
+    Field keyField = record.keySchema().fields().get(0);
+    BinlogRow result = new BinlogRow();
+    result.setDatabase(val.getStruct("source").getString("db"));
+    result.setTable(val.getStruct("source").getString("table"));
+    result.setKey(((Struct) record.key()).get(keyField).toString());
+    result.setTimestamp(val.getStruct("source").getInt64("ts_ms").toString());
+    result.setDDL(false);
+    result.setVersion(1);
+    result.setValue(serialized);
     return result;
   }
 
