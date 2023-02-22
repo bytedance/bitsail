@@ -43,53 +43,55 @@ public abstract class BinlogSourceReader implements SourceReader<Row, BinlogSpli
 
   protected final BinlogSplitReader<Row> reader;
 
-  private boolean isRunning;
+  private boolean splitSubmitted;
 
   public BinlogSourceReader(BitSailConfiguration jobConf, SourceReader.Context readerContext) {
     this.jobConf = jobConf;
     this.readerContext = readerContext;
     this.remainSplits = new ArrayDeque<>();
     this.reader = getReader();
-    this.isRunning = false;
+    this.splitSubmitted = false;
   }
 
   public abstract BinlogSplitReader<Row> getReader();
 
   @Override
   public void start() {
-    //start debezium streaming reader and send data to queue
+    // do nothing
   }
 
   @Override
   public void pollNext(SourcePipeline<Row> pipeline) throws Exception {
-    // each reader only read one binlog split
-    if (!isRunning) {
-      submitSplit();
-      isRunning = true;
-    }
-
     // poll from reader
-    if (!this.reader.isCompleted() && this.reader.hasNext()) {
-      //SourceRecord record = this.reader.poll();
-
+    if (this.reader.isRunning() && this.reader.hasNext()) {
+      Row record = this.reader.poll();
+      pipeline.output(record);
     }
-    //TODO: Convert source record to Row and collect
   }
 
   @Override
   public void addSplits(List<BinlogSplit> splits) {
+    LOG.info("Received splits from coordinator.");
     splits.forEach(e -> LOG.info("Add split: {}", e.toString()));
     remainSplits.addAll(splits);
+    if (!splitSubmitted) {
+      submitSplit();
+      splitSubmitted = true;
+    }
   }
 
   @Override
   public boolean hasMoreElements() {
-    return this.reader.hasNext();
+    if (!splitSubmitted) {
+      return true;
+    } else {
+      return this.reader.hasNext();
+    }
   }
 
   @Override
   public void notifyNoMoreSplits() {
-    SourceReader.super.notifyNoMoreSplits();
+    // do nothing
   }
 
   @Override
@@ -99,17 +101,20 @@ public abstract class BinlogSourceReader implements SourceReader<Row, BinlogSpli
     }
   }
 
+  /**
+   * Snapshot the offset into state.
+   */
   @Override
   public abstract List<BinlogSplit> snapshotState(long checkpointId);
 
   @Override
   public void notifyCheckpointComplete(long checkpointId) throws Exception {
-    SourceReader.super.notifyCheckpointComplete(checkpointId);
+    // do nothing
   }
 
   @Override
   public void close() {
-    if (this.reader != null && !this.reader.isCompleted()) {
+    if (this.reader != null && this.reader.isRunning()) {
       this.reader.close();
       LOG.info("Reader close successfully");
     }
