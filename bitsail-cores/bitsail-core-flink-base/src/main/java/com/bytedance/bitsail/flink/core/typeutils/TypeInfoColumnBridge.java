@@ -86,10 +86,31 @@ public class TypeInfoColumnBridge {
           COLUMN_BRIDGE_TYPE_INFO_MAPPING.get(typeInfo));
     }
 
-    for (TypeInfo<?> typeInfo : COLUMN_BRIDGE_TYPE_INFO_MAPPING.keySet()) {
-      TYPE_INFO_BRIDGE_CLASS_MAPPING.put(COLUMN_BRIDGE_TYPE_INFO_MAPPING.get(typeInfo).getTypeClass(),
-          typeInfo);
-    }
+    //According to column type info not match with framework type info, so we decide use fixed mapping for it.
+    //TODO after we deprecated column type info we will delete those logic.
+    TYPE_INFO_BRIDGE_CLASS_MAPPING.put(
+        PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO.getTypeClass(),
+        TypeInfos.LONG_TYPE_INFO);
+
+    TYPE_INFO_BRIDGE_CLASS_MAPPING.put(
+        PrimitiveColumnTypeInfo.DOUBLE_COLUMN_TYPE_INFO.getTypeClass(),
+        TypeInfos.DOUBLE_TYPE_INFO);
+
+    TYPE_INFO_BRIDGE_CLASS_MAPPING.put(
+        PrimitiveColumnTypeInfo.STRING_COLUMN_TYPE_INFO.getTypeClass(),
+        TypeInfos.STRING_TYPE_INFO);
+
+    TYPE_INFO_BRIDGE_CLASS_MAPPING.put(
+        PrimitiveColumnTypeInfo.BOOL_COLUMN_TYPE_INFO.getTypeClass(),
+        TypeInfos.BOOLEAN_TYPE_INFO);
+
+    TYPE_INFO_BRIDGE_CLASS_MAPPING.put(
+        PrimitiveColumnTypeInfo.DATE_COLUMN_TYPE_INFO.getTypeClass(),
+        TypeInfos.SQL_TIMESTAMP_TYPE_INFO);
+
+    TYPE_INFO_BRIDGE_CLASS_MAPPING.put(
+        PrimitiveColumnTypeInfo.BYTES_COLUMN_TYPE_INFO.getTypeClass(),
+        BasicArrayTypeInfo.BINARY_TYPE_INFO);
   }
 
   public static TypeInformation<?> bridgeTypeInfo(TypeInfo<?> bridge) {
