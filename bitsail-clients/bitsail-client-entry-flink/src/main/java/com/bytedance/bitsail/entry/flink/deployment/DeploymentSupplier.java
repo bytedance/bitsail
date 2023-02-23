@@ -26,7 +26,7 @@ import java.util.List;
 public interface DeploymentSupplier {
   String ENTRY_JAR_NAME = "bitsail-core.jar";
 
-  void addRunProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands);
+  void addProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands);
 
   void addRunJarAndJobConfCommands(BaseCommandArgs baseCommandArgs, List<String> flinkCommands);
 

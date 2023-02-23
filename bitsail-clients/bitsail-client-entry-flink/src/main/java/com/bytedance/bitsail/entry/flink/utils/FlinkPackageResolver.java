@@ -26,14 +26,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class FlinkPackageResolver {
+  private static final String FLINK_LIB_DIR = "lib";
+  private static final String FLINK_CONF_DIR = "conf";
   public static final String FLINK_LIB_DIST_JAR_NAME = "flink-dist";
   public static final String FLINK_CONF_FILE = "flink-conf.yaml";
   public static final String FLINK_LOG_FILE_PREFIX = "log4j";
   public static final String ENV_PROP_FLINK_CONF_DIR = "FLINK_CONF_DIR";
   private static final Logger LOG = LoggerFactory.getLogger(FlinkPackageResolver.class);
 
-  public static Path getFlinkDir(Path rootDir, FlinkDirectory dir) {
-    return rootDir.resolve(dir.value);
+  public static Path getFlinkConfDir(Path rootDir) {
+    return rootDir.resolve(FLINK_CONF_DIR);
+  }
+
+  public static Path getFlinkLibDir(Path rootDir) {
+    return rootDir.resolve(FLINK_LIB_DIR);
   }
 
   public static Configuration loadFlinkConfiguration(Path flinkConfDir) {

@@ -30,6 +30,7 @@ Here are the contents of this part:
     - [Stop Application](#jump_stop_application)
     - [Kubernetes Logs](#jump_kubernetes_logs)
     - [History Server](#jump_history_server)
+    - [Test locally](#jump_test_locally)
 
 -----
 # <span id="yarn_deployment">Yarn Deployment</span>
@@ -201,6 +202,7 @@ Below is a step-by-step guide to help you effectively deploy it on native Kubern
 1. Kubernetes >= 1.9
 2. KubeConfig, which has access to list, create, delete pods and services, configurable via `~/.kube/config`. You can verify permissions by running `kubectl auth can-i <list|create|edit|delete> pods` 
 3. Kubernetes DNS enabled
+4. Have compiled BitSail ready (After building with `./build.sh`, the artifacts will be located in `output/`)
 
 If you have problems setting up a Kubernetes cluster, then take a look at [how to setup a Kubernetes cluster](https://kubernetes.io/docs/setup/).
 
@@ -223,7 +225,7 @@ Application mode allows users to create a single image containing their Job and 
 Build your `<CustomImage>` using below [`Dockerfile`](https://docs.docker.com/engine/reference/builder/):
 ```dockerfile
 FROM flink:1.11.6-scala_2.11-java8
-ENV USERLIB=/opt/flink/usrlib
+ENV USERLIB=/opt/bitsail
 RUN mkdir -p $USERLIB
 COPY libs/ $USERLIB/
 ```
@@ -249,6 +251,7 @@ bash ./bin/bitsail run \
    --target kubernetes-application \
    --deployment-mode kubernetes-application \
    --execution-mode run-application \
+   -p kubernetes.cluster-id=<cluster-id> \
    -p kubernetes.jobmanager.service-account=<self-defined-service-account> \
    -p kubernetes.container.image=<CustomImage> \
    -p kubernetes.jobmanager.cpu=0.25 \
@@ -271,9 +274,17 @@ Configurations:
   </tr>
 
   <tr>
+    <td>kubernetes.cluster-id</td>
+    <td>Optional</td>
+    <td>&#60;job_name&#62;_&#60;instance_id&#62;</td>
+    <td>String</td>
+    <td>The cluster-id, which should be no more than 45 characters, is used for identifying a unique Flink cluster. If not set, the client will automatically generate it with a random ID.</td>
+  </tr>
+
+  <tr>
     <td>kubernetes.container.image</td>
     <td>Required</td>
-    <td>The default value depends on the actually running version. In general it looks like "bitsail-core:appmode"</td>
+    <td>The default value depends on the actually running version. In general it looks like "flink:&#60;FLINK_VERSION&#62;-scala_&#60;SCALA_VERSION&#62;"</td>
     <td>String</td>
     <td>Image to use for BitSail containers. The specified image must be based upon the same Apache Flink and Scala versions as used by the application. Visit https://hub.docker.com/_/flink?tab=tags for the images provided by the Flink project.</td>
   </tr>
@@ -336,15 +347,29 @@ Configurations:
 </table>
 
 ### <span id="jump_stop_application">Stop Application</span>
+Users can go to Flink WebUI to cancel running jobs. 
+
+Alternatively, users can run the following bitSail command to cancel a job. 
+
+Noted that 
+- `<jobId>` can be retrieved from Flink JobManager, either from logs or WebUI.
+- `<cluster-id>` can be retrieved from `kubectl get deployment`
+```bash
+kubectl get deployment
+# expected output
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+<cluster-id>   1/1     1            1           22s
+```
 ```bash
 bash ./bin/bitsail stop \
    --engine flink \
    --target kubernetes-application \
    --deployment-mode kubernetes-application \
    --execution-mode cancel \
+   -p kubernetes.cluster-id=<cluster-id> \
    --job-id <jobId>
 ```
-Alternatively, users can run `kubectl` commands to delete the whole deployment in order to stop the application
+If users want to delete the whole application, users can run `kubectl` commands to delete the whole deployment in order to stop the application
 ```bash
 kubectl delete deployments bitsail-job
 ```
@@ -355,7 +380,21 @@ There are three types of logs:
 2. BitSail JobManager log: `/opt/flink/log/jobmanager.log` on Kubernetes JobManager pod
 3. BitSail TaskManager log: `/opt/flink/log/taskmanager.log` on Kubernetes TaskManager pod
 
-User can also dump JobManager/TaskManager logs on client end by running `kubectl` commands
+
+If you want to use kubectl logs <PodName> to view the logs, you must perform the following:
+
+1. Add a new appender to the log4j.properties in the Flink client. 
+2. Add the following ‘appenderRef’ the rootLogger in log4j.properties `rootLogger.appenderRef.console.ref = ConsoleAppender`. 
+3. Stop and start your Application again. Now you could use kubectl logs to view your logs.
+
+```bash
+# Log all infos to the console
+appender.console.name = ConsoleAppender
+appender.console.type = CONSOLE
+appender.console.layout.type = PatternLayout
+appender.console.layout.pattern = %d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
+```
+User can dump JobManager/TaskManager logs on client end by running `kubectl` commands
 ```bash
 # During job running
 kubectl get pods # Will return jobmanager pod and taskmanager pod
@@ -382,15 +421,29 @@ bash ./bin/bitsail run \
    --target kubernetes-application \
    --deployment-mode kubernetes-application \
    --execution-mode run-application \
+   -p kubernetes.cluster-id=<cluster-id> \
    -p kubernetes.jobmanager.service-account=<self-defined-service-account> \
    -p kubernetes.container.image=<CustomImage> \
    -p kubernetes.jobmanager.cpu=0.25 \
    -p kubernetes.taskmanager.cpu=0.5 \
-   --historyserver.enable true \
-   --jobmanager.archive.fs.dir hdfs:///completed-jobs/ \
-   --historyserver.web.address 0.0.0.0 \
-   --historyserver.web.port 8082 \
-   --historyserver.archive.fs.dir hdfs:///completed-jobs/ \
-   --historyserver.archive.fs.refresh-interval \
+   -p jobmanager.archive.fs.dir=hdfs:///completed-jobs/ \
+   -p historyserver.web.address=0.0.0.0 \
+   -p historyserver.web.port 8082 \
+   -p historyserver.archive.fs.dir hdfs:///completed-jobs/ \
+   -p historyserver.archive.fs.refresh-interval 10000 \
    --conf-in-base64 <base64 conf>
+```
+
+### <span id="jump_test_locally">Test Locally</span>
+BitSail provides a test script for running built bitSail jar on local Kubernetes cluster.
+
+Prerequisites:
+ 1. Local environment has built BitSail with build.sh
+ 2. Local environment has minikube and kubectl installed 
+    1. minikube installation: https://minikube.sigs.k8s.io/docs/start/
+    2. kubectl installation: https://kubernetes.io/docs/tasks/tools/#kubectl
+
+Commands:
+```bash
+bash testscripts/run_bitsail-locally_with_minikube.sh -c <Path of Job conf file>
 ```

@@ -17,27 +17,37 @@
 package com.bytedance.bitsail.entry.flink.deployment.kubernetes;
 
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
+import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_KUBERNETES_APPLICATION;
 import static com.bytedance.bitsail.entry.flink.deployment.kubernetes.KubernetesDeploymentSupplier.KUBERNETES_CLUSTER_ID;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class KubernetesDeploymentSupplierTest {
+  @Rule
+  public EnvironmentVariables variables = new EnvironmentVariables();
+  BitSailConfiguration jobConfiguration = BitSailConfiguration.newDefault();
   FlinkCommandArgs flinkRunCommandArgs;
   BaseCommandArgs baseCommandArgs;
   List<String> flinkCommands;
 
   @Before
-  public void setup() {
+  public void setup() throws URISyntaxException {
+    variables.set("BITSAIL_CONF_DIR", Paths.get(KubernetesDeploymentSupplier.class.getClassLoader().getResource("").toURI()).toString());
     flinkRunCommandArgs = new FlinkCommandArgs();
     baseCommandArgs = new BaseCommandArgs();
     flinkCommands = new ArrayList<>();
@@ -46,28 +56,59 @@ public class KubernetesDeploymentSupplierTest {
   @Test
   public void testAddRunDeploymentCommands() {
     flinkRunCommandArgs.setDeploymentMode(DEPLOYMENT_KUBERNETES_APPLICATION);
-    flinkRunCommandArgs.setKubernetesClusterId("testClusterId");
     baseCommandArgs.setJobConfInBase64("test");
-    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs);
-    deploymentSupplier.addRunProperties(baseCommandArgs, flinkCommands);
+    jobConfiguration.set(CommonOptions.JOB_NAME, "jobName");
+    jobConfiguration.set(CommonOptions.INSTANCE_ID, 123L);
+    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs, jobConfiguration);
+    deploymentSupplier.addProperties(baseCommandArgs, flinkCommands);
     deploymentSupplier.addRunJarAndJobConfCommands(baseCommandArgs, flinkCommands);
     assertEquals(ImmutableList.of(
-        "local:///opt/flink/usrlibs/bitsail-core.jar",
+        "local:///opt/bitsail/bitsail-core.jar",
         "-xjob_conf_in_base64",
         "test"
     ), flinkCommands);
-    assertEquals(baseCommandArgs.getProperties().get(KUBERNETES_CLUSTER_ID), "testClusterId");
+    assertEquals("jobName_123", baseCommandArgs.getProperties().get(KUBERNETES_CLUSTER_ID));
+  }
+
+  @Test
+  public void testAddRunDeploymentCommandsWithAssignedClusterId() {
+    flinkRunCommandArgs.setDeploymentMode(DEPLOYMENT_KUBERNETES_APPLICATION);
+    baseCommandArgs.setJobConfInBase64("test");
+    baseCommandArgs.getProperties().put(KUBERNETES_CLUSTER_ID, "clusterId");
+    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs, jobConfiguration);
+    deploymentSupplier.addProperties(baseCommandArgs, flinkCommands);
+    deploymentSupplier.addRunJarAndJobConfCommands(baseCommandArgs, flinkCommands);
+    assertEquals(ImmutableList.of(
+        "local:///opt/bitsail/bitsail-core.jar",
+        "-xjob_conf_in_base64",
+        "test"
+    ), flinkCommands);
+  }
+
+  @Test(expected = BitSailException.class)
+  public void testAddStopDeploymentCommandsWithoutClusterId() {
+    flinkRunCommandArgs.setDeploymentMode(DEPLOYMENT_KUBERNETES_APPLICATION);
+    flinkRunCommandArgs.setJobId("jobId");
+    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs, jobConfiguration);
+    deploymentSupplier.addStopProperties(baseCommandArgs, flinkCommands);
+  }
+
+  @Test(expected = BitSailException.class)
+  public void testAddStopDeploymentCommandsWithoutJobId() {
+    flinkRunCommandArgs.setDeploymentMode(DEPLOYMENT_KUBERNETES_APPLICATION);
+    flinkRunCommandArgs.setKubernetesClusterId("clusterId");
+    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs, jobConfiguration);
+    deploymentSupplier.addStopProperties(baseCommandArgs, flinkCommands);
   }
 
   @Test
   public void testAddStopDeploymentCommands() {
     flinkRunCommandArgs.setDeploymentMode(DEPLOYMENT_KUBERNETES_APPLICATION);
-    flinkRunCommandArgs.setKubernetesClusterId("testClusterId");
-    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs);
+    flinkRunCommandArgs.setJobId("jobId");
+    baseCommandArgs.getProperties().put(KUBERNETES_CLUSTER_ID, "clusterId");
+    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs, jobConfiguration);
     deploymentSupplier.addStopProperties(baseCommandArgs, flinkCommands);
-    assertTrue(flinkCommands.isEmpty());
-
+    assertEquals(ImmutableList.of("-D", KUBERNETES_CLUSTER_ID + "=clusterId", "jobId"), flinkCommands);
     assertEquals(baseCommandArgs.getProperties().size(), 1);
-    assertEquals(baseCommandArgs.getProperties().get(KUBERNETES_CLUSTER_ID), "testClusterId");
   }
 }

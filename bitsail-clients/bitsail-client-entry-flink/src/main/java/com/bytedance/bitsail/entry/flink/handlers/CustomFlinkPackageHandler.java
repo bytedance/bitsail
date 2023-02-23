@@ -19,14 +19,11 @@ package com.bytedance.bitsail.entry.flink.handlers;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.component.format.security.kerberos.option.KerberosOptions;
 import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
-import com.bytedance.bitsail.entry.flink.utils.FlinkDirectory;
 
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.configuration.HistoryServerOptions;
-import org.apache.flink.configuration.JobManagerOptions;
 import org.apache.flink.configuration.SecurityOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +43,7 @@ import java.util.stream.Stream;
 
 import static com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver.FLINK_CONF_FILE;
 import static com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver.FLINK_LOG_FILE_PREFIX;
-import static com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver.getFlinkDir;
+import static com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver.getFlinkConfDir;
 import static com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver.loadFlinkConfiguration;
 
 public class CustomFlinkPackageHandler {
@@ -65,9 +62,8 @@ public class CustomFlinkPackageHandler {
   public static Path buildCustomFlinkPackage(BitSailConfiguration sysConfiguration,
                                              FlinkCommandArgs flinkRunCommandArgs,
                                              Path originalFlinkDir) throws IOException {
-    Configuration flinkConfiguration = loadFlinkConfiguration(getFlinkDir(originalFlinkDir, FlinkDirectory.CONF));
+    Configuration flinkConfiguration = loadFlinkConfiguration(getFlinkConfDir(originalFlinkDir));
     processSecurity(sysConfiguration, flinkConfiguration);
-    processHistoryServer(flinkRunCommandArgs, flinkConfiguration);
     Path tmpFlinkConfDir = writeConfToTmpFile(flinkConfiguration);
     symbolicLinkFlinkLog4j(originalFlinkDir, tmpFlinkConfDir);
     return tmpFlinkConfDir;
@@ -95,21 +91,6 @@ public class CustomFlinkPackageHandler {
     } else {
       flinkConfiguration.set(SecurityOptions.KERBEROS_LOGIN_CONTEXTS, CONTEXT_CLIENT);
     }
-  }
-
-  /**
-   * Enable History Server for querying completed job status. Check more reference in
-   * https://nightlies.apache.org/flink/flink-docs-release-1.11/monitoring/historyserver.html
-   */
-  static void processHistoryServer(FlinkCommandArgs flinkRunCommandArgs, Configuration flinkConfiguration) {
-    if (!flinkRunCommandArgs.isHistoryServerEnable()) {
-      return;
-    }
-    flinkConfiguration.set(JobManagerOptions.ARCHIVE_DIR, flinkRunCommandArgs.getJobmanagerArchiveFsDir());
-    flinkConfiguration.set(HistoryServerOptions.HISTORY_SERVER_WEB_ADDRESS, flinkRunCommandArgs.getHistoryServerWebAddress());
-    flinkConfiguration.set(HistoryServerOptions.HISTORY_SERVER_WEB_PORT, flinkRunCommandArgs.getHistoryServerWebPort());
-    flinkConfiguration.set(HistoryServerOptions.HISTORY_SERVER_ARCHIVE_DIRS, flinkRunCommandArgs.getHistoryServerArchiveFsDir());
-    flinkConfiguration.set(HistoryServerOptions.HISTORY_SERVER_ARCHIVE_REFRESH_INTERVAL, flinkRunCommandArgs.getHistoryServerArchiveFsRefreshInterval());
   }
 
   static Path writeConfToTmpFile(Configuration flinkConfiguration) throws IOException {
@@ -149,7 +130,7 @@ public class CustomFlinkPackageHandler {
    * to the temporary dir as well.
    */
   private static void symbolicLinkFlinkLog4j(Path flinkDir, Path tmpFlinkConfDir) throws IOException {
-    Path flinkConfDir = getFlinkDir(flinkDir, FlinkDirectory.CONF);
+    Path flinkConfDir = getFlinkConfDir(flinkDir);
     try (Stream<Path> flinkLogConfPath = java.nio.file.Files.list(flinkConfDir)) {
       List<Path> flinkLogConfPaths = flinkLogConfPath.filter(file -> file.getFileName().toString()
               .startsWith(FLINK_LOG_FILE_PREFIX))

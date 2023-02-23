@@ -18,12 +18,9 @@ package com.bytedance.bitsail.entry.flink.handlers;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.component.format.security.kerberos.option.KerberosOptions;
-import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 
 import lombok.SneakyThrows;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.configuration.HistoryServerOptions;
-import org.apache.flink.configuration.JobManagerOptions;
 import org.apache.flink.configuration.SecurityOptions;
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,31 +54,6 @@ public class CustomFlinkPackageHandlerTest {
         sysConfiguration.get(KerberosOptions.KERBEROS_KEYTAB_PATH));
     Assert.assertEquals(flinkConfiguration.getString(SecurityOptions.KERBEROS_LOGIN_PRINCIPAL),
         sysConfiguration.get(KerberosOptions.KERBEROS_PRINCIPAL));
-  }
-
-  @Test
-  public void testProcessHistoryServer() {
-
-    FlinkCommandArgs flinkCommandArgs = new FlinkCommandArgs();
-    flinkCommandArgs.setHistoryServerEnable(true);
-    flinkCommandArgs.setJobmanagerArchiveFsDir("test_dir");
-    flinkCommandArgs.setHistoryServerWebAddress("test_address");
-    flinkCommandArgs.setHistoryServerWebPort(100);
-    flinkCommandArgs.setHistoryServerArchiveFsDir("test_dir2");
-    flinkCommandArgs.setHistoryServerArchiveFsRefreshInterval(20000);
-    Configuration flinkConfiguration = new Configuration();
-
-    CustomFlinkPackageHandler.processHistoryServer(flinkCommandArgs, flinkConfiguration);
-    Assert.assertEquals(flinkConfiguration.getString(JobManagerOptions.ARCHIVE_DIR),
-        flinkCommandArgs.getJobmanagerArchiveFsDir());
-    Assert.assertEquals(flinkConfiguration.getString(HistoryServerOptions.HISTORY_SERVER_WEB_ADDRESS),
-        flinkCommandArgs.getHistoryServerWebAddress());
-    Assert.assertEquals(flinkConfiguration.getInteger(HistoryServerOptions.HISTORY_SERVER_WEB_PORT),
-        flinkCommandArgs.getHistoryServerWebPort());
-    Assert.assertEquals(flinkConfiguration.getString(HistoryServerOptions.HISTORY_SERVER_ARCHIVE_DIRS),
-        flinkCommandArgs.getHistoryServerArchiveFsDir());
-    Assert.assertEquals(flinkConfiguration.getLong(HistoryServerOptions.HISTORY_SERVER_ARCHIVE_REFRESH_INTERVAL),
-        flinkCommandArgs.getHistoryServerArchiveFsRefreshInterval());
   }
 
   @Test
