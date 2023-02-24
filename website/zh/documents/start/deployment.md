@@ -265,7 +265,7 @@ bash ${BITSAIL_HOME}/bin/bitsail run \
   <tr>
     <td>kubernetes.cluster-id</td>
     <td>Optional</td>
-    <td>&#60;job_name&#62;_&#60;instance_id&#62;</td>
+    <td>bitsail-job</td>
     <td>String</td>
     <td>The cluster-id, which should be no more than 45 characters, is used for identifying a unique Flink cluster. If not set, the client will automatically generate it with a random ID.</td>
   </tr>
