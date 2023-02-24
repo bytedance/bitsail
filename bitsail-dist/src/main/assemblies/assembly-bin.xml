@@ -111,14 +111,6 @@
         </fileSet>
 
         <fileSet>
-            <directory>src/main/archive</directory>
-            <includes>
-                <include>Dockerfile</include>
-            </includes>
-            <outputDirectory>/</outputDirectory>
-        </fileSet>
-
-        <fileSet>
             <directory>target/flink-${flink.version}</directory>
             <includes>
                 <include>**</include>
