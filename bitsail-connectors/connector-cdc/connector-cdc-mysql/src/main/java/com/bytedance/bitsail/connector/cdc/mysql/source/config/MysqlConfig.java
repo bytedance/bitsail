@@ -22,6 +22,7 @@ import com.bytedance.bitsail.connector.cdc.model.ClusterInfo;
 import com.bytedance.bitsail.connector.cdc.model.ConnectionInfo;
 import com.bytedance.bitsail.connector.cdc.option.BinlogReaderOptions;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.debezium.config.Configuration;
 import io.debezium.connector.mysql.MySqlConnectorConfig;
 import lombok.Builder;
@@ -32,6 +33,7 @@ import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -57,7 +59,10 @@ public class MysqlConfig implements Serializable {
     assert (clusterInfo.size() == 1);
     ConnectionInfo connectionInfo = clusterInfo.get(0).getMaster();
     assert (connectionInfo != null);
-    Properties props = extractProps(jobConf);
+    Properties props = new Properties();
+    fillDefaultProps(props);
+    extractProps(props, jobConf);
+
     String username = jobConf.getNecessaryOption(BinlogReaderOptions.USER_NAME, BinlogReaderErrorCode.REQUIRED_VALUE);
     String password = jobConf.getNecessaryOption(BinlogReaderOptions.PASSWORD, BinlogReaderErrorCode.REQUIRED_VALUE);
     fillConnectionInfo(props, connectionInfo, username, password);
@@ -74,7 +79,7 @@ public class MysqlConfig implements Serializable {
         .build();
   }
 
-  //Visible for testing
+  @VisibleForTesting
   public static MysqlConfig newDefault() {
     Properties props = new Properties();
     Configuration config = Configuration.from(props);
@@ -89,21 +94,42 @@ public class MysqlConfig implements Serializable {
         .build();
   }
 
-  public static Properties extractProps(BitSailConfiguration jobConf) {
-    Properties props = new Properties();
-    jobConf.getKeys().stream()
+  /**
+   * Extract debezium related properties from BitSail Configuration.
+   */
+  public static void extractProps(Properties props, BitSailConfiguration jobConf) {
+    List<String> dbzConfKey = jobConf.getKeys().stream()
         .filter(s -> s.startsWith(DEBEZIUM_PREFIX))
-            .map(s -> StringUtils.substringAfter(s, DEBEZIUM_PREFIX))
-                .forEach(s -> props.setProperty(s, jobConf.getString(DEBEZIUM_PREFIX + s)));
-    return props;
+        .map(s -> StringUtils.substringAfter(s, DEBEZIUM_PREFIX)).collect(Collectors.toList());
+    for (String k : dbzConfKey) {
+      String key = DEBEZIUM_PREFIX + k;
+      String val = jobConf.getString(key);
+      props.setProperty(k, val);
+    }
   }
 
+  /**
+   * Set connection information to debezium properties.
+   */
   public static void fillConnectionInfo(Properties props, ConnectionInfo connectionInfo, String username, String password) {
     props.put("database.hostname", connectionInfo.getHost());
     props.put("database.port", String.valueOf(connectionInfo.getPort()));
     props.put("database.user", username);
     props.put("database.password", password);
-    props.put("database.serverTimezone", ZoneId.of("UTC").toString());
+    props.put("database.server.name", connectionInfo.getHost());
+    props.put("database.server.id", String.valueOf(connectionInfo.getPort()));
   }
 
+  /**
+   * Set up default debezium properties.
+   * @param props
+   */
+  public static void fillDefaultProps(Properties props) {
+    props.put("database.serverTimezone", ZoneId.of("UTC").toString());
+    props.put("database.history", "io.debezium.relational.history.MemoryDatabaseHistory");
+    props.put("schema.history.internal", "io.debezium.relational.history.MemorySchemaHistory");
+    props.put("include.schema.changes", "false");
+    props.put("database.useSSL", "false");
+    props.put("database.allowPublicKeyRetrieval", "true");
+  }
 }

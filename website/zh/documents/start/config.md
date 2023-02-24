@@ -82,6 +82,15 @@ order: 3
 | dirty_records_count_threshold     | FALSE | -1  | 整体脏数据的阈值设置，如果在传输结束后发现脏数据多于该设置，作业失败。        | -1  |
 | dirty_record_percentage_threshold | FALSE | -1  | 整体脏数据占整体传输数据的比例，如果传输结束后发现脏数据的比例大于该阈值，作业失败。 | -1  |
 
+流控配置： 任务的流控配置
+
+| 参数名称                               | 是否必须 | 默认值 | 参数含义                  | 示例 |
+|---------------------------------------|---------|------|--------------------------|-----|
+| reader_transport_channel_speed_byte   | FALSE   | -1   | 控制单并发读的流量, X字节/S  | 10  |
+| reader_transport_channel_speed_record | FALSE   | -1   | 控制单并发读的速度, X条/S    | 10  |
+| writer_transport_channel_speed_byte   | FALSE   | -1   | 控制单并发写的流量, Y字节/S  | 10  |
+| writer_transport_channel_speed_record | FALSE   | -1   | 控制单并发写的速度, Y条/S    | 10  |
+
 ## Reader 模块
 
 字节跳动数据集成目前支持多数据源写入的同时读取，在支持多数据源读取的场景下，要求上游数据源的输入数据schema需要保持一致，下面介绍Reader模块的具体信息。
