@@ -37,7 +37,7 @@ public class LocalDeploymentSupplier implements DeploymentSupplier {
   }
 
   @Override
-  public void addProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
+  public void addRunProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
     String jobManagerAddress = flinkCommandArgs.getJobManagerAddress();
     if (StringUtils.isNotEmpty(jobManagerAddress)) {
       flinkCommands.add("-m");

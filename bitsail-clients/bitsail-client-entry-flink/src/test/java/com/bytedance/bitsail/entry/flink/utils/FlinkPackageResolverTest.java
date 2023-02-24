@@ -24,8 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-import static com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver.getFlinkConfDir;
-import static com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver.getFlinkLibDir;
+import static com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver.getFlinkDir;
 import static com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver.loadFlinkConfiguration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -35,14 +34,14 @@ public class FlinkPackageResolverTest {
   public void testGetFlinkConfDir() {
     Path path = getResourcePath("test_dir");
     Path confPath = getResourcePath("test_dir/conf");
-    assertEquals(confPath, getFlinkConfDir(path));
+    assertEquals(confPath, getFlinkDir(path, FlinkDirectory.CONF));
   }
 
   @Test
   public void testGetFlinkLibDir() {
     Path path = getResourcePath("test_dir");
     Path libPath = getResourcePath("test_dir/lib");
-    assertEquals(libPath, getFlinkLibDir(path));
+    assertEquals(libPath, getFlinkDir(path, FlinkDirectory.LIB));
   }
 
   @Test

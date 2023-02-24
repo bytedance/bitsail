@@ -29,6 +29,7 @@ import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory;
 import com.bytedance.bitsail.entry.flink.handlers.CustomFlinkPackageHandler;
 import com.bytedance.bitsail.entry.flink.savepoint.FlinkRunnerSavepointLoader;
+import com.bytedance.bitsail.entry.flink.utils.FlinkDirectory;
 import com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver;
 
 import com.google.common.collect.Lists;
@@ -80,7 +81,7 @@ public class FlinkEngineRunner implements EngineRunner {
   @Override
   @SneakyThrows
   public void loadLibrary(URLClassLoader classLoader) {
-    Path flinkLibDir = FlinkPackageResolver.getFlinkLibDir(flinkDir);
+    Path flinkLibDir = FlinkPackageResolver.getFlinkDir(flinkDir, FlinkDirectory.LIB);
     LOG.info("Load flink library from path: {}.", flinkLibDir);
 
     try (Stream<Path> libraries = Files.list(flinkLibDir)) {
@@ -114,8 +115,8 @@ public class FlinkEngineRunner implements EngineRunner {
     FlinkCommandArgs flinkRunCommandArgs = new FlinkCommandArgs();
     CommandArgsParser.parseArguments(baseCommandArgs.getUnknownOptions(), flinkRunCommandArgs);
     ProcessBuilder flinkProcBuilder = new ProcessBuilder();
-    addProcBuilderWithRunCommands(flinkProcBuilder, baseCommandArgs, flinkRunCommandArgs);
-    addProcBuilderWithEnvProps(flinkProcBuilder, flinkRunCommandArgs);
+    flinkProcBuilderBuildWithRunCommands(flinkProcBuilder, baseCommandArgs, flinkRunCommandArgs);
+    flinkProcBuilderBuildWithEnvProperties(flinkProcBuilder, flinkRunCommandArgs);
     return flinkProcBuilder;
   }
 
@@ -123,16 +124,16 @@ public class FlinkEngineRunner implements EngineRunner {
     FlinkCommandArgs flinkStopCommandArgs = new FlinkCommandArgs();
     CommandArgsParser.parseArguments(baseCommandArgs.getUnknownOptions(), flinkStopCommandArgs);
     ProcessBuilder flinkProcBuilder = new ProcessBuilder();
-    addProcBuilderWithStopCommands(flinkProcBuilder, baseCommandArgs, flinkStopCommandArgs);
+    flinkProcBuilderWithStopCommands(flinkProcBuilder, baseCommandArgs, flinkStopCommandArgs);
     return flinkProcBuilder;
   }
 
-  private void addProcBuilderWithRunCommands(ProcessBuilder flinkProcBuilder, BaseCommandArgs baseCommandArgs, FlinkCommandArgs flinkRunCommandArgs) {
+  private void flinkProcBuilderBuildWithRunCommands(ProcessBuilder flinkProcBuilder, BaseCommandArgs baseCommandArgs, FlinkCommandArgs flinkRunCommandArgs) {
     BitSailConfiguration jobConfiguration = StringUtils.isNotBlank(baseCommandArgs.getJobConf()) ?
         ConfigParser.fromRawConfPath(baseCommandArgs.getJobConf()) :
         BitSailConfiguration.from(
             new String(Base64.getDecoder().decode(baseCommandArgs.getJobConfInBase64())));
-    DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(sysConfiguration, flinkRunCommandArgs,
+    DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(flinkRunCommandArgs,
         jobConfiguration);
     List<String> flinkCommands = Lists.newArrayList();
 
@@ -140,7 +141,7 @@ public class FlinkEngineRunner implements EngineRunner {
     flinkCommands.add(flinkRunCommandArgs.getExecutionMode());
     flinkCommands.add("-t");
     flinkCommands.add(flinkRunCommandArgs.getDeploymentMode());
-    deploymentSupplier.addProperties(baseCommandArgs, flinkCommands);
+    deploymentSupplier.addRunProperties(baseCommandArgs, flinkCommands);
 
     FlinkRunnerSavepointLoader.loadSavepointPath(sysConfiguration,
         jobConfiguration,
@@ -171,7 +172,7 @@ public class FlinkEngineRunner implements EngineRunner {
     flinkProcBuilder.command(flinkCommands);
   }
 
-  private void addProcBuilderWithEnvProps(ProcessBuilder flinkProcBuilder, FlinkCommandArgs flinkRunCommandArgs) throws IOException {
+  private void flinkProcBuilderBuildWithEnvProperties(ProcessBuilder flinkProcBuilder, FlinkCommandArgs flinkRunCommandArgs) throws IOException {
     Path customFlinkPackageDir = CustomFlinkPackageHandler.buildCustomFlinkPackage(sysConfiguration, flinkRunCommandArgs, flinkDir);
     if (Objects.nonNull(customFlinkPackageDir)) {
       Map<String, String> envProps = flinkProcBuilder.environment();
@@ -180,22 +181,18 @@ public class FlinkEngineRunner implements EngineRunner {
     }
   }
 
-  private void addProcBuilderWithStopCommands(ProcessBuilder flinkProcBuilder, BaseCommandArgs baseCommandArgs, FlinkCommandArgs flinkStopCommandArgs) {
-    DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(sysConfiguration, flinkStopCommandArgs, null);
+  private void flinkProcBuilderWithStopCommands(ProcessBuilder flinkProcBuilder, BaseCommandArgs baseCommandArgs, FlinkCommandArgs flinkStopCommandArgs) {
+    DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(flinkStopCommandArgs, null);
     List<String> flinkCommands = Lists.newArrayList();
 
     flinkCommands.add(flinkDir + "/bin/flink");
     flinkCommands.add(flinkStopCommandArgs.getExecutionMode());
     flinkCommands.add("-t");
     flinkCommands.add(flinkStopCommandArgs.getDeploymentMode());
-    if (sysConfiguration.fieldExists(FlinkRunnerConfigOptions.FLINK_DEFAULT_STOP_PROPERTIES)) {
-      for (Map.Entry<String, String> property : sysConfiguration.getFlattenMap(FlinkRunnerConfigOptions.FLINK_DEFAULT_STOP_PROPERTIES.key()).entrySet()) {
-        LOG.info("Add System property {} = {}.", property.getKey(), property.getValue());
-        flinkCommands.add("-D");
-        flinkCommands.add(StringUtils.trim(property.getKey()) + "=" + StringUtils.trim((property.getValue())));
-      }
-    }
     deploymentSupplier.addStopProperties(baseCommandArgs, flinkCommands);
+
+    flinkCommands.add(flinkStopCommandArgs.getJobId());
+
     flinkProcBuilder.command(flinkCommands);
   }
 

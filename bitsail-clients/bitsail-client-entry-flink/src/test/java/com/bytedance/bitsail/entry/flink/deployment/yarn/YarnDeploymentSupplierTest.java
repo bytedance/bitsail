@@ -49,7 +49,7 @@ public class YarnDeploymentSupplierTest {
     BaseCommandArgs baseCommandArgs = new BaseCommandArgs();
     baseCommandArgs.setJobConf("testJobConf.json");
     List<String> flinkCommands = new ArrayList<>();
-    deploymentSupplier.addProperties(baseCommandArgs, flinkCommands);
+    deploymentSupplier.addRunProperties(baseCommandArgs, flinkCommands);
     deploymentSupplier.addRunJarAndJobConfCommands(baseCommandArgs, flinkCommands);
     assertEquals(ImmutableList.of(
         PackageResolver.getLibraryDir().resolve(ENTRY_JAR_NAME).toString(),

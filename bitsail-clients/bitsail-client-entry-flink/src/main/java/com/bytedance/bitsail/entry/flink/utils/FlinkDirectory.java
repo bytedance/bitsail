@@ -14,21 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.entry.flink.deployment;
+package com.bytedance.bitsail.entry.flink.utils;
 
-import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
+public enum FlinkDirectory {
+  LIB("lib"),
+  CONF("conf");
 
-import java.util.List;
+  public final String value;
 
-/**
- * Created 2022/8/8
- */
-public interface DeploymentSupplier {
-  String ENTRY_JAR_NAME = "bitsail-core.jar";
-
-  void addRunProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands);
-
-  void addRunJarAndJobConfCommands(BaseCommandArgs baseCommandArgs, List<String> flinkCommands);
-
-  void addStopProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands);
+  FlinkDirectory(String value) {
+    this.value = value;
+  }
 }

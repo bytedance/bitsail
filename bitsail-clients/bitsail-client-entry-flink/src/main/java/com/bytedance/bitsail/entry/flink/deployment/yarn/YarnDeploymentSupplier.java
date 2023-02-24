@@ -43,7 +43,7 @@ public class YarnDeploymentSupplier implements DeploymentSupplier {
   }
 
   @Override
-  public void addProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
+  public void addRunProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
     baseCommandArgs.getProperties()
             .put("yarn.application.name", jobConfiguration.getNecessaryOption(
                     CommonOptions.JOB_NAME, CommonErrorCode.CONFIG_ERROR));
