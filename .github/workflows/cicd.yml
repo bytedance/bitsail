@@ -45,12 +45,15 @@ jobs:
 
   # This workflow compile the project on Windows without running any test
   compile:
-    name: Compile
+    name: Windows Compile
     # The type of runner that the job will run on
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ windows-latest ]
+    defaults:
+      run:
+        shell: cmd
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - run: git config --global core.longpaths true
@@ -62,19 +65,26 @@ jobs:
           distribution: 'adopt'
           architecture: x64
           cache: 'maven'
+      - name: Setup Apache Thrift Compiler
+        run: |
+          mkdir thrift
+          cd thrift
+          certutil -urlcache -split -f http://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.exe thrift.exe
+          set path=%path%;${pwd}
+          thrift -version
 
       - name: Compile
         run:
           mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=true
 
-  # This workflow contains a single job called "unit-test"
-  unit-test:
-    name: Unit Test
+  # This workflow contains a single job called "macos-unit-test"
+  macos-unit-test:
+    name: MacOS Unit Test
     # The type of runner that the job will run on
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
+        os: [ macos-latest ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - run: git config --global core.longpaths true
@@ -86,6 +96,40 @@ jobs:
           distribution: 'adopt'
           architecture: x64
           cache: 'maven'
+      - name: Setup Apache Thrift Compiler
+        run: |
+          brew tap-new $USER/local-tap
+          brew extract --version='0.13.0' thrift $USER/local-tap
+          brew install thrift@0.13.0
+          thrift -version
+
+      - name: Maven Verify Unit Test
+        run:
+          mvn clean verify -pl bitsail-dist -am -DskipUT=false -DskipITCase=true
+
+  # This workflow contains a single job called "ubuntu-unit-test"
+  ubuntu-unit-test:
+    name: Ubuntu Unit Test
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - run: git config --global core.longpaths true
+      - uses: actions/checkout@v3
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          architecture: x64
+          cache: 'maven'
+      - name: Setup Apache Thrift Compiler
+        uses: dodopizza/setup-thrift@v1
+        with:
+          version: 0.13.0
 
       - name: Maven Verify Unit Test
         run:
@@ -110,6 +154,11 @@ jobs:
           distribution: 'adopt'
           architecture: x64
           cache: 'maven'
+      - name: Setup Apache Thrift Compiler
+        uses: dodopizza/setup-thrift@v1
+        with:
+          version: 0.13.0
+
       - name: Maven Verify Integration Test
         run:
           mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=false
