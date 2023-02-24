@@ -23,12 +23,6 @@ revision="0.2.0-SNAPSHOT"   # modify ${revision} when version updated
 echo "mvn profile = ${mvnProfile}"
 mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true -U -P${mvnProfile}
 
-# This is a workaround to enable kubectl logs in Flink 1.11 Native K8S
-# Can remove this line once upgrading Flink or not using Native K8S
-# See more information about the workaround:
-# https://nightlies.apache.org/flink/flink-docs-release-1.11/ops/deployment/native_kubernetes.html#log-files
-./enableKubectlLogs.sh
-
 # Copy bitsail files into `output` directory
 rm -rf output
 mkdir -p output

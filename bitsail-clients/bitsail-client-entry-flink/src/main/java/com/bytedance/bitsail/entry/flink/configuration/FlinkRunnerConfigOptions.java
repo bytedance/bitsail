@@ -43,4 +43,9 @@ public interface FlinkRunnerConfigOptions {
       key(FLINK_RUNNER + "flink_default_properties")
           .onlyReference(new TypeReference<Map<String, String>>() {
           });
+
+  ConfigOption<Map<String, String>> FLINK_DEFAULT_STOP_PROPERTIES =
+      key(FLINK_RUNNER + "flink_default_stop_properties")
+          .onlyReference(new TypeReference<Map<String, String>>() {
+          });
 }

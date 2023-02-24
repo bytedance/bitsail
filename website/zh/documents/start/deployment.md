@@ -34,6 +34,7 @@ order: 1
         - [停止Application](#cn_jump_stop_application)
         - [Kubernetes日志文件](#cn_jump_kubernetes_logs)
         - [History Server](#cn_jump_history_server)
+        - [本地测试](#cn_jump_test_locally)
 
 
 下面各部分详细介绍BitSail的部署。
@@ -224,42 +225,30 @@ $ kubectl create clusterrolebinding <self-defined-cluster-role-binding> --cluste
 Application 模式允许用户创建单个镜像，其中包含他们的作业和 Flink 运行时，该镜像将按需自动创建和销毁集群组件。Flink 社区提供了可以构建多用途自定义镜像的基础镜像。
 ### <span id="cn_jump_build_custom_flink_image">[在第一次跑BitSail或当BitSail Jar改动时] 自定义 Flink Docker 镜像</span>
 
-用以下的 [`Dockerfile`](https://docs.docker.com/engine/reference/builder/)创建你的 `<CustomImage>` :
-```dockerfile
-FROM flink:1.11.6-scala_2.11-java8
-ENV USERLIB=/opt/flink/usrlib
-RUN mkdir -p $USERLIB
-COPY libs/ $USERLIB/
-```
+用`${BITSAIL_HOME}/output/Dockerfile`创建你的 `<CustomImage>` :
 
-路径树:
-```
-.
-├── Dockerfile
-└── libs
-    ├── bitsail-core.jar
-    ├── clients/*
-    ├── connectors/*
-    └── engines/*
-```
-其中`libs`的内容可以从`${BITSAIL_HOME}/output/libs/`复制过来
+把你的`<CustomImage>`发表到Dockerhub，让Kubernetes集群可以下载下来:
 
-把你的`<CustomImage>`发表到Dockerhub，让Kubernetes集群可以下载下来。
+[How to create and manage docker repository](https://docs.docker.com/docker-hub/repos/#:~:text=To%20push%20an%20image%20to,docs%2Fbase%3Atesting%20))
+```bash
+docker build -t <your docker repository>:<tag>
+docker push <your docker repository>:<tag>
+```
 
 ### <span id="cn_jump_start_application">启动Application</span>
 ```bash
-bash ./bin/bitsail run \
+bash ${BITSAIL_HOME}/bin/bitsail run \
    --engine flink \
    --target kubernetes-application \
    --deployment-mode kubernetes-application \
    --execution-mode run-application \
+   -p kubernetes.cluster-id=<cluster-id> \
    -p kubernetes.kubernetes.jobmanager.service-account=<self-defined-service-account> \
    -p kubernetes.container.image=<CustomImage> \
    -p kubernetes.jobmanager.cpu=0.25 \
    -p kubernetes.taskmanager.cpu=0.5 \
    --conf-in-base64 <base64 conf>
 ```
-
 使用者可以在BitSail 指令集用`-p key=value`配置参数
 
 配置参数:
@@ -274,9 +263,25 @@ bash ./bin/bitsail run \
   </tr>
 
   <tr>
+    <td>kubernetes.cluster-id</td>
+    <td>Optional</td>
+    <td>&#60;job_name&#62;_&#60;instance_id&#62;</td>
+    <td>String</td>
+    <td>The cluster-id, which should be no more than 45 characters, is used for identifying a unique Flink cluster. If not set, the client will automatically generate it with a random ID.</td>
+  </tr>
+
+  <tr>
+    <td>kubernetes.cluster.jar.path</td>
+    <td>Optional</td>
+    <td>"/opt/bitsail/bitsail-core.jar"</td>
+    <td>String</td>
+    <td>The BitSail jar path in kubernetes cluster.</td>
+  </tr>
+
+  <tr>
     <td>kubernetes.container.image</td>
     <td>Required</td>
-    <td>The default value depends on the actually running version. In general it looks like "bitsail-core:appmode"</td>
+    <td>The default value depends on the actually running version. In general it looks like "flink:&#60;FLINK_VERSION&#62;-scala_&#60;SCALA_VERSION&#62;"</td>
     <td>String</td>
     <td>Image to use for BitSail containers. The specified image must be based upon the same Apache Flink and Scala versions as used by the application. Visit https://hub.docker.com/_/flink?tab=tags for the images provided by the Flink project.</td>
   </tr>
@@ -339,12 +344,16 @@ bash ./bin/bitsail run \
 </table>
 
 ### <span id="cn_jump_stop_application">停止Application</span>
+用户可以去 Flink WebUI 取消正在运行的作业。
+
+或者，用户可以运行以下 bitsail 命令来取消作业。请注意，`<jobId>` 应该从 Flink JobManager 中检索，可以从日志或 WebUI 中检索。
 ```bash
-bash ./bin/bitsail stop \
+bash ${BITSAIL_HOME}/bin/bitsail stop \
    --engine flink \
    --target kubernetes-application \
    --deployment-mode kubernetes-application \
    --execution-mode cancel \
+   -p kubernetes.cluster-id=<cluster-id> \
    --job-id <jobId>
 ```
 当 Application 停止时，所有 Flink 集群资源都会自动销毁。 与往常一样，作业可能会在手动取消或执行完的情况下停止。
@@ -359,7 +368,21 @@ kubectl delete deployments bitsail-job
 2. BitSail JobManager日志： `/opt/flink/log/jobmanager.log` on Kubernetes JobManager pod
 3. BitSail TaskManager日志： `/opt/flink/log/taskmanager.log` on Kubernetes TaskManager pod
 
-使用者也可以使用以下`kubectl` 指令集来查看日志
+如果要使用 kubectl logs <PodName> 查看日志，必须执行以下操作：
+
+1. 在 Flink 客户端的 log4j.properties 中增加新的 appender。 
+2. 在 log4j.properties 的 rootLogger 中增加如下 ‘appenderRef’，`rootLogger.appenderRef.console.ref = ConsoleAppender`。 
+3. 停止并重启你的 session。现在你可以使用 kubectl logs 查看日志了。
+4. 已准备好编译 BitSail（使用 `${BITSAIL_HOME}/build.sh` 构建后，工件将位于 `${BITSAIL_HOME}/output/` 中）
+
+```bash
+# Log all infos to the console
+appender.console.name = ConsoleAppender
+appender.console.type = CONSOLE
+appender.console.layout.type = PatternLayout
+appender.console.layout.pattern = %d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
+```
+使用者可以使用以下`kubectl` 指令集来查看日志
 ```bash
 # During job running
 kubectl get pods # Will return jobmanager pod and taskmanager pod
@@ -381,20 +404,34 @@ ${FLINK_HOME}/bin/historyserver.sh (start|start-foreground|stop)
 
 使用BitSail指令集去配置history server。
 ```bash
-bash ./bin/bitsail run \
+bash ${BITSAIL_HOME}/bin/bitsail run \
    --engine flink \
    --target kubernetes-application \
    --deployment-mode kubernetes-application \
    --execution-mode run-application \
-   -p kubernetes.kubernetes.jobmanager.service-account=<self-defined-service-account> \
+   -p kubernetes.cluster-id=<cluster-id> \
+   -p kubernetes.jobmanager.service-account=<self-defined-service-account> \
    -p kubernetes.container.image=<CustomImage> \
    -p kubernetes.jobmanager.cpu=0.25 \
    -p kubernetes.taskmanager.cpu=0.5 \
-   --historyserver.enable true \
-   --jobmanager.archive.fs.dir hdfs:///completed-jobs/ \
-   --historyserver.web.address 0.0.0.0 \
-   --historyserver.web.port 8082 \
-   --historyserver.archive.fs.dir hdfs:///completed-jobs/ \
-   --historyserver.archive.fs.refresh-interval \
+   -p jobmanager.archive.fs.dir=hdfs:///completed-jobs/ \
+   -p historyserver.web.address=0.0.0.0 \
+   -p historyserver.web.port 8082 \
+   -p historyserver.archive.fs.dir hdfs:///completed-jobs/ \
+   -p historyserver.archive.fs.refresh-interval 10000 \
    --conf-in-base64 <base64 conf>
+```
+
+### <span id="cn_jump_test_locally">本地测试</span>
+BitSail提供了一个测试脚本，用于在本地 Kubernetes 集群上运行构建的 bitSail jar。
+
+先决条件： 
+1. 本地环境已经用build.sh搭建好BitSail 
+2. 本地环境安装了minikube和kubectl 
+   1. minikube安装：https://minikube.sigs.k8s.io/docs/start/
+   2. kubectl安装：https://kubernetes.io/docs/tasks/tools/#kubectl
+
+命令:
+```bash
+bash testscripts/run_bitsail-locally_with_minikube.sh -c <Path of Job conf file>
 ```

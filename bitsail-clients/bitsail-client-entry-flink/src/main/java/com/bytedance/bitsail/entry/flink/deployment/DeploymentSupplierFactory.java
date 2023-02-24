@@ -33,7 +33,7 @@ public class DeploymentSupplierFactory {
   private static final String DEPLOYMENT_LOCAL = "local";
   private static final String DEPLOYMENT_REMOTE = "remote";
 
-  public DeploymentSupplier getDeploymentSupplier(FlinkCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
+  public DeploymentSupplier getDeploymentSupplier(BitSailConfiguration sysConfiguration, FlinkCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
     String deploymentMode = flinkCommandArgs.getDeploymentMode().toLowerCase().trim();
 
     switch (deploymentMode) {
@@ -45,7 +45,7 @@ public class DeploymentSupplierFactory {
       case DEPLOYMENT_YARN_APPLICATION:
         return new YarnDeploymentSupplier(flinkCommandArgs, jobConfiguration);
       case DEPLOYMENT_KUBERNETES_APPLICATION:
-        return new KubernetesDeploymentSupplier(flinkCommandArgs);
+        return new KubernetesDeploymentSupplier(flinkCommandArgs, jobConfiguration);
       default:
         throw new UnsupportedOperationException("Unsupported deployment mode: " + deploymentMode);
     }
