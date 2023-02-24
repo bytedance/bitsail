@@ -21,7 +21,6 @@ import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.base.connector.writer.v1.WriterCommitter;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.base.serializer.SimpleVersionedBinarySerializer;
-import com.bytedance.bitsail.base.serializer.SimpleBinarySerializer;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
@@ -156,13 +155,33 @@ public class DorisSink<InputT> implements Sink<InputT, DorisCommittable, DorisWr
     String prefix = dorisPartitionTemplate.getPrefix();
     String start = dorisPartitionTemplate.getStartRange();
     String end = dorisPartitionTemplate.getEndRange();
+    DorisPartitionTemplate.DorisPartitionLevel partitionLevel = DorisPartitionTemplate.DorisPartitionLevel.valueOf(
+        dorisPartitionTemplate.getPartitionLevel().toUpperCase());
 
     SimpleDateFormat sdf = new SimpleDateFormat(pattern);
     try {
       Date dateStart = sdf.parse(start);
       Date dateEnd = sdf.parse(end);
       List<DorisPartition> dorisPartitions = new ArrayList<>();
-      List<Date> listDate = DateUtil.getDatesBetweenTwoDate(dateStart, dateEnd);
+      List<Date> listDate;
+      switch (partitionLevel) {
+        case DAY:
+          listDate = DateUtil.getDatesBetweenTwoDate(dateStart, dateEnd);
+          break;
+        case WEEK:
+          listDate = DateUtil.getDatesBetweenTwoDate(dateStart, dateEnd);
+          break;
+        case MONTH:
+          listDate = DateUtil.getDatesBetweenTwoDate(dateStart, dateEnd);
+          break;
+        case QUARTER:
+          listDate = DateUtil.getDatesBetweenTwoDate(dateStart, dateEnd);
+          break;
+        default:
+          throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR, "The configure partition level " + partitionLevel +
+              " is not supported, only support day, week, month and quarter");
+      }
+
       listDate.forEach(date -> {
         DorisPartition dorisPartition = new DorisPartition();
         dorisPartition.setName(prefix + sdf.format(date));
