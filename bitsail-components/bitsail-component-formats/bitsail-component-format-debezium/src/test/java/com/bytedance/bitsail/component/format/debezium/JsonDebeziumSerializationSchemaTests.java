@@ -14,26 +14,17 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.cdc.source.reader;
+package com.bytedance.bitsail.component.format.debezium;
 
-import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
-import java.io.Serializable;
-import java.util.Map;
+import org.junit.Test;
 
-public interface BinlogSplitReader<T> extends Serializable {
-  void readSplit(BinlogSplit split);
-
-  /**
-   * return the binlog offset being processed
-   */
-  Map<String, String> getOffset();
-
-  void close();
-
-  T poll();
-
-  boolean hasNext();
-
-  boolean isRunning();
+public class JsonDebeziumSerializationSchemaTests {
+  @Test
+  public void testSerializer() {
+    //TODO: Add UT
+    BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
+    JsonDebeziumSerializationSchema serializationSchema = new JsonDebeziumSerializationSchema(jobConf);
+  }
 }

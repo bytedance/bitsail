@@ -14,26 +14,16 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.cdc.source.reader;
+package com.bytedance.bitsail.component.format.debezium;
 
-import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
+import com.bytedance.bitsail.base.format.DeserializationSchema;
 
-import java.io.Serializable;
-import java.util.Map;
+import org.apache.kafka.connect.source.SourceRecord;
 
-public interface BinlogSplitReader<T> extends Serializable {
-  void readSplit(BinlogSplit split);
+public interface DebeziumDeserializationSchema extends DeserializationSchema<byte[], SourceRecord> {
+  @Override
+  public SourceRecord deserialize(byte[] message);
 
-  /**
-   * return the binlog offset being processed
-   */
-  Map<String, String> getOffset();
-
-  void close();
-
-  T poll();
-
-  boolean hasNext();
-
-  boolean isRunning();
+  @Override
+  public boolean isEndOfStream(SourceRecord nextElement);
 }

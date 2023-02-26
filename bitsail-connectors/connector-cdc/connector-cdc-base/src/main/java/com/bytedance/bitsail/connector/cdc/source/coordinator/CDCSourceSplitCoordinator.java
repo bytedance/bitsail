@@ -58,21 +58,20 @@ public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BinlogS
 
   @Override
   public void start() {
-    int totalReader = this.context.registeredReaders().size();
-    LOG.info("Total registered reader number: {}", totalReader);
-    if (!this.isBinlogAssigned) {
-      List<BinlogSplit> splitList = new ArrayList<>();
-      BinlogSplit split = createSplit(this.jobConf);
-      splitList.add(split);
-      LOG.info("binlog is not assigned, assigning a new binlog split to reader: " + split.toString());
-      this.context.assignSplit(0, splitList);
-      this.isBinlogAssigned = true;
-    }
+    // do nothing
   }
 
   @Override
   public void addReader(int subtaskId) {
-    // do not support add reader during the job is running
+    if (!this.isBinlogAssigned && context.registeredReaders().contains(subtaskId)) {
+      List<BinlogSplit> splitList = new ArrayList<>();
+      BinlogSplit split = createSplit(this.jobConf);
+      splitList.add(split);
+      LOG.info("binlog is not assigned, assigning a new binlog split to reader: " + split.toString());
+      this.context.assignSplit(subtaskId, splitList);
+      this.context.signalNoMoreSplits(subtaskId);
+      this.isBinlogAssigned = true;
+    }
   }
 
   @Override
@@ -83,6 +82,7 @@ public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BinlogS
   @Override
   public void handleSplitRequest(int subtaskId, @Nullable String requesterHostname) {
     // currently reader will not request for split
+    LOG.info("Received split request from " + subtaskId);
   }
 
   @Override

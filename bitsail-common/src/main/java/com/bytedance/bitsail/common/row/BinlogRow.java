@@ -14,26 +14,19 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.cdc.source.reader;
+package com.bytedance.bitsail.common.row;
 
-import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
-
-import java.io.Serializable;
-import java.util.Map;
-
-public interface BinlogSplitReader<T> extends Serializable {
-  void readSplit(BinlogSplit split);
-
-  /**
-   * return the binlog offset being processed
-   */
-  Map<String, String> getOffset();
-
-  void close();
-
-  T poll();
-
-  boolean hasNext();
-
-  boolean isRunning();
+/**
+ * Binlog row properties.
+ */
+@SuppressWarnings("checkstyle:MagicNumber")
+public class BinlogRow {
+  public static final int ROW_SIZE = 7;
+  public static final int DATABASE_INDEX = 0;
+  public static final int TABLE_INDEX = 1;
+  public static final int KEY_INDEX = 2;
+  public static final int TIMESTAMP_INDEX = 3;
+  public static final int DDL_FLAG_INDEX = 4;
+  public static final int VERSION_INDEX = 5;
+  public static final int VALUE_INDEX = 6;
 }

@@ -17,6 +17,7 @@
 package com.bytedance.bitsail.connector.cdc.mysql.source.debezium;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.cdc.model.ClusterInfo;
 import com.bytedance.bitsail.connector.cdc.model.ConnectionInfo;
 import com.bytedance.bitsail.connector.cdc.option.BinlogReaderOptions;
@@ -24,14 +25,18 @@ import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class MysqlBinlogSplitReaderTest {
+  private static final Logger LOG = LoggerFactory.getLogger(MysqlBinlogSplitReaderTest.class);
   String username = "root";
   String password = "pw";
   String host = "localhost";
@@ -65,9 +70,9 @@ public class MysqlBinlogSplitReaderTest {
     jobConf.set("job.reader.debezium.database.allowPublicKeyRetrieval", "true");
     jobConf.set("job.reader.debezium.database.server.id", "123");
     jobConf.set("job.reader.debezium.database.server.name", "abc");
-    jobConf.set("job.reader.debezium.gtid.source.filter.dml.events", "false");
     jobConf.set("job.reader.debezium.schema.history.internal", "io.debezium.relational.history.MemorySchemaHistory");
     jobConf.set("job.reader.debezium.database.history", "io.debezium.relational.history.MemoryDatabaseHistory");
+    jobConf.set("job.reader.debezium.include.schema.changes", "false");
 
     MysqlBinlogSplitReader reader = new MysqlBinlogSplitReader(jobConf, 0);
     BinlogSplit split = new BinlogSplit("split-1", BinlogOffset.earliest(), BinlogOffset.boundless());
@@ -75,7 +80,8 @@ public class MysqlBinlogSplitReaderTest {
     int maxPeriod = 0;
     while (maxPeriod <= 25) {
       if (reader.hasNext()) {
-        reader.poll();
+        Row row = reader.poll();
+        Arrays.stream(row.getFields()).forEach(o -> LOG.info(o.toString()));
         maxPeriod++;
       }
       TimeUnit.SECONDS.sleep(1);

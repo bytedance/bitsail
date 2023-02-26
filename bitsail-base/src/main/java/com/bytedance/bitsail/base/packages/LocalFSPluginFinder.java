@@ -44,7 +44,12 @@ public class LocalFSPluginFinder implements PluginFinder {
 
   @Override
   public void configure(BitSailConfiguration commonConfiguration) {
+    this.pluginStores = createPluginStores(commonConfiguration);
+    this.pluginClassloader = createPluginClassloader();
+  }
 
+  protected List<PluginStore> createPluginStores(BitSailConfiguration commonConfiguration) {
+    List<PluginStore> pluginStores = Lists.newArrayList();
     String frameworkBaseDir = commonConfiguration
         .getUnNecessaryOption(CommonOptions.JOB_PLUGIN_ROOT_PATH, getFrameworkEntryDir().toString());
 
@@ -53,7 +58,7 @@ public class LocalFSPluginFinder implements PluginFinder {
 
     Path frameworkBaseDirPath = Paths.get(frameworkBaseDir);
 
-    addPluginStore(PluginStore.builder()
+    pluginStores.add(PluginStore.builder()
         .pluginBaseDirPath(frameworkBaseDirPath.resolve(pluginDirName))
         .pluginMappingBaseDirPath(frameworkBaseDirPath.resolve(pluginMappingDirName))
         .build());
@@ -61,24 +66,17 @@ public class LocalFSPluginFinder implements PluginFinder {
     String engineDirName = commonConfiguration.get(CommonOptions.JOB_ENGINE_DIR_NAME);
     String engineMappingDirName = commonConfiguration.get(CommonOptions.JOB_ENGINE_MAPPING_DIR_NAME);
 
-    addPluginStore(PluginStore.builder()
+    pluginStores.add(PluginStore.builder()
         .pluginBaseDirPath(frameworkBaseDirPath.resolve(engineDirName))
         .pluginMappingBaseDirPath(frameworkBaseDirPath.resolve(engineMappingDirName))
         .build());
 
-    setPluginClassloader(URLClassLoader.newInstance(new URL[] {}, Thread.currentThread()
-        .getContextClassLoader()));
+    return pluginStores;
   }
 
-  public void addPluginStore(PluginStore pluginStore) {
-    if (pluginStores == null) {
-      pluginStores = Lists.newArrayList();
-    }
-    pluginStores.add(pluginStore);
-  }
-
-  public void setPluginClassloader(URLClassLoader classloader) {
-    pluginClassloader = classloader;
+  protected URLClassLoader createPluginClassloader() {
+    return URLClassLoader.newInstance(new URL[] {}, Thread.currentThread()
+        .getContextClassLoader());
   }
 
   @Override

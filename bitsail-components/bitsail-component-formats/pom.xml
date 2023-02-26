@@ -30,6 +30,7 @@
     <modules>
         <module>bitsail-component-format-json</module>
         <module>bitsail-component-format-csv</module>
+        <module>bitsail-component-format-debezium</module>
     </modules>
 
     <dependencies>

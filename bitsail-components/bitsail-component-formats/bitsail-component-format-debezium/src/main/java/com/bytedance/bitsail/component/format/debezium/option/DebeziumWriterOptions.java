@@ -14,26 +14,16 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.cdc.source.reader;
+package com.bytedance.bitsail.component.format.debezium.option;
 
-import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
+import com.bytedance.bitsail.common.option.ConfigOption;
+import com.bytedance.bitsail.common.option.WriterOptions;
 
-import java.io.Serializable;
-import java.util.Map;
+import static com.bytedance.bitsail.common.option.ConfigOptions.key;
+import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
 
-public interface BinlogSplitReader<T> extends Serializable {
-  void readSplit(BinlogSplit split);
-
-  /**
-   * return the binlog offset being processed
-   */
-  Map<String, String> getOffset();
-
-  void close();
-
-  T poll();
-
-  boolean hasNext();
-
-  boolean isRunning();
+public interface DebeziumWriterOptions extends WriterOptions.BaseWriterOptions {
+  ConfigOption<Boolean> DEBEZIUM_JSON_INCLUDE_SCHEMA =
+      key(WRITER_PREFIX + "DEBEZIUM_JSON_INCLUDE_SCHEMA")
+          .defaultValue(false);
 }

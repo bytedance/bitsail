@@ -35,7 +35,7 @@ import java.util.Map;
 public class KafkaRecord {
   private String key;
   @NonNull
-  private String value;
+  private Object value;
 
   private Integer partitionId;
 

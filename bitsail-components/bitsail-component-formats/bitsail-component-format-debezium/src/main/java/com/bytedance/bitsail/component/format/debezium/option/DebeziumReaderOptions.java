@@ -14,26 +14,9 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.cdc.source.reader;
+package com.bytedance.bitsail.component.format.debezium.option;
 
-import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
+import com.bytedance.bitsail.common.option.ReaderOptions;
 
-import java.io.Serializable;
-import java.util.Map;
-
-public interface BinlogSplitReader<T> extends Serializable {
-  void readSplit(BinlogSplit split);
-
-  /**
-   * return the binlog offset being processed
-   */
-  Map<String, String> getOffset();
-
-  void close();
-
-  T poll();
-
-  boolean hasNext();
-
-  boolean isRunning();
+public interface DebeziumReaderOptions extends ReaderOptions.BaseReaderOptions {
 }
