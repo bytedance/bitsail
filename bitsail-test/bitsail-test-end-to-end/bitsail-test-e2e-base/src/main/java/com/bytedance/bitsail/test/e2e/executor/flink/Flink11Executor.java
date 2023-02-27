@@ -38,6 +38,6 @@ public class Flink11Executor extends AbstractFlinkExecutor {
 
   @Override
   protected String getFlinkDockerImage() {
-    return "blockliu/flink-1.11.6-hadoop-3.1.1";
+    return "blockliu/flink:1.11.6-hadoop3";
   }
 }
