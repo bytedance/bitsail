@@ -14,33 +14,17 @@
  * limitations under the License.
  */
 
-import { navbar } from "vuepress-theme-hope";
+package com.bytedance.bitsail.base.version;
 
-export const zhNavbar = navbar([
-  "/zh/",
-  {
-    text: "文档",
-    link: "/zh/documents/introduce",
-    activeMatch: "^/zh/documents",
-  },
-  {
-    text: "社区",
-    link: "/zh/community/community",
-    activeMatch: "^/zh/community",
-  },
-  {
-    text: "博客",
-    link: "/zh/blog/blog",
-    activeMatch: "^/zh/blog",
-  },
-  {
-    text: "下载",
-    link: "https://github.com/bytedance/bitsail/releases",
-    activeMatch: "^/zh/release",
-  },
-  {
-    text: "Github",
-    link: "https://github.com/bytedance/bitsail",
-    activeMatch: "^/zh/github",
+import org.apache.commons.lang.StringUtils;
+import org.junit.Assert;
+import org.junit.Test;
+
+public class PackageInfoTest {
+  @Test
+  public void test() {
+    Package myPackage = VersionInfoAnnotation.class.getPackage();
+    VersionInfoAnnotation annotation = myPackage.getAnnotation(VersionInfoAnnotation.class);
+    Assert.assertTrue(StringUtils.isNotEmpty(annotation.version()));
   }
-]);
+}

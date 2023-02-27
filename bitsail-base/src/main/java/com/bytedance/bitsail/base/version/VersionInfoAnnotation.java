@@ -14,33 +14,16 @@
  * limitations under the License.
  */
 
-import { navbar } from "vuepress-theme-hope";
+package com.bytedance.bitsail.base.version;
 
-export const zhNavbar = navbar([
-  "/zh/",
-  {
-    text: "文档",
-    link: "/zh/documents/introduce",
-    activeMatch: "^/zh/documents",
-  },
-  {
-    text: "社区",
-    link: "/zh/community/community",
-    activeMatch: "^/zh/community",
-  },
-  {
-    text: "博客",
-    link: "/zh/blog/blog",
-    activeMatch: "^/zh/blog",
-  },
-  {
-    text: "下载",
-    link: "https://github.com/bytedance/bitsail/releases",
-    activeMatch: "^/zh/release",
-  },
-  {
-    text: "Github",
-    link: "https://github.com/bytedance/bitsail",
-    activeMatch: "^/zh/github",
-  }
-]);
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.PACKAGE})
+public @interface VersionInfoAnnotation {
+
+  String version() default "";
+}
