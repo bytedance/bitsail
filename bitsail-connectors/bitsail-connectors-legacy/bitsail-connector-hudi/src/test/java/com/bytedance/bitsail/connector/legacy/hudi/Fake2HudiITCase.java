@@ -39,7 +39,7 @@ import java.io.File;
 public class Fake2HudiITCase {
   private static final Logger LOG = LoggerFactory.getLogger(Fake2HudiITCase.class);
   private static final String TEST_SCHEMA =
-      "[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"text\",\"type\":\"string\"},{\"name\":\"age\",\"type\":\"byte\"},{\"name\":\"timestamp\",\"type\":\"string\"}]";
+      "[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"text\",\"type\":\"string\"},{\"name\":\"timestamp\",\"type\":\"string\"}]";"[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"text\",\"type\":\"string\"},{\"name\":\"age\",\"type\":\"byte\"},{\"name\":\"timestamp\",\"type\":\"string\"}]";
 
   private static final String WRITER_PREFIX = "job.writer.";
   @Rule

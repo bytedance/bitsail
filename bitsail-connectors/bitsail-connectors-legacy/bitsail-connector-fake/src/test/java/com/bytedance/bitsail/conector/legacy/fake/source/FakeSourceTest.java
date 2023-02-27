@@ -76,7 +76,6 @@ public class FakeSourceTest {
     List<ColumnInfo> columnInfos = new ArrayList<>();
     ColumnInfo age = new ColumnInfo("age", "byte");
     columnInfos.add(age);
-//    FakeSource fs = new FakeSource()
     RowTypeInfo rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(new BitSailTypeInfoConverter(), columnInfos);
     Assert.assertTrue(rowTypeInfo.getFieldTypes()[0] instanceof PrimitiveColumnTypeInfo);
   }
