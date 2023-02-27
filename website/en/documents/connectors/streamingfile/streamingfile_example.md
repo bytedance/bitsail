@@ -44,7 +44,7 @@ Parent document: [StreamingFile connector](./streamingfile.md)
           "type": "hive"
         }
       },
-      "metastore_properties": "{\"hive.metastore.uris\":\"thrift:localhost:9083\"}",
+      "metastore_properties": "{\"hive.metastore.uris\":\"thrift://localhost:9083\"}",
       "partition_infos": "[{\"name\":\"date\",\"type\":\"TIME\"},{\"name\":\"hour\",\"type\":\"TIME\"}]",
       "enable_event_time": "true",
       "event_time_fields": "timestamp",
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `default`.`bitsail_test_static`
           "type": "hive"
         }
       },
-      "metastore_properties": "{\"hive.metastore.uris\":\"thrift:localhost:9083\"}",
+      "metastore_properties": "{\"hive.metastore.uris\":\"thrift://localhost:9083\"}",
       "partition_infos": "[{\"name\":\"date\",\"type\":\"TIME\"},{\"name\":\"hour\",\"type\":\"TIME\"},{\"name\":\"app_name\",\"type\":\"DYNAMIC\"}]",
       "enable_event_time": "true",
       "event_time_fields": "timestamp",
