@@ -410,7 +410,7 @@ kubectl delete deployments bitsail-job
 2. BitSail JobManager日志： `/opt/flink/log/jobmanager.log` on Kubernetes JobManager pod
 3. BitSail TaskManager日志： `/opt/flink/log/taskmanager.log` on Kubernetes TaskManager pod
 
-如果要使用 kubectl logs <PodName> 查看日志，必须执行以下操作：
+如果要使用 `kubectl logs <PodName>` 查看日志，必须执行以下操作：
 
 1. 在 Flink 客户端的 log4j.properties 中增加新的 appender。 
 2. 在 log4j.properties 的 rootLogger 中增加如下 ‘appenderRef’，`rootLogger.appenderRef.console.ref = ConsoleAppender`。 

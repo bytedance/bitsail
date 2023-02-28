@@ -423,7 +423,7 @@ There are three types of logs:
 3. BitSail TaskManager log: `/opt/flink/log/taskmanager.log` on Kubernetes TaskManager pod
 
 
-If you want to use kubectl logs <PodName> to view the logs, you must perform the following:
+If you want to use `kubectl logs <PodName>` to view the logs, you must perform the following:
 
 1. Add a new appender to the log4j.properties in the Flink client. 
 2. Add the following ‘appenderRef’ the rootLogger in log4j.properties `rootLogger.appenderRef.console.ref = ConsoleAppender`. 
