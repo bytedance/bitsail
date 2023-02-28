@@ -21,7 +21,7 @@ import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
+import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 import com.bytedance.bitsail.entry.flink.configuration.FlinkRunnerConfigOptions;
 
 import org.apache.commons.lang3.StringUtils;
@@ -57,7 +57,7 @@ public class FlinkRunnerSavepointLoader {
   public static void loadSavepointPath(BitSailConfiguration sysConfiguration,
                                        BitSailConfiguration jobConfiguration,
                                        BaseCommandArgs baseCommandArgs,
-                                       FlinkRunCommandArgs flinkCommandArgs,
+                                       FlinkCommandArgs flinkCommandArgs,
                                        List<String> flinkCommands) {
     Mode jobRunMode = Mode.getJobRunMode(jobConfiguration.get(CommonOptions.JOB_TYPE));
     if (Mode.BATCH.equals(jobRunMode)) {

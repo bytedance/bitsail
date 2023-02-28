@@ -18,7 +18,7 @@ package com.bytedance.bitsail.entry.flink.deployment;
 
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
+import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 
 import java.util.List;
 
@@ -26,17 +26,21 @@ import java.util.List;
  * Created 2022/8/8
  */
 public interface DeploymentSupplier {
+  String ENTRY_JAR_NAME = "bitsail-core.jar";
 
   /**
    * Check whether deployment supplier could accept the input global configuration
    */
-  boolean accept(FlinkRunCommandArgs flinkCommandArgs);
+  boolean accept(FlinkCommandArgs flinkCommandArgs);
 
   /**
    * Configure the deployment.
    */
-  void configure(FlinkRunCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration);
+  void configure(FlinkCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration);
 
-  void addDeploymentCommands(BaseCommandArgs baseCommandArgs, List<String> flinkCommands);
+  void addProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands);
 
+  void addRunJarAndJobConfCommands(BaseCommandArgs baseCommandArgs, List<String> flinkCommands);
+
+  void addStopProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands);
 }

@@ -16,9 +16,15 @@
 
 package com.bytedance.bitsail.flink.core.typeutils;
 
+import com.bytedance.bitsail.common.column.LongColumn;
+import com.bytedance.bitsail.common.column.StringColumn;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfos;
+import com.bytedance.bitsail.flink.core.typeinfo.ListColumnTypeInfo;
+import com.bytedance.bitsail.flink.core.typeinfo.MapColumnTypeInfo;
 import com.bytedance.bitsail.flink.core.typeinfo.PrimitiveColumnTypeInfo;
 
 import com.google.common.collect.ImmutableList;
@@ -27,6 +33,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
 public class ColumnFlinkTypeInfoUtilTest {
 
@@ -52,5 +59,37 @@ public class ColumnFlinkTypeInfoUtilTest {
 
     Assert.assertEquals("List<StringColumn>", rowTypeInfo.getTypeAt(5).toString());
     Assert.assertEquals("Map<StringColumn, StringColumn>", rowTypeInfo.getTypeAt(6).toString());
+  }
+
+  @Test
+  public void testGetRowTypeInfo() {
+    RowTypeInfo rowTypeInfo = new RowTypeInfo(
+        PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO,
+        PrimitiveColumnTypeInfo.STRING_COLUMN_TYPE_INFO,
+        PrimitiveColumnTypeInfo.DOUBLE_COLUMN_TYPE_INFO,
+        PrimitiveColumnTypeInfo.DATE_COLUMN_TYPE_INFO,
+        PrimitiveColumnTypeInfo.BYTES_COLUMN_TYPE_INFO);
+
+    com.bytedance.bitsail.common.typeinfo.RowTypeInfo simpleFrameworkRowTypeInfo = ColumnFlinkTypeInfoUtil
+        .getRowTypeInfo(rowTypeInfo);
+
+    Assert.assertEquals(TypeInfos.LONG_TYPE_INFO, simpleFrameworkRowTypeInfo.getTypeInfos()[0]);
+    Assert.assertEquals(TypeInfos.STRING_TYPE_INFO, simpleFrameworkRowTypeInfo.getTypeInfos()[1]);
+    Assert.assertEquals(TypeInfos.DOUBLE_TYPE_INFO, simpleFrameworkRowTypeInfo.getTypeInfos()[2]);
+    Assert.assertEquals(TypeInfos.SQL_TIMESTAMP_TYPE_INFO, simpleFrameworkRowTypeInfo.getTypeInfos()[3]);
+    Assert.assertEquals(BasicArrayTypeInfo.BINARY_TYPE_INFO, simpleFrameworkRowTypeInfo.getTypeInfos()[4]);
+
+    MapColumnTypeInfo<StringColumn, LongColumn> mapColumnTypeInfo =
+        new MapColumnTypeInfo<>(PrimitiveColumnTypeInfo.STRING_COLUMN_TYPE_INFO,
+            PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO);
+    ListColumnTypeInfo<StringColumn> listColumnTypeInfo =
+        new ListColumnTypeInfo<>(PrimitiveColumnTypeInfo.STRING_COLUMN_TYPE_INFO);
+
+    RowTypeInfo complexRowTypeInfo = new RowTypeInfo(mapColumnTypeInfo, listColumnTypeInfo);
+    com.bytedance.bitsail.common.typeinfo.RowTypeInfo complexFrameworkRowTypeInfo = ColumnFlinkTypeInfoUtil
+        .getRowTypeInfo(complexRowTypeInfo);
+
+    Assert.assertTrue(complexFrameworkRowTypeInfo.getTypeInfos()[0].getTypeClass().isAssignableFrom(Map.class));
+    Assert.assertTrue(complexFrameworkRowTypeInfo.getTypeInfos()[1].getTypeClass().isAssignableFrom(List.class));
   }
 }

@@ -22,12 +22,17 @@ import com.beust.jcommander.Parameter;
 import lombok.Getter;
 import lombok.Setter;
 
+import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier.ENTRY_JAR_NAME;
+import static com.bytedance.bitsail.entry.flink.deployment.kubernetes.KubernetesDeploymentSupplier.KUBERNETES_CLUSTER_ID;
+import static com.bytedance.bitsail.entry.flink.deployment.kubernetes.KubernetesDeploymentSupplier.KUBERNETES_CLUSTER_JAR_PATH;
+
 /**
  * Created 2022/8/5
  */
 @Getter
 @Setter
-public class FlinkRunCommandArgs implements CommandArgs {
+public class FlinkCommandArgs implements CommandArgs {
+  public static final String JOB_ID = "job-id";
 
   @Parameter(names = "--execution-mode",
       required = true,
@@ -57,4 +62,16 @@ public class FlinkRunCommandArgs implements CommandArgs {
   @Parameter(names = "--jm-address",
       description = "Specify the job manager to use, eg: localhost:8081.")
   private String jobManagerAddress;
+
+  @Parameter(names = "--" + KUBERNETES_CLUSTER_JAR_PATH,
+      description = "The BitSail jar path in kubernetes cluster")
+  private String kubernetesClusterJarPath = "/opt/bitsail/" + ENTRY_JAR_NAME;
+
+  @Parameter(names = "--" + KUBERNETES_CLUSTER_ID,
+          description = "The cluster-id of kubernetes")
+  private String kubernetesClusterId;
+
+  @Parameter(names = "--" + JOB_ID,
+          description = "The job id of running job")
+  private String jobId;
 }

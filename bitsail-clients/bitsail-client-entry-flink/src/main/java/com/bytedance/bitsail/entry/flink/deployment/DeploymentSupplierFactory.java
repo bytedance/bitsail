@@ -17,7 +17,7 @@
 package com.bytedance.bitsail.entry.flink.deployment;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.entry.flink.command.FlinkRunCommandArgs;
+import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.ServiceLoader;
  */
 public class DeploymentSupplierFactory {
 
-  public DeploymentSupplier getDeploymentSupplier(FlinkRunCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
+  public DeploymentSupplier getDeploymentSupplier(FlinkCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
     ServiceLoader<DeploymentSupplier> loader = ServiceLoader.load(DeploymentSupplier.class);
 
     List<DeploymentSupplier> acceptableSupplier = new ArrayList<>();
