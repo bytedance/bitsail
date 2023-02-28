@@ -20,6 +20,8 @@ Here are the contents of this part:
       - [Submit an example job](#jump_submit_example)
       - [Log for Debugging](#jump_log)
   - [Submit to Local Flink Session](#jump_submit_local)
+      - [Run in Remote Flink Session](#jump_flink_remote)
+      - [Run Locally](#jump_flink_local)
 - [Native Kubernetes Deployment](#native_kubernetes_deployment)
   - [Prerequisites](#jump_prerequisites_k8s)
   - [Pre Configuration](#jump_pre_configuration_k8s)
@@ -134,7 +136,7 @@ Please go to Yarn WebUI to check the logs of Flink JobManager and TaskManager.
 
 -----
 
-## Submit to Local Flink Session
+## Submit to Flink
 
 Suppose that BitSail install path is: `${BITSAIL_HOME}`.
 
@@ -143,8 +145,9 @@ After building BitSail, we can enter the following path and find runnable jars a
 cd ${BITSAIL_HOME}/bitsail-dist/target/bitsail-dist-0.2.0-SNAPSHOT-bin/bitsail-archive-0.2.0-SNAPSHOT/
 ```
 
-### Run Fake_to_Print example
+### <span id="jump_flink_remote">Run in Remote Flink Session</span>
 
+Users can use commands `--deployment-mode remote` to submit a BitSail job to remote flink session.
 Use [examples/Fake_Print_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Print_Example.json) as example to start a BitSail job:
 
 - `<job-manager-address>`: the address of job manager, should be host:port, _e.g._ `localhost:8081`.
@@ -153,18 +156,41 @@ Use [examples/Fake_Print_Example.json](https://github.com/bytedance/bitsail/blob
 bash bin/bitsail run \
   --engine flink \
   --execution-mode run \
-  --deployment-mode local \
+  --deployment-mode remote \
   --conf examples/Fake_Print_Example.json \
   --jm-address <job-manager-address>
 ```
 
+For example, we can use the script `bitsail-archive-0.1.0-SNAPSHOT/embedded/flink/bin/start-cluster.sh` to start a standalone session. Then we can run the example with following commands:
+
+```shell
+bash bin/bitsail run \
+  --engine flink \
+  --execution-mode run \
+  --deployment-mode remote \
+  --conf examples/Fake_Print_Example.json \
+  --jm-address localhost:8081
+```
 Then you can visit Flink WebUI to see the running job.
 In task manager, we can see the output of the Fake_to_Print job in its stdout.
 
+### <span id="jump_flink_local">Run in Local Mini-Cluster</span>
 
-### Run Fake_to_Hive example
 
-Use [examples/Fake_hive_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Hive_Example.json) as an example:
+Users can use commands `--deployment-mode local` to run a BitSail job locally.
+Use [examples/Fake_Print_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Print_Example.json) as example to start a BitSail job:
+
+```shell
+bash bin/bitsail run \
+  --engine flink \
+  --execution-mode run \
+  --deployment-mode local \
+  --conf examples/Fake_Print_Example.json
+```
+
+#### Run Fake_to_Print example
+
+Take [examples/Fake_hive_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Hive_Example.json) as another example:
 - Remember fulfilling the job configuration with an available hive source before run the command:
     - `job.writer.db_name`: the hive database to write.
     - `job.writer.table_name`: the hive table to write.
@@ -186,9 +212,30 @@ bash bin/bitsail run \
   --engine flink \
   --execution-mode run \
   --deployment-mode local \
-  --conf examples/Fake_Hive_Example.json \
-  --jm-address <job-manager-address>
+  --conf examples/Fake_Hive_Example.json
   ```
+
+#### Run hadoop related job
+
+When any of the reader or writer data source is relate to hadoop, _e.g._, `hive_to_print` job, the hadoop libs are needed.
+There are two ways to offer hadoop libs for local minicluster:
+
+ 1. If you already have local hadoop environment, then you can directly set `$HADOOP_HOME` to the folder of your hadoop libs. For example:
+
+```bash
+export HADOOP_HOME=/usr/local/hadoop-3.1.1
+```
+
+ 2. If there is no hadoop environment, you can use `flink-shaded-hadoop`. Remember moving the uber jar to your flink lib dir.
+  For example, suppose the flink root dir is `/opt/flink`:
+
+```bash
+# download flink-shaded-hadoop-uber jar
+wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-shaded-hadoop-2-uber/2.7.5-10.0/flink-shaded-hadoop-2-uber-2.7.5-10.0.jar
+
+# move to flink libs
+mv flink-shaded-hadoop-2-uber-2.7.5-10.0.jar /opt/flink/lib/flink-shaded-hadoop-uber.jar
+```
 
 
 -----
@@ -208,7 +255,7 @@ If you have problems setting up a Kubernetes cluster, then take a look at [how t
 
 ## <span id="jump_pre_configuration_k8s">Pre Configuration</span>
 
-### <span id="jump_configure_RBAC">Setup [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)</span>
+### <span id="jump_configure_RBAC">Setup RBAC</span>
 Role-based access control ([RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)) is a method of regulating access to compute or network resources based on the roles of individual users within an enterprise. Users can configure RBAC roles and service accounts used by JobManager to access the Kubernetes API server within the Kubernetes cluster.
 
 Every namespace has a default service account. However, the `default` service account may not have the permission to create or delete pods within the Kubernetes cluster. Users can instead use the following command to create a new service account `<self-defined-service-account>` and set the role binding. Then use the config option `kubernetes.service-account=<self-defined-service-account>` to make the JobManager pod use the `<self-defined-service-account>` service account to create/delete TaskManager pods and leader ConfigMaps. Also this will allow the TaskManager to watch leader ConfigMaps to retrieve the address of JobManager and ResourceManager.
@@ -220,13 +267,13 @@ $ kubectl create clusterrolebinding <self-defined-cluster-role-binding> --cluste
 
 ## <span id="jump_application_mode"> Application Mode</span>
 Application mode allows users to create a single image containing their Job and the Flink runtime, which will automatically create and destroy cluster components as needed. The Flink community provides base docker images [customized](https://nightlies.apache.org/flink/flink-docs-release-1.11/ops/deployment/docker.html#customize-flink-image) for any use case.
-### <span id="jump_build_custom_flink_image">[First Time or Per BitSail JAR Executable Update] Build Custom Flink Image</span>
+### <span id="jump_build_custom_flink_image">Build Custom Flink Image [First Time or Per BitSail JAR Executable Update]</span>
 
 Build your `<CustomImage>` using the [`Dockerfile`](https://docs.docker.com/engine/reference/builder/) from `${BITSAIL_HOME}/output/Dockerfile`:
 
 Publish your `<CustomImage>` onto Dockerhub so that Kubernetes cluster can download:
 
-[如何创建和管理docker存储库](https://docs.docker.com/docker-hub/repos/#:~:text=To%20push%20an%20image%20to,docs%2Fbase%3Atesting%20)
+[How to create and manage docker repositories.](https://docs.docker.com/docker-hub/repos/#:~:text=To%20push%20an%20image%20to,docs%2Fbase%3Atesting%20)
 ```bash
 docker build -t <your docker repository>:<tag>
 docker push <your docker repository>:<tag>
@@ -376,7 +423,7 @@ There are three types of logs:
 3. BitSail TaskManager log: `/opt/flink/log/taskmanager.log` on Kubernetes TaskManager pod
 
 
-If you want to use kubectl logs <PodName> to view the logs, you must perform the following:
+If you want to use `kubectl logs <PodName>` to view the logs, you must perform the following:
 
 1. Add a new appender to the log4j.properties in the Flink client. 
 2. Add the following ‘appenderRef’ the rootLogger in log4j.properties `rootLogger.appenderRef.console.ref = ConsoleAppender`. 

@@ -32,6 +32,7 @@ header:
     - '**/*.exe'
     - '**/*.dll'
     - '**/*.csv'
+    - '**/_SUCCESS'
     - '**/*.cnf'
     - 'build.sh'
     - 'bitsail-connectors/bitsail-connectors-legacy/bitsail-connector-hudi/src/test/resources/'

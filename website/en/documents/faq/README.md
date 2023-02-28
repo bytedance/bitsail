@@ -162,3 +162,12 @@ dir:
 > - [commons-cli](https://repo1.maven.org/maven2/commons-cli/commons-cli/1.5.0/commons-cli-1.5.0.jar)
 >
 > Then you can submit test job in `output` folder.
+
+32. **How to run E2E test on flink engine if your OS/ARCH is not linux/amd64 or linux/arm64?**
+
+> Current flink executor for E2E test only supports linux/amd64 and linux/arm64.
+> 
+> If you want to run E2E test on flink engine, you need to build a flink image for your OS/ARCH.
+> You can refer this document for detailed instructions: [Support multi-arch flink docker image](https://github.com/bytedance/bitsail/blob/master/bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-base/src/main/resources/docker/flink/README.md). 
+> 
+> Then you can replace the docker image used in related Flink executor(s).

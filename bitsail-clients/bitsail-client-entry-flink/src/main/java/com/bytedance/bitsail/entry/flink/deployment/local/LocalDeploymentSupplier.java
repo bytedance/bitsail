@@ -18,33 +18,35 @@ package com.bytedance.bitsail.entry.flink.deployment.local;
 
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 import com.bytedance.bitsail.client.api.utils.PackageResolver;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 
+/**
+ * Run flink job in local mini cluster.
+ */
 public class LocalDeploymentSupplier implements DeploymentSupplier {
-  private static final Logger LOG = LoggerFactory.getLogger(LocalDeploymentSupplier.class);
 
-  private final FlinkCommandArgs flinkCommandArgs;
+  private static final String DEPLOYMENT_LOCAL = "local";
 
-  public LocalDeploymentSupplier(FlinkCommandArgs flinkCommandArgs) {
-    this.flinkCommandArgs = flinkCommandArgs;
+  @Override
+  public boolean accept(FlinkCommandArgs flinkCommandArgs) {
+    String deploymentMode = flinkCommandArgs.getDeploymentMode().toLowerCase().trim();
+    return deploymentMode.equals(DEPLOYMENT_LOCAL);
+  }
+
+  @Override
+  public void configure(FlinkCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
+
   }
 
   @Override
   public void addProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
-    String jobManagerAddress = flinkCommandArgs.getJobManagerAddress();
-    if (StringUtils.isNotEmpty(jobManagerAddress)) {
-      flinkCommands.add("-m");
-      flinkCommands.add(jobManagerAddress);
-    } else {
-      LOG.info("Job manager is not specified. Job will be submit to default job manager.");
-    }
+
   }
 
   @Override

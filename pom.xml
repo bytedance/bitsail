@@ -40,6 +40,7 @@
         <!--    maven properties    -->
         <maven.deploy.skip>false</maven.deploy.skip>
         <skipITCase>true</skipITCase>
+        <skipE2E>true</skipE2E>
         <skipUT>false</skipUT>
         <enforcer.skip>false</enforcer.skip>
         <skipCheckStyle>false</skipCheckStyle>
@@ -1032,6 +1033,22 @@
                         </goals>
                         <configuration>
                             <skipTests>${skipITCase}</skipTests>
+                            <includes>
+                                <include>**/*ITCase.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>e2e-tests</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <skipTests>${skipE2E}</skipTests>
+                            <includes>
+                                <include>**/*E2ETest.java</include>
+                            </includes>
                         </configuration>
                     </execution>
                 </executions>

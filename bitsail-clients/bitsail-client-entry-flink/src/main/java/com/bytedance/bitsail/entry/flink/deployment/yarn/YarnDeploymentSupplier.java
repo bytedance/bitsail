@@ -33,11 +33,26 @@ import java.util.List;
  */
 public class YarnDeploymentSupplier implements DeploymentSupplier {
 
+  public static final String DEPLOYMENT_YARN_PER_JOB = "yarn-per-job";
+  public static final String DEPLOYMENT_YARN_SESSION = "yarn-session";
+  public static final String DEPLOYMENT_YARN_APPLICATION = "yarn-application";
+
   private FlinkCommandArgs flinkCommandArgs;
 
   private BitSailConfiguration jobConfiguration;
 
-  public YarnDeploymentSupplier(FlinkCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
+  private String deploymentMode;
+
+  @Override
+  public boolean accept(FlinkCommandArgs flinkCommandArgs) {
+    String deploymentMode = flinkCommandArgs.getDeploymentMode().toLowerCase().trim();
+    return deploymentMode.equals(DEPLOYMENT_YARN_PER_JOB)
+        || deploymentMode.equals(DEPLOYMENT_YARN_SESSION)
+        || deploymentMode.equals(DEPLOYMENT_YARN_APPLICATION);
+  }
+
+  @Override
+  public void configure(FlinkCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
     this.flinkCommandArgs = flinkCommandArgs;
     this.jobConfiguration = jobConfiguration;
   }
@@ -45,14 +60,14 @@ public class YarnDeploymentSupplier implements DeploymentSupplier {
   @Override
   public void addProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
     baseCommandArgs.getProperties()
-            .put("yarn.application.name", jobConfiguration.getNecessaryOption(
-                    CommonOptions.JOB_NAME, CommonErrorCode.CONFIG_ERROR));
+        .put("yarn.application.name", jobConfiguration.getNecessaryOption(
+            CommonOptions.JOB_NAME, CommonErrorCode.CONFIG_ERROR));
 
     baseCommandArgs.getProperties()
-            .put("yarn.application.queue", flinkCommandArgs.getQueue());
+        .put("yarn.application.queue", flinkCommandArgs.getQueue());
 
     baseCommandArgs.getProperties()
-            .put("yarn.application.priority", String.valueOf(flinkCommandArgs.getPriority()));
+        .put("yarn.application.priority", String.valueOf(flinkCommandArgs.getPriority()));
   }
 
   @Override

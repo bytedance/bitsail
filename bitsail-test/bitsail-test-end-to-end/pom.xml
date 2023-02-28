@@ -25,27 +25,32 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>bitsail-test-end-to-end</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
+    <modules>
+        <module>bitsail-test-e2e-base</module>
+        <module>bitsail-test-e2e-connector-v1</module>
+        <module>bitsail-test-e2e-generic-executor-templates</module>
+    </modules>
+
+    <properties>
+        <test.container.version>1.17.3</test.container.version>
+    </properties>
 
     <dependencies>
+        <!-- bitsail framework -->
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-base</artifactId>
+        </dependency>
+
+        <!-- test -->
         <dependency>
             <groupId>com.github.stefanbirkner</groupId>
             <artifactId>system-rules</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-jdbc</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-test</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
