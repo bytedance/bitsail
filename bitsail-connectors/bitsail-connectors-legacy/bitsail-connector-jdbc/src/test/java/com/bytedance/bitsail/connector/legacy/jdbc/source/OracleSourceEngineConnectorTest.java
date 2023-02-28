@@ -17,10 +17,10 @@
 package com.bytedance.bitsail.connector.legacy.jdbc.source;
 
 import com.bytedance.bitsail.common.model.ColumnInfo;
-import com.bytedance.bitsail.common.type.filemapping.JdbcTypeInfoConverter;
 import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
+import com.bytedance.bitsail.connector.legacy.jdbc.converter.JdbcTypeInfoConverter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
