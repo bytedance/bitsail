@@ -18,8 +18,8 @@ package com.bytedance.bitsail.connector.legacy.jdbc.catalog;
 
 import com.bytedance.bitsail.common.catalog.table.CatalogTable;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableDefinition;
-import com.bytedance.bitsail.common.type.filemapping.JdbcTypeInfoConverter;
 import com.bytedance.bitsail.connector.legacy.jdbc.container.MySQLContainerMariadbAdapter;
+import com.bytedance.bitsail.connector.legacy.jdbc.converter.JdbcTypeInfoConverter;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.junit.After;

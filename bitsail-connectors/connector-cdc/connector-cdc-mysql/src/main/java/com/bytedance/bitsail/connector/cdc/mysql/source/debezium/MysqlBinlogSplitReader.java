@@ -132,8 +132,6 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
   public void readSplit(BinlogSplit split) {
     this.split = split;
     this.offset = new HashMap<>();
-    MySqlOffsetContext offsetContext = DebeziumHelper.loadOffsetContext(connectorConfig, split);
-
     this.topicSelector = MySqlTopicSelector.defaultSelector(connectorConfig);
 
     final MySqlValueConverters valueConverters = DebeziumHelper.getValueConverters(connectorConfig);
@@ -164,8 +162,8 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
     } catch (SQLException e) {
       throw new RuntimeException("Failed to connect", e);
     }
-
     DebeziumHelper.validateBinlogConfiguration(connectorConfig, connection);
+    MySqlOffsetContext offsetContext = DebeziumHelper.loadOffsetContext(connectorConfig, split, connection);
 
     final boolean tableIdCaseInsensitive = connection.isTableIdCaseSensitive();
 

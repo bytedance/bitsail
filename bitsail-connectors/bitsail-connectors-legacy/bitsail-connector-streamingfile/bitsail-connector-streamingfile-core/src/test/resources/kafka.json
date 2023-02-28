@@ -33,7 +33,7 @@
           "type": "hive"
         }
       },
-      "metastore_properties": "{\"hive.metastore.uris\":\"thrift://10.227.17.202:9083\"}",
+      "metastore_properties": "{\"hive.metastore.uris\":\"thrift://localhost:9083\"}",
       "source_schema": "[{\"name\":\"id\",\"type\":\"bigint\"},{\"name\":\"date_type\",\"type\":\"date\"}]",
       "sink_schema": "[{\"name\":\"id\",\"type\":\"bigint\"},{\"name\":\"date_type\",\"type\":\"date\"}]",
       "class": "com.bytedance.bitsail.connector.legacy.streamingfile.sink.FileSystemSinkFunctionDAGBuilder",

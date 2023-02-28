@@ -56,7 +56,7 @@ public class BitSailTypeParser {
     for (String split : splits) {
       TypeProperty property = TypeProperty.PROPERTY_MAP.get(StringUtils.trim(split));
       if (Objects.isNull(property)) {
-        throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,
+        throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_COLUMN_TYPE,
             String.format("Not support type property string %s.", typePropertyString));
       }
       typeProperties.add(property);
