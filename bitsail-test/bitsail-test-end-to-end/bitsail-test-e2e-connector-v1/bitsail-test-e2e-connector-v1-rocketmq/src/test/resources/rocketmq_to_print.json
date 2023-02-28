@@ -1,0 +1,53 @@
+{
+  "job": {
+    "common": {
+      "job_id": -21217,
+      "job_name": "bitsail_rocketmq_to_redis_e2e_test",
+      "instance_id": -212171,
+      "user_name": "user"
+    },
+    "reader": {
+      "cluster": "localhost:9876",
+      "topic": "TBW102",
+      "consumer_group": "sss",
+      "columns": [
+        {
+          "name": "id",
+          "type": "long",
+          "properties": "unique"
+        },
+        {
+          "name": "random_string",
+          "type": "string"
+        },
+        {
+          "name": "random_double",
+          "type": "double"
+        }
+      ],
+      "format_type": "json",
+      "class": "com.bytedance.bitsail.connector.rocketmq.source.RocketMQSource",
+      "reader_parallelism_num": 1
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
+      "sample_write": true,
+      "sample_limit": 50,
+      "columns": [
+        {
+          "name": "id",
+          "type": "long"
+        },
+        {
+          "name": "random_string",
+          "type": "string"
+        },
+        {
+          "name": "random_double",
+          "type": "double"
+        }
+      ],
+      "writer_parallelism_num": 1
+    }
+  }
+}

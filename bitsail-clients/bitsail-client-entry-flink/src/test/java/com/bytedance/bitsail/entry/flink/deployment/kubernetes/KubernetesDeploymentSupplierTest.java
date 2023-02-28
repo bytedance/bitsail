@@ -33,7 +33,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_KUBERNETES_APPLICATION;
+import static com.bytedance.bitsail.entry.flink.deployment.kubernetes.KubernetesDeploymentSupplier.DEPLOYMENT_KUBERNETES_APPLICATION;
 import static com.bytedance.bitsail.entry.flink.deployment.kubernetes.KubernetesDeploymentSupplier.KUBERNETES_CLUSTER_ID;
 import static org.junit.Assert.assertEquals;
 
@@ -58,7 +58,8 @@ public class KubernetesDeploymentSupplierTest {
     flinkRunCommandArgs.setDeploymentMode(DEPLOYMENT_KUBERNETES_APPLICATION);
     baseCommandArgs.setJobConfInBase64("test");
     jobConfiguration.set(CommonOptions.INSTANCE_ID, 123L);
-    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs, jobConfiguration);
+    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier();
+    deploymentSupplier.configure(flinkRunCommandArgs, jobConfiguration);
     deploymentSupplier.addProperties(baseCommandArgs, flinkCommands);
     deploymentSupplier.addRunJarAndJobConfCommands(baseCommandArgs, flinkCommands);
     assertEquals(ImmutableList.of(
@@ -74,7 +75,8 @@ public class KubernetesDeploymentSupplierTest {
     flinkRunCommandArgs.setDeploymentMode(DEPLOYMENT_KUBERNETES_APPLICATION);
     baseCommandArgs.setJobConfInBase64("test");
     baseCommandArgs.getProperties().put(KUBERNETES_CLUSTER_ID, "clusterId");
-    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs, jobConfiguration);
+    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier();
+    deploymentSupplier.configure(flinkRunCommandArgs, jobConfiguration);
     deploymentSupplier.addProperties(baseCommandArgs, flinkCommands);
     deploymentSupplier.addRunJarAndJobConfCommands(baseCommandArgs, flinkCommands);
     assertEquals(ImmutableList.of(
@@ -88,7 +90,8 @@ public class KubernetesDeploymentSupplierTest {
   public void testAddStopDeploymentCommandsWithoutClusterId() {
     flinkRunCommandArgs.setDeploymentMode(DEPLOYMENT_KUBERNETES_APPLICATION);
     flinkRunCommandArgs.setJobId("jobId");
-    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs, jobConfiguration);
+    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier();
+    deploymentSupplier.configure(flinkRunCommandArgs, jobConfiguration);
     deploymentSupplier.addStopProperties(baseCommandArgs, flinkCommands);
   }
 
@@ -96,7 +99,8 @@ public class KubernetesDeploymentSupplierTest {
   public void testAddStopDeploymentCommandsWithoutJobId() {
     flinkRunCommandArgs.setDeploymentMode(DEPLOYMENT_KUBERNETES_APPLICATION);
     flinkRunCommandArgs.setKubernetesClusterId("clusterId");
-    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs, jobConfiguration);
+    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier();
+    deploymentSupplier.configure(flinkRunCommandArgs, jobConfiguration);
     deploymentSupplier.addStopProperties(baseCommandArgs, flinkCommands);
   }
 
@@ -105,7 +109,8 @@ public class KubernetesDeploymentSupplierTest {
     flinkRunCommandArgs.setDeploymentMode(DEPLOYMENT_KUBERNETES_APPLICATION);
     flinkRunCommandArgs.setJobId("jobId");
     baseCommandArgs.getProperties().put(KUBERNETES_CLUSTER_ID, "clusterId");
-    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs, jobConfiguration);
+    final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier();
+    deploymentSupplier.configure(flinkRunCommandArgs, jobConfiguration);
     deploymentSupplier.addStopProperties(baseCommandArgs, flinkCommands);
     assertEquals(ImmutableList.of("-D", KUBERNETES_CLUSTER_ID + "=clusterId", "jobId"), flinkCommands);
     assertEquals(baseCommandArgs.getProperties().size(), 1);

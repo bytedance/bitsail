@@ -40,9 +40,9 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_KUBERNETES_APPLICATION;
-import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_YARN_PER_JOB;
+import static com.bytedance.bitsail.entry.flink.deployment.kubernetes.KubernetesDeploymentSupplier.DEPLOYMENT_KUBERNETES_APPLICATION;
 import static com.bytedance.bitsail.entry.flink.deployment.kubernetes.KubernetesDeploymentSupplier.KUBERNETES_CLUSTER_ID;
+import static com.bytedance.bitsail.entry.flink.deployment.yarn.YarnDeploymentSupplier.DEPLOYMENT_YARN_PER_JOB;
 
 /**
  * Created 2022/8/5

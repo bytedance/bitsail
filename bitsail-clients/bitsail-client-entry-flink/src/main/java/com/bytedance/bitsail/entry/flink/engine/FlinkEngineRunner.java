@@ -132,8 +132,8 @@ public class FlinkEngineRunner implements EngineRunner {
         ConfigParser.fromRawConfPath(baseCommandArgs.getJobConf()) :
         BitSailConfiguration.from(
             new String(Base64.getDecoder().decode(baseCommandArgs.getJobConfInBase64())));
-    DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(sysConfiguration, flinkRunCommandArgs,
-        jobConfiguration);
+    DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(
+        flinkRunCommandArgs, jobConfiguration);
     List<String> flinkCommands = Lists.newArrayList();
 
     flinkCommands.add(flinkDir + "/bin/flink");
@@ -181,7 +181,8 @@ public class FlinkEngineRunner implements EngineRunner {
   }
 
   private void addProcBuilderWithStopCommands(ProcessBuilder flinkProcBuilder, BaseCommandArgs baseCommandArgs, FlinkCommandArgs flinkStopCommandArgs) {
-    DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(sysConfiguration, flinkStopCommandArgs, null);
+    DeploymentSupplier deploymentSupplier = deploymentSupplierFactory.getDeploymentSupplier(
+        flinkStopCommandArgs, null);
     List<String> flinkCommands = Lists.newArrayList();
 
     flinkCommands.add(flinkDir + "/bin/flink");

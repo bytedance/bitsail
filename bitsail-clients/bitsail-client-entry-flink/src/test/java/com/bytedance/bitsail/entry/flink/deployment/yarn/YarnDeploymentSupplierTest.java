@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier.ENTRY_JAR_NAME;
-import static com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplierFactory.DEPLOYMENT_YARN_PER_JOB;
+import static com.bytedance.bitsail.entry.flink.deployment.yarn.YarnDeploymentSupplier.DEPLOYMENT_YARN_PER_JOB;
 import static org.junit.Assert.assertEquals;
 
 public class YarnDeploymentSupplierTest {
@@ -45,7 +45,8 @@ public class YarnDeploymentSupplierTest {
     BitSailConfiguration conf = BitSailConfiguration.newDefault();
     conf.set(CommonOptions.JOB_NAME, "test");
 
-    YarnDeploymentSupplier deploymentSupplier = new YarnDeploymentSupplier(flinkRunCommandArgs, conf);
+    YarnDeploymentSupplier deploymentSupplier = new YarnDeploymentSupplier();
+    deploymentSupplier.configure(flinkRunCommandArgs, conf);
     BaseCommandArgs baseCommandArgs = new BaseCommandArgs();
     baseCommandArgs.setJobConf("testJobConf.json");
     List<String> flinkCommands = new ArrayList<>();

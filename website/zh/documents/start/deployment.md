@@ -2,7 +2,7 @@
 order: 1
 ---
 
-# 部署指南
+# <span id="jump_deployment_guide">部署指南</span>
 
 [English](../../../en/documents/start/deployment.md) | 简体中文
 
@@ -12,18 +12,15 @@ order: 1
 
 本部分目录:
 
-- [部署指南](#部署指南)
-    - [<span id="jump_pre_configure">环境配置</span>](#环境配置)
-        - [<span id="jump_configure_hadoop">配置Hadoop</span>](#配置hadoop)
-        - [<span id="jump_configure_flink">配置Flink</span>](#配置flink)
-    - [<span id="jump_submit_to_yarn">提交到Yarn</span>](#提交到yarn)
-        - [<span id="jump_submit_example">提交一个示例作业</span>](#提交一个示例作业)
-        - [<span id="jump_log">调试日志</span>](#调试日志)
-            - [client端日志](#client端日志)
-            - [Yarn作业日志](#yarn作业日志)
-    - [本地提交](#本地提交)
-        - [运行Fake_to_Print示例作业](#运行fake_to_print示例作业)
-        - [运行Fake_to_Hive示例作业](#运行fake_to_hive示例作业)
+- [部署指南](#jump_deployment_guide)
+  - [环境配置](#jump_pre_configure)
+    - [配置Hadoop](#jump_configure_hadoop)
+    - [配置Flink](#jump_configure_flink)
+  - [提交到Yarn](#jump_submit_to_yarn)
+    - [提交一个示例作业](#jump_submit_example)
+    - [调试日志](#jump_log)
+  - [远程提交](#jump_remote_submit)
+  - [本地提交](#jump_local_submit)
   - [部署原生Kubernetes](#cn_native_kubernetes_deployment)
     - [要求](#cn_jump_prerequisites_k8s)
     - [前置作业](#cn_jump_pre_configuration_k8s)
@@ -45,7 +42,7 @@ order: 1
 
 ### <span id="jump_configure_hadoop">配置Hadoop</span>
 
-为了支持Yarn部署，需要在环境变量中配置`HADOOP_CLASSPATH`。目前有两种方式设置:
+为了支持Yarn/Kubernetes部署，需要在环境变量中配置`HADOOP_CLASSPATH`。目前有两种方式设置:
 
 1. 直接手动设置 `HADOOP_CLASSPATH`。
 
@@ -142,30 +139,56 @@ bash ./bin/bitsail run --engine flink --conf ~/bitsail-archive-0.1.0-SNAPSHOT/ex
 
 -----
 
-## 本地提交
+## Flink提交
+
 
 假设BitSail的安装路径为: `${BITSAIL_HOME}`。打包BitSail后，我们可以在如下路径中找到可运行jar包以及示例作业配置文件:
 
 ```shell
 cd ${BITSAIL_HOME}/bitsail-dist/target/bitsail-dist-0.1.0-SNAPSHOT-bin/bitsail-archive-0.1.0-SNAPSHOT/
 ```
-### 运行Fake_to_Print示例作业
-以 [examples/Fake_Print_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Print_Example.json) 为例来启动一个本地BitSail作业:
+
+### <span id="jump_remote_submit">远程提交</span>
+
+用户可以通过 `--deployment-mode remote` 选项来将作业提交到指定的flink session。以 [examples/Fake_Print_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Print_Example.json) 为例，可以通过如下指令进行提交:
+
 - `<job-manager-address>`: 要连接的的JobManager地址，格式为host:port，例如`localhost:8081`。
 
 ```shell
 bash bin/bitsail run \
   --engine flink \
   --execution-mode run \
-  --deployment-mode local \
+  --deployment-mode remote \
   --conf examples/Fake_Print_Example.json \
   --jm-address <job-manager-address>
 ```
 
+例如，使用`bitsail-archive-0.1.0-SNAPSHOT/embedded/flink/bin/start-cluster.sh`脚本可以在本地启动一个flink standalone集群，此时 `<job-manager-address>` 就是 `localhost:8081`。
+
+```shell
+bash bin/bitsail run \
+  --engine flink \
+  --execution-mode run \
+  --deployment-mode remote \
+  --conf examples/Fake_Print_Example.json \
+  --jm-address localhost:8081
+```
 执行命令后，可以在Flink WebUI中查看运行的Fake_to_Print作业。在task manager的stdout文件中可以看到作业输出。
 
+### <span id="jump_local_submit">本地提交</span>
 
-### 运行Fake_to_Hive示例作业
+用户可以通过 `--deployment-mode local` 选项在本地运行作业。以 [examples/Fake_Print_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Print_Example.json) 为例，可以通过如下指令进行提交:
+
+```shell
+bash bin/bitsail run \
+  --engine flink \
+  --execution-mode run \
+  --deployment-mode local \
+  --conf examples/Fake_Print_Example.json
+```
+
+
+#### 运行Fake_to_Hive示例作业
 以 [examples/Fake_hive_Example.json](https://github.com/bytedance/bitsail/blob/master/bitsail-dist/src/main/archive/examples/Fake_Hive_Example.json) 为例:
 - 在运行前补充完整配置文件中的hive信息:
     - `job.writer.db_name`: 要写入的hive库.
@@ -181,16 +204,36 @@ bash bin/bitsail run \
        }
     ```
 
-执行如下命令，便可以在指定的Flink session中启动一个Fake_to_Hive作业:
+执行如下命令，便可以在本地启动一个Fake_to_Hive作业:
 
 ```shell
 bash bin/bitsail run \
   --engine flink \
   --execution-mode run \
   --deployment-mode local \
-  --conf examples/Fake_Hive_Example.json \
-  --jm-address <job-manager-address>
+  --conf examples/Fake_Hive_Example.json
   ```
+
+#### 运行hadoop相关任务
+
+如果读或者写数据源与hadoop相关，例如`hive_to_print`任务，那么需要向本体的flink mini cluster提供hadoop lib。
+下面介绍两种提供hadoop lib的方法:
+
+1. 如果你的环境已经部署了hadoop，那么直接通过`$HADOOP_HOME`环境变量指向本地的hadoop目录即可，例如:
+
+```bash
+export HADOOP_HOME=/usr/local/hadoop-3.1.1
+```
+
+2. 如果本地没有hadoop环境，可以通过`flink-shaded-hadoop-uber` jar包提供hadoop lib。例如，假设flink的目录为 `/opt/flink`，那么可以通过如下命令添加`flink-shaded-hadoop-uber`包:
+
+```bash
+# download flink-shaded-hadoop-uber jar
+wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-shaded-hadoop-2-uber/2.7.5-10.0/flink-shaded-hadoop-2-uber-2.7.5-10.0.jar
+
+# move to flink libs
+mv flink-shaded-hadoop-2-uber-2.7.5-10.0.jar /opt/flink/lib/flink-shaded-hadoop-uber.jar
+```
 
 
 
@@ -367,7 +410,7 @@ kubectl delete deployments bitsail-job
 2. BitSail JobManager日志： `/opt/flink/log/jobmanager.log` on Kubernetes JobManager pod
 3. BitSail TaskManager日志： `/opt/flink/log/taskmanager.log` on Kubernetes TaskManager pod
 
-如果要使用 kubectl logs <PodName> 查看日志，必须执行以下操作：
+如果要使用 `kubectl logs <PodName>` 查看日志，必须执行以下操作：
 
 1. 在 Flink 客户端的 log4j.properties 中增加新的 appender。 
 2. 在 log4j.properties 的 rootLogger 中增加如下 ‘appenderRef’，`rootLogger.appenderRef.console.ref = ConsoleAppender`。 
@@ -434,3 +477,4 @@ BitSail提供了一个测试脚本，用于在本地 Kubernetes 集群上运行�
 ```bash
 bash testscripts/run_bitsail-locally_with_minikube.sh -c <Path of Job conf file>
 ```
+

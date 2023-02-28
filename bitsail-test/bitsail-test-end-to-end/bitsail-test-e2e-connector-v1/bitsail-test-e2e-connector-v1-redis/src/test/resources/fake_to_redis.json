@@ -1,0 +1,42 @@
+{
+  "job": {
+    "common": {
+      "job_id": -2413,
+      "job_name": "bitsail_fake_to_redis_e2e_test",
+      "instance_id": -20413,
+      "user_name": "user"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 100,
+      "null_percentage": 0,
+      "unique_fields": "fake_key",
+      "columns": [
+        {
+          "name": "fake_key",
+          "type": "long",
+          "properties": "unique"
+        },
+        {
+          "name": "fake_value",
+          "type": "string"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.redis.sink.RedisSink",
+      "redis_data_type": "string",
+      "columns": [
+        {
+          "name": "fake_key",
+          "type": "string"
+        },
+        {
+          "name": "fake_value",
+          "type": "string"
+        }
+      ]
+    }
+  }
+}

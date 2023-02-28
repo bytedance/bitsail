@@ -1,0 +1,21 @@
+{
+  "name": "test-executor",
+  "executor-image": "test-image",
+  "exec-commands": [
+    "pwd", "&&", "sleep 5000"
+  ],
+  "failure-handle-commands": [
+    "pwd", "&&", "sleep 1000"
+  ],
+  "global-job-config": "{\"job\":{\"reader\":{\"reader_parallelism_num\":1},\"writer\":{\"writer_parallelism_num\":2}}}",
+  "additional-files": [
+    {
+      "host-path": "/local/1.jar",
+      "executor-path": "/executor/1.jar"
+    },
+    {
+      "host-path": "/local/2.jar",
+      "executor-path": "/executor/2.jar"
+    }
+  ]
+}

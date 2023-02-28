@@ -33,22 +33,32 @@ import static com.bytedance.bitsail.common.exception.CommonErrorCode.CONFIG_ERRO
  * Created 2022/12/23
  */
 public class KubernetesDeploymentSupplier implements DeploymentSupplier {
+  public static final String DEPLOYMENT_KUBERNETES_APPLICATION = "kubernetes-application";
+
   public static final String KUBERNETES_CLUSTER_ID = "kubernetes.cluster-id";
   public static final String KUBERNETES_CLUSTER_JAR_PATH = "kubernetes.cluster.jar.path";
 
   private BitSailConfiguration jobConfiguration;
   private FlinkCommandArgs flinkRunCommandArgs;
 
-  public KubernetesDeploymentSupplier(FlinkCommandArgs flinkRunCommandArgs, BitSailConfiguration jobConfiguration) {
+  @Override
+  public boolean accept(FlinkCommandArgs flinkCommandArgs) {
+    String deploymentMode = flinkCommandArgs.getDeploymentMode().toLowerCase().trim();
+    return deploymentMode.equals(DEPLOYMENT_KUBERNETES_APPLICATION);
+  }
+
+  @Override
+  public void configure(FlinkCommandArgs flinkCommandArgs, BitSailConfiguration jobConfiguration) {
+    this.flinkRunCommandArgs = flinkCommandArgs;
     this.jobConfiguration = jobConfiguration;
-    this.flinkRunCommandArgs = flinkRunCommandArgs;
   }
 
   @Override
   public void addProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
     String kubernetesClusterId = baseCommandArgs.getProperties().get(KUBERNETES_CLUSTER_ID);
     if (StringUtils.isBlank(kubernetesClusterId)) {
-      baseCommandArgs.getProperties().put(KUBERNETES_CLUSTER_ID, "bitsail-" + jobConfiguration.get(CommonOptions.INSTANCE_ID));
+      baseCommandArgs.getProperties().put(KUBERNETES_CLUSTER_ID,
+          "bitsail-" + jobConfiguration.get(CommonOptions.INSTANCE_ID));
     }
   }
 
