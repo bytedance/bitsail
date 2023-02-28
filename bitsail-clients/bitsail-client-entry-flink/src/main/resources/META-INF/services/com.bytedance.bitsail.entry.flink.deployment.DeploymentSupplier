@@ -16,3 +16,4 @@
 com.bytedance.bitsail.entry.flink.deployment.local.LocalDeploymentSupplier
 com.bytedance.bitsail.entry.flink.deployment.remote.RemoteDeploymentSupplier
 com.bytedance.bitsail.entry.flink.deployment.yarn.YarnDeploymentSupplier
+com.bytedance.bitsail.entry.flink.deployment.kubernetes.KubernetesDeploymentSupplier
