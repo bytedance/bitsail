@@ -14,18 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.common.type.filemapping;
+package com.bytedance.bitsail.connector.legacy.jdbc.converter;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.util.Preconditions;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 /**
  * Created 2022/5/11
  */
 public class JdbcTypeInfoConverter extends FileMappingTypeInfoConverter {
+  private static final Logger LOG = LoggerFactory.getLogger(JdbcTypeInfoConverter.class);
+
   private static final String LIST_TYPE_NAME = "list";
   private static final String MAP_TYPE_NAME = "map";
 
@@ -43,6 +52,9 @@ public class JdbcTypeInfoConverter extends FileMappingTypeInfoConverter {
 
   @Override
   public TypeInfo<?> fromTypeString(String typeString) {
+    Preconditions.checkNotNull(typeString,
+        String.format("Type string %s can not be null.", typeString));
+    LOG.debug("type string = {}.", typeString);
     typeString = getBaseName(typeString);
     if (isArrayType(typeString)) {
       return getArrayTypeInfo(typeString);
@@ -51,7 +63,12 @@ public class JdbcTypeInfoConverter extends FileMappingTypeInfoConverter {
       return getMapTypeInfo(typeString);
 
     } else {
-      return reader.getToTypeInformation().get(typeString);
+      TypeInfo<?> typeInfo = reader.getToTypeInformation().get(typeString);
+      if (Objects.isNull(typeInfo)) {
+        throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_COLUMN_TYPE,
+            String.format("Not support type string %s.", typeString));
+      }
+      return typeInfo;
     }
   }
 
