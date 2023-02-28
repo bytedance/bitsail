@@ -46,6 +46,15 @@ public class BaseCommandArgsParserTest {
     assertEquals(0, strings.length);
   }
 
+  @Test
+  public void testBaseCommandArgsMoreProperties() {
+    BaseCommandArgs baseCommandArgs = new BaseCommandArgs();
+    String[] args = new String[] {"--engine", "flink", "--conf", "test", "--props", "key=value", "--props", "key2=value2"};
+    String[] strings = CommandArgsParser.parseArguments(args, baseCommandArgs);
+    assertEquals(baseCommandArgs.getProperties().size(), 2);
+    assertEquals(0, strings.length);
+  }
+
   @Test(expected = ParameterException.class)
   public void testDynamicParameter() {
     String[] args = new String[] {"--engine", "flink", "--props", "key"};

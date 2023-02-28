@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.entry.flink.security;
+package com.bytedance.bitsail.entry.flink.handlers;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.component.format.security.kerberos.option.KerberosOptions;
@@ -27,39 +27,18 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 
-public class FlinkSecurityHandlerTest {
+import static com.bytedance.bitsail.entry.flink.handlers.CustomFlinkPackageHandler.writeConfToTmpFile;
+import static com.bytedance.bitsail.entry.flink.utils.FlinkPackageResolver.loadFlinkConfiguration;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-  @Test
-  public void testDefaultConf() {
-    Path path = getResourcePath("conf");
-    Configuration flinkConfiguration = FlinkSecurityHandler.loadFlinkConfiguration(path);
-    Assert.assertEquals("1", flinkConfiguration.getString("parallelism.default", null));
-  }
+public class CustomFlinkPackageHandlerTest {
 
   @Test
-  public void testUserDefinedConf() {
-    Path path = getResourcePath("test_dir/conf");
-    Configuration flinkConfiguration = FlinkSecurityHandler.loadFlinkConfiguration(path);
-    Assert.assertEquals("2", flinkConfiguration.getString("parallelism.default", null));
-  }
-
-  @Test
-  public void testWriteFlinkConf() throws IOException {
-    Path path = getResourcePath("conf");
-    Configuration conf = FlinkSecurityHandler.loadFlinkConfiguration(path);
-    Path tmpConfDir = FlinkSecurityHandler.writeConfToTmpFile(conf);
-
-    File tmpConfFile = tmpConfDir.resolve("flink-conf.yaml").toFile();
-    Assert.assertTrue(tmpConfFile.exists());
-  }
-
-  @Test
-  public void testHandleGlobal() throws IOException {
+  public void testProcessSecurity() {
     String workingDir = getResourcePath("").toString();
 
     BitSailConfiguration sysConfiguration = BitSailConfiguration.newDefault();
@@ -68,22 +47,30 @@ public class FlinkSecurityHandlerTest {
     sysConfiguration.set(KerberosOptions.KERBEROS_PRINCIPAL, "test_principal");
     sysConfiguration.set(KerberosOptions.KERBEROS_KRB5_CONF_PATH, (Paths.get(workingDir, "krb5.conf").toString()));
 
-    ProcessBuilder processBuilder = new ProcessBuilder();
-    FlinkSecurityHandler.processSecurity(sysConfiguration, processBuilder, Paths.get(workingDir));
-    Map<String, String> environment = processBuilder.environment();
-    Path flinkConfDir = Paths.get(environment.get("FLINK_CONF_DIR"));
-    Assert.assertNotNull(flinkConfDir);
-    Files.exists(flinkConfDir);
-    Configuration flinkConfiguration = FlinkSecurityHandler.loadFlinkConfiguration(flinkConfDir);
+    Configuration flinkConfiguration = new Configuration();
+
+    CustomFlinkPackageHandler.processSecurity(sysConfiguration, flinkConfiguration);
     Assert.assertEquals(flinkConfiguration.getString(SecurityOptions.KERBEROS_LOGIN_KEYTAB),
         sysConfiguration.get(KerberosOptions.KERBEROS_KEYTAB_PATH));
     Assert.assertEquals(flinkConfiguration.getString(SecurityOptions.KERBEROS_LOGIN_PRINCIPAL),
         sysConfiguration.get(KerberosOptions.KERBEROS_PRINCIPAL));
   }
 
+  @Test
+  public void testWriteFlinkConf() throws IOException {
+    Path path = getResourcePath("conf");
+    Configuration conf = loadFlinkConfiguration(path);
+    Path tmpConfDir = writeConfToTmpFile(conf);
+
+    File tmpConfFile = tmpConfDir.resolve("flink-conf.yaml").toFile();
+    assertTrue(tmpConfFile.exists());
+    Configuration tmpFlinkConfiguration = loadFlinkConfiguration(tmpConfDir);
+    assertEquals("1", tmpFlinkConfiguration.getString("parallelism.default", null));
+  }
+
   @SneakyThrows
   private Path getResourcePath(String resource) {
-    return Paths.get(FlinkSecurityHandlerTest.class
+    return Paths.get(CustomFlinkPackageHandlerTest.class
         .getClassLoader()
         .getResource(resource)
         .toURI()

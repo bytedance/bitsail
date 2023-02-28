@@ -24,7 +24,6 @@ import com.bytedance.bitsail.client.entry.constants.EntryConstants;
 import com.bytedance.bitsail.client.entry.security.SecurityContextFactory;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.configuration.BitSailSystemConfiguration;
-import com.bytedance.bitsail.common.configuration.ConfigParser;
 
 import com.beust.jcommander.internal.Maps;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +36,9 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
+
+import static com.bytedance.bitsail.client.api.command.CommandAction.RUN_COMMAND;
+import static java.util.Locale.US;
 
 /**
  * Created 2022/8/1
@@ -102,7 +104,8 @@ public class Entry {
   public static BaseCommandArgs loadCommandArguments(String[] args) {
     if (args.length < 1) {
       CommandArgsParser.printHelp();
-      System.out.println("Please specify an action. Supported action are " + CommandAction.RUN_COMMAND);
+      System.out.println(String.format(US, "Please specify an action. Supported action are [%s], [%s]",
+              RUN_COMMAND, CommandAction.STOP_COMMAND));
       System.exit(EntryConstants.ERROR_EXIT_CODE_COMMAND_ERROR);
     }
     final String mainCommand = args[0];
@@ -121,9 +124,6 @@ public class Entry {
 
   private ProcessBuilder buildProcessBuilder(BitSailConfiguration sysConfiguration,
                                              BaseCommandArgs baseCommandArgs) throws IOException {
-    BitSailConfiguration jobConfiguration =
-        ConfigParser.fromRawConfPath(baseCommandArgs.getJobConf());
-
     String engineName = baseCommandArgs.getEngineName();
     LOG.info("Final engine: {}.", engineName);
     EngineRunner engineRunner = RUNNERS.get(StringUtils.upperCase(engineName));
@@ -134,7 +134,6 @@ public class Entry {
     engineRunner.loadLibrary(classloader);
 
     ProcessBuilder procBuilder = engineRunner.getProcBuilder(
-        jobConfiguration,
         baseCommandArgs);
     LOG.info("Engine {}'s command: {}.", baseCommandArgs.getEngineName(), procBuilder.command());
     return procBuilder;
