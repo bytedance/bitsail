@@ -29,10 +29,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class NativeFlinkTypeInfoUtil {
+  private static final Logger LOG = LoggerFactory.getLogger(NativeFlinkTypeInfoUtil.class);
 
   public static RowTypeInfo getRowTypeInformation(List<ColumnInfo> columnInfos) {
     return getRowTypeInformation(columnInfos, new BitSailTypeInfoConverter());
@@ -40,7 +43,7 @@ public class NativeFlinkTypeInfoUtil {
 
   public static RowTypeInfo getRowTypeInformation(List<ColumnInfo> columnInfos,
                                                   TypeInfoConverter typeInfoConverter) {
-
+    LOG.debug("TypeInfoConverter = {}.", typeInfoConverter);
     String[] fieldNames = new String[columnInfos.size()];
     TypeInformation<?>[] fieldTypes = new TypeInformation[columnInfos.size()];
 

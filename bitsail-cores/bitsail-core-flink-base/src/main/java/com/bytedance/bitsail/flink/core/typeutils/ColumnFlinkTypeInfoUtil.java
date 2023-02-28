@@ -25,6 +25,8 @@ import com.bytedance.bitsail.flink.core.typeinfo.MapColumnTypeInfo;
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -35,10 +37,12 @@ import java.util.List;
  */
 
 public class ColumnFlinkTypeInfoUtil {
+  private static final Logger LOG = LoggerFactory.getLogger(ColumnFlinkTypeInfoUtil.class);
 
   public static RowTypeInfo getRowTypeInformation(TypeInfoConverter converter,
                                                   List<ColumnInfo> columnInfos) {
 
+    LOG.debug("TypeInfoConverter = {}.", converter);
     String[] fieldNames = new String[columnInfos.size()];
     TypeInformation<?>[] fieldTypes = new TypeInformation[columnInfos.size()];
     for (int index = 0; index < columnInfos.size(); index++) {

@@ -22,6 +22,12 @@ import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
+import com.bytedance.bitsail.common.util.Preconditions;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 /**
  * Created 2022/5/11
@@ -29,6 +35,7 @@ import com.bytedance.bitsail.common.typeinfo.TypeInfos;
  * @author ke.hao
  */
 public class MongoTypeInfoConverter extends FileMappingTypeInfoConverter {
+  private static final Logger LOG = LoggerFactory.getLogger(MongoTypeInfoConverter.class);
 
   private static final String OBJECT_TYPE = "object";
   private static final String ARRAY_TYPE = "array";
@@ -39,7 +46,10 @@ public class MongoTypeInfoConverter extends FileMappingTypeInfoConverter {
 
   @Override
   public TypeInfo<?> fromTypeString(String engineType) {
+    Preconditions.checkNotNull(engineType,
+        String.format("Type string %s can not be null.", engineType));
     engineType = trim(engineType);
+    LOG.debug("type string = {}.", engineType);
     if (isBasicType(engineType)) {
       return getBasicTypeInfoFromMongoDBType(engineType);
     } else if (isArrayType(engineType)) {
@@ -48,7 +58,7 @@ public class MongoTypeInfoConverter extends FileMappingTypeInfoConverter {
       return getMapTypeInfoFromMongoDBType(engineType);
     } else {
       throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-          "MongDB engine, invalid MongoDB type: " + engineType);
+          "MongoDB engine, invalid MongoDB type: " + engineType);
     }
   }
 
@@ -111,7 +121,12 @@ public class MongoTypeInfoConverter extends FileMappingTypeInfoConverter {
   }
 
   public TypeInfo<?> getBasicTypeInfoFromMongoDBType(String mongoType) {
-    return reader.getToTypeInformation().get(mongoType);
+    TypeInfo<?> typeInfo = reader.getToTypeInformation().get(mongoType);
+    if (Objects.isNull(typeInfo)) {
+      throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_COLUMN_TYPE,
+          String.format("MongoDB engine, not support type string %s.", mongoType));
+    }
+    return typeInfo;
   }
 }
 

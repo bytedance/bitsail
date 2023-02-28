@@ -22,11 +22,15 @@ import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created 2022/5/11
  */
 public class HiveTypeInfoConverter extends FileMappingTypeInfoConverter {
+  private static final Logger LOG = LoggerFactory.getLogger(HiveTypeInfoConverter.class);
+
   public static final String DEFAULT_STAGE_NAME = "hive";
   private static final String LIST_TYPE_NAME = "array";
   private static final String MAP_TYPE_NAME = "map";
@@ -51,7 +55,10 @@ public class HiveTypeInfoConverter extends FileMappingTypeInfoConverter {
 
   @Override
   public TypeInfo<?> fromTypeString(String typeString) {
+    Preconditions.checkNotNull(typeString,
+        String.format("Type string %s can not be null.", typeString));
     typeString = trim(getBaseName(typeString));
+    LOG.debug("type string = {}.", typeString);
     if (isArrayType(typeString)) {
       return internalRecursion(typeString, Category.LIST);
     }
