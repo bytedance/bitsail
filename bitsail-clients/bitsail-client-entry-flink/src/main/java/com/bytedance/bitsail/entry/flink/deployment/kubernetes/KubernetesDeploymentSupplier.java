@@ -19,6 +19,7 @@ package com.bytedance.bitsail.entry.flink.deployment.kubernetes;
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 import com.bytedance.bitsail.entry.flink.deployment.DeploymentSupplier;
 
@@ -47,7 +48,7 @@ public class KubernetesDeploymentSupplier implements DeploymentSupplier {
   public void addProperties(BaseCommandArgs baseCommandArgs, List<String> flinkCommands) {
     String kubernetesClusterId = baseCommandArgs.getProperties().get(KUBERNETES_CLUSTER_ID);
     if (StringUtils.isBlank(kubernetesClusterId)) {
-      throw new BitSailException(CONFIG_ERROR, "Missing kubernetes cluster-id. Not able to stop the application");
+      baseCommandArgs.getProperties().put(KUBERNETES_CLUSTER_ID, "bitsail-" + jobConfiguration.get(CommonOptions.INSTANCE_ID));
     }
   }
 

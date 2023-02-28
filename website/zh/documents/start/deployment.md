@@ -242,7 +242,6 @@ bash ${BITSAIL_HOME}/bin/bitsail run \
    --target kubernetes-application \
    --deployment-mode kubernetes-application \
    --execution-mode run-application \
-   -p kubernetes.cluster-id=<cluster-id> \
    -p kubernetes.kubernetes.jobmanager.service-account=<self-defined-service-account> \
    -p kubernetes.container.image=<CustomImage> \
    -p kubernetes.jobmanager.cpu=0.25 \
@@ -265,9 +264,9 @@ bash ${BITSAIL_HOME}/bin/bitsail run \
   <tr>
     <td>kubernetes.cluster-id</td>
     <td>Optional</td>
-    <td>bitsail-job</td>
+    <td>bitsail-&#60;instance-id&#62;</td>
     <td>String</td>
-    <td>The cluster-id, which should be no more than 45 characters, is used for identifying a unique Flink cluster. If not set, the client will automatically generate it with a random ID.</td>
+    <td>The cluster-id, which should be no more than 45 characters, is used for identifying a unique Flink cluster. If not set, the client will automatically generate it with a random numeric ID with 'bitsail-' prefix.</td>
   </tr>
 
   <tr>

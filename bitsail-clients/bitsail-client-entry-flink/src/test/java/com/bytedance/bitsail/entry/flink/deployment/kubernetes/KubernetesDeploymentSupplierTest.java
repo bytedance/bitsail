@@ -19,6 +19,7 @@ package com.bytedance.bitsail.entry.flink.deployment.kubernetes;
 import com.bytedance.bitsail.client.api.command.BaseCommandArgs;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.entry.flink.command.FlinkCommandArgs;
 
 import com.google.common.collect.ImmutableList;
@@ -52,10 +53,11 @@ public class KubernetesDeploymentSupplierTest {
     flinkCommands = new ArrayList<>();
   }
 
-  @Test(expected = BitSailException.class)
+  @Test
   public void testAddRunDeploymentCommands() {
     flinkRunCommandArgs.setDeploymentMode(DEPLOYMENT_KUBERNETES_APPLICATION);
     baseCommandArgs.setJobConfInBase64("test");
+    jobConfiguration.set(CommonOptions.INSTANCE_ID, 123L);
     final KubernetesDeploymentSupplier deploymentSupplier = new KubernetesDeploymentSupplier(flinkRunCommandArgs, jobConfiguration);
     deploymentSupplier.addProperties(baseCommandArgs, flinkCommands);
     deploymentSupplier.addRunJarAndJobConfCommands(baseCommandArgs, flinkCommands);
@@ -64,6 +66,7 @@ public class KubernetesDeploymentSupplierTest {
         "-xjob_conf_in_base64",
         "test"
     ), flinkCommands);
+    assertEquals("bitsail-123", baseCommandArgs.getProperties().get(KUBERNETES_CLUSTER_ID));
   }
 
   @Test

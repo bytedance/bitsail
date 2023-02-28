@@ -188,13 +188,6 @@ public class FlinkEngineRunner implements EngineRunner {
     flinkCommands.add(flinkStopCommandArgs.getExecutionMode());
     flinkCommands.add("-t");
     flinkCommands.add(flinkStopCommandArgs.getDeploymentMode());
-    if (sysConfiguration.fieldExists(FlinkRunnerConfigOptions.FLINK_DEFAULT_STOP_PROPERTIES)) {
-      for (Map.Entry<String, String> property : sysConfiguration.getFlattenMap(FlinkRunnerConfigOptions.FLINK_DEFAULT_STOP_PROPERTIES.key()).entrySet()) {
-        LOG.info("Add System property {} = {}.", property.getKey(), property.getValue());
-        flinkCommands.add("-D");
-        flinkCommands.add(StringUtils.trim(property.getKey()) + "=" + StringUtils.trim((property.getValue())));
-      }
-    }
     deploymentSupplier.addStopProperties(baseCommandArgs, flinkCommands);
     flinkProcBuilder.command(flinkCommands);
   }
