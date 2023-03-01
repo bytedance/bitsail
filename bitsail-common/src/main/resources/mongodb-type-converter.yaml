@@ -137,6 +137,9 @@ engine.type.to.bitsail.type.converter:
   - source.type: set
     target.type: string
 
+  - source.type: objectId
+    target.type: string
+
 bitsail.type.to.engine.type.converter:
   - source.type: int
     target.type: int
@@ -170,3 +173,6 @@ bitsail.type.to.engine.type.converter:
 
   - source.type: boolean
     target.type: bit
+
+  - source.type: string
+    target.type: objectId

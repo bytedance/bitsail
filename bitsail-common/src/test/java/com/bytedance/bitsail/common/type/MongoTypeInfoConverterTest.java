@@ -118,6 +118,9 @@ public class MongoTypeInfoConverterTest {
 
     TypeInfo<?> realTypeInfo = converter.fromTypeString("real");
     Assert.assertEquals(realTypeInfo.getTypeClass(), Double.class);
+
+    TypeInfo<?> stringTypeInfo = converter.fromTypeString("objectId");
+    Assert.assertEquals(stringTypeInfo.getTypeClass(), String.class);
   }
 
   @Test
