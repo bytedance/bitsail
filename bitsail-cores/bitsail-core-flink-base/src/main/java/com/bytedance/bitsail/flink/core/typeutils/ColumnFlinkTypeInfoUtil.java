@@ -16,6 +16,8 @@
 
 package com.bytedance.bitsail.flink.core.typeutils;
 
+import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
@@ -29,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * flink type information helper
@@ -50,6 +53,10 @@ public class ColumnFlinkTypeInfoUtil {
       String name = columnInfos.get(index).getName();
 
       TypeInfo<?> typeInfo = converter.fromTypeString(type);
+      if (Objects.isNull(typeInfo)) {
+        throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_COLUMN_TYPE,
+            String.format("Not support type string %s.", type));
+      }
       fieldNames[index] = name;
       fieldTypes[index] = toColumnFlinkTypeInformation(typeInfo);
     }

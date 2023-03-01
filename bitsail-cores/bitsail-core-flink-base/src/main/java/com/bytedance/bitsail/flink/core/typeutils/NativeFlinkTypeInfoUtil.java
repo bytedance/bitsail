@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 
 public class NativeFlinkTypeInfoUtil {
   private static final Logger LOG = LoggerFactory.getLogger(NativeFlinkTypeInfoUtil.class);
@@ -52,6 +53,10 @@ public class NativeFlinkTypeInfoUtil {
       String name = columnInfos.get(index).getName();
 
       TypeInfo<?> typeInfo = typeInfoConverter.fromTypeString(type);
+      if (Objects.isNull(typeInfo)) {
+        throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_COLUMN_TYPE,
+            String.format("Not support type string %s.", type));
+      }
 
       fieldNames[index] = name;
       fieldTypes[index] = toNativeFlinkTypeInformation(typeInfo);

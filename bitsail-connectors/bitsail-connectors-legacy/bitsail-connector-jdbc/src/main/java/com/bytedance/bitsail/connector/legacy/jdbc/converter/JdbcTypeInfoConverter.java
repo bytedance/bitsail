@@ -27,8 +27,6 @@ import com.bytedance.bitsail.common.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
-
 /**
  * Created 2022/5/11
  */
@@ -63,12 +61,7 @@ public class JdbcTypeInfoConverter extends FileMappingTypeInfoConverter {
       return getMapTypeInfo(typeString);
 
     } else {
-      TypeInfo<?> typeInfo = reader.getToTypeInformation().get(typeString);
-      if (Objects.isNull(typeInfo)) {
-        throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_COLUMN_TYPE,
-            String.format("Not support type string %s.", typeString));
-      }
-      return typeInfo;
+      return reader.getToTypeInformation().get(typeString);
     }
   }
 

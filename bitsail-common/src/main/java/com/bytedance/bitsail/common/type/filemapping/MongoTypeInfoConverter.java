@@ -27,8 +27,6 @@ import com.bytedance.bitsail.common.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
-
 /**
  * Created 2022/5/11
  *
@@ -121,12 +119,7 @@ public class MongoTypeInfoConverter extends FileMappingTypeInfoConverter {
   }
 
   public TypeInfo<?> getBasicTypeInfoFromMongoDBType(String mongoType) {
-    TypeInfo<?> typeInfo = reader.getToTypeInformation().get(mongoType);
-    if (Objects.isNull(typeInfo)) {
-      throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_COLUMN_TYPE,
-          String.format("MongoDB engine, not support type string %s.", mongoType));
-    }
-    return typeInfo;
+    return reader.getToTypeInformation().get(mongoType);
   }
 }
 
