@@ -55,7 +55,7 @@ public class NativeFlinkTypeInfoUtil {
       TypeInfo<?> typeInfo = typeInfoConverter.fromTypeString(type);
       if (Objects.isNull(typeInfo)) {
         throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_COLUMN_TYPE,
-            String.format("Not support type string %s.", type));
+            String.format("Column %s type string %s is not support.", name, type));
       }
 
       fieldNames[index] = name;
