@@ -85,7 +85,7 @@
             <directory>src/main/resources</directory>
             <fileMode>755</fileMode>
             <includes>
-                <include>*</include>
+                <include>**</include>
             </includes>
             <outputDirectory>/</outputDirectory>
         </fileSet>
