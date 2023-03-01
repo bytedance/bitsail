@@ -37,7 +37,7 @@ public class GeneratorMatcher {
     }
 
     // Data generator by snowFlake
-    if (CollectionUtils.isNotEmpty(typeInfo.getTypeProperties()) && typeInfo.getTypeProperties().contains(TypeProperty.UNIQUE)) {
+    if (supportedUnique(typeInfo)) {
       if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
         return new SnowflakeId(generateConfig.getTaskId());
       }
@@ -49,5 +49,14 @@ public class GeneratorMatcher {
       return new FakerData(typeInfo);
     }
     throw new RuntimeException("Unsupported type " + typeInfo);
+  }
+
+  private static boolean supportedUnique(TypeInfo<?> typeInfo){
+    try {
+      return typeInfo.getTypeProperties().contains(TypeProperty.UNIQUE);
+    } catch (Exception ex){
+      // some type not supported typeProperties method will throw exception
+      return false;
+    }
   }
 }
