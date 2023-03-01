@@ -9,7 +9,8 @@
       "internal_instance_id": "1",
       "extra_properties": {
         "update-mode": "append"
-      }
+      },
+      "job_name": "bitsail_test_integration_cdc_to_print"
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.cdc.mysql.source.MysqlBinlogSource",
@@ -51,38 +52,7 @@
       ]
     },
     "writer": {
-      "class": "com.bytedance.bitsail.connector.kafka.sink.KafkaSink",
-      "content_type": "debezium",
-      "columns": [
-        {
-          "name": "db",
-          "type": "string"
-        },
-        {
-          "name": "table",
-          "type": "string"
-        },
-        {
-          "name": "id",
-          "type": "string"
-        },
-        {
-          "name": "timestamp",
-          "type": "string"
-        },
-        {
-          "name": "ddl",
-          "type": "boolean"
-        },
-        {
-          "name": "version",
-          "type": "int"
-        },
-        {
-          "name": "value",
-          "type": "binary"
-        }
-      ]
+      "class": "com.bytedance.bitsail.connector.print.sink.PrintSink"
     }
   }
 }

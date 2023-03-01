@@ -30,6 +30,8 @@
     <modules>
         <module>bitsail-test-integration-base</module>
         <module>bitsail-test-integration-assert</module>
+        <module>bitsail-test-integration-cdc</module>
+        <module>bitsail-test-integration-kafka</module>
     </modules>
 
     <dependencies>
@@ -53,6 +55,14 @@
                     <artifactId>junit-dep</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- junit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <type>jar</type>
+            <scope>compile</scope>
         </dependency>
 
         <!-- dependencies for running flink jobs -->

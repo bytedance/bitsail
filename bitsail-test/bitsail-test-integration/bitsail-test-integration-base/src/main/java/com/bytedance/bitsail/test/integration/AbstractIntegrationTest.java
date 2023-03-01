@@ -67,9 +67,10 @@ public abstract class AbstractIntegrationTest {
     for (EngineType engineType : engineTypes) {
       IntegrationEngine engine = engineType.getInstance();
       try {
+        LOG.info("Running test [{}] on engine [{}].", jobName, engineType.name());
         engine.submitJob(jobConf);
       } catch (Throwable t) {
-        LOG.error("Integration test [{}] Failed on engine [{}]", jobName, engineType.name(), t);
+        LOG.error("Integration test [{}] Failed on engine [{}].", jobName, engineType.name(), t);
         if (exitUponException) {
           throw t;
         }
