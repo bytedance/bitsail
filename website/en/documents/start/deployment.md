@@ -32,7 +32,6 @@ Here are the contents of this part:
     - [Stop Application](#jump_stop_application)
     - [Kubernetes Logs](#jump_kubernetes_logs)
     - [History Server](#jump_history_server)
-    - [Test locally](#jump_test_locally)
 
 -----
 # <span id="yarn_deployment">Yarn Deployment</span>
@@ -474,18 +473,4 @@ bash ${BITSAIL_HOME}/bin/bitsail run \
    -p historyserver.archive.fs.dir hdfs:///completed-jobs/ \
    -p historyserver.archive.fs.refresh-interval 10000 \
    --conf-in-base64 <base64 conf>
-```
-
-### <span id="jump_test_locally">Test Locally</span>
-BitSail provides a test script for running built bitSail jar on local Kubernetes cluster.
-
-Prerequisites:
- 1. Local environment has built BitSail with build.sh
- 2. Local environment has minikube and kubectl installed 
-    1. minikube installation: https://minikube.sigs.k8s.io/docs/start/
-    2. kubectl installation: https://kubernetes.io/docs/tasks/tools/#kubectl
-
-Commands:
-```bash
-bash testscripts/run_bitsail-locally_with_minikube.sh -c <Path of Job conf file>
 ```

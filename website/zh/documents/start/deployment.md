@@ -31,7 +31,6 @@ order: 1
         - [停止Application](#cn_jump_stop_application)
         - [Kubernetes日志文件](#cn_jump_kubernetes_logs)
         - [History Server](#cn_jump_history_server)
-        - [本地测试](#cn_jump_test_locally)
 
 
 下面各部分详细介绍BitSail的部署。
@@ -462,19 +461,5 @@ bash ${BITSAIL_HOME}/bin/bitsail run \
    -p historyserver.archive.fs.dir hdfs:///completed-jobs/ \
    -p historyserver.archive.fs.refresh-interval 10000 \
    --conf-in-base64 <base64 conf>
-```
-
-### <span id="cn_jump_test_locally">本地测试</span>
-BitSail提供了一个测试脚本，用于在本地 Kubernetes 集群上运行构建的 bitSail jar。
-
-先决条件： 
-1. 本地环境已经用build.sh搭建好BitSail 
-2. 本地环境安装了minikube和kubectl 
-   1. minikube安装：https://minikube.sigs.k8s.io/docs/start/
-   2. kubectl安装：https://kubernetes.io/docs/tasks/tools/#kubectl
-
-命令:
-```bash
-bash testscripts/run_bitsail-locally_with_minikube.sh -c <Path of Job conf file>
 ```
 
