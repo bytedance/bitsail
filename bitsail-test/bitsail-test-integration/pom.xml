@@ -14,34 +14,38 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>bitsail-all</artifactId>
+        <artifactId>bitsail-test</artifactId>
         <groupId>com.bytedance.bitsail</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitsail-test</artifactId>
+    <artifactId>bitsail-test-integration</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>bitsail-test-end-to-end</module>
-        <module>bitsail-connector-test</module>
-        <module>bitsail-connector-kudu-test</module>
-        <module>bitsail-test-integration</module>
+        <module>bitsail-test-integration-base</module>
     </modules>
 
-    <properties>
-        <enforcer.skip>true</enforcer.skip>
-        <hbase.version>2.4.13</hbase.version>
-        <kafka.clients.version>1.0.1</kafka.clients.version>
-        <elasticsearch.version>7.5.1</elasticsearch.version>
-        <mongo.version>3.11.0</mongo.version>
-        <jedis.version>4.2.2</jedis.version>
-        <kudu.version>1.16.0</kudu.version>
-        <rocketmq.version>4.9.2</rocketmq.version>
-    </properties>
+    <dependencies>
+        <!-- bitsail framework -->
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-base</artifactId>
+        </dependency>
 
+        <!-- test -->
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+        </dependency>
+    </dependencies>
 </project>
