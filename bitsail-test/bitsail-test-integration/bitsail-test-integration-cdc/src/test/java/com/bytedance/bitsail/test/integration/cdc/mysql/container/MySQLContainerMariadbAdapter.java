@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.integration.container;
+package com.bytedance.bitsail.test.integration.cdc.mysql.container;
 
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;

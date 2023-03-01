@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.integration;
+package com.bytedance.bitsail.test.integration.cdc.mysql;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.cdc.model.ClusterInfo;
 import com.bytedance.bitsail.connector.cdc.model.ConnectionInfo;
 import com.bytedance.bitsail.connector.cdc.option.BinlogReaderOptions;
 import com.bytedance.bitsail.connector.kafka.option.KafkaWriterOptions;
-import com.bytedance.bitsail.test.integration.container.MySQLContainerMariadbAdapter;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.cdc.mysql.container.MySQLContainerMariadbAdapter;
 import com.bytedance.bitsail.test.integration.kafka.KafkaCluster;
 import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
@@ -38,18 +39,14 @@ import org.testcontainers.utility.DockerImageName;
 import java.util.stream.Stream;
 
 public class MysqlBinlogSourceITCase extends AbstractIntegrationTest {
+
   private static final Logger LOG = LoggerFactory.getLogger(MysqlBinlogSourceITCase.class);
-
   private static final String MYSQL_DOCKER_IMAGER = "mysql:8.0.29";
-
   private static final String TEST_USERNAME = "root";
   private static final String TEST_PASSWORD = "pw";
   private static final String TEST_DATABASE = "test";
-
   private MySQLContainer<?> container;
-
   private final String topicName = "testTopic";
-
   private final KafkaCluster kafkaCluster = new KafkaCluster();
 
   @Before
@@ -62,9 +59,7 @@ public class MysqlBinlogSourceITCase extends AbstractIntegrationTest {
         .withUsername(TEST_USERNAME)
         .withPassword(TEST_PASSWORD)
         .withLogConsumer(new Slf4jLogConsumer(LOG));
-
     Startables.deepStart(Stream.of(container)).join();
-
     kafkaCluster.startService();
     kafkaCluster.createTopic(topicName);
   }
@@ -87,10 +82,8 @@ public class MysqlBinlogSourceITCase extends AbstractIntegrationTest {
         .master(connectionInfo)
         .build();
     jobConf.set(BinlogReaderOptions.CONNECTIONS, Lists.newArrayList(clusterInfo));
-
     submit(jobConf);
   }
-
   //@Test
   public void testMysqlCDC2Kafka() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("bitsail_mysql_cdc_kafka.json");
@@ -102,14 +95,11 @@ public class MysqlBinlogSourceITCase extends AbstractIntegrationTest {
     ClusterInfo clusterInfo = ClusterInfo.builder()
         .master(connectionInfo)
         .build();
-
     // set mysql connections info
     jobConf.set(BinlogReaderOptions.CONNECTIONS, Lists.newArrayList(clusterInfo));
-
     // set kafka config
     jobConf.set(KafkaWriterOptions.BOOTSTRAP_SERVERS, KafkaCluster.getBootstrapServer());
     jobConf.set(KafkaWriterOptions.TOPIC_NAME, topicName);
-
     submit(jobConf);
   }
 }
