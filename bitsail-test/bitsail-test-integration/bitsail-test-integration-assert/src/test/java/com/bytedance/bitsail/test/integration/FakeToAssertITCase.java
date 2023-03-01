@@ -14,39 +14,38 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.assertion.sink;
+package com.bytedance.bitsail.test.integration;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import org.apache.flink.runtime.client.JobExecutionException;
+import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertThrows;
+public class FakeToAssertITCase extends AbstractIntegrationTest {
 
-public class AssertWriterTest {
+  public FakeToAssertITCase() {
+    super();
+    this.exitUponException = true;
+  }
 
   @Test
   public void testAssertWriter() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("assert_sink.json");
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submit(jobConf);
   }
 
   @Test
   public void testAssertByColumnCheck() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("assert_sink_col_check.json");
-    BitSailException e = assertThrows(BitSailException.class, () -> {
-      EmbeddedFlinkCluster.submitJob(jobConf);
-    });
+    BitSailException e = Assert.assertThrows(BitSailException.class, () -> submit(jobConf));
   }
 
   @Test
   public void testAssertByRowCheck() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("assert_sink_row_check.json");
-    JobExecutionException e = assertThrows(JobExecutionException.class, () -> {
-      EmbeddedFlinkCluster.submitJob(jobConf);
-    });
+    JobExecutionException e = Assert.assertThrows(JobExecutionException.class, () -> submit(jobConf));
   }
 }

@@ -25,53 +25,21 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitsail-test-integration-base</artifactId>
+    <artifactId>bitsail-test-integration-assert</artifactId>
 
     <dependencies>
-        <!-- log deps -->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.classic.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${logback.classic.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-access</artifactId>
-            <version>${logback.access.version}</version>
-        </dependency>
-
-        <!-- engine libs -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-core-entry</artifactId>
+            <artifactId>bitsail-test-integration-base</artifactId>
             <version>${revision}</version>
-        </dependency>
-
-        <!-- flink 1.11 engine -->
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-core-flink-bridge</artifactId>
-            <version>${revision}</version>
-        </dependency>
-
-        <!-- common used connector -->
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>connector-fake</artifactId>
-            <version>${revision}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>connector-print</artifactId>
+            <artifactId>connector-assert</artifactId>
             <version>${revision}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
