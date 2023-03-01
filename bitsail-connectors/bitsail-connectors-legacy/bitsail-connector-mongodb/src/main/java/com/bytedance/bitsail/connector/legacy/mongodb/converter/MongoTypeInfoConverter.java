@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.common.type.filemapping;
+package com.bytedance.bitsail.connector.legacy.mongodb.converter;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;

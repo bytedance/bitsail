@@ -85,7 +85,12 @@ public class BitSailTypeParser {
         return new ListTypeInfo<>(fromTypeString(elementTypeString));
       }
     }
-    return TypeInfoBridge.bridgeTypeInfo(typeString);
+    TypeInfo<?> typeInfo = TypeInfoBridge.bridgeTypeInfo(typeString);
+    if (Objects.isNull(typeInfo)) {
+      throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,
+          String.format("Not support type string %s.", typeString));
+    }
+    return typeInfo;
   }
 
   private static String[] parseMapTypeString(String typeString) {
