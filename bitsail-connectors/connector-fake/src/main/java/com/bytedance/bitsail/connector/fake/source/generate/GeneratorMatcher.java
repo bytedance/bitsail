@@ -22,10 +22,7 @@ import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 import com.bytedance.bitsail.common.typeinfo.TypeProperty;
 
-import org.apache.commons.collections.CollectionUtils;
-
 public class GeneratorMatcher {
-
   public static ColumnDataGenerator match(TypeInfo<?> typeInfo, GenerateConfig generateConfig) {
     if (typeInfo instanceof ListTypeInfo) {
       return new ListGenerator(match(((ListTypeInfo<?>) typeInfo).getElementTypeInfo(), generateConfig));
@@ -51,10 +48,10 @@ public class GeneratorMatcher {
     throw new RuntimeException("Unsupported type " + typeInfo);
   }
 
-  private static boolean supportedUnique(TypeInfo<?> typeInfo){
+  private static boolean supportedUnique(TypeInfo<?> typeInfo) {
     try {
       return typeInfo.getTypeProperties().contains(TypeProperty.UNIQUE);
-    } catch (Exception ex){
+    } catch (Exception ex) {
       // some type not supported typeProperties method will throw exception
       return false;
     }
