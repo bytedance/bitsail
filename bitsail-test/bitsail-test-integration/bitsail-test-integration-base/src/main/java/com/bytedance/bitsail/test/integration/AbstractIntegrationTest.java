@@ -45,7 +45,7 @@ public abstract class AbstractIntegrationTest {
 
   protected boolean exitUponException = false;
 
-  AbstractIntegrationTest() {
+  protected AbstractIntegrationTest() {
     engineTypes = new ArrayList<>();
 
     RunWith runWithEngines = getClass().getAnnotation(RunWith.class);

@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.integration;
+package com.bytedance.bitsail.test.integration.assertion;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
 import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import org.apache.flink.runtime.client.JobExecutionException;
