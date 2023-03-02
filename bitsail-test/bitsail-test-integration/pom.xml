@@ -43,7 +43,7 @@
         <module>bitsail-test-integration-redis</module>
         <module>bitsail-test-integration-rocketmq</module>
         <module>bitsail-test-integration-selectdb</module>
-        <module>bitsail-test-integration-conector-legacy</module>
+        <module>bitsail-test-integration-connector-legacy</module>
     </modules>
 
     <dependencies>

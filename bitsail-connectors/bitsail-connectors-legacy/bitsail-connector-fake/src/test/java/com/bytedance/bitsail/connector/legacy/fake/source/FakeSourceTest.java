@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.conector.legacy.fake.source;
-
-import com.bytedance.bitsail.connector.legacy.fake.source.FakeSource;
+package com.bytedance.bitsail.connector.legacy.fake.source;
 
 import org.junit.Assert;
 import org.junit.Test;
