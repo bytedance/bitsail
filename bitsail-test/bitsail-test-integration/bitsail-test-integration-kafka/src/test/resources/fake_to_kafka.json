@@ -40,7 +40,7 @@
           "type": "string"
         },
         {
-          "name": "long_type",
+          "name": "bigint_type",
           "type": "long"
         }
       ]

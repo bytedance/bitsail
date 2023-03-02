@@ -38,7 +38,7 @@
         },
         {
           "name": "c5",
-          "type": "string"
+          "type": "date"
         },
         {
           "name": "c6",
@@ -46,7 +46,7 @@
         },
         {
           "name": "c7",
-          "type": "long"
+          "type": "timestamp"
         },
         {
           "name": "c8",
@@ -80,7 +80,7 @@
         },
         {
           "name": "c5",
-          "type": "string"
+          "type": "date"
         },
         {
           "name": "c6",
@@ -88,7 +88,7 @@
         },
         {
           "name": "c7",
-          "type": "long"
+          "type": "timestamp"
         },
         {
           "name": "c8",
