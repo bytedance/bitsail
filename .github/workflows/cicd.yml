@@ -112,7 +112,7 @@ jobs:
           cache: 'maven'
       - name: Maven Verify Integration Test
         run:
-          mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=false
+          mvn clean verify -DskipUT=true -DskipITCase=false -DskipE2E=true -D"checkstyle.skip"=true -D"license.skipAddThirdParty"=true --no-snapshot-updates -am
 
     # This workflow contains a single job called "integration-tests"
   end-to-end-tests:
