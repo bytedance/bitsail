@@ -30,27 +30,34 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.client.core.CountResponse;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Collections;
 
+@SuppressWarnings("checkstyle:MagicNumber")
 public class ElasticsearchSinkITCase extends AbstractIntegrationTest {
 
   private final int totalCount = 300;
-  private final String index = "es_index_test";
-  private final CountRequest countRequest = new CountRequest(index);
-  private ElasticsearchCluster esCluster;
+  private static final String INDEX = "es_index_test";
+  private static ElasticsearchCluster esCluster;
+
+  private final CountRequest countRequest = new CountRequest(INDEX);
   private RestHighLevelClient client;
 
-  @Before
-  public void prepareEsCluster() throws Exception {
+  @BeforeClass
+  public static void prepareEsCluster() throws Exception {
     esCluster = new ElasticsearchCluster();
     esCluster.startService();
     esCluster.checkClusterHealth();
-    esCluster.createIndex(index);
+  }
 
+  @Before
+  public void initIndex() {
+    esCluster.resetIndex(INDEX);
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
     jobConf.set(ElasticsearchWriterOptions.ES_HOSTS,
         Collections.singletonList(esCluster.getHttpHostAddress()));
@@ -58,7 +65,12 @@ public class ElasticsearchSinkITCase extends AbstractIntegrationTest {
   }
 
   @After
-  public void closeEsCluster() {
+  public void closeClient() throws Exception {
+    client.close();
+  }
+
+  @AfterClass
+  public static void closeEsCluster() {
     esCluster.close();
   }
 
@@ -68,7 +80,7 @@ public class ElasticsearchSinkITCase extends AbstractIntegrationTest {
 
     jobConf.set(FakeReaderOptions.TOTAL_COUNT, totalCount);
     jobConf.set(FakeReaderOptions.RATE, 1000);
-    jobConf.set(ElasticsearchWriterOptions.ES_INDEX, index);
+    jobConf.set(ElasticsearchWriterOptions.ES_INDEX, INDEX);
     jobConf.set(ElasticsearchWriterOptions.ES_HOSTS,
         Collections.singletonList(esCluster.getHttpHostAddress()));
 
@@ -86,7 +98,8 @@ public class ElasticsearchSinkITCase extends AbstractIntegrationTest {
     jobConf.set(CommonOptions.JOB_TYPE, "STREAMING");
     jobConf.set(CommonOptions.CheckPointOptions.CHECKPOINT_ENABLE, true);
     jobConf.set(FakeReaderOptions.TOTAL_COUNT, totalCount);
-    jobConf.set(ElasticsearchWriterOptions.ES_INDEX, index);
+    jobConf.set(FakeReaderOptions.RATE, totalCount / 10);
+    jobConf.set(ElasticsearchWriterOptions.ES_INDEX, INDEX);
     jobConf.set(ElasticsearchWriterOptions.ES_HOSTS,
         Collections.singletonList(esCluster.getHttpHostAddress()));
 

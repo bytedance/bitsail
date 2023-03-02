@@ -16,8 +16,10 @@
 
 package com.bytedance.bitsail.test.integration.elasticsearch.container;
 
+import lombok.SneakyThrows;
 import org.apache.http.HttpHost;
 import org.apache.http.util.EntityUtils;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Response;
@@ -83,11 +85,32 @@ public class ElasticsearchCluster implements AutoCloseable {
     Assert.assertTrue(EntityUtils.toString(response.getEntity()).contains("cluster_name"));
   }
 
-  public void createIndex(String indexName) throws IOException {
+  @SneakyThrows
+  public void createIndex(String indexName) {
     RestClientBuilder builder = getRestClientBuilder();
     RestHighLevelClient client = new RestHighLevelClient(builder);
 
     client.indices().create(new CreateIndexRequest(indexName), RequestOptions.DEFAULT);
+  }
+
+  /**
+   * Delete an index.
+   */
+  public void deleteIndex(String indexName) {
+    RestClientBuilder builder = getRestClientBuilder();
+    RestHighLevelClient client = new RestHighLevelClient(builder);
+
+    try {
+      DeleteIndexRequest request = new DeleteIndexRequest(indexName);
+      client.indices().delete(request, RequestOptions.DEFAULT);
+    } catch (Exception ignored) {
+      // ignored
+    }
+  }
+
+  public void resetIndex(String indexName) {
+    deleteIndex(indexName);
+    createIndex(indexName);
   }
 
   /**

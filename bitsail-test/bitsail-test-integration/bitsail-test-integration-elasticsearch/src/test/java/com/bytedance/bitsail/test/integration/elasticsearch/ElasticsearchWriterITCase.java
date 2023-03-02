@@ -35,8 +35,10 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -45,7 +47,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class EleaticsearchWriterITCase {
+public class ElasticsearchWriterITCase {
 
   private final String docString = "{\n" +
       "    \"date\":\"20220810\",\n" +
@@ -60,19 +62,23 @@ public class EleaticsearchWriterITCase {
   private final String id = "test_id";
   private final String index = "es_index_test";
 
+  private static ElasticsearchCluster esCluster;
   private RestHighLevelClient client;
-  private ElasticsearchCluster esCluster;
 
   private BitSailConfiguration jobConf;
   private IndexRequest indexRequest = new IndexRequest().index(index).id(id);
   private GetRequest getRequest = new GetRequest().index(index).id(id);
 
-  @Before
-  public void prepareEsCluster() throws Exception {
+  @BeforeClass
+  public static void prepareEsCluster() throws Exception {
     esCluster = new ElasticsearchCluster();
     esCluster.startService();
     esCluster.checkClusterHealth();
-    esCluster.createIndex(index);
+  }
+
+  @Before
+  public void initIndex() {
+    esCluster.resetIndex(index);
 
     jobConf = BitSailConfiguration.newDefault();
     jobConf.set(ElasticsearchWriterOptions.ES_HOSTS,
@@ -82,8 +88,12 @@ public class EleaticsearchWriterITCase {
   }
 
   @After
-  public void closeEsCluster() throws Exception {
+  public void closeClient() throws Exception {
     client.close();
+  }
+
+  @AfterClass
+  public static void closeEsCluster() {
     esCluster.close();
   }
 
