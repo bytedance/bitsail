@@ -39,6 +39,7 @@
         <module>bitsail-test-integration-ftp</module>
         <module>bitsail-test-integration-kudu</module>
         <module>bitsail-test-integration-larksheet</module>
+        <module>bitsail-test-integration-localfilesystem</module>
     </modules>
 
     <dependencies>
