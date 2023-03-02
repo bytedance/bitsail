@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.source;
+package com.bytedance.bitsail.test.integration.ftp;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.ftp.core.config.FtpConfig;
 import com.bytedance.bitsail.connector.ftp.option.FtpReaderOptions;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
-import com.bytedance.bitsail.util.SetupUtil;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.ftp.container.FtpDataSource;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
 
-public class FtpSourceITCase {
+public class FtpSourceITCase extends AbstractIntegrationTest {
 
   protected FakeFtpServer ftpServer;
 
   @Before
   public void setup() {
-    SetupUtil setupUtil = new SetupUtil();
-    ftpServer = setupUtil.getFTP();
+    ftpServer = FtpDataSource.create();
     ftpServer.start();
   }
 
@@ -49,7 +48,6 @@ public class FtpSourceITCase {
     BitSailConfiguration globalConfiguration = JobConfUtils.fromClasspath("scripts/json_ftp_to_print.json");
     globalConfiguration.set(FtpReaderOptions.PROTOCOL, FtpConfig.Protocol.FTP.name());
     globalConfiguration.set(FtpReaderOptions.PORT, ftpServer.getServerControlPort());
-    EmbeddedFlinkCluster.submitJob(globalConfiguration);
+    submitJob(globalConfiguration);
   }
-
 }

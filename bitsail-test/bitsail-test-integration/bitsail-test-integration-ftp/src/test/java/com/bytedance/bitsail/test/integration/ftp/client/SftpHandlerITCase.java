@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.client;
+package com.bytedance.bitsail.test.integration.ftp.client;
 
 import com.bytedance.bitsail.connector.ftp.core.client.FtpHandlerFactory;
 import com.bytedance.bitsail.connector.ftp.core.client.IFtpHandler;
 import com.bytedance.bitsail.connector.ftp.core.config.FtpConfig;
-import com.bytedance.bitsail.util.SetupUtil;
+import com.bytedance.bitsail.test.integration.ftp.container.FtpConfigUtils;
+import com.bytedance.bitsail.test.integration.ftp.container.SftpDataSource;
+import com.bytedance.bitsail.test.integration.ftp.container.constant.FtpTestConstants;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -30,9 +32,6 @@ import org.testcontainers.containers.GenericContainer;
 import java.io.IOException;
 import java.util.Collections;
 
-import static com.bytedance.bitsail.util.Constant.CSV_SUCCESS_TAG;
-import static com.bytedance.bitsail.util.Constant.CSV_UPLOAD1;
-
 public class SftpHandlerITCase {
 
   private IFtpHandler sftpHandler;
@@ -40,11 +39,10 @@ public class SftpHandlerITCase {
 
   @Before
   public void setup() {
-    SetupUtil setupUtil = new SetupUtil();
-    sftpServer = setupUtil.getSFTP();
+    sftpServer = SftpDataSource.create();
     sftpServer.start();
 
-    FtpConfig config = setupUtil.initCommonConfig(sftpServer.getFirstMappedPort());
+    FtpConfig config = FtpConfigUtils.initCommonConfig(sftpServer.getFirstMappedPort());
     config.setProtocol(FtpConfig.Protocol.SFTP);
     sftpHandler = FtpHandlerFactory.createFtpHandler(config);
     sftpHandler.loginFtpServer();
@@ -58,14 +56,14 @@ public class SftpHandlerITCase {
 
   @Test
   public void testGetFiles() {
-    Assert.assertEquals(2, sftpHandler.getFiles(CSV_UPLOAD1).size());
-    Assert.assertEquals(Collections.singletonList(CSV_UPLOAD1 + "test1.csv"), sftpHandler.getFiles(CSV_UPLOAD1 + "test1.csv"));
-    Assert.assertEquals(Collections.emptyList(), sftpHandler.getFiles(CSV_UPLOAD1 + "badname"));
+    Assert.assertEquals(2, sftpHandler.getFiles(FtpTestConstants.CSV_UPLOAD1).size());
+    Assert.assertEquals(Collections.singletonList(FtpTestConstants.CSV_UPLOAD1 + "test1.csv"), sftpHandler.getFiles(FtpTestConstants.CSV_UPLOAD1 + "test1.csv"));
+    Assert.assertEquals(Collections.emptyList(), sftpHandler.getFiles(FtpTestConstants.CSV_UPLOAD1 + "badname"));
   }
 
   @Test
   public void testGetFilesSize() {
-    Assert.assertEquals(751L, sftpHandler.getFilesSize(CSV_UPLOAD1));
-    Assert.assertEquals(807L, sftpHandler.getFilesSize(CSV_SUCCESS_TAG));
+    Assert.assertEquals(751L, sftpHandler.getFilesSize(FtpTestConstants.CSV_UPLOAD1));
+    Assert.assertEquals(807L, sftpHandler.getFilesSize(FtpTestConstants.CSV_SUCCESS_TAG));
   }
 }

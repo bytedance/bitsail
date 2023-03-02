@@ -36,6 +36,7 @@
         <module>bitsail-test-integration-doris</module>
         <module>bitsail-test-integration-druid</module>
         <module>bitsail-test-integration-elasticsearch</module>
+        <module>bitsail-test-integration-ftp</module>
     </modules>
 
     <dependencies>

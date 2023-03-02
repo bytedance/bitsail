@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.util;
+package com.bytedance.bitsail.test.integration.ftp.container.constant;
 
-public class Constant {
+public class FtpTestConstants {
   public static final int FTP_PORT = 60021;
   public static final int SFTP_PORT = 22;
   public static final int DEFAULT_TIMEOUT = 5000;
@@ -31,5 +31,4 @@ public class Constant {
   public static final String JSON_UPLOAD1 = "/data/json/upload1/";
   public static final String JSON_UPLOAD2 = "/data/json/upload2/";
   public static final String JSON_SUCCESS_TAG = "/data/json/_SUCCESS";
-
 }
