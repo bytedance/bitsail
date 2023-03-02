@@ -29,6 +29,7 @@ import com.bytedance.bitsail.connector.fake.source.FakeRowGenerator;
 import lombok.NonNull;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class RowGenerator {
 
@@ -61,7 +62,7 @@ public class RowGenerator {
 
   public void init(@NonNull BitSailConfiguration conf) {
     conf.setIfAbsent(FakeReaderOptions.NULL_PERCENTAGE, 0);
-    this.fakeRowGenerator = new FakeRowGenerator(conf, 0, typeInfos);
+    this.fakeRowGenerator = new FakeRowGenerator(conf, 0, typeInfos, new AtomicLong());
   }
 
   public Row next() {

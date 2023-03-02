@@ -23,20 +23,20 @@ import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 import com.bytedance.bitsail.common.typeinfo.TypeProperty;
 
 public class GeneratorMatcher {
-  public static ColumnDataGenerator match(TypeInfo<?> typeInfo, GenerateConfig generateConfig) {
+  public static ColumnDataGenerator match(TypeInfo<?> typeInfo, GenerateContext generateContext) {
     if (typeInfo instanceof ListTypeInfo) {
-      return new ListGenerator(match(((ListTypeInfo<?>) typeInfo).getElementTypeInfo(), generateConfig));
+      return new ListGenerator(match(((ListTypeInfo<?>) typeInfo).getElementTypeInfo(), generateContext));
     }
 
     if (typeInfo instanceof MapTypeInfo) {
-      return new MapGenerator(match(((MapTypeInfo<?, ?>) typeInfo).getKeyTypeInfo(), generateConfig),
-          match(((MapTypeInfo<?, ?>) typeInfo).getValueTypeInfo(), generateConfig));
+      return new MapGenerator(match(((MapTypeInfo<?, ?>) typeInfo).getKeyTypeInfo(), generateContext),
+          match(((MapTypeInfo<?, ?>) typeInfo).getValueTypeInfo(), generateContext));
     }
 
     // Data generator by snowFlake
     if (supportedUnique(typeInfo)) {
       if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
-        return new SnowflakeId(generateConfig.getTaskId());
+        return new SnowflakeId(generateContext.getTaskId());
       }
       // Data Generator by AutoIncrementData
       return new AutoIncrementData(typeInfo);

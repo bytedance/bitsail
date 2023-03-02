@@ -26,7 +26,7 @@ public class SnowflakeId implements ColumnDataGenerator {
   }
 
   @Override
-  public Object generate(GenerateConfig generateConfig) {
+  public Object generate(GenerateContext generateContext) {
     return snowflakeIdGenerator.nextId();
   }
 }

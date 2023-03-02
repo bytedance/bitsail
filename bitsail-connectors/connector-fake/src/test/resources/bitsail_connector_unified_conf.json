@@ -12,7 +12,7 @@
     "reader": {
       "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
       "total_count": 300,
-      "rate": 10,
+      "rate": 100,
       "columns": [
         {
           "name": "id",

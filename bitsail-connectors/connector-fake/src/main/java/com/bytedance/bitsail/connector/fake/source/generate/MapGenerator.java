@@ -30,9 +30,9 @@ public class MapGenerator implements ColumnDataGenerator {
   }
 
   @Override
-  public Object generate(GenerateConfig generateConfig) {
+  public Object generate(GenerateContext generateContext) {
     Map<Object, Object> mapRawValue = Maps.newHashMap();
-    mapRawValue.put(keyGenerator.generate(generateConfig), valueGenerator.generate(generateConfig));
+    mapRawValue.put(keyGenerator.generate(generateContext), valueGenerator.generate(generateContext));
     return mapRawValue;
   }
 }

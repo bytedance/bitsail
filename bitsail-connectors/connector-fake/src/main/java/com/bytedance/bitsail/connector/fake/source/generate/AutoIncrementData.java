@@ -19,6 +19,8 @@ package com.bytedance.bitsail.connector.fake.source.generate;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Date;
@@ -29,6 +31,7 @@ import java.time.ZoneOffset;
 /**
  * auto increment column data generate
  */
+@Slf4j
 public class AutoIncrementData implements ColumnDataGenerator {
 
   private Increment increment;
@@ -46,63 +49,65 @@ public class AutoIncrementData implements ColumnDataGenerator {
   }
 
   @Override
-  public Object generate(GenerateConfig generateConfig) {
-    return increment.next(generateConfig, generateConfig.getRowId().get());
+  public Object generate(GenerateContext generateContext) {
+    assert generateContext != null;
+    assert increment != null;
+    return increment.next(generateContext, generateContext.getRowId().get());
   }
 
   private interface Increment {
-    Object next(GenerateConfig config, Long rowId);
+    Object next(GenerateContext config, Long rowId);
 
   }
 
   private enum IncrementInstance implements Increment {
     TO_LONG(TypeInfos.LONG_TYPE_INFO) {
       @Override
-      public Object next(GenerateConfig config, Long rowId) {
+      public Object next(GenerateContext config, Long rowId) {
         return rowId;
       }
 
     },
     TO_INTEGER(TypeInfos.INT_TYPE_INFO) {
       @Override
-      public Object next(GenerateConfig config, Long rowId) {
+      public Object next(GenerateContext config, Long rowId) {
         return rowId.intValue();
       }
 
     },
     TO_SHORT(TypeInfos.SHORT_TYPE_INFO) {
       @Override
-      public Object next(GenerateConfig config, Long rowId) {
+      public Object next(GenerateContext config, Long rowId) {
         return rowId.shortValue();
       }
     },
     TO_FLOAT(TypeInfos.FLOAT_TYPE_INFO) {
       @Override
-      public Object next(GenerateConfig config, Long rowId) {
+      public Object next(GenerateContext config, Long rowId) {
         return rowId.floatValue();
       }
     },
     TO_DOUBLE(TypeInfos.DOUBLE_TYPE_INFO) {
       @Override
-      public Object next(GenerateConfig config, Long rowId) {
+      public Object next(GenerateContext config, Long rowId) {
         return rowId.doubleValue();
       }
     },
     TO_BIG_INTEGER(TypeInfos.BIG_INTEGER_TYPE_INFO) {
       @Override
-      public Object next(GenerateConfig config, Long rowId) {
+      public Object next(GenerateContext config, Long rowId) {
         return BigInteger.valueOf(rowId);
       }
     },
     TO_BIG_DECIMAL(TypeInfos.BIG_DECIMAL_TYPE_INFO) {
       @Override
-      public Object next(GenerateConfig config, Long rowId) {
+      public Object next(GenerateContext config, Long rowId) {
         return BigDecimal.valueOf(rowId);
       }
     },
     TO_TIMESTAMP(TypeInfos.SQL_TIMESTAMP_TYPE_INFO) {
       @Override
-      public Object next(GenerateConfig config, Long rowId) {
+      public Object next(GenerateContext config, Long rowId) {
         return Timestamp.from(config.getFromTimestamp()
             .toLocalDateTime()
             .plusNanos(rowId)
@@ -111,7 +116,7 @@ public class AutoIncrementData implements ColumnDataGenerator {
     },
     TO_DATE(TypeInfos.SQL_DATE_TYPE_INFO) {
       @Override
-      public Object next(GenerateConfig config, Long rowId) {
+      public Object next(GenerateContext config, Long rowId) {
         return Date.from(config.getFromTimestamp()
             .toLocalDateTime()
             .plusDays(rowId)
@@ -121,7 +126,7 @@ public class AutoIncrementData implements ColumnDataGenerator {
     },
     TO_TIME(TypeInfos.SQL_TIME_TYPE_INFO) {
       @Override
-      public Object next(GenerateConfig config, Long rowId) {
+      public Object next(GenerateContext config, Long rowId) {
         return Time.from(config.getFromTimestamp()
             .toLocalDateTime()
             .plusSeconds(rowId)
@@ -130,33 +135,33 @@ public class AutoIncrementData implements ColumnDataGenerator {
     },
     TO_LOCAL_DATE_TIME(TypeInfos.LOCAL_DATE_TIME_TYPE_INFO) {
       @Override
-      public Object next(GenerateConfig config, Long rowId) {
+      public Object next(GenerateContext config, Long rowId) {
         return config.getFromTimestamp().toLocalDateTime().plusNanos(rowId);
       }
 
     },
     TO_LOCAL_DATE(TypeInfos.LOCAL_DATE_TYPE_INFO) {
       @Override
-      public Object next(GenerateConfig config, Long rowId) {
+      public Object next(GenerateContext config, Long rowId) {
         return config.getFromTimestamp().toLocalDateTime().toLocalDate().plusDays(rowId);
       }
 
     },
     TO_LOCAL_TIME(TypeInfos.LOCAL_TIME_TYPE_INFO) {
       @Override
-      public Object next(GenerateConfig config, Long rowId) {
+      public Object next(GenerateContext config, Long rowId) {
         return config.getFromTimestamp().toLocalDateTime().toLocalTime().plusSeconds(rowId);
       }
     },
     TO_STRING(TypeInfos.STRING_TYPE_INFO) {
       @Override
-      public Object next(GenerateConfig config, Long rowId) {
+      public Object next(GenerateContext config, Long rowId) {
         return rowId.toString();
       }
     };
 
     @Override
-    public Object next(GenerateConfig config, Long rowId) {
+    public Object next(GenerateContext config, Long rowId) {
       return config;
     }
 

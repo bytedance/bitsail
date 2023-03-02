@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class KuduTestUtils {
@@ -94,7 +95,7 @@ public class KuduTestUtils {
         TypeInfos.STRING_TYPE_INFO,
         TypeInfos.STRING_TYPE_INFO      // getBytes()
     };
-    FakeRowGenerator fakeRowGenerator = new FakeRowGenerator(BitSailConfiguration.newDefault(),1, typeInfos);
+    FakeRowGenerator fakeRowGenerator = new FakeRowGenerator(BitSailConfiguration.newDefault(), 1, typeInfos, new AtomicLong());
 
     KuduTable kuduTable = client.openTable(tableName);
     KuduSession session = client.newSession();

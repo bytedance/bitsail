@@ -22,7 +22,7 @@ import com.bytedance.bitsail.common.typeinfo.BasicTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.connector.fake.option.FakeReaderOptions;
 import com.bytedance.bitsail.connector.fake.source.generate.ColumnDataGenerator;
-import com.bytedance.bitsail.connector.fake.source.generate.GenerateConfig;
+import com.bytedance.bitsail.connector.fake.source.generate.GenerateContext;
 import com.bytedance.bitsail.connector.fake.source.generate.GeneratorMatcher;
 
 import net.datafaker.Faker;
@@ -32,6 +32,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.bytedance.bitsail.common.typeinfo.TypeProperty.NULLABLE;
 
@@ -41,21 +42,21 @@ public class FakeRowGenerator {
   // column info
   private final TypeInfo<?>[] typeInfos;
   private final List<ColumnDataGenerator> columnDataGeneratorList = new ArrayList<>();
-  private final GenerateConfig generateConfig;
+  private final GenerateContext generateContext;
 
-  public FakeRowGenerator(BitSailConfiguration jobConf, int taskId, TypeInfo<?>[] typeInfos) {
-    this.generateConfig = GenerateConfig.builder()
+  public FakeRowGenerator(BitSailConfiguration jobConf, int taskId, TypeInfo<?>[] typeInfos, AtomicLong rowId) {
+    this.generateContext = GenerateContext.builder()
         .taskId(taskId)
+        .rowId(rowId)
         .lower(jobConf.get(FakeReaderOptions.UPPER_LIMIT))
         .upper(jobConf.get(FakeReaderOptions.LOWER_LIMIT))
         .fromTimestamp(Timestamp.valueOf(jobConf.get(FakeReaderOptions.FROM_TIMESTAMP)))
         .toTimestamp(Timestamp.valueOf(jobConf.get(FakeReaderOptions.TO_TIMESTAMP)))
         .build();
-
     this.nullPercentage = jobConf.get(FakeReaderOptions.NULL_PERCENTAGE);
     this.typeInfos = typeInfos;
     for (TypeInfo<?> typeInfo : typeInfos) {
-      columnDataGeneratorList.add(GeneratorMatcher.match(typeInfo, generateConfig));
+      columnDataGeneratorList.add(GeneratorMatcher.match(typeInfo, generateContext));
     }
 
   }
@@ -67,9 +68,10 @@ public class FakeRowGenerator {
       if (isNullable(typeInfo) && isNull()) {
         row.setField(index, null);
       } else {
-        row.setField(index, columnDataGeneratorList.get(index).generate(generateConfig));
+        row.setField(index, columnDataGeneratorList.get(index).generate(generateContext));
       }
     }
+    generateContext.getRowId().incrementAndGet();
     return row;
   }
 

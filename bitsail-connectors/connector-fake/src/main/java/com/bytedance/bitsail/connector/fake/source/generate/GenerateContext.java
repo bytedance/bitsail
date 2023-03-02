@@ -27,12 +27,12 @@ import java.util.concurrent.atomic.AtomicLong;
 @Builder
 @Getter
 @AllArgsConstructor
-public class GenerateConfig {
+public class GenerateContext {
 
   private Integer taskId;
   private final transient AtomicLong rowId;
-  private final long upper;
-  private final long lower;
+  private final Long upper;
+  private final Long lower;
   private final transient Timestamp fromTimestamp;
   private final transient Timestamp toTimestamp;
   private final ZoneId zoneId = ZoneId.systemDefault();

@@ -44,7 +44,7 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
     this.totalCount = readerConfiguration.get(FakeReaderOptions.TOTAL_COUNT);
     this.fakeGenerateRate = RateLimiter.create(readerConfiguration.get(FakeReaderOptions.RATE));
     this.counter = new AtomicLong();
-    this.fakeRowGenerator = new FakeRowGenerator(readerConfiguration, context.getIndexOfSubtask(), rowTypeInfo.getTypeInfos());
+    this.fakeRowGenerator = new FakeRowGenerator(readerConfiguration, context.getIndexOfSubtask(), rowTypeInfo.getTypeInfos(), counter);
   }
 
   @Override
@@ -55,6 +55,6 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
 
   @Override
   public boolean hasMoreElements() {
-    return counter.incrementAndGet() <= totalCount;
+    return counter.get() <= totalCount;
   }
 }
