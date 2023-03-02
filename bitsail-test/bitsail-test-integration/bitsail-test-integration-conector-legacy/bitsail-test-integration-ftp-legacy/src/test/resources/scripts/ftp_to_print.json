@@ -3,7 +3,7 @@
     "common": {
       "job_id": 312,
       "instance_id": 3124,
-      "job_name": "bitsail_ftp_to_print_test",
+      "job_name": "bitsail_test_integration_legacy_ftp_to_print",
       "user_name": "test"
     },
     "reader": {

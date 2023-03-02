@@ -14,51 +14,44 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>bitsail-connectors-legacy</artifactId>
+        <artifactId>bitsail-test-integration</artifactId>
         <groupId>com.bytedance.bitsail</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitsail-connector-ftp</artifactId>
+    <artifactId>bitsail-test-integration-conector-legacy</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>bitsail-test-integration-ftp-legacy</module>
+    </modules>
 
     <dependencies>
-
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-base</artifactId>
+            <artifactId>bitsail-test-integration-base</artifactId>
             <version>${revision}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-common</artifactId>
-            <version>${revision}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-flink-row-parser</artifactId>
+            <artifactId>bitsail-connector-fake</artifactId>
             <version>${revision}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>commons-net</groupId>
-            <artifactId>commons-net</artifactId>
-            <version>3.6</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
-            <version>0.1.54</version>
-            <scope>compile</scope>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-connector-print</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

@@ -14,32 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.ftp.source;
+package com.bytedance.bitsail.test.integration.legacy.ftp;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.legacy.ftp.common.FtpConfig;
 import com.bytedance.bitsail.connector.legacy.ftp.option.FtpReaderOptions;
-import com.bytedance.bitsail.connector.legacy.ftp.util.SetupUtil;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.legacy.ftp.container.FtpDataSource;
+import com.bytedance.bitsail.test.integration.legacy.ftp.container.constant.FtpTestConstants;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockftpserver.fake.FakeFtpServer;
 
-import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.GBK_CHARSET;
-import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.SUCCESS_TAG;
-import static com.bytedance.bitsail.connector.legacy.ftp.util.Constant.UPLOAD_CHARSET;
-
-public class FtpSourceITCase {
-
+public class FtpSourceITCase extends AbstractIntegrationTest {
   protected FakeFtpServer ftpServer;
 
   @Before
   public void setup() {
-    SetupUtil setupUtil = new SetupUtil();
-    ftpServer = setupUtil.getFTP();
+    ftpServer = FtpDataSource.create();
     ftpServer.start();
   }
 
@@ -53,7 +48,7 @@ public class FtpSourceITCase {
     BitSailConfiguration globalConfiguration = JobConfUtils.fromClasspath("scripts/ftp_to_print.json");
     globalConfiguration.set(FtpReaderOptions.PROTOCOL, FtpConfig.Protocol.FTP.name());
     globalConfiguration.set(FtpReaderOptions.PORT, ftpServer.getServerControlPort());
-    EmbeddedFlinkCluster.submitJob(globalConfiguration);
+    submitJob(globalConfiguration);
   }
 
   @Test
@@ -61,9 +56,10 @@ public class FtpSourceITCase {
     BitSailConfiguration globalConfiguration = JobConfUtils.fromClasspath("scripts/ftp_to_print.json");
     globalConfiguration.set(FtpReaderOptions.PROTOCOL, FtpConfig.Protocol.FTP.name());
     globalConfiguration.set(FtpReaderOptions.PORT, ftpServer.getServerControlPort());
-    globalConfiguration.set(FtpReaderOptions.PATH_LIST, UPLOAD_CHARSET);
-    globalConfiguration.set(FtpReaderOptions.SUCCESS_FILE_PATH, UPLOAD_CHARSET + SUCCESS_TAG);
-    globalConfiguration.set(FtpReaderOptions.CHARSET, GBK_CHARSET);
-    EmbeddedFlinkCluster.submitJob(globalConfiguration);
+    globalConfiguration.set(FtpReaderOptions.PATH_LIST, FtpTestConstants.UPLOAD_CHARSET);
+    globalConfiguration.set(FtpReaderOptions.SUCCESS_FILE_PATH,
+        FtpTestConstants.UPLOAD_CHARSET + FtpTestConstants.SUCCESS_TAG);
+    globalConfiguration.set(FtpReaderOptions.CHARSET, FtpTestConstants.GBK_CHARSET);
+    submitJob(globalConfiguration);
   }
 }

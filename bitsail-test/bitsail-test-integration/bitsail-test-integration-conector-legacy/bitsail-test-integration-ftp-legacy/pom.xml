@@ -14,51 +14,41 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>bitsail-connectors-legacy</artifactId>
+        <artifactId>bitsail-test-integration-conector-legacy</artifactId>
         <groupId>com.bytedance.bitsail</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitsail-connector-ftp</artifactId>
+    <artifactId>bitsail-test-integration-ftp-legacy</artifactId>
 
     <dependencies>
-
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-base</artifactId>
+            <artifactId>bitsail-connector-ftp</artifactId>
             <version>${revision}</version>
+            <scope>test</scope>
         </dependency>
 
+        <!-- ftp data source -->
         <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-common</artifactId>
-            <version>${revision}</version>
+            <groupId>org.mockftpserver</groupId>
+            <artifactId>MockFtpServer</artifactId>
+            <version>2.7.1</version>
+            <scope>test</scope>
         </dependency>
 
+        <!-- test containers for create sftp data source -->
         <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-flink-row-parser</artifactId>
-            <version>${revision}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-net</groupId>
-            <artifactId>commons-net</artifactId>
-            <version>3.6</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
-            <version>0.1.54</version>
-            <scope>compile</scope>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>1.17.3</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>
