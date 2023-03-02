@@ -71,6 +71,7 @@ public class FakeRowGenerator {
         row.setField(index, columnDataGeneratorList.get(index).generate(generateContext));
       }
     }
+    // row count++
     generateContext.getRowId().incrementAndGet();
     return row;
   }

@@ -55,6 +55,6 @@ public class FakeSourceReader extends SimpleSourceReaderBase<Row> {
 
   @Override
   public boolean hasMoreElements() {
-    return counter.get() <= totalCount;
+    return counter.get() < totalCount;
   }
 }
