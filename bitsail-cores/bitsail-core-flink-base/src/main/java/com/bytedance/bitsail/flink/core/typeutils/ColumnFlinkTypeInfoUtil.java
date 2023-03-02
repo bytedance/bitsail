@@ -16,6 +16,8 @@
 
 package com.bytedance.bitsail.flink.core.typeutils;
 
+import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
@@ -25,8 +27,11 @@ import com.bytedance.bitsail.flink.core.typeinfo.MapColumnTypeInfo;
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * flink type information helper
@@ -35,10 +40,12 @@ import java.util.List;
  */
 
 public class ColumnFlinkTypeInfoUtil {
+  private static final Logger LOG = LoggerFactory.getLogger(ColumnFlinkTypeInfoUtil.class);
 
   public static RowTypeInfo getRowTypeInformation(TypeInfoConverter converter,
                                                   List<ColumnInfo> columnInfos) {
 
+    LOG.debug("TypeInfoConverter = {}.", converter);
     String[] fieldNames = new String[columnInfos.size()];
     TypeInformation<?>[] fieldTypes = new TypeInformation[columnInfos.size()];
     for (int index = 0; index < columnInfos.size(); index++) {
@@ -46,6 +53,10 @@ public class ColumnFlinkTypeInfoUtil {
       String name = columnInfos.get(index).getName();
 
       TypeInfo<?> typeInfo = converter.fromTypeString(type);
+      if (Objects.isNull(typeInfo)) {
+        throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_COLUMN_TYPE,
+            String.format("Column %s type string %s is not support.", name, type));
+      }
       fieldNames[index] = name;
       fieldTypes[index] = toColumnFlinkTypeInformation(typeInfo);
     }

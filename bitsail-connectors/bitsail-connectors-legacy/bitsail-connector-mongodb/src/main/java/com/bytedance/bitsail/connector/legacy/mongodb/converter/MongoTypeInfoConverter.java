@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.common.type.filemapping;
+package com.bytedance.bitsail.connector.legacy.mongodb.converter;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
+import com.bytedance.bitsail.common.util.Preconditions;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created 2022/5/11
@@ -29,6 +34,7 @@ import com.bytedance.bitsail.common.typeinfo.TypeInfos;
  * @author ke.hao
  */
 public class MongoTypeInfoConverter extends FileMappingTypeInfoConverter {
+  private static final Logger LOG = LoggerFactory.getLogger(MongoTypeInfoConverter.class);
 
   private static final String OBJECT_TYPE = "object";
   private static final String ARRAY_TYPE = "array";
@@ -39,7 +45,10 @@ public class MongoTypeInfoConverter extends FileMappingTypeInfoConverter {
 
   @Override
   public TypeInfo<?> fromTypeString(String engineType) {
+    Preconditions.checkNotNull(engineType,
+        String.format("Type string %s can not be null.", engineType));
     engineType = trim(engineType);
+    LOG.debug("type string = {}.", engineType);
     if (isBasicType(engineType)) {
       return getBasicTypeInfoFromMongoDBType(engineType);
     } else if (isArrayType(engineType)) {
@@ -48,7 +57,7 @@ public class MongoTypeInfoConverter extends FileMappingTypeInfoConverter {
       return getMapTypeInfoFromMongoDBType(engineType);
     } else {
       throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-          "MongDB engine, invalid MongoDB type: " + engineType);
+          "MongoDB engine, invalid MongoDB type: " + engineType);
     }
   }
 
