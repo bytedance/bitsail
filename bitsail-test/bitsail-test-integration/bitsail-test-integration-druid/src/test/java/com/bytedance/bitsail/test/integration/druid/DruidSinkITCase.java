@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.druid.sink;
+package com.bytedance.bitsail.test.integration.druid;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.druid.option.DruidWriterOptions;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -30,19 +30,19 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import java.io.File;
 import java.time.Duration;
 
-public class DruidSinkITCase {
+public class DruidSinkITCase extends AbstractIntegrationTest {
   private static final String DRUID_SERVICE_NAME = "router";
   private static final int DRUID_SERVICE_PORT = 8888;
-  private DockerComposeContainer environment;
+  private DockerComposeContainer<?> environment;
 
   @Before
   public void setup() {
-    environment = new DockerComposeContainer(new File("src/test/resources/docker-compose.yml"))
-            .withExposedService(
-                    DRUID_SERVICE_NAME,
-                    DRUID_SERVICE_PORT,
-                    Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(180))
-            );
+    environment = new DockerComposeContainer<>(new File("src/test/resources/docker-compose.yml"))
+        .withExposedService(
+            DRUID_SERVICE_NAME,
+            DRUID_SERVICE_PORT,
+            Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(180))
+        );
     environment.start();
   }
 
@@ -51,12 +51,12 @@ public class DruidSinkITCase {
 
     // Arrange
     final String coordinatorURL = environment.getServiceHost(DRUID_SERVICE_NAME, DRUID_SERVICE_PORT) + ":" +
-            environment.getServicePort(DRUID_SERVICE_NAME, DRUID_SERVICE_PORT);
+        environment.getServicePort(DRUID_SERVICE_NAME, DRUID_SERVICE_PORT);
     final BitSailConfiguration jobConfiguration = JobConfUtils.fromClasspath("fake_to_druid.json");
     jobConfiguration.set(DruidWriterOptions.COORDINATOR_URL, coordinatorURL);
 
     // Act; Assert
-    EmbeddedFlinkCluster.submitJob(jobConfiguration);
+    submitJob(jobConfiguration);
   }
 
   @After
