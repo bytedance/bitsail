@@ -27,6 +27,7 @@ import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.test.KuduTestHarness;
 import org.apache.kudu.test.cluster.MiniKuduCluster;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -34,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Ignore("Mini kudu cluster cannot work on all platforms (e.g., windows)")
 public class KuduSinkITCase extends AbstractIntegrationTest {
   private static final String TABLE_NAME = "test_kudu_table";
   private static final int TOTAL_COUNT = 10000;
