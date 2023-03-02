@@ -52,7 +52,7 @@ public class FakeToKafkaITCase extends AbstractIntegrationTest {
   public void testKafkaSink() throws Exception {
     BitSailConfiguration configuration = JobConfUtils.fromClasspath("fake_to_kafka.json");
     updateConfiguration(configuration);
-    submit(configuration);
+    submitJob(configuration);
     checkByConsumer(kafkaCluster, topicName, TOTAL_SEND_COUNT);
   }
 

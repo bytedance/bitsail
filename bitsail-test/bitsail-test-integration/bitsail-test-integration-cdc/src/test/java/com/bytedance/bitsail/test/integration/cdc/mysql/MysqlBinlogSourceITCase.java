@@ -82,7 +82,7 @@ public class MysqlBinlogSourceITCase extends AbstractIntegrationTest {
         .master(connectionInfo)
         .build();
     jobConf.set(BinlogReaderOptions.CONNECTIONS, Lists.newArrayList(clusterInfo));
-    submit(jobConf);
+    submitJob(jobConf);
   }
 
   //@Test
@@ -101,6 +101,6 @@ public class MysqlBinlogSourceITCase extends AbstractIntegrationTest {
     // set kafka config
     jobConf.set(KafkaWriterOptions.BOOTSTRAP_SERVERS, KafkaCluster.getBootstrapServer());
     jobConf.set(KafkaWriterOptions.TOPIC_NAME, topicName);
-    submit(jobConf);
+    submitJob(jobConf);
   }
 }

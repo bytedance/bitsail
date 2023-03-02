@@ -59,7 +59,7 @@ public abstract class AbstractIntegrationTest {
     }
   }
 
-  public void submit(BitSailConfiguration jobConf) throws Exception {
+  public void submitJob(BitSailConfiguration jobConf) throws Exception {
     String jobName = jobConf.getUnNecessaryOption(CommonOptions.JOB_NAME, "default_integration_job_name");
 
     List<Pair<EngineType, Throwable>> throwableList = new ArrayList<>();

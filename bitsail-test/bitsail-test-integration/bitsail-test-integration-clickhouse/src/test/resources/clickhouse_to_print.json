@@ -3,7 +3,7 @@
     "common": {
       "job_id": 313,
       "instance_id": 3123,
-      "job_name": "bitsail_clickhouse_to_print_test",
+      "job_name": "bitsail_test_integration_clickhouse_to_print",
       "user_name": "test"
     },
     "reader": {
@@ -33,7 +33,7 @@
         },
         {
           "name": "p_date",
-          "type": "date"
+          "type": "string"
         },
         {
           "name": "int_128",
@@ -46,7 +46,37 @@
       ]
     },
     "writer": {
-      "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink"
+      "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
+      "columns": [
+        {
+          "name": "id",
+          "type": "long"
+        },
+        {
+          "name": "int_type",
+          "type": "int"
+        },
+        {
+          "name": "double_type",
+          "type": "double"
+        },
+        {
+          "name": "string_type",
+          "type": "string"
+        },
+        {
+          "name": "p_date",
+          "type": "string"
+        },
+        {
+          "name": "int_128",
+          "type": "string"
+        },
+        {
+          "name": "int_256",
+          "type": "string"
+        }
+      ]
     }
   }
 }

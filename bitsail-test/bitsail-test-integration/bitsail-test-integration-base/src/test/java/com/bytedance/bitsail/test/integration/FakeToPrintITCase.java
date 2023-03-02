@@ -26,6 +26,6 @@ public class FakeToPrintITCase extends AbstractIntegrationTest {
   @Test
   public void testFakeToPrint() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("fake_to_print.json");
-    submit(jobConf);
+    submitJob(jobConf);
   }
 }

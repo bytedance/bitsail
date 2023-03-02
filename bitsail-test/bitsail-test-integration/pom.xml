@@ -32,6 +32,7 @@
         <module>bitsail-test-integration-assert</module>
         <module>bitsail-test-integration-cdc</module>
         <module>bitsail-test-integration-kafka</module>
+        <module>bitsail-test-integration-clickhouse</module>
     </modules>
 
     <dependencies>

@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.clickhouse.source;
+package com.bytedance.bitsail.test.integration.clickhouse;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.connector.clickhouse.ClickhouseContainerHolder;
 import com.bytedance.bitsail.connector.clickhouse.option.ClickhouseReaderOptions;
-import com.bytedance.bitsail.connector.clickhouse.source.split.strategy.SimpleDivideSplitConstructor.SplitConfiguration;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.connector.clickhouse.source.split.strategy.SimpleDivideSplitConstructor;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.clickhouse.container.ClickhouseContainerHolder;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ClickhouseReaderITCase {
+public class ClickhouseReaderITCase extends AbstractIntegrationTest {
   private static final int TOTAL_COUNT = 300;
 
   private ClickhouseContainerHolder containerHolder;
@@ -51,13 +51,13 @@ public class ClickhouseReaderITCase {
     jobConf.set(ClickhouseReaderOptions.USER_NAME, containerHolder.getUsername());
     jobConf.set(ClickhouseReaderOptions.PASSWORD, containerHolder.getPassword());
 
-    SplitConfiguration splitConf = new SplitConfiguration();
+    SimpleDivideSplitConstructor.SplitConfiguration splitConf = new SimpleDivideSplitConstructor.SplitConfiguration();
     splitConf.setName("id");
     splitConf.setSplitNum(3);
     splitConf.setLower((long) TOTAL_COUNT / 2);
     jobConf.set(ClickhouseReaderOptions.SPLIT_CONFIGURATION, new ObjectMapper().writeValueAsString(splitConf));
 
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submitJob(jobConf);
   }
 
   @After
@@ -67,3 +67,4 @@ public class ClickhouseReaderITCase {
     }
   }
 }
+

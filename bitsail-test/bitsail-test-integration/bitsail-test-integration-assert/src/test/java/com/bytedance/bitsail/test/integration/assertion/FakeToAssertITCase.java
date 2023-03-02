@@ -35,18 +35,18 @@ public class FakeToAssertITCase extends AbstractIntegrationTest {
   @Test
   public void testAssertWriter() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("assert_sink.json");
-    submit(jobConf);
+    submitJob(jobConf);
   }
 
   @Test
   public void testAssertByColumnCheck() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("assert_sink_col_check.json");
-    BitSailException e = Assert.assertThrows(BitSailException.class, () -> submit(jobConf));
+    BitSailException e = Assert.assertThrows(BitSailException.class, () -> submitJob(jobConf));
   }
 
   @Test
   public void testAssertByRowCheck() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("assert_sink_row_check.json");
-    JobExecutionException e = Assert.assertThrows(JobExecutionException.class, () -> submit(jobConf));
+    JobExecutionException e = Assert.assertThrows(JobExecutionException.class, () -> submitJob(jobConf));
   }
 }
