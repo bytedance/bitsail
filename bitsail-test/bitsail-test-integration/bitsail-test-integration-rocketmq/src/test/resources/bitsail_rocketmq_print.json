@@ -2,14 +2,9 @@
   "job": {
     "common": {
       "job_type": "STREAMING",
-      "job_plugin_lib_dir": "plugin",
-      "job_plugin_conf_dir": "plugin_conf",
-      "enable_dynamic_loader": true,
+      "job_name": "bitsail_test_integration_rocketmq_to_print",
       "instance_id": "1",
-      "internal_instance_id": "1",
-      "extra_properties": {
-        "update-mode": "append"
-      }
+      "internal_instance_id": "1"
     },
     "reader": {
       "cluster": "localhost:9876",
@@ -17,7 +12,7 @@
       "consumer_group": "sss",
       "columns": [
         {
-          "name": "ID",
+          "name": "id",
           "type": "long"
         }
       ],
@@ -25,7 +20,15 @@
       "class": "com.bytedance.bitsail.connector.rocketmq.source.RocketMQSource"
     },
     "writer": {
-      "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink"
+      "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
+      "sample_write": true,
+      "sample_limit": 10,
+      "columns": [
+        {
+          "name": "id",
+          "type": "long"
+        }
+      ]
     }
   }
 }
