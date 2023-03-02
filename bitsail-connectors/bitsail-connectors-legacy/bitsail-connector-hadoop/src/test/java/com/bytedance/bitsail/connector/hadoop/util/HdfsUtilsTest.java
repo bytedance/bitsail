@@ -36,17 +36,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class HdfsUtilsTest {
 
   @Test
-  public void testTimeoutFuseRetryer() throws IOException {
+  public void testTimeoutFuseRetryer() {
     AtomicInteger prevInt = new AtomicInteger(1);
     AtomicInteger afterInt = new AtomicInteger(1);
-    Callable<Object> call = new Callable<Object>() {
-      @Override
-      public Integer call() throws Exception {
-        prevInt.incrementAndGet();
-        Thread.sleep(200);
-        afterInt.incrementAndGet();
-        return null;
-      }
+    Callable<Object> call = () -> {
+      prevInt.incrementAndGet();
+      Thread.sleep(200);
+      afterInt.incrementAndGet();
+      return null;
     };
 
     Retryer<Object> timeoutFuseRetryer = RetryerBuilder.newBuilder()

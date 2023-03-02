@@ -3,7 +3,7 @@
     "common": {
       "job_id": 313,
       "instance_id": 3123,
-      "job_name": "bitsail_hadoop_to_print_test",
+      "job_name": "bitsail_test_integration_legacy_hadoop_to_print",
       "user_name": "root"
     },
     "reader": {

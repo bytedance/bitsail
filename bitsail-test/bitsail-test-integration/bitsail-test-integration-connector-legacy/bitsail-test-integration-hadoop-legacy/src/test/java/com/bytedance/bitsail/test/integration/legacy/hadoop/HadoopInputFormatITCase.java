@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.hadoop.source;
+package com.bytedance.bitsail.test.integration.legacy.hadoop;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.hadoop.option.HadoopReaderOptions;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -38,7 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class HadoopInputFormatITCase {
+public class HadoopInputFormatITCase extends AbstractIntegrationTest {
   private static final Logger LOG = LoggerFactory.getLogger(HadoopInputFormatITCase.class);
 
   @ClassRule
@@ -71,6 +71,6 @@ public class HadoopInputFormatITCase {
     LOG.info("fs.defaultFS: {}", defaultFS);
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("hadoop_to_print.json");
     jobConf.set(HadoopReaderOptions.PATH_LIST, defaultFS + target);
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submitJob(jobConf);
   }
 }
