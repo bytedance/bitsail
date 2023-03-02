@@ -35,6 +35,7 @@
         <module>bitsail-test-integration-clickhouse</module>
         <module>bitsail-test-integration-doris</module>
         <module>bitsail-test-integration-druid</module>
+        <module>bitsail-test-integration-elasticsearch</module>
     </modules>
 
     <dependencies>

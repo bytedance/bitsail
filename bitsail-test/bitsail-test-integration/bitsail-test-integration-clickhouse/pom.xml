@@ -47,6 +47,7 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>clickhouse</artifactId>
             <version>1.17.5</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

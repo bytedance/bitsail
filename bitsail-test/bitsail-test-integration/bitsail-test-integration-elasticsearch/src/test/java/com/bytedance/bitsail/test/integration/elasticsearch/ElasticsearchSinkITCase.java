@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.elasticsearch;
+package com.bytedance.bitsail.test.integration.elasticsearch;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchWriterOptions;
 import com.bytedance.bitsail.connector.elasticsearch.rest.EsRestClientBuilder;
-import com.bytedance.bitsail.connector.legacy.fake.option.FakeReaderOptions;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.testcontainers.elasticsearch.ElasticsearchCluster;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.connector.fake.option.FakeReaderOptions;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.elasticsearch.container.ElasticsearchCluster;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -36,7 +36,7 @@ import org.junit.Test;
 
 import java.util.Collections;
 
-public class ElasticsearchSinkITCase {
+public class ElasticsearchSinkITCase extends AbstractIntegrationTest {
 
   private final int totalCount = 300;
   private final String index = "es_index_test";
@@ -72,7 +72,7 @@ public class ElasticsearchSinkITCase {
     jobConf.set(ElasticsearchWriterOptions.ES_HOSTS,
         Collections.singletonList(esCluster.getHttpHostAddress()));
 
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submitJob(jobConf);
 
     esCluster.flush();
     CountResponse countResponse = client.count(countRequest, RequestOptions.DEFAULT);
@@ -90,7 +90,7 @@ public class ElasticsearchSinkITCase {
     jobConf.set(ElasticsearchWriterOptions.ES_HOSTS,
         Collections.singletonList(esCluster.getHttpHostAddress()));
 
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submitJob(jobConf);
 
     esCluster.flush();
     CountResponse countResponse = client.count(countRequest, RequestOptions.DEFAULT);

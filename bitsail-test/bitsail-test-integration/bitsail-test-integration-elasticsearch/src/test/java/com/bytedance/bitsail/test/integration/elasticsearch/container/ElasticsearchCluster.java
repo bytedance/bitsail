@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.connector.test.testcontainers.elasticsearch;
+package com.bytedance.bitsail.test.integration.elasticsearch.container;
 
 import org.apache.http.HttpHost;
 import org.apache.http.util.EntityUtils;

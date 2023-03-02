@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.elasticsearch.rest;
+package com.bytedance.bitsail.test.integration.elasticsearch;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchWriterOptions;
+import com.bytedance.bitsail.connector.elasticsearch.rest.EsRestClientBuilder;
 import com.bytedance.bitsail.connector.elasticsearch.rest.bulk.EsBulkListener;
 import com.bytedance.bitsail.connector.elasticsearch.rest.bulk.EsBulkProcessorBuilder;
 import com.bytedance.bitsail.connector.elasticsearch.rest.bulk.EsBulkRequestFailureHandler;
 import com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchWriter;
-import com.bytedance.bitsail.test.connector.test.testcontainers.elasticsearch.ElasticsearchCluster;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.test.integration.elasticsearch.container.ElasticsearchCluster;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.get.GetRequest;
@@ -140,3 +141,4 @@ public class EleaticsearchWriterITCase {
     Assert.assertEquals(id, source.get("id"));
   }
 }
+
