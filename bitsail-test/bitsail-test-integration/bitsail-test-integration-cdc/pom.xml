@@ -57,12 +57,17 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- kafka data source -->
+        <!-- deps for create kafka container -->
         <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-test-integration-kafka</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>kafka</artifactId>
+            <version>1.17.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>${kafka.clients.version}</version>
         </dependency>
     </dependencies>
 </project>

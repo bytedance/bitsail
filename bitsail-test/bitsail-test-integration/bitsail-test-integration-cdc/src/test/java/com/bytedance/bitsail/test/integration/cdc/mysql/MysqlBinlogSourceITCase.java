@@ -23,7 +23,7 @@ import com.bytedance.bitsail.connector.cdc.option.BinlogReaderOptions;
 import com.bytedance.bitsail.connector.kafka.option.KafkaWriterOptions;
 import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
 import com.bytedance.bitsail.test.integration.cdc.mysql.container.MySQLContainerMariadbAdapter;
-import com.bytedance.bitsail.test.integration.kafka.KafkaCluster;
+import com.bytedance.bitsail.test.integration.kafka.container.KafkaCluster;
 import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import com.google.common.collect.Lists;
@@ -84,6 +84,7 @@ public class MysqlBinlogSourceITCase extends AbstractIntegrationTest {
     jobConf.set(BinlogReaderOptions.CONNECTIONS, Lists.newArrayList(clusterInfo));
     submit(jobConf);
   }
+
   //@Test
   public void testMysqlCDC2Kafka() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("bitsail_mysql_cdc_kafka.json");

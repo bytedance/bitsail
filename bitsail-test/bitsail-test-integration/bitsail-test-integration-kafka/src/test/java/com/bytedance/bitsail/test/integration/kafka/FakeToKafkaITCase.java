@@ -19,6 +19,7 @@ package com.bytedance.bitsail.test.integration.kafka;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.kafka.option.KafkaWriterOptions;
 import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.kafka.container.KafkaCluster;
 import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;

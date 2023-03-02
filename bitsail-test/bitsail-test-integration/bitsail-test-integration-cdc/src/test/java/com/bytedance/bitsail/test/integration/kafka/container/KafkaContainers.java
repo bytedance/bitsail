@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.integration.kafka;
+package com.bytedance.bitsail.test.integration.kafka.container;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.Container;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
@@ -51,7 +50,7 @@ public class KafkaContainers extends KafkaContainer {
     LOG.info("BootstrapServers: {}", getBootstrapServers());
     LOG.info("advertised.listeners: {}", advertisedListeners);
 
-    Container.ExecResult result = execInContainer(
+    ExecResult result = execInContainer(
         "kafka-configs",
         "--alter",
         "--zookeeper", zkHost,

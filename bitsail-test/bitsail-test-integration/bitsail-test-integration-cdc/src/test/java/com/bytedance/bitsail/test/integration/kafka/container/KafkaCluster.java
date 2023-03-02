@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.integration.kafka;
+package com.bytedance.bitsail.test.integration.kafka.container;
 
 import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
