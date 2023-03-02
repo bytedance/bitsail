@@ -19,24 +19,27 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>bitsail-connectors-legacy</artifactId>
+        <artifactId>bitsail-test-integration-connector-legacy</artifactId>
         <groupId>com.bytedance.bitsail</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitsail-connector-hbase</artifactId>
-
-    <properties>
-        <hbase.version>2.4.13</hbase.version>
-    </properties>
+    <artifactId>bitsail-test-integration-hbase-legacy</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-connector-hbase</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-connector-hadoop</artifactId>
             <version>${revision}</version>
-            <scope>provided</scope>
+            <scope>test</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.tukaani</groupId>
@@ -49,64 +52,33 @@
             </exclusions>
         </dependency>
 
+        <!-- deps for create hbase data source -->
         <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-component-security-kerberos</artifactId>
-            <version>${revision}</version>
-            <scope>compile</scope>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>1.17.3</version>
+            <scope>test</scope>
         </dependency>
 
-        <!-- hbase -->
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
             <version>${hbase.version}</version>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>metrics-core</artifactId>
-                    <groupId>com.codahale.metrics</groupId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.htrace</groupId>
                     <artifactId>htrace-core4</artifactId>
+                    <groupId>org.apache.htrace</groupId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.jruby.jcodings</groupId>
                     <artifactId>jcodings</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>hadoop-common</artifactId>
-                    <groupId>org.apache.hadoop</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>hadoop-auth</artifactId>
-                    <groupId>org.apache.hadoop</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-shaded-mapreduce</artifactId>
-            <version>${hbase.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
+                    <groupId>org.jruby.jcodings</groupId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>*</artifactId>
+                    <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
     </dependencies>
-
 </project>

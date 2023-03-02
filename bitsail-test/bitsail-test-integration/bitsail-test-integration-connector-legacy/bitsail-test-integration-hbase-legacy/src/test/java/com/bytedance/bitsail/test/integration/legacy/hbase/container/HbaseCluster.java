@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.connector.test.testcontainers.hbase;
+package com.bytedance.bitsail.test.integration.legacy.hbase.container;
 
 import lombok.SneakyThrows;
 import org.apache.hadoop.conf.Configuration;
@@ -72,7 +72,6 @@ public class HbaseCluster {
     tableDesc.setColumnFamilies(colFamilyList);
     Admin hbaseAdmin = connection.getAdmin();
     hbaseAdmin.createTable(tableDesc.build());
-
   }
 
   @SneakyThrows

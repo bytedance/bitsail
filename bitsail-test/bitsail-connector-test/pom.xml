@@ -88,23 +88,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-client</artifactId>
-            <version>${hbase.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>htrace-core4</artifactId>
-                    <groupId>org.apache.htrace</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jcodings</artifactId>
-                    <groupId>org.jruby.jcodings</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>
             <version>6.2.1.RELEASE</version>

@@ -2,7 +2,7 @@
   "job": {
     "common": {
       "job_id": -2314,
-      "job_name": "bitsail_fake_to_hbase_test",
+      "job_name": "bitsail_test_integration_legacy_fake_to_hbase",
       "instance_id": -20314,
       "user_name": "root"
     },
@@ -13,22 +13,18 @@
       "random_null_rate": 0,
       "columns": [
         {
-          "index": 0,
           "name": "str1",
           "type": "string"
         },
         {
-          "index": 1,
           "name": "int1",
           "type": "bigint"
         },
         {
-          "index": 2,
           "name": "str2",
           "type": "string"
         },
         {
-          "index": 3,
           "name": "int3",
           "type": "bigint"
         }
@@ -36,7 +32,7 @@
     },
     "writer": {
       "class": "com.bytedance.bitsail.connector.hbase.sink.HBaseOutputFormat",
-      "table": "test_table",
+      "table": "test_table_sink",
       "hbase_conf":{
         "hbase.zookeeper.quorum":"127.0.0.1",
         "hbase.zookeeper.property.clientPort":"2181"
@@ -44,22 +40,18 @@
       "row_key_column": "id_$(cf1:str1)",
       "columns": [
         {
-          "index": 0,
           "name": "cf1:str1",
           "type": "string"
         },
         {
-          "index": 1,
           "name": "cf1:int1",
           "type": "bigint"
         },
         {
-          "index": 2,
           "name": "cf2:str2",
           "type": "string"
         },
         {
-          "index": 3,
           "name": "cf3:int3",
           "type": "bigint"
         }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.connector.test.testcontainers.hbase;
+package com.bytedance.bitsail.test.integration.legacy.hbase.container;
 
 import lombok.Getter;
 import org.apache.hadoop.conf.Configuration;
