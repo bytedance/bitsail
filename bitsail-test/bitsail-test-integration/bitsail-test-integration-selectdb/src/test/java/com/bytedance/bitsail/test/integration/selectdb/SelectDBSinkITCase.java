@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.selectdb.sink;
+package com.bytedance.bitsail.test.integration.selectdb;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.connector.selectdb.config.SelectdbWriterOptions;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
-public class SelectdbSinkITCase {
+@Ignore("Ignore tests which cannot offer local test data sources.")
+public class SelectDBSinkITCase extends AbstractIntegrationTest {
 
   @Test
   public void test() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("fake_to_selectdb.json");
     addSelectdbInfo(jobConf);
-//    EmbeddedFlinkCluster.submitJob(jobConf);  // Comment this line so that the github pipeline test passes
+    submitJob(jobConf);
   }
 
   /**
@@ -46,7 +49,5 @@ public class SelectdbSinkITCase {
     jobConf.set(SelectdbWriterOptions.SINK_LABEL_PREFIX, "bitsail-selectdb");
     jobConf.set(CommonOptions.CheckPointOptions.CHECKPOINT_ENABLE, true);
     jobConf.set(CommonOptions.CheckPointOptions.CHECKPOINT_INTERVAL, 5000L);
-
   }
-
 }

@@ -42,6 +42,7 @@
         <module>bitsail-test-integration-localfilesystem</module>
         <module>bitsail-test-integration-redis</module>
         <module>bitsail-test-integration-rocketmq</module>
+        <module>bitsail-test-integration-selectdb</module>
     </modules>
 
     <dependencies>
