@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.redis.sink;
+package com.bytedance.bitsail.test.integration.redis;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.fake.option.FakeReaderOptions;
 import com.bytedance.bitsail.connector.redis.option.RedisWriterOptions;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.testcontainers.redis.RedisContainer;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.redis.container.RedisContainer;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class RedisSinkITCase {
+public class RedisSinkITCase extends AbstractIntegrationTest {
+
   private static final int TOTAL_COUNT = 300;
   private RedisContainer redisContainer;
   private String redisHost;
@@ -55,7 +56,7 @@ public class RedisSinkITCase {
     jobConfiguration.set(RedisWriterOptions.HOST, redisHost);
     jobConfiguration.set(RedisWriterOptions.PORT, redisPort);
 
-    EmbeddedFlinkCluster.submitJob(jobConfiguration);
+    submitJob(jobConfiguration);
 
     Assert.assertEquals(TOTAL_COUNT, redisContainer.getKeyCount());
   }
@@ -68,7 +69,7 @@ public class RedisSinkITCase {
     jobConfiguration.set(RedisWriterOptions.HOST, redisHost);
     jobConfiguration.set(RedisWriterOptions.PORT, redisPort);
 
-    EmbeddedFlinkCluster.submitJob(jobConfiguration);
+    submitJob(jobConfiguration);
 
     Assert.assertEquals(TOTAL_COUNT, redisContainer.getKeyCount());
   }
@@ -81,9 +82,8 @@ public class RedisSinkITCase {
     jobConfiguration.set(RedisWriterOptions.HOST, redisHost);
     jobConfiguration.set(RedisWriterOptions.PORT, redisPort);
 
-    EmbeddedFlinkCluster.submitJob(jobConfiguration);
+    submitJob(jobConfiguration);
 
     Assert.assertEquals(TOTAL_COUNT, redisContainer.getKeyCount());
   }
-
 }

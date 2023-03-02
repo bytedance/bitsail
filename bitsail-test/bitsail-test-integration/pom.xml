@@ -40,6 +40,7 @@
         <module>bitsail-test-integration-kudu</module>
         <module>bitsail-test-integration-larksheet</module>
         <module>bitsail-test-integration-localfilesystem</module>
+        <module>bitsail-test-integration-redis</module>
     </modules>
 
     <dependencies>
