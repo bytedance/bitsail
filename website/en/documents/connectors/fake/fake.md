@@ -2,16 +2,20 @@
 
 Parent document: [connectors](../README.md)
 
-***BitSail*** Fake is a read connector. After you specify the name and type of some columns, the Fake connector will generate the specified number of data rows for you; it is a good helper for functional testing, and is usually the read connector for the HelloWorld program for BitSail beginners.
+***BitSail*** Fake is a read connector. After you specify the name and type of some columns, the Fake connector will
+generate the specified number of data rows for you; it is a good helper for functional testing, and is usually the read
+connector for the HelloWorld program for BitSail beginners.
 
+- Randomly generate test data, support unique, specified range and other features
 
 ## Maven depedency
 
 ```xml
+
 <dependency>
-   <groupId>com.bytedance.bitsail</groupId>
-   <artifactId>bitsail-connector-fake</artifactId>
-   <version>${revision}</version>
+    <groupId>com.bytedance.bitsail</groupId>
+    <artifactId>bitsail-connector-fake</artifactId>
+    <version>${revision}</version>
 </dependency>
 ```
 
@@ -20,30 +24,29 @@ Parent document: [connectors](../README.md)
 ### Supported data types
 
 - Basic Data types:
-    - Integer type:
-        - short
-        - int
-        - long
-        - biginteger
-    - Float type:
-        - float
-        - double
-        - bigdecimal
-    - Time type:
-        - time
-        - timestamp
-        - date
-        - date.date
-        - date.time
-        - date.datetime
-    - String type:
-        - string
-    - Bool type:
-        - not support
-    - Binary type:
-        - binary
-        - bytes
-    
+	- Integer type:
+		- short
+		- int
+		- long
+		- biginteger
+	- Float type:
+		- float
+		- double
+		- bigdecimal
+	- Time type:
+		- time
+		- timestamp
+		- date
+		- date.date
+		- date.time
+		- date.datetime
+	- String type:
+		- string
+	- Bool type:
+		- not support
+	- Binary type:
+		- binary
+		- bytes
 
 ### Parameters
 
@@ -53,18 +56,39 @@ The following mentioned parameters should be added to job.reader block when usin
 {
   "job": {
     "reader": {
-      "class": "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource",
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
       "total_count": 300,
       "rate": 100,
       "random_null_rate": 0.1,
       "columns": [
         {
-          "name": "name",
-          "type": "string"
+          "name": "id",
+          "type": "long",
+          "properties": "unique"
         },
         {
-          "name": "age",
-          "type": "int"
+          "name": "id",
+          "type": "date"
+        },
+        {
+          "name": "list_value",
+          "type": "list<string>"
+        },
+        {
+          "name": "map_value",
+          "type": "map<string,string>"
+        },
+        {
+          "name": "local_datetime_value",
+          "type": "timestamp"
+        },
+        {
+          "name": "date_value",
+          "type": "date.date"
+        },
+        {
+          "name": "datetime_value",
+          "type": "date.datetime"
         }
       ]
     }
@@ -72,30 +96,40 @@ The following mentioned parameters should be added to job.reader block when usin
 }
 ```
 
-
-
 #### Necessary parameters
 
-| Param name                   | Required | Optional value | Description                                                                                                    |
-|:------------------|:-----|:------|:------------------------------------------------------------------------------------------|
-| class             | yes  |       | Fake reader's class name, `com.bytedance.bitsail.connector.legacy.fake.source.FakeSource` |
-| total_count       | yes | | total number of data to generate  |
+| Param name  | Required | Optional value | Description                                                                               |
+|:------------|:---------|:---------------|:------------------------------------------------------------------------------------------|
+| class       | yes      |                | Fake reader's class name, `com.bytedance.bitsail.connector.legacy.fake.source.FakeSource` |
+| total_count | yes      |                | total number of data to generate                                                          |
 
 #### Optional parameters
 
+| Param name      | Required | Optional value | Description                                                                                                                           |
+|:----------------|:---------|:---------------|:--------------------------------------------------------------------------------------------------------------------------------------|
+| rate            | no       |                | The frequency of data generation, the larger the value, the more data generated per unit time                                         |
+| lower_limit     | no       |                | Together with upper_limit, it is used as the seed to generate float, double, bigdecimal type fields, not the boundary of field values |
+| upper_limit     | no       |                | Together with lower_limit, it is used as the seed to generate float, double, bigdecimal type fields, not the boundary of field values |
+| from_timestamp  | no       |                | Together with to_timestamp, it is used as the seed for generating time type fields, not the boundary of field values                  |
+| to_timestamp    | no       |                | Together with from_timestamp, it is used as the seed for generating time type fields, not the boundary of field values                |
+| NULL_PERCENTAGE | no       | 0              | If a column can be null, this value represents the ratio of randomly generated null                                                   |
 
+#### type properties
 
+| Param name | Description              | Default | 
+|------------|--------------------------|:--------|
+| NULLABLE   | can be null              |         | 
+| NOT_NULL   | can't be null            |         | 
+| UNIQUE     | the column should unique |         |
 
+##### NULL_PERCENTAGE
 
+If a column allows null data, the default is NOT_ NULL, then null data is randomly generated according to the parameter
+ratio
 
-| Param name                   | Required | Optional value | Description                                                                                                    |
-|:----------------------------------------|:------|:------|:-----------------------------------------------------|
-| rate | no |       | The frequency of data generation, the larger the value, the more data generated per unit time                  |
-| lower_limit |  no | | Together with upper_limit, it is used as the seed to generate float, double, bigdecimal type fields, not the boundary of field values |
-| upper_limit | no | | Together with lower_limit, it is used as the seed to generate float, double, bigdecimal type fields, not the boundary of field values |
-| from_timestamp |  no | | Together with to_timestamp, it is used as the seed for generating time type fields, not the boundary of field values |
-| to_timestamp | no | | Together with from_timestamp, it is used as the seed for generating time type fields, not the boundary of field values |
+##### UNIQUE
 
+The LONG type is snowflake id, and the other is incremental data generated by combining rowNum
 
 ## Related document
 

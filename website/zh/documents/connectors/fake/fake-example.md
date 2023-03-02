@@ -1,16 +1,17 @@
 # Fake连接器
 
-Parent document: [fake-example_zh.md](fake-example_zh.md)
+上级文档: [fake-example_zh.md](fake-example_zh.md)
 
-The following shows how to generate random numbers by faking data sources
+如下展示了如何通过fake数据源生成随机数
+
 ```json
-
 {
   "job": {
     "reader": {
       "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
       "total_count": 300,
-      "rate": 10,
+      "rate": 100,
+      "random_null_rate": 0.1,
       "columns": [
         {
           "name": "id",

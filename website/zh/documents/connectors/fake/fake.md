@@ -1,12 +1,12 @@
-# Fake connector
+# Fake连接器
 
-Parent document: [connectors](../introduction_zh. md)
+上级文档: [connectors](../README.md)
 
-***BitSafe*** make connector supports batch reading, and its main function points are as follows
+***BitSail*** Fake是一个读连接器，你指定一些列的name、type后，Fake连接器会为你生成指定数量的数据行；他是功能测试的好帮手，通常也是BitSail新手的HelloWorld程序的读连接器。
 
-- Randomly generate test data, support unique, specified range and other features
+- 随机生成测试数据，支持unique,指定范围等特性
 
-## Dependency introduction
+## 依赖引入
 
 ```xml
 
@@ -15,68 +15,119 @@ Parent document: [connectors](../introduction_zh. md)
     <artifactId>bitsail-connector-fake</artifactId>
     <version>${revision}</version>
 </dependency>
-
-
-
 ```
 
-## Data type
+## Fake读取
 
-Reference ` com. bytenance. bitmail. common. typeinfo. Types`
+### 支持数据类型
 
-@Deprecated will be deleted in the future
+- 基本类型:
+	- 整数类型:
+		- short
+		- int
+		- long
+		- biginteger
+	- 浮点类型::
+		- float
+		- double
+		- bigdecimal
+	- 时间类型:
+		- time
+		- timestamp
+		- date
+		- date.date
+		- date.time
+		- date.datetime
+	- 字符类型:
+		- string
+	- 布尔类型:
+		- 不支持
+	- 二进制类型:
+		- binary
+		- bytes
 
-- VOID
-- SHORT
-- INT
-- LONG
-- BIGINT 等同LONG
-- DOUBLE
-- BIGDECIMAL
-- BIGINTEGER
-- BYTE
-- BINARY
-- DATE
-- TIME
-- TIMESTAMP
-- BOOLEAN
-- STRING
-- LIST
-- MAP
-- BYTES(@Deprecated) 等同BINARY
-- date.date(@Deprecated)
-- date.time(@Deprecated)
-- date.datetime(@Deprecated)
+### 主要参数
 
-## Property and parameter settings
+写连接器参数在`job.reader`中配置，实际使用时请注意路径前缀。示例:
 
-| Parameter name   | Parameter meaning                  | Parameter default value | Parameter enumeration value |
-|:-----------------|:-----------------------------------|:------------------------|:----------------------------|
-| total_ Count     | Total number of rows               | 10000                   ||
-| Rate             | Rate limit                         | 10                      ||
-| lower_ Limit     | The lower limit of the number type | 0                       ||
-| upper_ Limit     | The upper limit of the number type | 10000000                ||
-| from_ Timestamp  | Lower limit of time type           | 1970-01-01 00:00:00     ||
-| to_ Timestamp    | Upper limit of time type           | 2077-07-07 07:07:07     ||
-| NULL_ PERCENTAGE | Ratio of NULL data                 | 0                       ||
+```json
+{
+  "job": {
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 100,
+      "random_null_rate": 0.1,
+      "columns": [
+        {
+          "name": "id",
+          "type": "long",
+          "properties": "unique"
+        },
+        {
+          "name": "id",
+          "type": "date"
+        },
+        {
+          "name": "list_value",
+          "type": "list<string>"
+        },
+        {
+          "name": "map_value",
+          "type": "map<string,string>"
+        },
+        {
+          "name": "local_datetime_value",
+          "type": "timestamp"
+        },
+        {
+          "name": "date_value",
+          "type": "date.date"
+        },
+        {
+          "name": "datetime_value",
+          "type": "date.datetime"
+        }
+      ]
+    }
+  }
+}
+```
 
-# Properties configuration of columns
+#### 必需参数
 
-| Parameter name | Parameter meaning        | Default value |
-|----------------|--------------------------|:--------------|
-| NULL           | Nullable                 |               |
-| NOT_ NULL      | Not null                 |               |
-| UNIQUE         | Do not repeat and unique |               |
+| 参数名称        | 是否必填 | 参数枚举值 | 参数含义                                                                 |
+|:------------|:-----|:------|:---------------------------------------------------------------------|
+| class       | 是    |       | Fake读连接器类型, `com.bytedance.bitsail.connector.fake.source.FakeSource` |
+| total_count | 是    |       | 生成数据的总条数                                                             |
 
-### NULL_ PERCENTAGE
+#### 可选参数
 
-If a column allows null data, the default is NOT_ NULL, then null data is randomly generated according to the parameter
-ratio
+| 参数名称            | 是否必填      | 参数默认值               | 参数含义                                                        |
+|:----------------|:----------|:--------------------|:------------------------------------------------------------|
+| rate            | 否         | 10                  | 产生数据的频率,数值越大，单位时间生成的数据越多                                    |
+| lower_limit     | 否         | 10                  | 与upper_limit一起作为生成 float,double,bigdecimal 类型字段的种子,并非字段值的边界 |
+| upper_limit     | 否         | 2077-07-07 07:07:07 | 与lower_limit一起作为生成 float,double,bigdecimal 类型字段的种子,并非字段值的边界 |
+| from_timestamp  | 否         | 1970-01-01 00:00:00 | 与 to_timestamp 一起作为生成时间类型字段的种子,并非字段值的边界                     |
+| to_timestamp    | 否         |                     | 与 from_timestamp 一起作为生成时间类型字段的种子,并非字段值的边界                   |
+| NULL_PERCENTAGE | NULL数据的比率 | 0                   |                                                             |
 
-# UNIQUE
+# 列的properties配置
 
-The LONG type is snowflake id, and the other is incremental data generated by combining rowNum
+| 参数名称     | 参数含义   | 默认值 | 
+|----------|--------|:----|
+| NULLABLE | 可为null |     | 
+| NOT_NULL | 不为null |     | 
+| UNIQUE   | 不重复唯一  |     |
 
-## Related documents
+###### NULL_PERCENTAGE
 
-Configuration sample document [fake-example_zh. md] (fake-example_zh. md)
+如果一个列是允许null数据的，默认是NOT_NULL，那么按照参数比率随机生成null数据
+
+##### UNIQUE
+
+LONG类型是雪花id,其他是结合rowNum生成的递增数据
+
+## 相关文档
+
+配置示例文档: [fake-connector-example](./fake-example.md)
