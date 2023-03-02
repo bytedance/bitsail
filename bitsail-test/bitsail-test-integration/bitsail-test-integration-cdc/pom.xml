@@ -27,6 +27,10 @@
 
     <artifactId>bitsail-test-integration-cdc</artifactId>
 
+    <properties>
+        <debezium.version>1.6.4.Final</debezium.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
@@ -56,6 +60,15 @@
             <version>1.17.5</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>io.debezium</groupId>
+            <artifactId>debezium-core</artifactId>
+            <version>${debezium.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
 
         <!-- deps for create kafka container -->
         <dependency>

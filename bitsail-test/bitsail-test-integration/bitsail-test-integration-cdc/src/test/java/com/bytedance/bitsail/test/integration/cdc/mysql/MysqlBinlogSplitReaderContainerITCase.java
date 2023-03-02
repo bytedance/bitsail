@@ -7,23 +7,24 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.cdc.mysql.source.debezium;
+package com.bytedance.bitsail.test.integration.cdc.mysql;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.cdc.model.ClusterInfo;
 import com.bytedance.bitsail.connector.cdc.model.ConnectionInfo;
-import com.bytedance.bitsail.connector.cdc.mysql.container.MySQLContainerMariadbAdapter;
-import com.bytedance.bitsail.connector.cdc.mysql.utils.TestDatabase;
+import com.bytedance.bitsail.connector.cdc.mysql.source.debezium.MysqlBinlogSplitReader;
 import com.bytedance.bitsail.connector.cdc.option.BinlogReaderOptions;
 import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
+import com.bytedance.bitsail.test.integration.cdc.mysql.container.MySQLContainerMariadbAdapter;
+import com.bytedance.bitsail.test.integration.cdc.mysql.container.util.TestDatabase;
 
 import com.google.common.collect.Lists;
 import org.junit.After;
@@ -38,9 +39,9 @@ import org.testcontainers.utility.DockerImageName;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-public class MysqlBinlogSplitReaderContainerTest {
+public class MysqlBinlogSplitReaderContainerITCase {
 
-  private static final Logger LOG = LoggerFactory.getLogger(MysqlBinlogSplitReaderContainerTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MysqlBinlogSplitReaderContainerITCase.class);
 
   private static final String MYSQL_DOCKER_IMAGER = "mysql:8.0.29";
 
