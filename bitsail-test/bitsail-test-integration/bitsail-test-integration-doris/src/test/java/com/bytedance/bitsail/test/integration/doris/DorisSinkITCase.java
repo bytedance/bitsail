@@ -14,28 +14,33 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.doris.sink;
+package com.bytedance.bitsail.test.integration.doris;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.connector.doris.option.DorisWriterOptions;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.connector.fake.option.FakeReaderOptions;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.Map;
+
 /**
- * Use local doris to test.
+ * todo: add doris data source for integration test.
  */
 @Ignore
-public class DorisSinkITCase {
+public class DorisSinkITCase extends AbstractIntegrationTest {
 
   @Test
   public void test() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("fake_to_doris.json");
     addDorisInfo(jobConf);
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submitJob(jobConf);
   }
 
   /**
@@ -53,5 +58,14 @@ public class DorisSinkITCase {
     jobConf.set(CommonOptions.CheckPointOptions.CHECKPOINT_INTERVAL, 5000L);
     jobConf.set(DorisWriterOptions.SINK_ENABLE_2PC, false);
     jobConf.set(DorisWriterOptions.SINK_LABEL_PREFIX, "bitsail-doris");
+
+    Map<String, Object> dorisPartition = ImmutableMap.of(
+        "name", "p20221010",
+        "start_range", ImmutableList.of("2022-10-10"),
+        "end_range", ImmutableList.of("2022-10-11")
+    );
+    jobConf.set(DorisWriterOptions.PARTITIONS, ImmutableList.of(dorisPartition));
+    jobConf.set(FakeReaderOptions.FROM_TIMESTAMP, "2022-10-10 01:00:00");
+    jobConf.set(FakeReaderOptions.TO_TIMESTAMP, "2022-10-10 02:00:00");
   }
 }

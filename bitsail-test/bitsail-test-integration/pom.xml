@@ -33,6 +33,7 @@
         <module>bitsail-test-integration-cdc</module>
         <module>bitsail-test-integration-kafka</module>
         <module>bitsail-test-integration-clickhouse</module>
+        <module>bitsail-test-integration-doris</module>
     </modules>
 
     <dependencies>
