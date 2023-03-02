@@ -37,6 +37,7 @@
         <module>bitsail-test-integration-druid</module>
         <module>bitsail-test-integration-elasticsearch</module>
         <module>bitsail-test-integration-ftp</module>
+        <module>bitsail-test-integration-kudu</module>
     </modules>
 
     <dependencies>

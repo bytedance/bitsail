@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.kudu.source;
+package com.bytedance.bitsail.test.integration.kudu;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.connector.kudu.KuduTestUtils;
 import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
-import com.bytedance.bitsail.connector.kudu.source.split.strategy.SimpleDivideSplitConstructor.SplitConfiguration;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.connector.kudu.source.split.strategy.SimpleDivideSplitConstructor;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.kudu.container.KuduDataSource;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kudu.client.KuduClient;
@@ -34,7 +34,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class KuduReaderITCase {
+public class KuduSourceITCase extends AbstractIntegrationTest {
+
   private static final String TABLE_NAME = "test_kudu_table";
   private static final int TOTAL_COUNT = 1000;
   private static final int SPLIT_NUM = 3;
@@ -44,18 +45,18 @@ public class KuduReaderITCase {
    */
   @Rule
   public KuduTestHarness harness = new KuduTestHarness(
-      new MiniKuduCluster.MiniKuduClusterBuilder().numTabletServers(KuduTestUtils.BUCKET_NUM)
+      new MiniKuduCluster.MiniKuduClusterBuilder().numTabletServers(KuduDataSource.BUCKET_NUM)
   );
 
   @Test
   public void testKuduToPrint() throws Exception {
     KuduClient client = harness.getClient();
-    KuduTestUtils.createTable(client, TABLE_NAME);
-    KuduTestUtils.insertRandomData(client, TABLE_NAME, TOTAL_COUNT);
+    KuduDataSource.createTable(client, TABLE_NAME);
+    KuduDataSource.insertRandomData(client, TABLE_NAME, TOTAL_COUNT);
 
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("kudu_to_print.json");
     updateJobConf(jobConf);
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submitJob(jobConf);
   }
 
   private void updateJobConf(BitSailConfiguration jobConf) throws Exception {
@@ -64,10 +65,11 @@ public class KuduReaderITCase {
     jobConf.set(KuduReaderOptions.MASTER_ADDRESS_LIST, masterAddressList);
     jobConf.set(KuduReaderOptions.KUDU_TABLE_NAME, TABLE_NAME);
 
-    SplitConfiguration splitConf = new SplitConfiguration();
+    SimpleDivideSplitConstructor.SplitConfiguration splitConf = new SimpleDivideSplitConstructor.SplitConfiguration();
     splitConf.setName("key");
     splitConf.setSplitNum(SPLIT_NUM);
     splitConf.setLower((long) (TOTAL_COUNT / 2));
+    splitConf.setUpper((long) (TOTAL_COUNT / 2) + 10);
     jobConf.set(KuduReaderOptions.SPLIT_CONFIGURATION, new ObjectMapper().writeValueAsString(splitConf));
   }
 }

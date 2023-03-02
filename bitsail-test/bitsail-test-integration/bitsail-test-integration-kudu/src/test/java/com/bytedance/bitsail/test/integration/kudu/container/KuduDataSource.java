@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.kudu;
+package com.bytedance.bitsail.test.integration.kudu.container;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
@@ -47,8 +47,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class KuduTestUtils {
-  private static final Logger LOG = LoggerFactory.getLogger(KuduTestUtils.class);
+public class KuduDataSource {
+  private static final Logger LOG = LoggerFactory.getLogger(KuduDataSource.class);
 
   public static final int REPLICA_NUM = 1;
   public static final int BUCKET_NUM = 3;

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.kudu.sink;
+package com.bytedance.bitsail.test.integration.kudu;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.fake.option.FakeReaderOptions;
-import com.bytedance.bitsail.connector.kudu.KuduTestUtils;
 import com.bytedance.bitsail.connector.kudu.option.KuduWriterOptions;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.kudu.container.KuduDataSource;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.test.KuduTestHarness;
@@ -34,7 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class KuduWriterITCase {
+public class KuduSinkITCase extends AbstractIntegrationTest {
   private static final String TABLE_NAME = "test_kudu_table";
   private static final int TOTAL_COUNT = 10000;
 
@@ -43,22 +43,22 @@ public class KuduWriterITCase {
    */
   @Rule
   public KuduTestHarness harness = new KuduTestHarness(
-      new MiniKuduCluster.MiniKuduClusterBuilder().numTabletServers(KuduTestUtils.BUCKET_NUM)
+      new MiniKuduCluster.MiniKuduClusterBuilder().numTabletServers(KuduDataSource.BUCKET_NUM)
   );
 
   @Test
   public void testFakeToKudu() throws Exception {
     KuduClient client = harness.getClient();
-    KuduTestUtils.createTable(client, TABLE_NAME);
+    KuduDataSource.createTable(client, TABLE_NAME);
 
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("fake_to_kudu.json");
     updateJobConf(jobConf);
 
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submitJob(jobConf);
 
     List<List<Object>> scanResults;
     try {
-      scanResults = KuduTestUtils.scanTable(client, TABLE_NAME);
+      scanResults = KuduDataSource.scanTable(client, TABLE_NAME);
     } catch (Exception e) {
       throw new RuntimeException("Failed to scan rows from table " + TABLE_NAME, e);
     }

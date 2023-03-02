@@ -1,56 +1,21 @@
 {
   "job": {
     "common": {
-      "job_id": -2413,
-      "job_name": "bitsail_fake_to_kudu_test",
-      "instance_id": -20413,
-      "user_name": "user"
+      "job_id": 312,
+      "instance_id": 3124,
+      "job_name": "bitsail_test_integration_kudu_to_print",
+      "user_name": "test"
     },
     "reader": {
-      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
-      "total_count": 5000,
-      "rate": 1000,
-      "null_percentage": 20,
+      "class": "com.bytedance.bitsail.connector.kudu.source.KuduSource",
+      "kudu_table_name": "kudu_test_table",
+      "kudu_master_address_list": "localhost:1234",
+      "read_mode": "READ_LATEST",
+      "split_config": "{\"name\": \"key\", \"lower_bound\": 0, \"upper_bound\": \"10\", \"split_num\": 3}",
       "columns": [
         {
           "name": "key",
-          "type": "long",
-          "properties": "unique"
-        },
-        {
-          "name": "fake_boolean",
-          "type": "boolean"
-        },
-        {
-          "name": "fake_int",
-          "type": "int"
-        },
-        {
-          "name": "fake_double",
-          "type": "double"
-        },
-        {
-          "name": "fake_date",
-          "type": "date.date"
-        },
-        {
-          "name": "fake_string",
-          "type": "string"
-        },
-        {
-          "name": "fake_binary",
-          "type": "binary"
-        }
-      ]
-    },
-    "writer": {
-      "class": "com.bytedance.bitsail.connector.kudu.sink.KuduSink",
-      "kudu_worker_count": 2,
-      "columns": [
-        {
-          "name": "key",
-          "type": "long",
-          "properties": "unique"
+          "type": "int64"
         },
         {
           "name": "field_boolean",
@@ -70,13 +35,44 @@
         },
         {
           "name": "field_string",
-          "type": "string",
-          "properties": "nullable"
+          "type": "string"
         },
         {
           "name": "field_binary",
-          "type": "binary",
-          "properties": "nullable"
+          "type": "binary"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
+      "columns": [
+        {
+          "name": "key",
+          "type": "long"
+        },
+        {
+          "name": "field_boolean",
+          "type": "boolean"
+        },
+        {
+          "name": "field_int",
+          "type": "int"
+        },
+        {
+          "name": "field_double",
+          "type": "double"
+        },
+        {
+          "name": "field_date",
+          "type": "date"
+        },
+        {
+          "name": "field_string",
+          "type": "string"
+        },
+        {
+          "name": "field_binary",
+          "type": "binary"
         }
       ]
     }
