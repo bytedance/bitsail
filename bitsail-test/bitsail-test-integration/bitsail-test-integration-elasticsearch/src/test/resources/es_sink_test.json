@@ -11,15 +11,14 @@
       "bitsail_location": "./"
     },
     "reader": {
-      "class": "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource",
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
       "total_count": 300,
       "rate": 10,
-      "random_null_rate": 0,
-      "unique_fields": "id",
       "columns": [
         {
           "name": "id",
-          "type": "string"
+          "type": "string",
+          "properties": "unique"
         },
         {
           "name": "varchar_type",
