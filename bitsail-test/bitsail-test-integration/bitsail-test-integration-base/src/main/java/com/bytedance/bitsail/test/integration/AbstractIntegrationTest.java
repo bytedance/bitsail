@@ -37,15 +37,27 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Note: If you extend  {@link AbstractIntegrationTest}, the class name should end with "ITCase".
+ */
 @AbstractIntegrationTest.RunWith(with = {EngineType.FLINK_1_11})
 public abstract class AbstractIntegrationTest {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractIntegrationTest.class);
+
+  private static final String INTEGRATION_TEST_CLASS_NAME_PREFIX = "ITCase";
 
   protected List<EngineType> engineTypes;
 
   protected boolean exitUponException = false;
 
   protected AbstractIntegrationTest() {
+    // Check if the class name is ended with "ITCase".
+    String className = getClass().getSimpleName();
+    if (!className.endsWith(INTEGRATION_TEST_CLASS_NAME_PREFIX)) {
+      throw BitSailException.asBitSailException(IntegrationTestErrorCode.INTEGRATION_CLASS_NAME_ERROR,
+          "Current test class name is: " + getClass().getName());
+    }
+
     engineTypes = new ArrayList<>();
 
     RunWith runWithEngines = getClass().getAnnotation(RunWith.class);

@@ -19,7 +19,8 @@ package com.bytedance.bitsail.test.integration.error;
 import com.bytedance.bitsail.common.exception.ErrorCode;
 
 public enum IntegrationTestErrorCode implements ErrorCode {
-  INTEGRATION_TEST_FAILED("INTEGRATION-TEST-00", "Integration test failed.");
+  INTEGRATION_TEST_FAILED("INTEGRATION-TEST-00", "Integration test failed."),
+  INTEGRATION_CLASS_NAME_ERROR("INTEGRATION-TEST-01", "Integration test class name should ends with `ITCase`");
 
   private final String code;
 

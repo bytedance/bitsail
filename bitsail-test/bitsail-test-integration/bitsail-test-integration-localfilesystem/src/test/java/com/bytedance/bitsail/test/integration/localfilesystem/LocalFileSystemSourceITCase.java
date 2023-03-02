@@ -22,7 +22,7 @@ import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import org.junit.Test;
 
-public class LocalFileSystemSourceTest extends AbstractIntegrationTest {
+public class LocalFileSystemSourceITCase extends AbstractIntegrationTest {
 
   @Test
   public void testUnifiedLocalFSSourceWithCSV() throws Exception {
