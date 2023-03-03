@@ -37,13 +37,6 @@
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-streamingfile</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-connector-kafka</artifactId>
             <version>${revision}</version>
             <scope>test</scope>
