@@ -2,7 +2,7 @@
   "job": {
     "common": {
       "job_id": -2413,
-      "job_name": "bitsail_fake_to_rocketmq_test",
+      "job_name": "bitsail_test_integration_legacy_fake_to_rocketmq",
       "instance_id": -20413,
       "user_name": "user"
     },
@@ -14,27 +14,22 @@
       "unique_fields": "id",
       "columns": [
         {
-          "index": 0,
           "name": "id",
           "type": "string"
         },
         {
-          "index": 1,
           "name": "string_field",
           "type": "string"
         },
         {
-          "index": 2,
           "name": "int_field",
           "type": "bigint"
         },
         {
-          "index": 3,
           "name": "double_field",
           "type": "double"
         },
         {
-          "index": 4,
           "name": "date_field",
           "type": "date.date"
         }
@@ -50,27 +45,22 @@
       "partition_fields": "id,date_field",
       "columns": [
         {
-          "index": 0,
           "name": "id",
           "type": "string"
         },
         {
-          "index": 1,
           "name": "string_field",
           "type": "string"
         },
         {
-          "index": 2,
           "name": "int_field",
           "type": "long"
         },
         {
-          "index": 3,
           "name": "double_field",
           "type": "double"
         },
         {
-          "index": 4,
           "name": "date_field",
           "type": "date"
         }

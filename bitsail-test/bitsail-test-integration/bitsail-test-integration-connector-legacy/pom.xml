@@ -38,6 +38,7 @@
         <module>bitsail-test-integration-larksheet-legacy</module>
         <module>bitsail-test-integration-mongodb-legacy</module>
         <module>bitsail-test-integration-redis-legacy</module>
+        <module>bitsail-test-integration-rocketmq-legacy</module>
     </modules>
 
     <properties>

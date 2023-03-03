@@ -19,35 +19,28 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>bitsail-connectors-legacy</artifactId>
+        <artifactId>bitsail-test-integration-connector-legacy</artifactId>
         <groupId>com.bytedance.bitsail</groupId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitsail-connector-rocketmq</artifactId>
-
-    <properties>
-        <rocketmq.version>4.9.2</rocketmq.version>
-    </properties>
+    <artifactId>bitsail-test-integration-rocketmq-legacy</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.rocketmq</groupId>
-            <artifactId>rocketmq-client</artifactId>
-            <version>${rocketmq.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.rocketmq</groupId>
-            <artifactId>rocketmq-acl</artifactId>
-            <version>${rocketmq.version}</version>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-connector-rocketmq</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
         </dependency>
 
+        <!-- test containers for redis data source -->
         <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-json</artifactId>
-            <version>${flink.version}</version>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>1.17.3</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>
