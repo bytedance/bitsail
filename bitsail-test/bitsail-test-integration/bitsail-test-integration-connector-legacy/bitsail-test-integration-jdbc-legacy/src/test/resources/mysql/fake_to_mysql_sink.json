@@ -1,19 +1,10 @@
 {
   "job": {
     "common": {
-      "cid": 0,
-      "domain": "test",
       "job_id": -23,
-      "job_name": "bitsail_hive_mysql_tqs_regression",
+      "job_name": "bitsail_test_integration_fake_to_mysql",
       "instance_id": -203,
-      "user_name": "root",
-      "reader_transport_channel_flowControl_interval": 1000,
-      "reader_transport_channel_speed_byte": -1,
-      "reader_transport_channel_speed_record": -1,
-      "writer_transport_channel_flowControl_interval": 1000,
-      "writer_transport_channel_speed_byte": -1,
-      "writer_transport_channel_speed_record": -1,
-      "bitsail_location": "./"
+      "user_name": "root"
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource",
@@ -21,17 +12,14 @@
       "rate": 100000,
       "columns": [
         {
-          "index": 0,
           "name": "varchar_type",
           "type": "string"
         },
         {
-          "index": 1,
           "name": "text_type",
           "type": "string"
         },
         {
-          "index": 2,
           "name": "bigint_type",
           "type": "long"
         }
@@ -52,17 +40,14 @@
       "partition_pattern_format": "yyyyMMdd",
       "columns": [
         {
-          "index": 0,
           "name": "varchar_type",
           "type": "varchar"
         },
         {
-          "index": 1,
           "name": "text_type",
           "type": "text"
         },
         {
-          "index": 2,
           "name": "bigint_type",
           "type": "bigint"
         }

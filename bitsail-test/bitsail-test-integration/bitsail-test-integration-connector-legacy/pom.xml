@@ -33,6 +33,7 @@
         <module>bitsail-test-integration-hadoop-legacy</module>
         <module>bitsail-test-integration-hbase-legacy</module>
         <module>bitsail-test-integration-hudi-legacy</module>
+        <module>bitsail-test-integration-jdbc-legacy</module>
     </modules>
 
     <properties>

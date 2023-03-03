@@ -1,10 +1,8 @@
 {
   "job": {
     "common": {
-      "cid": 0,
-      "domain": "test",
       "job_id": -23,
-      "job_name": "bitsail_test_mysql_source",
+      "job_name": "bitsail_test_integration_mysql_to_print_without_column_info",
       "instance_id": -203,
       "user_name": "test"
     },

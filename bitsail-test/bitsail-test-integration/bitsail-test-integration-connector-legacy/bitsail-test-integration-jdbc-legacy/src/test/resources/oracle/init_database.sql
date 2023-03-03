@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-create table ORACLE_DYNAMIC_TABLE
+ALTER SESSION SET nls_date_language='american';
+
+create table ORACLE_TABLE_SOURCE
 (
     ID          VARCHAR2(1024),
     INT_TYPE    NUMBER,
@@ -25,5 +27,17 @@ create table ORACLE_DYNAMIC_TABLE
     DATE_TYPE   DATE
 );
 
-insert into ORACLE_DYNAMIC_TABLE (ID, INT_TYPE, BIGINT_TYPE, FLOAT_TYPE, DOUBLE_TYPE, RAW_TYPE, DATE_TYPE)
+insert into ORACLE_TABLE_SOURCE (ID, INT_TYPE, BIGINT_TYPE, FLOAT_TYPE, DOUBLE_TYPE, RAW_TYPE, DATE_TYPE)
 values ('id', 123, 1e12, 1.23, 1.2345, '1afe28', '05-JUL-2022');
+
+create table ORACLE_TABLE_SINK
+(
+    ID          VARCHAR2(1024),
+    DATETIME    NUMBER,
+    INT_TYPE    NUMBER,
+    BIGINT_TYPE NUMBER,
+    FLOAT_TYPE  NUMBER,
+    DOUBLE_TYPE NUMBER,
+    RAW_TYPE    RAW(1024),
+    DATE_TYPE   DATE
+);
