@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.hudi;
+package com.bytedance.bitsail.test.integration.legacy.hudi;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
@@ -24,8 +24,8 @@ import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.util.JsonSerializer;
 import com.bytedance.bitsail.connector.legacy.hudi.configuration.FlinkOptions;
 import com.bytedance.bitsail.connector.legacy.messagequeue.source.option.BaseMessageQueueReaderOptions;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.testcontainers.kafka.KafkaCluster;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.kafka.container.KafkaCluster;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -49,7 +49,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.bytedance.bitsail.connector.legacy.kafka.constants.KafkaConstants.CONNECTOR_STARTUP_MODE_VALUE_EARLIEST;
 import static org.apache.flink.table.descriptors.ConnectorDescriptorValidator.CONNECTOR;
 
-public class Kafka2HudiITCase {
+public class Kafka2HudiITCase extends AbstractIntegrationTest {
+
   private static final Logger LOG = LoggerFactory.getLogger(Kafka2HudiITCase.class);
   private static final String[] COLUMNS = {"id", "text", "timestamp"};
   private static final String TEST_SCHEMA =
@@ -165,6 +166,6 @@ public class Kafka2HudiITCase {
     setStreamingConfiguration(jobConf);
     setReaderConfiguration(jobConf);
     setWriterConfiguration(jobConf);
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submitJob(jobConf);
   }
 }

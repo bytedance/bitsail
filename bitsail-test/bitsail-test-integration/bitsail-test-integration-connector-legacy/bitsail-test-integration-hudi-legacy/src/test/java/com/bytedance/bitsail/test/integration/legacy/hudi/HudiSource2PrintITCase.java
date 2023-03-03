@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.hudi;
+package com.bytedance.bitsail.test.integration.legacy.hudi;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
@@ -25,7 +25,7 @@ import com.bytedance.bitsail.connector.legacy.hudi.sink.utils.TestWriteBase;
 import com.bytedance.bitsail.connector.legacy.hudi.util.AvroSchemaConverter;
 import com.bytedance.bitsail.connector.legacy.hudi.utils.TestConfigurations;
 import com.bytedance.bitsail.connector.legacy.hudi.utils.TestData;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
 
 import org.apache.flink.configuration.Configuration;
 import org.apache.hudi.common.model.HoodieTableType;
@@ -35,7 +35,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 
-public class HudiSource2PrintITCase extends TestWriteBase {
+public class HudiSource2PrintITCase extends AbstractIntegrationTest {
 
   protected Configuration conf;
 
@@ -98,17 +98,17 @@ public class HudiSource2PrintITCase extends TestWriteBase {
         // upsert another data buffer
         .consume(TestData.DATA_SET_UPDATE_INSERT_SIMPLE)
         // the data is not flushed yet
-        .checkWrittenData(EXPECTED1)
+        .checkWrittenData(TestWriteBase.getExpected1())
         .checkpoint(2)
         .assertNextEvent()
         .checkpointComplete(2)
-        .checkWrittenData(EXPECTED2)
+        .checkWrittenData(TestWriteBase.getExpected2())
         .end();
 
     // run BitSail job to load the read optimize view
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
     setCOWConfiguration(jobConf);
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submitJob(jobConf);
   }
 
   @Test
@@ -125,7 +125,7 @@ public class HudiSource2PrintITCase extends TestWriteBase {
         .checkpoint(1)
         .assertNextEvent()
         .checkpointComplete(1)
-        .checkWrittenData(EXPECTED1)
+        .checkWrittenData(TestWriteBase.getExpected1())
         .end();
 
     // write the second commit without compaction
@@ -135,21 +135,20 @@ public class HudiSource2PrintITCase extends TestWriteBase {
         .checkpoint(2)
         .assertNextEvent()
         .checkpointComplete(2)
-        .checkWrittenData(EXPECTED2)
+        .checkWrittenData(TestWriteBase.getExpected2())
         .end();
 
     // load read optimize view has 1 commit with 8 record
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
     setMORConfiguration(jobConf);
     jobConf.set(READER_PREFIX + FlinkOptions.QUERY_TYPE.key(), FlinkOptions.QUERY_TYPE_READ_OPTIMIZED);
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submitJob(jobConf);
 
     // load snapshot view has 2 commits with 11 record
     jobConf = BitSailConfiguration.newDefault();
     setMORConfiguration(jobConf);
     jobConf.set(READER_PREFIX + FlinkOptions.QUERY_TYPE.key(), FlinkOptions.QUERY_TYPE_SNAPSHOT);
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submitJob(jobConf);
     // TODO: add count assertion
   }
-
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.hudi;
+package com.bytedance.bitsail.test.integration.legacy.hudi;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
@@ -24,20 +24,17 @@ import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.util.JsonSerializer;
 import com.bytedance.bitsail.connector.legacy.fake.option.FakeReaderOptions;
 import com.bytedance.bitsail.connector.legacy.hudi.configuration.FlinkOptions;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
 
 import org.junit.Rule;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-public class Fake2HudiITCase {
-  private static final Logger LOG = LoggerFactory.getLogger(Fake2HudiITCase.class);
+public class FakeToHudiITCase extends AbstractIntegrationTest {
   private static final String TEST_SCHEMA =
       "[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"text\",\"type\":\"string\"},{\"name\":\"timestamp\",\"type\":\"string\"}]";
 
@@ -89,6 +86,6 @@ public class Fake2HudiITCase {
     setStreamingConfiguration(jobConf);
     setReaderConfiguration(jobConf);
     setWriterConfiguration(jobConf);
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submitJob(jobConf);
   }
 }

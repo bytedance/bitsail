@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.hudi;
+package com.bytedance.bitsail.test.integration.legacy.hudi.compaction;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
@@ -24,21 +24,17 @@ import com.bytedance.bitsail.connector.legacy.hudi.configuration.FlinkOptions;
 import com.bytedance.bitsail.connector.legacy.hudi.sink.utils.TestWriteBase;
 import com.bytedance.bitsail.connector.legacy.hudi.utils.TestConfigurations;
 import com.bytedance.bitsail.connector.legacy.hudi.utils.TestData;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
 
 import org.apache.flink.configuration.Configuration;
 import org.apache.hudi.common.model.HoodieTableType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-public class HudiCompactionITCase extends TestWriteBase {
-
-  private static final Logger LOG = LoggerFactory.getLogger(HudiCompactionITCase.class);
+public class HudiCompactionITCase extends AbstractIntegrationTest {
 
   protected Configuration conf;
 
@@ -75,7 +71,7 @@ public class HudiCompactionITCase extends TestWriteBase {
   @Test
   public void testCompaction() throws Exception {
     // write test data and schedule a compaction
-    TestHarness.instance().preparePipeline(tempFile, conf)
+    TestWriteBase.TestHarness.instance().preparePipeline(tempFile, conf)
         .consume(TestData.DATA_SET_INSERT)
         .assertEmptyDataFiles()
         .checkpoint(1)
@@ -84,22 +80,22 @@ public class HudiCompactionITCase extends TestWriteBase {
         // upsert another data buffer
         .consume(TestData.DATA_SET_UPDATE_INSERT)
         // the data is not flushed yet
-        .checkWrittenData(EXPECTED1)
+        .checkWrittenData(TestWriteBase.getExpected1())
         .checkpoint(2)
         .assertNextEvent()
         .checkpointComplete(2)
-        .checkWrittenData(EXPECTED2)
+        .checkWrittenData(TestWriteBase.getExpected2())
         .end();
 
     // run BitSail job to execute the compaction
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
     setCompactionConfiguration(jobConf);
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submitJob(jobConf);
 
     // delta_commit -> compaction -> delta_commit
     // check data written as expected
-    TestHarness.instance().preparePipeline(tempFile, conf)
-        .checkWrittenDataCow(tempFile, EXPECTED1, 4)
-        .checkWrittenDataMor(tempFile, EXPECTED2, 4);
+    TestWriteBase.TestHarness.instance().preparePipeline(tempFile, conf)
+        .checkWrittenDataCow(tempFile, TestWriteBase.getExpected1(), 4)
+        .checkWrittenDataMor(tempFile, TestWriteBase.getExpected2(), 4);
   }
 }
