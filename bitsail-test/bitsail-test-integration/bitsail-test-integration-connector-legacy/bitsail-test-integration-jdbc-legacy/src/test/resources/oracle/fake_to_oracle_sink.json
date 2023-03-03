@@ -2,7 +2,7 @@
   "job": {
     "common": {
       "job_id": -23,
-      "job_name": "bitsail_test_integration_fake_to_oracle",
+      "job_name": "bitsail_test_integration_legacy_fake_to_oracle",
       "instance_id": -203,
       "user_name": "root"
     },

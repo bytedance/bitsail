@@ -2,14 +2,9 @@
   "job": {
     "common": {
       "job_type": "STREAMING",
-      "job_plugin_lib_dir": "plugin",
-      "job_plugin_conf_dir": "plugin_conf",
-      "enable_dynamic_loader": true,
       "instance_id": "1",
       "internal_instance_id": "1",
-      "extra_properties": {
-        "update-mode": "append"
-      }
+      "job_name": "bitsail_test_integration_legacy_kafka_to_print"
     },
     "reader": {
       "connector": {

@@ -34,6 +34,7 @@
         <module>bitsail-test-integration-hbase-legacy</module>
         <module>bitsail-test-integration-hudi-legacy</module>
         <module>bitsail-test-integration-jdbc-legacy</module>
+        <module>bitsail-test-integration-kafka-legacy</module>
     </modules>
 
     <properties>

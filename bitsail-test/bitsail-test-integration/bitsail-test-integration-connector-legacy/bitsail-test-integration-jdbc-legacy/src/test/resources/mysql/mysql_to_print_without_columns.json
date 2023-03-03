@@ -2,7 +2,7 @@
   "job": {
     "common": {
       "job_id": -23,
-      "job_name": "bitsail_test_integration_mysql_to_print_without_column_info",
+      "job_name": "bitsail_test_integration_legacy_mysql_to_print_without_column_info",
       "instance_id": -203,
       "user_name": "test"
     },
