@@ -36,6 +36,7 @@
         <module>bitsail-test-integration-jdbc-legacy</module>
         <module>bitsail-test-integration-kafka-legacy</module>
         <module>bitsail-test-integration-larksheet-legacy</module>
+        <module>bitsail-test-integration-mongodb-legacy</module>
     </modules>
 
     <properties>
