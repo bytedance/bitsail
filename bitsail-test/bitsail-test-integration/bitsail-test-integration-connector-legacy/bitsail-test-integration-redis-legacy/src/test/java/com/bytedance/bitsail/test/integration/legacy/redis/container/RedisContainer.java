@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.connector.test.testcontainers.redis;
+package com.bytedance.bitsail.test.integration.legacy.redis.container;
 
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;

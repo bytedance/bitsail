@@ -2,7 +2,7 @@
   "job": {
     "common": {
       "job_id": -2413,
-      "job_name": "bitsail_fake_to_redis_test",
+      "job_name": "bitsail_test_integration_legacy_fake_to_redis",
       "instance_id": -20413,
       "user_name": "user"
     },
@@ -14,12 +14,10 @@
       "unique_fields": "fake_key",
       "columns": [
         {
-          "index": 0,
           "name": "fake_key",
           "type": "string"
         },
         {
-          "index": 1,
           "name": "fake_value",
           "type": "string"
         }
