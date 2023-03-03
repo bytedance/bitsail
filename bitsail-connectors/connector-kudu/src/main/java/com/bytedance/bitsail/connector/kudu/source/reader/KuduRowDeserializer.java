@@ -17,79 +17,91 @@
 package com.bytedance.bitsail.connector.kudu.source.reader;
 
 import com.bytedance.bitsail.common.BitSailException;
-import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.typeinfo.BasicTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
-import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
 
 import org.apache.kudu.client.RowResult;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class KuduRowDeserializer {
 
-  private final List<Function<RowResult, Object>> converters;
+  interface FiledConverter {
+    Object apply(RowResult rowResult) throws SQLException;
+  }
+
+  private final List<FiledConverter> converters;
   private final int fieldSize;
 
-  public KuduRowDeserializer(BitSailConfiguration jobConf) {
-    List<ColumnInfo> columnInfos = jobConf.get(KuduReaderOptions.COLUMNS);
-    this.converters = columnInfos.stream().map(this::initWrappedConverter).collect(Collectors.toList());
-    this.fieldSize = converters.size();
+  public KuduRowDeserializer(RowTypeInfo rowTypeInfo) {
+    this.converters = new ArrayList <>();
+    this.fieldSize = rowTypeInfo.getTypeInfos().length;
+    for (int i = 0; i < fieldSize; ++i) {
+      converters.add(initFieldConverter(i + 1, rowTypeInfo.getTypeInfos()[i]));
+    }
   }
 
   public Row convert(RowResult rowResult) {
     Row row = new Row(fieldSize);
-    for (int i = 0; i < fieldSize; ++i) {
-      row.setField(i, converters.get(i).apply(rowResult));
+    try {
+      for (int i = 0; i < fieldSize; ++i) {
+        row.setField(i, converters.get(i).apply(rowResult));
+      }
+    } catch (SQLException e) {
+      throw BitSailException.asBitSailException(KuduErrorCode.UNSUPPORTED_TYPE, e.getCause());
     }
     return row;
   }
 
-  private Function<RowResult, Object> initWrappedConverter(ColumnInfo columnInfo) {
-    String columnName = columnInfo.getName();
-    Function<RowResult, Object> converter = initConverter(columnInfo);
-    return rowResult -> rowResult.isNull(columnName) ? null : converter.apply(rowResult);
-  }
-
-  private Function<RowResult, Object> initConverter(ColumnInfo columnInfo) {
-    String columnName = columnInfo.getName();
-    String typeName = columnInfo.getType().trim().toUpperCase();
-
-    switch (typeName) {
-      case "BOOLEAN": // BOOLEAN_TYPE_INFO
-        return rowResult -> rowResult.getBoolean(columnName);
-      case "INT8":    // BYTE_TYPE_INFO
-        return rowResult -> rowResult.getByte(columnName);
-      case "INT16":   // SHORT_TYPE_INFO
-        return rowResult -> rowResult.getShort(columnName);
-      case "INT32":
-      case "INT":     // INT_TYPE_INFO
-        return rowResult -> rowResult.getInt(columnName);
-      case "INT64":
-      case "LONG":    // LONG_TYPE_INFO
-        return rowResult -> rowResult.getLong(columnName);
-      case "DATE":    // SQL_DATE_TYPE_INFO
-        return rowResult -> rowResult.getDate(columnName);
-      case "TIMESTAMP":   // SQL_TIMESTAMP_TYPE_INFO
-        return rowResult -> rowResult.getTimestamp(columnName);
-      case "FLOAT":   // FLOAT_TYPE_INFO
-        return rowResult -> rowResult.getFloat(columnName);
-      case "DOUBLE":  // DOUBLE_TYPE_INFO
-        return rowResult -> rowResult.getDouble(columnName);
-      case "DECIMAL": // BIG_DECIMAL_TYPE_INFO
-        return rowResult -> rowResult.getDecimal(columnName);
-      case "VARCHAR": // STRING_TYPE_INFO
-        return rowResult -> rowResult.getVarchar(columnName);
-      case "STRING":  // STRING_TYPE_INFO
-        return rowResult -> rowResult.getString(columnName);
-      case "STRING_UTF8": // BINARY_TYPE_INFO
-      case "BINARY":      // BINARY_TYPE_INFO
-        return rowResult -> rowResult.getBinary(columnName);
-      default:
-        throw new BitSailException(KuduErrorCode.UNSUPPORTED_TYPE, "Type " + typeName + " is not supported");
+  private FiledConverter initFieldConverter(int index, TypeInfo <?> typeInfo) {
+    if (!(typeInfo instanceof BasicTypeInfo)) {
+      throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_COLUMN_TYPE, typeInfo.getTypeClass().getName() + " is not supported yet.");
     }
+
+    Class<?> curClass = typeInfo.getTypeClass();
+    if (TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getBoolean(index);
+    }
+    if (TypeInfos.BYTE_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getByte(index);
+    }
+    if (TypeInfos.SHORT_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getShort(index);
+    }
+    if (TypeInfos.INT_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getInt(index);
+    }
+    if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getLong(index);
+    }
+    if (TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getDate(index);
+    }
+    if (TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getTimestamp(index);
+    }
+    if (TypeInfos.FLOAT_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getFloat(index);
+    }
+    if (TypeInfos.DOUBLE_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getDouble(index);
+    }
+    if (TypeInfos.BIG_DECIMAL_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getDecimal(index);
+    }
+    if (TypeInfos.STRING_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getString(index);
+    }
+    if (TypeInfos.BINARY_TYPE_INFO.getTypeClass() == curClass) {
+      return resultSet -> resultSet.getBinary(index);
+    }
+    throw new UnsupportedOperationException("Unsupported data type: " + typeInfo);
   }
 }
