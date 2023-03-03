@@ -24,7 +24,7 @@ import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore
+@Ignore("Online lark sheet is not stable")
 public class LarkSheetSourceITCase extends AbstractIntegrationTest {
 
   @Test
