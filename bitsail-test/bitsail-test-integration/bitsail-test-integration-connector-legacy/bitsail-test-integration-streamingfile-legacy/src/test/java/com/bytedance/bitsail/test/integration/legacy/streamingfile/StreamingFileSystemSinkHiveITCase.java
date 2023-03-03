@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.streamingfile.core.sink;
+package com.bytedance.bitsail.test.integration.legacy.streamingfile;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.util.JsonSerializer;
 import com.bytedance.bitsail.connector.legacy.streamingfile.common.option.FileSystemSinkOptions;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.testcontainers.kafka.KafkaCluster;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.legacy.kafka.container.KafkaCluster;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import com.bytedance.bitsail.shaded.hive.client.HiveMetaClientUtil;
 
@@ -45,11 +46,9 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Created 2022/7/26
- */
-@Ignore
-public class StreamingFileSystemSinkHiveITCase {
+@Ignore("Ignore non-local tests until local hive cluster added")
+public class StreamingFileSystemSinkHiveITCase extends AbstractIntegrationTest {
+
   private static final Logger LOG = LoggerFactory.getLogger(StreamingFileSystemSinkHiveITCase.class);
 
   private static final String HIVE_SITE_CONF_FILE = "hive-site.xml";
@@ -132,8 +131,8 @@ public class StreamingFileSystemSinkHiveITCase {
 
   @Test
   public void testHiveFormatType() throws Exception {
-    BitSailConfiguration hdfsConfiguration = BitSailConfiguration.newDefault();
+    BitSailConfiguration hdfsConfiguration = JobConfUtils.fromClasspath("kafka_to_hive.json");
     updateConfiguration(hdfsConfiguration);
-    EmbeddedFlinkCluster.submitJob(hdfsConfiguration);
+    submitJob(hdfsConfiguration);
   }
 }

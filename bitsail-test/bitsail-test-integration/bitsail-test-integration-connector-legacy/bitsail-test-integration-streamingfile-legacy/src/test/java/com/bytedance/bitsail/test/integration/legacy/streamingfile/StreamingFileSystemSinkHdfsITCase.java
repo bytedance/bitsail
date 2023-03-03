@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.legacy.streamingfile.core.sink;
+package com.bytedance.bitsail.test.integration.legacy.streamingfile;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
+import com.bytedance.bitsail.connector.legacy.kafka.source.KafkaSourceFunctionDAGBuilder;
 import com.bytedance.bitsail.connector.legacy.messagequeue.source.option.BaseMessageQueueReaderOptions;
 import com.bytedance.bitsail.connector.legacy.streamingfile.common.option.FileSystemCommonOptions;
 import com.bytedance.bitsail.connector.legacy.streamingfile.common.option.FileSystemSinkOptions;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.testcontainers.kafka.KafkaCluster;
+import com.bytedance.bitsail.connector.legacy.streamingfile.sink.FileSystemSinkFunctionDAGBuilder;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.legacy.kafka.container.KafkaCluster;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -47,19 +49,19 @@ import static com.bytedance.bitsail.connector.legacy.kafka.constants.KafkaConsta
 import static com.bytedance.bitsail.connector.legacy.streamingfile.common.validator.StreamingFileSystemValidator.HDFS_DUMP_TYPE_JSON;
 import static org.apache.flink.table.descriptors.ConnectorDescriptorValidator.CONNECTOR;
 
-/**
- * Created 2022/7/26
- */
-public class StreamingFileSystemSinkHdfsITCase {
+public class StreamingFileSystemSinkHdfsITCase extends AbstractIntegrationTest {
   private static final Logger LOG = LoggerFactory.getLogger(StreamingFileSystemSinkHdfsITCase.class);
+
   private static final String LOCAL_FS = "file://";
   private static final String OUTPUT_DIR = LOCAL_FS + "/tmp/streaming_file_hdfs/";
   private static final String[] COLUMNS = {"id", "text", "timestamp"};
   private static final long START_TIME = 1658743200L;
   private static final long SEND_BATCH = 2000L;
   private static final long SEND_INTERVAL = 1L;
+
   @Rule
   public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+
   private final String topicName = "testTopic";
   private final KafkaCluster kafkaDocker = new KafkaCluster();
   private KafkaProducer kafkaProducer;
@@ -95,10 +97,8 @@ public class StreamingFileSystemSinkHdfsITCase {
 
   protected void updateConfiguration(BitSailConfiguration jobConfiguration) {
     jobConfiguration.set(CommonOptions.JOB_TYPE, "STREAMING");
-    jobConfiguration.set(ReaderOptions.READER_CLASS, "com.bytedance.bitsail.connector.legacy.kafka.source" +
-        ".KafkaSourceFunctionDAGBuilder");
-    jobConfiguration.set(WriterOptions.WRITER_CLASS, "com.bytedance.bitsail.connector.legacy.streamingfile.sink" +
-        ".FileSystemSinkFunctionDAGBuilder");
+    jobConfiguration.set(ReaderOptions.READER_CLASS, KafkaSourceFunctionDAGBuilder.class.getName());
+    jobConfiguration.set(WriterOptions.WRITER_CLASS, FileSystemSinkFunctionDAGBuilder.class.getName());
     setConnectorProps(jobConfiguration, ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaDocker.getBootstrapServer());
     setConnectorProps(jobConfiguration, ConsumerConfig.GROUP_ID_CONFIG, "test_consumer");
     setConnectorProps(jobConfiguration, ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
@@ -152,6 +152,6 @@ public class StreamingFileSystemSinkHdfsITCase {
   public void testHdfsFormatType() throws Exception {
     BitSailConfiguration hdfsConfiguration = BitSailConfiguration.newDefault();
     updateConfiguration(hdfsConfiguration);
-    EmbeddedFlinkCluster.submitJob(hdfsConfiguration);
+    submitJob(hdfsConfiguration);
   }
 }
