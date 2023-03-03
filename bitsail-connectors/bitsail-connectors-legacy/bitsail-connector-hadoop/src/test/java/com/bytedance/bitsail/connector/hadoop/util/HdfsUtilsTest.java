@@ -40,7 +40,7 @@ public class HdfsUtilsTest {
     AtomicInteger afterInt = new AtomicInteger(1);
     Callable<Object> call = () -> {
       prevInt.incrementAndGet();
-      Thread.sleep(200);
+      Thread.sleep(3000);
       afterInt.incrementAndGet();
       return null;
     };
