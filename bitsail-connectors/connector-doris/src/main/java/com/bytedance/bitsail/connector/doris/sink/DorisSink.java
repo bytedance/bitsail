@@ -150,6 +150,7 @@ public class DorisSink<InputT> implements Sink<InputT, DorisCommittable, DorisWr
     LOG.info("Start to init DorisExecutionOptions!");
     final DorisExecutionOptions.DorisExecutionOptionsBuilder builder = DorisExecutionOptions.builder();
     builder.flushIntervalMs(writerConfiguration.get(DorisWriterOptions.SINK_FLUSH_INTERVAL_MS))
+        .checkInterval(writerConfiguration.get(DorisWriterOptions.SINK_CHECK_INTERVAL))
         .maxRetries(writerConfiguration.get(DorisWriterOptions.SINK_MAX_RETRIES))
         .bufferCount(writerConfiguration.get(DorisWriterOptions.SINK_BUFFER_COUNT))
         .bufferSize(writerConfiguration.get(DorisWriterOptions.SINK_BUFFER_SIZE))

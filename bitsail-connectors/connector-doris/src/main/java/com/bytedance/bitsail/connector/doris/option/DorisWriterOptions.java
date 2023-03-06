@@ -69,6 +69,10 @@ public interface DorisWriterOptions extends WriterOptions.BaseWriterOptions {
       key(WRITER_PREFIX + "sink_flush_interval_ms")
           .defaultValue(5000);
 
+  ConfigOption<Integer> SINK_CHECK_INTERVAL =
+      key(WRITER_PREFIX + "sink_check_interval")
+          .defaultValue(10000);
+
   ConfigOption<Integer> SINK_MAX_RETRIES =
       key(WRITER_PREFIX + "sink_max_retries")
           .defaultValue(3);
