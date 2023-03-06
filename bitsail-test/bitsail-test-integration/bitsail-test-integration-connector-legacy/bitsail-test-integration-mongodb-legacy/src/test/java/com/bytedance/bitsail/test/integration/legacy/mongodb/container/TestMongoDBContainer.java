@@ -126,9 +126,7 @@ public class TestMongoDBContainer implements Closeable {
 
   private static Document makeDocument(Map<String, Object> fields) {
     Document document = new Document();
-    for (String key : fields.keySet()) {
-      document.put(key, fields.get(key));
-    }
+    document.putAll(fields);
     return document;
   }
 }
