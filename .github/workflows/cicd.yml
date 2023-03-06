@@ -112,9 +112,9 @@ jobs:
           cache: 'maven'
       - name: Maven Verify Integration Test
         env:
-          TEST_MODULES: echo `python tools/test/list-test-modules.py integration`
+          INTEGRATION_TEST_MODULES: echo `python tools/test/list-test-modules.py integration`
         run:
-          mvn clean verify -pl $TEST_MODULES -DskipUT=true -DskipITCase=false -DskipE2E=true -D"checkstyle.skip"=true -D"license.skipAddThirdParty"=true --no-snapshot-updates -am
+          mvn clean verify -pl $INTEGRATION_TEST_MODULES -DskipUT=true -DskipITCase=false -DskipE2E=true -D"checkstyle.skip"=true -D"license.skipAddThirdParty"=true --no-snapshot-updates -am
 
     # This workflow contains a single job called "integration-tests"
   end-to-end-tests:
@@ -138,6 +138,6 @@ jobs:
 
       - name: Maven Verify End-to-End Test
         env:
-          TEST_MODULES: echo `python tools/test/list-test-modules.py e2e`
+          E2E_TEST_MODULES: echo `python tools/test/list-test-modules.py e2e`
         run:
-          mvn clean verify -pl $TEST_MODULES -DskipUT=true -DskipITCase=true -DskipE2E=false -D"checkstyle.skip"=true -D"license.skipAddThirdParty"=true --no-snapshot-updates -am
+          mvn clean verify -pl $E2E_TEST_MODULES -DskipUT=true -DskipITCase=true -DskipE2E=false -D"checkstyle.skip"=true -D"license.skipAddThirdParty"=true --no-snapshot-updates -am
