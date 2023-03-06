@@ -128,10 +128,10 @@ public class DateColumn extends Column {
     if (getRawData() instanceof LocalTime) {
       return LocalDateTime.of(FIRST_DATE, (LocalTime) getRawData());
     }
-   return LocalDateTime.ofInstant(
-       Instant.ofEpochMilli((Long) getRawData()),
-       ZoneId.systemDefault()
-   );
+    return LocalDateTime.ofInstant(
+        Instant.ofEpochMilli((Long) getRawData()),
+        ZoneId.systemDefault()
+    );
   }
 
   @Override
