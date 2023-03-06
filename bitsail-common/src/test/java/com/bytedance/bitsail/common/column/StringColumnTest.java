@@ -22,6 +22,7 @@ import com.bytedance.bitsail.common.option.CommonOptions;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -33,6 +34,18 @@ public class StringColumnTest {
 
   private String timeZone;
 
+  private final String[] dateStrList = {
+      "2023-01-01",
+      "2023-01-01 12:34:56",
+      "12:34:56"
+  };
+  private final String[] expectedDateStrList = {
+      "2023-01-01 00:00:00",
+      "2023-01-01 12:34:56",
+      "1970-01-01 12:34:56"
+  };
+  private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
   @Before
   public void before() {
     timeZone = ZoneOffset.ofHours(0).getId();
@@ -43,16 +56,23 @@ public class StringColumnTest {
   }
 
   @Test
-  public void asDate() {
-    String timeStr = "2019-04-01 11:11:11";
-    StringColumn strColumn = new StringColumn(timeStr);
-    Date dateTime = strColumn.asDate();
+  public void testParseDate() {
+    for (int i = 0; i < dateStrList.length; ++i) {
+      StringColumn column = new StringColumn(dateStrList[i]);
+      Date date = column.asDate();
+      String parsedDateStr = formatter.format(date.toInstant()
+          .atZone(ZoneId.of(timeZone)).toOffsetDateTime());
+      assertEquals(expectedDateStrList[i], parsedDateStr);
+    }
+  }
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    String dateStr = formatter.format(dateTime
-        .toInstant()
-        .atZone(ZoneId.of(timeZone)).toOffsetDateTime());
-    assertEquals(dateStr, timeStr);
+  @Test
+  public void testParseLocalDateTime() {
+    for (int i = 0; i < dateStrList.length; ++i) {
+      StringColumn column = new StringColumn(dateStrList[i]);
+      LocalDateTime parsedLocalDateTime = column.asLocalDateTime();
+      assertEquals(expectedDateStrList[i], parsedLocalDateTime.format(formatter));
+    }
   }
 
   @Test
@@ -64,6 +84,5 @@ public class StringColumnTest {
     str = "";
     sc = new StringColumn(str);
     assertEquals(str, new String(sc.asBytes()));
-
   }
 }

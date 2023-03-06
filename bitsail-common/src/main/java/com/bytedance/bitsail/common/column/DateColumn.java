@@ -22,9 +22,11 @@ import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Time;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Date;
 
@@ -32,6 +34,8 @@ import java.util.Date;
 
 @Deprecated
 public class DateColumn extends Column {
+
+  private static final LocalDate FIRST_DATE = LocalDate.ofEpochDay(0);
 
   private DateType subType = DateType.DATETIME;
 
@@ -108,6 +112,26 @@ public class DateColumn extends Column {
       return new Time(localTime.getHour(), localTime.getMinute(), localTime.getSecond());
     }
     return new Date((Long) this.getRawData());
+  }
+
+  @Override
+  public LocalDateTime asLocalDateTime() {
+    if (null == this.getRawData()) {
+      return null;
+    }
+    if (getRawData() instanceof LocalDate) {
+      return LocalDateTime.of(((LocalDate) getRawData()), LocalTime.MIN);
+    }
+    if (getRawData() instanceof LocalDateTime) {
+      return (LocalDateTime) getRawData();
+    }
+    if (getRawData() instanceof LocalTime) {
+      return LocalDateTime.of(FIRST_DATE, (LocalTime) getRawData());
+    }
+   return LocalDateTime.ofInstant(
+       Instant.ofEpochMilli((Long) getRawData()),
+       ZoneId.systemDefault()
+   );
   }
 
   @Override

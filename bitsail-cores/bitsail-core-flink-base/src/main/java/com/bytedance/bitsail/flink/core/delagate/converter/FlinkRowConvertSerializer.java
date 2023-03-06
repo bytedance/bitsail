@@ -230,6 +230,12 @@ public class FlinkRowConvertSerializer implements RowSerializer<Row> {
       return new java.sql.Time(column.asDate().getTime());
     } else if (TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
       return new java.sql.Timestamp(column.asDate().getTime());
+    } else if (TypeInfos.LOCAL_DATE_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      return column.asLocalDateTime().toLocalDate();
+    } else if (TypeInfos.LOCAL_DATE_TIME_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      return column.asLocalDateTime();
+    } else if (TypeInfos.LOCAL_TIME_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      return column.asLocalDateTime().toLocalTime();
     } else if (BasicArrayTypeInfo.BINARY_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
       return column.asBytes();
     } else {

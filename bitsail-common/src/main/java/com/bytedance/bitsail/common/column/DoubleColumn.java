@@ -22,6 +22,7 @@ import com.bytedance.bitsail.common.util.OverFlowUtil;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Deprecated
@@ -151,6 +152,12 @@ public class DoubleColumn extends Column {
   public Date asDate() {
     throw BitSailException.asBitSailException(
         CommonErrorCode.CONVERT_NOT_SUPPORT, "Double can't convert to Date.");
+  }
+
+  @Override
+  public LocalDateTime asLocalDateTime() {
+    throw BitSailException.asBitSailException(
+        CommonErrorCode.CONVERT_NOT_SUPPORT, "Double can't convert to LocalDateTime .");
   }
 
   @Override

@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSON;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -64,6 +65,8 @@ public abstract class Column implements Serializable, Comparable<Column> {
   public abstract String asString();
 
   public abstract Date asDate();
+
+  public abstract LocalDateTime asLocalDateTime();
 
   public abstract byte[] asBytes();
 

@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
-import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,6 +46,8 @@ import java.util.Objects;
 public final class ColumnCast {
 
   private static final Logger LOG = LoggerFactory.getLogger(ColumnCast.class);
+
+  private static final LocalDate FIRST_DATE = LocalDate.ofEpochDay(0);
 
   private static String dateTimePattern;
   private static String datePattern;
@@ -100,7 +101,8 @@ public final class ColumnCast {
     for (DateTimeFormatter formatter : formatters) {
       try {
         TemporalAccessor parse = formatter.parse(dateStr);
-        return fromTemporalAccessor(parse);
+        LocalDateTime localDateTime = fromTemporalAccessorWithoutTimeZone(parse);
+        return Date.from(localDateTime.atZone(dateTimeZone).toInstant());
       } catch (Exception e) {
         LOG.debug("Formatter = {} parse string {} failed.", formatter, dateStr, e);
         //ignore
@@ -109,7 +111,27 @@ public final class ColumnCast {
     throw new IllegalArgumentException(String.format("String [%s] can't be parse by all formatter.", dateStr));
   }
 
-  private static Date fromTemporalAccessor(TemporalAccessor temporalAccessor) {
+  public static LocalDateTime string2LocalDateTime(StringColumn column) {
+    checkState();
+    if (null == column.asString()) {
+      return null;
+    }
+    String dateStr = column.asString();
+
+    for (DateTimeFormatter formatter : formatters) {
+      try {
+        TemporalAccessor parse = formatter.parse(dateStr);
+        LocalDateTime localDateTime = fromTemporalAccessorWithoutTimeZone(parse);
+        return localDateTime.atZone(dateTimeZone).toLocalDateTime();
+      } catch (Exception e) {
+        LOG.debug("Formatter = {} parse string {} failed.", formatter, dateStr, e);
+        //ignore
+      }
+    }
+    throw new IllegalArgumentException(String.format("String [%s] can't be parse by all formatter.", dateStr));
+  }
+
+  private static LocalDateTime fromTemporalAccessorWithoutTimeZone(TemporalAccessor temporalAccessor) {
     LocalDate localDate = null;
     LocalTime localTime = null;
 
@@ -138,14 +160,10 @@ public final class ColumnCast {
       } else {
         localDateTime = localDate.atStartOfDay();
       }
-      return Date.from(localDateTime.atZone(dateTimeZone).toInstant());
+      return localDateTime;
     }
     if (Objects.nonNull(localTime)) {
-      return new Time(
-          localTime.getHour(),
-          localTime.getMinute(),
-          localTime.getSecond()
-      );
+      return LocalDateTime.of(FIRST_DATE, localTime);
     }
     throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
         String.format("Temporal %s can't convert to date.", temporalAccessor));

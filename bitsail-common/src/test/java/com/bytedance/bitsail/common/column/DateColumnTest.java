@@ -26,7 +26,9 @@ import org.junit.Test;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
@@ -126,5 +128,27 @@ public class DateColumnTest {
     Date date = dateColumn.asDate();
     String format = simpleDateFormat.format(date);
     Assert.assertEquals(format, "2022-01-01");
+  }
+
+  @Test
+  public void testAsLocalDateTime() {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    DateColumn column = new DateColumn((Date) null);
+    LocalDateTime localDateTime = column.asLocalDateTime();
+    Assert.assertNull(localDateTime);
+
+    column = new DateColumn(LocalDate.of(2022, 1, 1));
+    localDateTime = column.asLocalDateTime();
+    Assert.assertEquals("2022-01-01 00:00:00", localDateTime.format(formatter));
+
+    column = new DateColumn(LocalDateTime.of(LocalDate.of(2022, 1, 1),
+        LocalTime.of(12, 34, 56)));
+    localDateTime = column.asLocalDateTime();
+    Assert.assertEquals("2022-01-01 12:34:56", localDateTime.format(formatter));
+
+    column = new DateColumn(LocalTime.of(12, 34, 56));
+    localDateTime = column.asLocalDateTime();
+    Assert.assertEquals("1970-01-01 12:34:56", localDateTime.format(formatter));
   }
 }
