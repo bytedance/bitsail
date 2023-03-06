@@ -36,6 +36,7 @@ public class ColumnInfo implements Serializable {
   private String comment;
   private Object defaultValue;
   private String properties;
+  private Boolean nullable;
 
   @Builder
   public ColumnInfo(String name, String type) {
@@ -56,6 +57,12 @@ public class ColumnInfo implements Serializable {
                     Object defaultValue) {
     this(name, type, comment);
     this.defaultValue = defaultValue;
+  }
+
+  public ColumnInfo(String name, String type, Boolean nullable) {
+    this.name = name;
+    this.type = type;
+    this.nullable = nullable;
   }
 
   public String getComment() {

@@ -1,0 +1,105 @@
+{
+  "job": {
+    "common": {
+      "job_id": 312,
+      "instance_id": 3124,
+      "job_name": "BitSail_fake_to_print_test",
+      "user_name": "test"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.clickhouse.source.ClickhouseSource",
+      "jdbc_url": "jdbc:clickhouse://localhost:8123",
+      "db_name": "default",
+      "table_name": "test_ch_table",
+      "split_field": "id",
+      "split_config": "{\"name\": \"id\", \"lower_bound\": 0, \"upper_bound\": \"10000\", \"split_num\": 3}",
+      "sql_filter": "( id % 2 == 0 )",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int64"
+        },
+        {
+          "name": "int_type",
+          "type": "int32"
+        },
+        {
+          "name": "double_type",
+          "type": "float64"
+        },
+        {
+          "name": "string_type",
+          "type": "string"
+        },
+        {
+          "name": "p_date",
+          "type": "date"
+        },
+        {
+          "name": "int_128",
+          "type": "int128"
+        },
+        {
+          "name": "int_256",
+          "type": "int256"
+        },
+        {
+          "name": "decimal_type",
+          "type": "decimal"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.clickhouse.sink.ClickhouseSink",
+      "jdbc_url": "jdbc:clickhouse://localhost:8123",
+      "db_name": "default",
+      "table_name": "test_ch_table_sink",
+      "user_name": "12345677",
+      "password": "test_001",
+      "write_mode": "overwrite",
+      "writer_parallelism_num": 1,
+      "columns": [
+        {
+          "name": "id",
+          "type": "int64",
+          "nullable": true
+        },
+        {
+          "name": "int_type",
+          "type": "int32",
+          "nullable": true
+        },
+        {
+          "name": "double_type",
+          "type": "float64",
+          "nullable": true
+        },
+        {
+          "name": "string_type",
+          "type": "string",
+          "nullable": true
+        },
+        {
+          "name": "p_date",
+          "type": "date",
+          "nullable": true
+        },
+        {
+          "name": "int_128",
+          "type": "int128",
+          "nullable": false
+        },
+        {
+          "name": "int_256",
+          "type": "int256",
+          "nullable": true
+        },
+        {
+          "name": "decimal_type",
+          "type": "decimal",
+          "nullable": false
+        }
+      ]
+    }
+  }
+}
