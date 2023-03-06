@@ -50,6 +50,7 @@
         <module>connector-larksheet</module>
         <module>connector-cdc</module>
         <module>connector-kafka</module>
+        <module>connector-mongodb</module>
     </modules>
 
     <dependencyManagement>
