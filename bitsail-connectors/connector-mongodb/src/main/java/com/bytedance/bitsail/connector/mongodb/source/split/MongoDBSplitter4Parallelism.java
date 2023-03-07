@@ -34,6 +34,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class MongoDBSplitter4Parallelism extends MongoDBSplitter {
 
+  private static final int MB_SIZE = 1024 * 1024;
+
   private static final Logger LOG = LoggerFactory.getLogger(MongoDBSplitter4Parallelism.class);
 
   private static final int ERR_CODE_UNAUTHORIZED = 13;
@@ -111,7 +113,7 @@ public class MongoDBSplitter4Parallelism extends MongoDBSplitter {
     List<Object> splitPoints = Lists.newArrayList();
     boolean forceMedianSplit = false;
     int avgObjSize = getAvgObjSize(collStats);
-    long maxChunkSize = (docCount / splitsCount - 1) * 2 * avgObjSize / (1024 * 1024);
+    long maxChunkSize = (docCount / splitsCount - 1) * 2 * avgObjSize / MB_SIZE;
     if (maxChunkSize < 1) {
       forceMedianSplit = true;
     }

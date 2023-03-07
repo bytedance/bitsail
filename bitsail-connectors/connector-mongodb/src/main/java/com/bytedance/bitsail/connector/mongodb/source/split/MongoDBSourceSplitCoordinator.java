@@ -95,7 +95,7 @@ public class MongoDBSourceSplitCoordinator implements SourceSplitCoordinator<Mon
   }
 
   private void tryAssignSplitsToReader() {
-    Map<Integer, List<MongoDBSourceSplit>> splitsToAssign = new HashMap<>(16);
+    Map<Integer, List<MongoDBSourceSplit>> splitsToAssign = new HashMap<>();
 
     for (Integer readerIndex : splitAssignmentPlan.keySet()) {
       if (CollectionUtils.isNotEmpty(splitAssignmentPlan.get(readerIndex)) && context.registeredReaders().contains(readerIndex)) {

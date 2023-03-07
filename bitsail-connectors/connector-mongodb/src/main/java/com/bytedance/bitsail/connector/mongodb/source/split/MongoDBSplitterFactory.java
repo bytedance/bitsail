@@ -36,6 +36,8 @@ import org.apache.commons.lang3.StringUtils;
 @AllArgsConstructor
 public class MongoDBSplitterFactory {
 
+  private static final int DEFAULT_FETCH_SIZE = 100000;
+
   private int batchSize;
   private int parallelism;
   private String splitKey;
@@ -50,7 +52,7 @@ public class MongoDBSplitterFactory {
    */
   public static MongoDBSplitterFactory getMongoSplitterFactory(BitSailConfiguration jobConf,
                                                                MongoDBConnConfig mongoConnConfig) {
-    int batchSize = jobConf.getUnNecessaryOption(MongoDBReaderOptions.READER_FETCH_SIZE, 100000);
+    int batchSize = jobConf.getUnNecessaryOption(MongoDBReaderOptions.READER_FETCH_SIZE, DEFAULT_FETCH_SIZE);
     int parallelismNum = MongoDBSourceReader.getParallelismNum(jobConf);
     String splitKey = jobConf.getNecessaryOption(MongoDBReaderOptions.SPLIT_PK, MongoDBErrorCode.REQUIRED_VALUE);
 

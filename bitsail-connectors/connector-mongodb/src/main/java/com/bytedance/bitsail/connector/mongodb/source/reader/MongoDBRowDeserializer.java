@@ -145,7 +145,7 @@ public class MongoDBRowDeserializer {
 
   @SuppressWarnings("unchecked")
   private Map<Object, Object> parseMapTypeInfo(Object value, MapTypeInfo<?, ?> typeInfo) {
-    Map<Object, Object> result = new HashMap<>(16);
+    Map<Object, Object> result = new HashMap<>();
     TypeInfo<?> keyTypeInfo = typeInfo.getKeyTypeInfo();
     TypeInfo<?> valueTypeInfo = typeInfo.getValueTypeInfo();
     Map<Object, Object> map = (Map<Object, Object>) value;
@@ -192,7 +192,7 @@ public class MongoDBRowDeserializer {
   }
 
   private Map<String, Object> parseDocument(Document document) {
-    Map<String, Object> map = new HashMap<>(16);
+    Map<String, Object> map = new HashMap<>();
     for (String key : document.keySet()) {
       Object value = document.get(key);
       if (value instanceof List) {
