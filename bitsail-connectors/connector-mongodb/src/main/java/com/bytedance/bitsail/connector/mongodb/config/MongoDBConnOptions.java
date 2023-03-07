@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.io.Serializable;
 @Getter
 @Builder
 public class MongoDBConnOptions implements Serializable {
+
   private int connectionsPerHost;
   private int threadsAllowedToBlockForConnectionMultiplier;
   private int connectTimeout;

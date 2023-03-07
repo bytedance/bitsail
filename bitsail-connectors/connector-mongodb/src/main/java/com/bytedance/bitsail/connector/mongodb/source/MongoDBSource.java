@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@ import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.connector.mongodb.constant.MongoDBConstants;
 import com.bytedance.bitsail.connector.mongodb.converter.MongoDBTypeInfoConverter;
-import com.bytedance.bitsail.connector.mongodb.source.split.MongoDBSourceSplitCoordinator;
 import com.bytedance.bitsail.connector.mongodb.source.reader.MongoDBSourceReader;
 import com.bytedance.bitsail.connector.mongodb.source.split.MongoDBSourceSplit;
+import com.bytedance.bitsail.connector.mongodb.source.split.MongoDBSourceSplitCoordinator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
