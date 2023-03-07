@@ -27,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,17 +35,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class HdfsUtilsTest {
 
   @Test
-  public void testTimeoutFuseRetryer() throws IOException {
+  public void testTimeoutFuseRetryer() {
     AtomicInteger prevInt = new AtomicInteger(1);
     AtomicInteger afterInt = new AtomicInteger(1);
-    Callable<Object> call = new Callable<Object>() {
-      @Override
-      public Integer call() throws Exception {
-        prevInt.incrementAndGet();
-        Thread.sleep(200);
-        afterInt.incrementAndGet();
-        return null;
-      }
+    Callable<Object> call = () -> {
+      prevInt.incrementAndGet();
+      Thread.sleep(3000);
+      afterInt.incrementAndGet();
+      return null;
     };
 
     Retryer<Object> timeoutFuseRetryer = RetryerBuilder.newBuilder()

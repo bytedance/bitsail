@@ -16,7 +16,8 @@
 
 package com.bytedance.bitsail.connector.selectdb.sink.record;
 
-import org.apache.flink.util.Preconditions;
+import com.bytedance.bitsail.common.util.Preconditions;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

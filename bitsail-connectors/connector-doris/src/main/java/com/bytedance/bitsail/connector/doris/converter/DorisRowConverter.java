@@ -17,6 +17,7 @@
 package com.bytedance.bitsail.connector.doris.converter;
 
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.doris.typeinfo.DorisDataType;
 
 import java.io.Serializable;
@@ -28,15 +29,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.TimeZone;
 
-import static org.apache.flink.util.Preconditions.checkNotNull;
-
 public class DorisRowConverter implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private final SerializationConverter[] serializationConverters;
 
   public DorisRowConverter(DorisDataType[] dataTypes) {
-    checkNotNull(dataTypes);
+    Preconditions.checkNotNull(dataTypes);
     this.serializationConverters = new SerializationConverter[dataTypes.length];
     for (int i = 0; i < dataTypes.length; i++) {
       DorisDataType dorisDataType = dataTypes[i];

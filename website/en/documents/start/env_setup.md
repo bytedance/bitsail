@@ -62,10 +62,10 @@ bitsail-archive-${version}-SNAPSHOT
 
 ## Run Local Integration Tests
 
-In [`bitsail-connector-test`](https://github.com/bytedance/bitsail/tree/master/bitsail-test/bitsail-connector-test) module, we provide the [EmbeddedFlinkCluster](https://github.com/bytedance/bitsail/blob/master/bitsail-test/bitsail-connector-test/src/main/java/com/bytedance/bitsail/test/connector/test/EmbeddedFlinkCluster.java) class that can be used to start a job in local Flink MiniCluster.
+In [`bitsail-test-integration`](https://github.com/bytedance/bitsail/tree/master/bitsail-test/bitsail-test-integration) module, we provide the [Flink11Engine](https://github.com/bytedance/bitsail/blob/master/bitsail-test/bitsail-test-integration/bitsail-test-integration-base/src/main/java/com/bytedance/bitsail/test/integration/engine/flink/Flink11Engine.java) class that can be used to start a job in local Flink MiniCluster.
 
 
-For example, we build an integration test [KafkaSourceITCase](https://github.com/bytedance/bitsail/blob/master/bitsail-connectors/bitsail-connectors-legacy/bitsail-connector-kafka/src/test/java/com/bytedance/bitsail/connector/legacy/kafka/source/KafkaSourceITCase.java) for Kafka source connector.
+For example, we build an integration test [KafkaSourceITCase](https://github.com/bytedance/bitsail/blob/master/bitsail-test/bitsail-test-integration/bitsail-test-integration-connector-legacy/bitsail-test-integration-kafka-legacy/src/test/java/com/bytedance/bitsail/test/integration/legacy/KafkaSourceITCase.java) for Kafka source connector.
 It uses [test container](https://www.testcontainers.org/modules/kafka/) to start kafka service in local docker.
 We can run the `testKafkaSource` method to start a kafka2print task in local flink MiniCluster.
 

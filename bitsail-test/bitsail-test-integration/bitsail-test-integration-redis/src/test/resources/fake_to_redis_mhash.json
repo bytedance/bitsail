@@ -1,0 +1,61 @@
+{
+  "job": {
+    "common": {
+      "job_id": -2413,
+      "job_name": "bitsail_test_integration_fake_to_redis_mhash",
+      "instance_id": -20413,
+      "user_name": "user"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 100,
+      "columns": [
+        {
+          "name": "fake_key",
+          "type": "string",
+          "properties": "unique"
+        },
+        {
+          "name": "fake_field1",
+          "type": "string"
+        },
+        {
+          "name": "fake_value1",
+          "type": "string"
+        },
+        {
+          "name": "fake_field2",
+          "type": "string"
+        },
+        {
+          "name": "fake_value2",
+          "type": "string"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.redis.sink.RedisSink",
+      "redis_data_type": "mhash",
+      "redis_host": "localhost",
+      "redis_port": 6379,
+      "columns": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    }
+  }
+}
