@@ -23,12 +23,12 @@ public class Flink11Executor extends AbstractFlinkExecutor {
 
   @Override
   public String getClientEngineModule() {
-    return "bitsail-clients/bitsail-client-entry-flink";
+    return "bitsail-clients/bitsail-client-flink/bitsail-client-flink-1.11";
   }
 
   @Override
   public String getCoreEngineModule() {
-    return "bitsail-cores/bitsail-core-flink-bridge";
+    return "bitsail-cores/bitsail-core-flink/bitsail-core-flink-1.11-bridge";
   }
 
   @Override

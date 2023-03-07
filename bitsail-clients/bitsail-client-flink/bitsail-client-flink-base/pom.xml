@@ -14,74 +14,44 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>bitsail-test-integration</artifactId>
         <groupId>com.bytedance.bitsail</groupId>
+        <artifactId>bitsail-client-flink</artifactId>
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bitsail-test-integration-base</artifactId>
+    <artifactId>bitsail-client-flink-base</artifactId>
 
     <dependencies>
-        <!-- log deps -->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.classic.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${logback.classic.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-access</artifactId>
-            <version>${logback.access.version}</version>
-        </dependency>
-
-        <!-- engine libs -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-core-entry</artifactId>
-            <version>${revision}</version>
-        </dependency>
-
-        <!-- common used connector -->
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>connector-fake</artifactId>
+            <artifactId>bitsail-client-api</artifactId>
             <version>${revision}</version>
         </dependency>
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>connector-print</artifactId>
+            <artifactId>bitsail-component-security-kerberos</artifactId>
             <version>${revision}</version>
+            <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-shaded-hadoop</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-core</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>flink-1.11</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.bytedance.bitsail</groupId>
-                    <artifactId>bitsail-core-flink-1.11-bridge</artifactId>
-                    <version>${revision}</version>
-                </dependency>
-            </dependencies>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-    </profiles>
 </project>

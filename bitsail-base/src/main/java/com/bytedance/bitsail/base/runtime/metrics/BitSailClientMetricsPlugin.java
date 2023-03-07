@@ -19,10 +19,11 @@ package com.bytedance.bitsail.base.runtime.metrics;
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.constants.ClientMetricName;
+import com.bytedance.bitsail.base.execution.Mode;
 import com.bytedance.bitsail.base.execution.ProcessResult;
 import com.bytedance.bitsail.base.metrics.MetricManager;
 import com.bytedance.bitsail.base.metrics.manager.BitSailMetricManager;
-import com.bytedance.bitsail.base.runtime.RuntimePlugin;
+import com.bytedance.bitsail.base.runtime.RuntimePluggable;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.util.Pair;
 
@@ -36,7 +37,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class BitSailClientMetricsPlugin extends RuntimePlugin {
+public class BitSailClientMetricsPlugin implements RuntimePluggable {
 
   private MetricManager metricManager;
   private long startTime;
@@ -48,6 +49,11 @@ public class BitSailClientMetricsPlugin extends RuntimePlugin {
       return wrappedName;
     }
     return "[" + wrappedName + "]";
+  }
+
+  @Override
+  public boolean accept(Mode mode) {
+    return Mode.BATCH.equals(mode);
   }
 
   @Override
@@ -111,5 +117,10 @@ public class BitSailClientMetricsPlugin extends RuntimePlugin {
   @VisibleForTesting
   public List<Pair<String, String>> getAllMetricTags() {
     return metricManager.getAllMetricDimensions();
+  }
+
+  @Override
+  public String getComponentName() {
+    return "client-metric-plugin";
   }
 }
