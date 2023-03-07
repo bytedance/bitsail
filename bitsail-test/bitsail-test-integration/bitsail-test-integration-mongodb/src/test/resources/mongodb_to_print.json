@@ -7,7 +7,7 @@
       "user_name": "user"
     },
     "reader": {
-      "class": "com.bytedance.bitsail.connector.mongodb.source.MongoSource",
+      "class": "com.bytedance.bitsail.connector.mongodb.source.MongoDBSource",
       "db_name": "test_db",
       "collection_name": "test_collection",
       "split_pk": "_id",
@@ -47,7 +47,7 @@
       "split_mode": "paginating"
     },
     "writer": {
-      "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink"
+      "class": "com.bytedance.bitsail.connector.print.sink.PrintSink"
     }
   }
 }

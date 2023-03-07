@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.mongodb.source;
+package com.bytedance.bitsail.test.integration.mongodb;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.mongodb.option.MongoDBReaderOptions;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.testcontainers.mongodb.TestMongoDBContainer;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.mongodb.container.TestMongoDBContainer;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import com.mongodb.BasicDBObject;
 import org.junit.After;
@@ -36,9 +36,9 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Integration test for MongoDB source.
+ * Integration test for MongoDB reader.
  */
-public class MongoDBSourceITCase {
+public class MongoDBReaderITCase extends AbstractIntegrationTest {
 
   private static final int TOTAL_COUNT = 300;
   private static final String DB_NAME = "test_db";
@@ -66,7 +66,7 @@ public class MongoDBSourceITCase {
     jobConf.set(MongoDBReaderOptions.DB_NAME, DB_NAME);
     jobConf.set(MongoDBReaderOptions.COLLECTION_NAME, COLLECTION_NAME);
 
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submitJob(jobConf);
   }
 
   @After
