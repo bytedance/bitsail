@@ -1,0 +1,49 @@
+{
+  "job": {
+    "common": {
+      "cid": 0,
+      "domain": "test",
+      "job_id": -24,
+      "job_name": "bitsail_test_integration_fake_to_kafka",
+      "instance_id": -204,
+      "user_name": "root"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 100,
+      "columns": [
+        {
+          "name": "varchar_type",
+          "type": "string"
+        },
+        {
+          "name": "text_type",
+          "type": "string"
+        },
+        {
+          "name": "bigint_type",
+          "type": "long"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.kafka.sink.KafkaSink",
+      "content_type": "json",
+      "columns": [
+        {
+          "name": "varchar_type",
+          "type": "string"
+        },
+        {
+          "name": "text_type",
+          "type": "string"
+        },
+        {
+          "name": "bigint_type",
+          "type": "long"
+        }
+      ]
+    }
+  }
+}

@@ -16,6 +16,7 @@
 
 package com.bytedance.bitsail.connector.selectdb.sink.uploadload;
 
+import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.selectdb.config.SelectdbExecutionOptions;
 import com.bytedance.bitsail.connector.selectdb.config.SelectdbOptions;
 import com.bytedance.bitsail.connector.selectdb.http.HttpPutBuilder;
@@ -26,9 +27,8 @@ import com.bytedance.bitsail.connector.selectdb.sink.record.RecordStream;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.apache.flink.util.Preconditions;
-import org.apache.flink.util.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -169,7 +169,7 @@ public class SelectdbUploadLoad {
       final int statusCode = response.getStatusLine().getStatusCode();
       if (statusCode == SC_OK && response.getEntity() != null) {
         String loadResult = EntityUtils.toString(response.getEntity());
-        if (StringUtils.isNullOrWhitespaceOnly(loadResult)) {
+        if (StringUtils.isEmpty(loadResult) || StringUtils.isBlank(loadResult)) {
           return null;
         }
         LOG.info("response result {}", loadResult);

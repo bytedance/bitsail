@@ -1,0 +1,90 @@
+{
+  "job": {
+    "common": {
+      "job_id": -23,
+      "job_name": "bitsail_test_integration_legacy_fake_to_oracle",
+      "instance_id": -203,
+      "user_name": "root"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 100000,
+      "columns": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "int_type",
+          "type": "int"
+        },
+        {
+          "name": "bigint_type",
+          "type": "long"
+        },
+        {
+          "name": "float_type",
+          "type": "float"
+        },
+        {
+          "name": "double_type",
+          "type": "double"
+        },
+        {
+          "name": "bytes_type",
+          "type": "binary"
+        },
+        {
+          "name": "date_type",
+          "type": "date.date"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.legacy.jdbc.sink.OracleOutputFormat",
+      "db_name": "TEST",
+      "table_name": "ORACLE_TABLE_SINK",
+      "primary_key": "ID",
+      "connections": [
+      ],
+      "user_name": "TEST",
+      "password": "TEST_PASSWORD",
+      "write_mode": "insert",
+      "writer_parallelism_num": 1,
+      "partition_name": "DATETIME",
+      "partition_value": "20220705",
+      "partition_pattern_format": "yyyyMMdd",
+      "columns": [
+        {
+          "name": "ID",
+          "type": "varchar"
+        },
+        {
+          "name": "INT_TYPE",
+          "type": "integer"
+        },
+        {
+          "name": "BIGINT_TYPE",
+          "type": "number"
+        },
+        {
+          "name": "FLOAT_TYPE",
+          "type": "float"
+        },
+        {
+          "name": "DOUBLE_TYPE",
+          "type": "double"
+        },
+        {
+          "name": "RAW_TYPE",
+          "type": "raw"
+        },
+        {
+          "name": "DATE_TYPE",
+          "type": "date"
+        }
+      ]
+    }
+  }
+}

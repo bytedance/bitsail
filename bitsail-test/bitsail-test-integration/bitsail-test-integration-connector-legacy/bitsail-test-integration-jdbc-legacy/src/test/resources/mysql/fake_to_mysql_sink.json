@@ -1,0 +1,57 @@
+{
+  "job": {
+    "common": {
+      "job_id": -23,
+      "job_name": "bitsail_test_integration_legacy_fake_to_mysql",
+      "instance_id": -203,
+      "user_name": "root"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 100000,
+      "columns": [
+        {
+          "name": "varchar_type",
+          "type": "string"
+        },
+        {
+          "name": "text_type",
+          "type": "string"
+        },
+        {
+          "name": "bigint_type",
+          "type": "long"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.legacy.jdbc.sink.JDBCOutputFormat",
+      "db_name": "test",
+      "table_name": "jdbc_dynamic_table",
+      "connections": [
+      ],
+      "user_name": "test",
+      "password": "test",
+      "write_mode": "insert",
+      "writer_parallelism_num": 1,
+      "partition_name": "datetime",
+      "partition_value": "20220705",
+      "partition_pattern_format": "yyyyMMdd",
+      "columns": [
+        {
+          "name": "varchar_type",
+          "type": "varchar"
+        },
+        {
+          "name": "text_type",
+          "type": "text"
+        },
+        {
+          "name": "bigint_type",
+          "type": "bigint"
+        }
+      ]
+    }
+  }
+}

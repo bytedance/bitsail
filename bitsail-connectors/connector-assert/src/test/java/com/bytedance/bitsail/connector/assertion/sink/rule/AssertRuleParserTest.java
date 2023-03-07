@@ -22,10 +22,11 @@ import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.typeinfo.BasicTypeInfo;
 import com.bytedance.bitsail.connector.assertion.sink.constants.AssertRuleType;
 import com.bytedance.bitsail.connector.assertion.sink.option.AssertWriterOptions;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
 import org.junit.Test;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,8 @@ public class AssertRuleParserTest {
 
   @Test
   public void testParseRowRules() throws Exception {
-    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("assert_sink.json");
+    BitSailConfiguration jobConf = BitSailConfiguration.from(new File(
+        Paths.get(getClass().getClassLoader().getResource("assert_sink.json").toURI()).toString()));
 
     Map<String, Object> rowRules = jobConf.get(AssertWriterOptions.ROW_RULES);
     assertNotNull(rowRules);
@@ -57,7 +59,8 @@ public class AssertRuleParserTest {
 
   @Test
   public void testParseColumnRules() throws Exception {
-    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("assert_sink.json");
+    BitSailConfiguration jobConf = BitSailConfiguration.from(new File(
+        Paths.get(getClass().getClassLoader().getResource("assert_sink.json").toURI()).toString()));
 
     Map<String, Map<String, Object>> columnRules = jobConf.get(AssertWriterOptions.COLUMN_RULES);
     assertNotNull(columnRules);

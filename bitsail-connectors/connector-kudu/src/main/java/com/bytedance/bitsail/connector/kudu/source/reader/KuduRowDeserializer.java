@@ -87,7 +87,7 @@ public class KuduRowDeserializer {
         return rowResult -> rowResult.getString(columnName);
       case "STRING_UTF8": // BINARY_TYPE_INFO
       case "BINARY":      // BINARY_TYPE_INFO
-        return rowResult -> rowResult.getBinary(columnName);
+        return rowResult -> rowResult.getBinary(columnName).array();
       default:
         throw new BitSailException(KuduErrorCode.UNSUPPORTED_TYPE, "Type " + typeName + " is not supported");
     }

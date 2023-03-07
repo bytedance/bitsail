@@ -55,7 +55,6 @@
                 <exclude>com.bytedance.bitsail:bitsail-connector-messagequeue</exclude>
                 <exclude>com.bytedance.bitsail:bitsail-connector-streamingfile-common</exclude>
                 <exclude>com.bytedance.bitsail:connector-base</exclude>
-                <exclude>com.bytedance.bitsail:bitsail-connector-test</exclude>
             </excludes>
             <outputFileNameMapping>${artifact.file.name}</outputFileNameMapping>
         </dependencySet>

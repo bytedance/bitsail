@@ -107,6 +107,14 @@ public class TestWriteBase {
         "id1,par1,id1,Danny,23,4,par1"));
   }
 
+  public static  Map<String, String> getExpected1() {
+    return EXPECTED1;
+  }
+
+  public static  Map<String, String> getExpected2() {
+    return EXPECTED2;
+  }
+
   // -------------------------------------------------------------------------
   //  Inner Class
   // -------------------------------------------------------------------------

@@ -111,8 +111,9 @@ jobs:
           architecture: x64
           cache: 'maven'
       - name: Maven Verify Integration Test
-        run:
-          mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=false
+        run: |
+          all_integration_test_modules=`python tools/test/list-test-modules.py integration`
+          mvn clean verify -pl $all_integration_test_modules -DskipUT=true -DskipITCase=false -DskipE2E=true -D"checkstyle.skip"=true -am
 
     # This workflow contains a single job called "integration-tests"
   end-to-end-tests:
@@ -135,5 +136,6 @@ jobs:
           cache: 'maven'
 
       - name: Maven Verify End-to-End Test
-        run:
-          mvn clean verify -DskipUT=true -DskipITCase=true -DskipE2E=false -D"checkstyle.skip"=true -D"license.skipAddThirdParty"=true --no-snapshot-updates -am
+        run: |
+          all_e2e_test_modules=`python tools/test/list-test-modules.py e2e`
+          mvn clean verify -pl $all_e2e_test_modules -DskipUT=true -DskipITCase=true -DskipE2E=false -D"checkstyle.skip"=true -am
