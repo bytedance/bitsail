@@ -28,4 +28,3 @@ rm -rf output
 mkdir -p output
 
 cp -r bitsail-dist/target/bitsail-dist-${revision}-bin/bitsail-archive-${revision}/* output/ || { echo 'cp bitsail-dist failed' ; exit 1; }
-cp -r bitsail-dist/src/main/resources/* output/ || { echo 'cp bitsail-dist failed' ; exit 1; }
