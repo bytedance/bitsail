@@ -86,6 +86,16 @@ public class RowToAvroConverters {
               return object;
             }
           };
+    } else if (BasicTypeInfo.BYTE_TYPE_INFO.getTypeClass().equals(typeClass)) {
+      converter =
+          new RowToAvroConverter() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public Object convert(Schema schema, Object object) {
+              return Integer.valueOf(Long.toString((Long) object));
+            }
+          };
     } else if (BasicTypeInfo.BIG_INT_TYPE_INFO.getTypeClass().equals(typeClass)) {
       converter =
           new RowToAvroConverter() {
@@ -255,4 +265,3 @@ public class RowToAvroConverters {
     Object convert(Schema schema, Object object);
   }
 }
-

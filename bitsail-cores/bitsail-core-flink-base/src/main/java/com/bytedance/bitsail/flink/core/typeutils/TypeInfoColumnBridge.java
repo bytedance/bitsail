@@ -50,6 +50,8 @@ public class TypeInfoColumnBridge {
         PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO);
     COLUMN_BRIDGE_TYPE_INFO_MAPPING.put(TypeInfos.LONG_TYPE_INFO,
         PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO);
+    COLUMN_BRIDGE_TYPE_INFO_MAPPING.put(TypeInfos.BYTE_TYPE_INFO,
+            PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO);
     COLUMN_BRIDGE_TYPE_INFO_MAPPING.put(TypeInfos.BIG_INTEGER_TYPE_INFO,
         PrimitiveColumnTypeInfo.LONG_COLUMN_TYPE_INFO);
 

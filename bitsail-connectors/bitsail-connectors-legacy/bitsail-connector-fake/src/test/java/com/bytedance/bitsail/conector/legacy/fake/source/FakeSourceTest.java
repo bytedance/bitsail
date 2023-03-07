@@ -16,12 +16,19 @@
 
 package com.bytedance.bitsail.conector.legacy.fake.source;
 
+import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.connector.legacy.fake.source.FakeSource;
+import com.bytedance.bitsail.flink.core.typeinfo.PrimitiveColumnTypeInfo;
+import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
 
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,5 +67,14 @@ public class FakeSourceTest {
 
     Assert.assertEquals(5678, actualValue);
     Assert.assertTrue(existValues.contains("5678"));
+  }
+
+  @Test
+  public void testSupportByteType() {
+    List<ColumnInfo> columnInfos = new ArrayList<>();
+    ColumnInfo age = new ColumnInfo("age", "byte");
+    columnInfos.add(age);
+    RowTypeInfo rowTypeInfo = ColumnFlinkTypeInfoUtil.getRowTypeInformation(new BitSailTypeInfoConverter(), columnInfos);
+    Assert.assertTrue(rowTypeInfo.getFieldTypes()[0] instanceof PrimitiveColumnTypeInfo);
   }
 }
