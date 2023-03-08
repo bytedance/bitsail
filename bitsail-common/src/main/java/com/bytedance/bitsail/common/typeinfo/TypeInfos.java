@@ -64,8 +64,7 @@ public final class TypeInfos {
       new BasicTypeInfo<>(LocalTime.class);
   public static final TypeInfo<LocalDateTime> LOCAL_DATE_TIME_TYPE_INFO =
       new BasicTypeInfo<>(LocalDateTime.class);
-  public static final TypeInfo<byte[]> BINARY_TYPE_INFO =
-      new BasicTypeInfo<>(byte[].class);
+
   @Deprecated
   public static final TypeInfo<Date> SQL_DATE_TYPE_INFO =
       new BasicTypeInfo<>(Date.class);
