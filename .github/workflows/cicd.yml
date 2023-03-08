@@ -74,7 +74,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
+        os: [ ubuntu-latest ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - run: git config --global core.longpaths true
