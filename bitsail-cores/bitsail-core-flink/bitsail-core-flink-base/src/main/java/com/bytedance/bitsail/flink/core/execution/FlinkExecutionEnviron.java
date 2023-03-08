@@ -55,6 +55,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Setter
@@ -196,8 +197,8 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
       LOG.warn("Flink job terminal failed.", e);
     }
 
-    for (RuntimePluggable runtimePlugin : runtimePlugins) {
-      runtimePlugin.close();
+    if (runtimePlugins != null) {
+      runtimePlugins.stream().filter(Objects::nonNull).forEach(RuntimePluggable::close);
     }
     LOG.info("Flink job terminal finished.");
   }
