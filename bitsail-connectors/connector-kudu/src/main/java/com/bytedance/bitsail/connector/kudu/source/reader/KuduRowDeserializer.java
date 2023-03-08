@@ -33,7 +33,7 @@ import java.util.function.Function;
 
 public class KuduRowDeserializer {
 
-  private final List<Function <RowResult, Object>> converters;
+  private final List<Function<RowResult, Object>> converters;
   private final int fieldSize;
 
   public KuduRowDeserializer(RowTypeInfo rowTypeInfo) {
