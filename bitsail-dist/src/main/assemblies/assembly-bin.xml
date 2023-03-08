@@ -163,7 +163,7 @@
         <moduleSet>
             <useAllReactorProjects>true</useAllReactorProjects>
             <includes>
-                <include>com.bytedance.bitsail:bitsail-core-*-bridge</include>
+                <include>com.bytedance.bitsail:bitsail-core-flink-*</include>
             </includes>
             <sources>
                 <includeModuleDirectory>false</includeModuleDirectory>
@@ -175,6 +175,26 @@
                             <include>*.json</include>
                         </includes>
                         <outputDirectory>libs/engines/mapping/</outputDirectory>
+                    </fileSet>
+                </fileSets>
+            </sources>
+        </moduleSet>
+
+        <moduleSet>
+            <useAllReactorProjects>true</useAllReactorProjects>
+            <includes>
+                <include>com.bytedance.bitsail:bitsail-client-flink-*</include>
+            </includes>
+            <sources>
+                <includeModuleDirectory>false</includeModuleDirectory>
+                <fileSets>
+                    <fileSet>
+                        <directory>src/main/resources</directory>
+                        <useDefaultExcludes>true</useDefaultExcludes>
+                        <includes>
+                            <include>*.json</include>
+                        </includes>
+                        <outputDirectory>libs/clients/mapping/</outputDirectory>
                     </fileSet>
                 </fileSets>
             </sources>

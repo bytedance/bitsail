@@ -23,8 +23,10 @@ import com.bytedance.bitsail.client.api.engine.EngineRunner;
 import com.bytedance.bitsail.client.entry.constants.EntryConstants;
 import com.bytedance.bitsail.client.entry.plugins.ClientPluginFinder;
 import com.bytedance.bitsail.client.entry.security.SecurityContextFactory;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.configuration.BitSailSystemConfiguration;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -62,6 +64,7 @@ public class Entry {
     this.baseCommandArgs = baseCommandArgs;
     this.classloader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
     this.clientPluginFinder = new ClientPluginFinder(classloader);
+    this.clientPluginFinder.configure(sysConfiguration);
   }
 
   @SuppressWarnings("checkstyle:EmptyLineSeparator")
@@ -116,6 +119,7 @@ public class Entry {
     LOG.info("Try to prepare engine's client entry: {}.", engine);
     clientPluginFinder.loadPlugin(engine);
     for (EngineRunner runner : ServiceLoader.load(ENGINE_SPI_CLASS, clientPluginFinder.getClassloader())) {
+      LOG.info("Founded engine runner: {}.", runner.engineName());
       if (StringUtils.equalsIgnoreCase(runner.engineName(), engine)) {
         this.engineRunner = runner;
         break;
@@ -123,7 +127,7 @@ public class Entry {
     }
     LOG.info("Finished load engine's client.");
     if (Objects.isNull(engineRunner)) {
-      //TODO
+      throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR, "");
     }
   }
 

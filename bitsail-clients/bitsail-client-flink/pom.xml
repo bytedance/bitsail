@@ -32,4 +32,32 @@
         <module>bitsail-client-flink-base</module>
         <module>bitsail-client-flink-1.11</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.bytedance.bitsail</groupId>
+                <artifactId>bitsail-base</artifactId>
+                <version>${revision}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.bytedance.bitsail</groupId>
+                <artifactId>bitsail-common</artifactId>
+                <version>${revision}</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven.shade.plugin.version}</version>
+            </plugin>
+        </plugins>
+    </build>
 </project>
