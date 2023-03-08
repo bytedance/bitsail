@@ -66,7 +66,7 @@ public abstract class AbstractExecutor extends AbstractContainer {
 
   private static final Path EXECUTOR_LIBRARIES_DIR = EXECUTOR_ROOT_DIR.resolve("libs");
   private static final Path EXECUTOR_CLIENTS_DIR = EXECUTOR_LIBRARIES_DIR.resolve("clients");
-  private static final Path EXECUTOR_CLIENTS_ENGINE_MAPPING_DIR = EXECUTOR_LIBRARIES_DIR.resolve("mapping");
+  private static final Path EXECUTOR_CLIENTS_ENGINE_MAPPING_DIR = EXECUTOR_CLIENTS_DIR.resolve("mapping");
   private static final Path EXECUTOR_CLIENTS_ENGINE_DIR = EXECUTOR_CLIENTS_DIR.resolve("engines");
   private static final Path EXECUTOR_ENGINES_DIR = EXECUTOR_LIBRARIES_DIR.resolve("engines");
   private static final Path EXECUTOR_ENGINES_MAPPING_DIR = EXECUTOR_ENGINES_DIR.resolve("mapping");
