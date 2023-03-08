@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Objects;
 
 /**
  * Created 2022/8/10
@@ -40,12 +39,8 @@ public class PackageResolver {
     return getRootDir().resolve(LIBS_PATH);
   }
 
-  public static Path getClientDir(String rootDir) {
-    if (Objects.isNull(rootDir)) {
-      return getRootDir().resolve(CLIENT_PATH);
-    }
-    return Paths.get(rootDir)
-        .resolve(CLIENT_PATH);
+  public static Path getClientDir() {
+    return getRootDir().resolve(CLIENT_PATH);
   }
 
   public static Path getEmbeddedEngineDir() {
