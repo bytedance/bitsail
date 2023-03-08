@@ -1,0 +1,48 @@
+{
+  "job": {
+    "common": {
+      "job_id": -24,
+      "job_name": "bitsail_test_integration_legacy_fake_to_kafka",
+      "instance_id": -204,
+      "user_name": "user"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 100000,
+      "random_null_rate": 0,
+      "columns": [
+        {
+          "name": "varchar_type",
+          "type": "string"
+        },
+        {
+          "name": "text_type",
+          "type": "string"
+        },
+        {
+          "name": "bigint_type",
+          "type": "long"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.legacy.kafka.sink.KafkaOutputFormat",
+      "content_type": "json",
+      "columns": [
+        {
+          "name": "varchar_type",
+          "type": "string"
+        },
+        {
+          "name": "text_type",
+          "type": "string"
+        },
+        {
+          "name": "long_type",
+          "type": "long"
+        }
+      ]
+    }
+  }
+}

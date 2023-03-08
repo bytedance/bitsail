@@ -1,0 +1,92 @@
+{
+  "job": {
+    "common": {
+      "job_id": -2413,
+      "job_name": "bitsail_test_integration_fake_to_doris",
+      "instance_id": -20413,
+      "user_name": "user"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 100,
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "properties": "unique"
+        },
+        {
+          "name": "bigint_type",
+          "type": "bigint"
+        },
+        {
+          "name": "string_type",
+          "type": "string"
+        },
+        {
+          "name": "double_type",
+          "type": "double"
+        },
+        {
+          "name": "decimal_type",
+          "type": "double"
+        },
+        {
+          "name": "date_type",
+          "type": "date.date"
+        },
+        {
+          "name": "partition_date",
+          "type": "string"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.doris.sink.DorisSink",
+      "fe_hosts": "<your doris fe hosts>",
+      "mysql_hosts": "<your doris jdbc hosts>",
+      "user": "<user name>",
+      "password": "<password>",
+      "db_name": "test_db",
+      "table_name": "test_doris_table",
+      "columns": [
+        {
+          "index": 0,
+          "name": "id",
+          "type": "bigint"
+        },
+        {
+          "index": 1,
+          "name": "bigint_type",
+          "type": "bigint"
+        },
+        {
+          "index": 2,
+          "name": "string_type",
+          "type": "varchar"
+        },
+        {
+          "index": 3,
+          "name": "double_type",
+          "type": "double"
+        },
+        {
+          "index": 4,
+          "name": "decimal_type",
+          "type": "double"
+        },
+        {
+          "index": 5,
+          "name": "date_type",
+          "type": "date"
+        },
+        {
+          "index": 6,
+          "name": "partition_date",
+          "type": "date"
+        }
+      ]
+    }
+  }
+}

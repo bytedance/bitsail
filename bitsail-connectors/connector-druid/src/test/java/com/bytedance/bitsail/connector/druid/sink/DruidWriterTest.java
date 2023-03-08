@@ -20,19 +20,21 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
 import org.apache.druid.indexing.common.task.batch.parallel.ParallelIndexIOConfig;
 import org.apache.druid.indexing.common.task.batch.parallel.ParallelIndexSupervisorTask;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -49,7 +51,9 @@ public class DruidWriterTest {
 
   @Before
   public void setup() throws IOException, URISyntaxException {
-    final BitSailConfiguration configuration = JobConfUtils.fromClasspath("druid_writer.json");
+    final BitSailConfiguration configuration = BitSailConfiguration.from(new File(
+        Paths.get(getClass().getClassLoader().getResource("druid_writer.json").toURI()).toString()));
+
     druidWriter = new DruidWriter(configuration, converter);
   }
 
@@ -83,7 +87,9 @@ public class DruidWriterTest {
     final String inputJSON = prePopulatedDruidWriter.provideInputJSONString(indexTask);
 
     // Assert
-    assertEquals(JobConfUtils.fromClasspathToString("expectedTask.json"), inputJSON);
+    String expectedTaskJson = new String(Files.readAllBytes(
+        Paths.get(getClass().getClassLoader().getResource("expectedTask.json").toURI())));
+    assertEquals(expectedTaskJson, inputJSON);
   }
 
   @Test
@@ -102,7 +108,9 @@ public class DruidWriterTest {
     prePopulatedDruidWriter.flush(false);
 
     // Assert
-    final byte[] expectedInput = JobConfUtils.fromClasspathToString("expectedTask.json").getBytes(StandardCharsets.UTF_8);
+    String expectedTaskJson = new String(Files.readAllBytes(
+        Paths.get(getClass().getClassLoader().getResource("expectedTask.json").toURI())));
+    final byte[] expectedInput = expectedTaskJson.getBytes(StandardCharsets.UTF_8);
     verify(mockOs, times(1)).write(expectedInput, 0, expectedInput.length);
   }
 
@@ -112,7 +120,8 @@ public class DruidWriterTest {
   }
 
   private DruidWriter getPrePopulatedDruidWriter(final HttpURLConnection connection) throws URISyntaxException, IOException {
-    final BitSailConfiguration configuration = JobConfUtils.fromClasspath("druid_writer.json");
+    final BitSailConfiguration configuration = BitSailConfiguration.from(new File(
+        Paths.get(getClass().getClassLoader().getResource("druid_writer.json").toURI()).toString()));
     final long processTime = 1668694453938L;
     final DruidWriter druidWriterWithMockInjection = new DruidWriter(configuration, converter, connection, processTime);
     final Row row1 = new Row(new Object[]{"string1", 123, 123L, 123.45f, 123.45});

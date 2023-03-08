@@ -1,0 +1,64 @@
+{
+  "job": {
+    "common": {
+      "job_id": -2413,
+      "job_name": "bitsail_test_integration_fake_to_druid",
+      "instance_id": -20413,
+      "user_name": "user"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
+      "total_count": 20,
+      "rate": 10,
+      "columns": [
+        {
+          "name": "string_type",
+          "type": "string",
+          "properties": "unique"
+        },
+        {
+          "name": "int_type",
+          "type": "int"
+        },
+        {
+          "name": "long_type",
+          "type": "long"
+        },
+        {
+          "name": "float_type",
+          "type": "float"
+        },
+        {
+          "name": "double_type",
+          "type": "double"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.druid.sink.DruidSink",
+      "datasource": "testDataSource",
+      "columns": [
+        {
+          "name": "string_type",
+          "type": "string"
+        },
+        {
+          "name": "int_type",
+          "type": "int"
+        },
+        {
+          "name": "long_type",
+          "type": "long"
+        },
+        {
+          "name": "float_type",
+          "type": "float"
+        },
+        {
+          "name": "double_type",
+          "type": "double"
+        }
+      ]
+    }
+  }
+}

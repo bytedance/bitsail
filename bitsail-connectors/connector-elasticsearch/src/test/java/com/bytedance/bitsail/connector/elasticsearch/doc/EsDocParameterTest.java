@@ -19,17 +19,20 @@ package com.bytedance.bitsail.connector.elasticsearch.doc;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.elasticsearch.doc.parameter.EsDocParameters;
 import com.bytedance.bitsail.connector.elasticsearch.rest.EsRequestEmitter;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
+import java.nio.file.Paths;
+
 public class EsDocParameterTest {
 
   @Test
   public void testInitializeEsDocParams() throws Exception {
-    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("es_doc_parameter_test.json");
+    BitSailConfiguration jobConf = BitSailConfiguration.from(new File(
+        Paths.get(getClass().getClassLoader().getResource("es_doc_parameter_test.json").toURI()).toString()));
     EsDocParameters params = EsRequestEmitter.initEsDocParams(jobConf);
 
     Assert.assertEquals(0, params.getIdFieldsIndices().get(0).intValue());

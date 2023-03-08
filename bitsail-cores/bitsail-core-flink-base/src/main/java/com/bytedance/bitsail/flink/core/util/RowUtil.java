@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.security.Timestamp;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -58,9 +58,9 @@ public class RowUtil {
     }
 
     if (field instanceof List) {
-      return getListBytesSize((List) field);
+      return getListBytesSize((List<?>) field);
     } else if (field instanceof Map) {
-      return geMapBytesSize((Map) field);
+      return geMapBytesSize((Map<?, ?>) field);
     } else {
       return getNormalTypeByteSize(field);
     }
@@ -69,8 +69,8 @@ public class RowUtil {
   private static long getListBytesSize(List<?> fieldVal) {
     long listBytesSize = 0L;
     if (fieldVal != null) {
-      for (int j = 0; j < fieldVal.size(); j++) {
-        long elementBytesSize = getBytesSize(fieldVal.get(j));
+      for (Object o : fieldVal) {
+        long elementBytesSize = getBytesSize(o);
         listBytesSize += elementBytesSize;
       }
     }
@@ -139,7 +139,7 @@ public class RowUtil {
       return 15L;
     }
 
-    LOG.debug("Object value = {} can't supported in current.", field);
+    LOG.debug("Unsupported type [{}] for object value [{}]", clazz.getName(), field);
     return 0L;
   }
 }

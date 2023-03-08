@@ -1,0 +1,41 @@
+{
+  "job": {
+    "common": {
+      "job_id": -250134,
+      "job_name": "bitsail_test_integration_legacy_hbase_to_print",
+      "instance_id": -2050134,
+      "user_name": "user"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.hbase.source.HBaseInputFormat",
+      "table": "test_table_source",
+      "hbase_conf":{
+        "hbase.zookeeper.quorum":"127.0.0.1",
+        "hbase.zookeeper.property.clientPort":"2181",
+        "hbase.mapreduce.splittable": "test_table_source"
+      },
+      "columns": [
+        {
+          "name": "cf1:int1",
+          "type": "bigint"
+        },
+        {
+          "name": "cf1:str1",
+          "type": "string"
+        },
+        {
+          "name": "cf2:int2",
+          "type": "bigint"
+        },
+        {
+          "name": "cf3:str2",
+          "type": "string"
+        }
+      ],
+      "reader_parallelism_num":1
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink"
+    }
+  }
+}

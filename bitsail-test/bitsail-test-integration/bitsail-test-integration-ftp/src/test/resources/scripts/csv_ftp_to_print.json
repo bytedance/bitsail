@@ -1,0 +1,100 @@
+{
+  "job": {
+    "common": {
+      "job_id": 312,
+      "instance_id": 3124,
+      "job_name": "bitsail_test_integration_ftp_to_print_csv",
+      "user_name": "test"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.ftp.source.FtpSource",
+      "host": "localhost",
+      "user": "user",
+      "password": "password",
+      "path_list": "/data/csv/upload1/,/data/csv/upload2/",
+      "content_type": "csv",
+      "enable_success_file_check": false,
+      "skip_first_line": true,
+      "columns": [
+        {
+          "name": "c0",
+          "type": "int"
+        },
+        {
+          "name": "c1",
+          "type": "string"
+        },
+        {
+          "name": "c2",
+          "type": "float"
+        },
+        {
+          "name": "c3",
+          "type": "double"
+        },
+        {
+          "name": "c4",
+          "type": "boolean"
+        },
+        {
+          "name": "c5",
+          "type": "date"
+        },
+        {
+          "name": "c6",
+          "type": "long"
+        },
+        {
+          "name": "c7",
+          "type": "timestamp"
+        },
+        {
+          "name": "c8",
+          "type": "decimal"
+        }
+      ],
+      "reader_parallelism_num":2
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
+      "columns": [
+        {
+          "name": "c0",
+          "type": "int"
+        },
+        {
+          "name": "c1",
+          "type": "string"
+        },
+        {
+          "name": "c2",
+          "type": "float"
+        },
+        {
+          "name": "c3",
+          "type": "double"
+        },
+        {
+          "name": "c4",
+          "type": "boolean"
+        },
+        {
+          "name": "c5",
+          "type": "date"
+        },
+        {
+          "name": "c6",
+          "type": "long"
+        },
+        {
+          "name": "c7",
+          "type": "timestamp"
+        },
+        {
+          "name": "c8",
+          "type": "double"
+        }
+      ]
+    }
+  }
+}

@@ -57,9 +57,9 @@ bitsail-archive-${version}-SNAPSHOT
 
 ## 运行本地集成测试
 
-在 [`bitsail-connector-test`](https://github.com/bytedance/bitsail/tree/master/bitsail-test/bitsail-connector-test) 模块中，我们提供了 [EmbeddedFlinkCluster](https://github.com/bytedance/bitsail/blob/master/bitsail-test/bitsail-connector-test/src/main/java/com/bytedance/bitsail/test/connector/test/EmbeddedFlinkCluster.java) 类用于启动一个本地运行的flink作业。
+在 [`bitsail-test-integration`](https://github.com/bytedance/bitsail/tree/master/bitsail-test/bitsail-test-integration) 模块中，我们提供了 [Flink11Engine](https://github.com/bytedance/bitsail/blob/master/bitsail-test/bitsail-test-integration/bitsail-test-integration-base/src/main/java/com/bytedance/bitsail/test/integration/engine/flink/Flink11Engine.java) 类用于启动一个本地运行的flink作业。
 
-例如，我们为Kafka读连接器构建了一个集成测试 [KafkaSourceITCase](https://github.com/bytedance/bitsail/blob/master/bitsail-connectors/bitsail-connectors-legacy/bitsail-connector-kafka/src/test/java/com/bytedance/bitsail/connector/legacy/kafka/source/KafkaSourceITCase.java) 。
+例如，我们为Kafka读连接器构建了一个集成测试 [KafkaSourceITCase](https://github.com/bytedance/bitsail/blob/master/bitsail-test/bitsail-test-integration/bitsail-test-integration-connector-legacy/bitsail-test-integration-kafka-legacy/src/test/java/com/bytedance/bitsail/test/integration/legacy/KafkaSourceITCase.java) 。
 在这个测试中，首先会使用 [test container](https://www.testcontainers.org/modules/kafka/) 在本地docker中启动Kafka服务。此后便可以通过 `testKafkaSource` 方法来启动一个本地的 kafka2print flink作业。
 
 ```java

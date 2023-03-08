@@ -59,48 +59,6 @@
             <artifactId>mariadb-java-client</artifactId>
             <version>${maridb.version}</version>
         </dependency>
-
-        <!-- dependencies for test -->
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-test</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.kafka</groupId>
-                    <artifactId>kafka-clients</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>connector-print</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>connector-kafka</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.kafka</groupId>
-                    <artifactId>kafka-clients</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>io.debezium</groupId>
-            <artifactId>debezium-core</artifactId>
-            <version>${debezium.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
 </project>
