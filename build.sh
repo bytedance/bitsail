@@ -17,7 +17,7 @@
 
 set -e
 
-mvnProfile=flink-embedded
+mvnProfile=flink-embedded,flink-1.11
 revision="0.2.0-SNAPSHOT"   # modify ${revision} when version updated
 
 echo "mvn profile = ${mvnProfile}"

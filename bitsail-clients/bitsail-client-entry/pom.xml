@@ -112,7 +112,6 @@
                                 <excludes>
                                     <!-- Exclude old version metrics-core -->
                                     <exclude>com.codahale.metrics:metrics-core</exclude>
-                                    <exclude>commons-collections:commons-collections</exclude>
                                     <exclude>log4j:*</exclude>
                                     <exclude>org.apache.flink:flink-runtime_${scala.binary.version}</exclude>
                                 </excludes>
