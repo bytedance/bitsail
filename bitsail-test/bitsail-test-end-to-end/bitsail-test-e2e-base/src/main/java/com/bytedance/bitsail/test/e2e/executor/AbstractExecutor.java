@@ -66,6 +66,8 @@ public abstract class AbstractExecutor extends AbstractContainer {
 
   private static final Path EXECUTOR_LIBRARIES_DIR = EXECUTOR_ROOT_DIR.resolve("libs");
   private static final Path EXECUTOR_CLIENTS_DIR = EXECUTOR_LIBRARIES_DIR.resolve("clients");
+  private static final Path EXECUTOR_CLIENTS_ENGINE_MAPPING_DIR = EXECUTOR_CLIENTS_DIR.resolve("mapping");
+  private static final Path EXECUTOR_CLIENTS_ENGINE_DIR = EXECUTOR_CLIENTS_DIR.resolve("engines");
   private static final Path EXECUTOR_ENGINES_DIR = EXECUTOR_LIBRARIES_DIR.resolve("engines");
   private static final Path EXECUTOR_ENGINES_MAPPING_DIR = EXECUTOR_ENGINES_DIR.resolve("mapping");
   private static final Path EXECUTOR_CONNECTORS_DIR = EXECUTOR_LIBRARIES_DIR.resolve("connectors");
@@ -218,8 +220,8 @@ public abstract class AbstractExecutor extends AbstractContainer {
 
     // libs/engines
     // libs/clients/bitsail-client-entry-{engine}-{revision}.jar
-    addEngineModuleLibrary(getCoreEngineModule(), EXECUTOR_ENGINES_DIR, EXECUTOR_ENGINES_MAPPING_DIR, true);
-    addEngineModuleLibrary(getClientEngineModule(), EXECUTOR_CLIENTS_DIR, null, false);
+    addEngineModuleLibrary(getCoreEngineModule(), EXECUTOR_ENGINES_DIR, EXECUTOR_ENGINES_MAPPING_DIR);
+    addEngineModuleLibrary(getClientEngineModule(), EXECUTOR_CLIENTS_ENGINE_DIR, EXECUTOR_CLIENTS_ENGINE_MAPPING_DIR);
   }
 
   /**
@@ -229,8 +231,7 @@ public abstract class AbstractExecutor extends AbstractContainer {
    */
   private void addEngineModuleLibrary(String moduleName,
                                       Path moduleExecutorPath,
-                                      Path moduleMappingExecutorPath,
-                                      boolean addMappingFile) {
+                                      Path moduleMappingExecutorPath) {
     Optional<File> optional = Modules.getModuleTargetJar(localRootDir, moduleName);
     if (!optional.isPresent()) {
       throw BitSailException.asBitSailException(
@@ -240,9 +241,6 @@ public abstract class AbstractExecutor extends AbstractContainer {
 
     File moduleFile = optional.get();
     transferableFiles.add(new TransferableFile(moduleFile.getAbsolutePath(), moduleExecutorPath.resolve(moduleFile.getName()).toAbsolutePath().toString()));
-    if (!addMappingFile) {
-      LOG.info("Module {} skip add mapping file to executor.", moduleName);
-    }
     Optional<File[]> moduleResourceMappings = Modules.getModuleResourceMappings(localRootDir, moduleName);
     if (!moduleResourceMappings.isPresent()) {
       throw BitSailException.asBitSailException(

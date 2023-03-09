@@ -54,13 +54,6 @@
             <version>${revision}</version>
         </dependency>
 
-        <!-- flink 1.11 engine -->
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-core-flink-bridge</artifactId>
-            <version>${revision}</version>
-        </dependency>
-
         <!-- common used connector -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
@@ -73,5 +66,22 @@
             <artifactId>connector-print</artifactId>
             <version>${revision}</version>
         </dependency>
+
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>flink-1.11</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.bytedance.bitsail</groupId>
+                    <artifactId>bitsail-core-flink-1.11-bridge</artifactId>
+                    <version>${revision}</version>
+                </dependency>
+            </dependencies>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
 </project>

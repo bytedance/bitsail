@@ -56,14 +56,6 @@
     </dependencyManagement>
 
     <dependencies>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-core-flink-bridge</artifactId>
-            <version>${revision}</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!--  flink -->
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -96,5 +88,23 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-table-planner-blink_${scala.binary.version}</artifactId>
         </dependency>
+
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>flink-1.11</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.bytedance.bitsail</groupId>
+                    <artifactId>bitsail-core-flink-1.11-bridge</artifactId>
+                    <version>${revision}</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
 </project>

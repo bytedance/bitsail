@@ -21,13 +21,14 @@ import re
 import sys
 
 # list all sub modules under `module`
-def list_sub_modules(module, include_pattern, exclude_pattern):
+def list_sub_modules(module, include_pattern, exclude_patterns = None):
     files = os.scandir(module)
     sub_modules = [f.name for f in files if f.is_dir()]
     if include_pattern is not None:
         sub_modules = [module for module in sub_modules if re.fullmatch(include_pattern, module) is not None]
-    if exclude_pattern is not None:
-        sub_modules = [module for module in sub_modules if re.fullmatch(exclude_pattern, module) is None]
+    if exclude_patterns is not None:
+        for exclude_pattern in exclude_patterns:
+            sub_modules = [module for module in sub_modules if re.fullmatch(exclude_pattern, module) is None]
     sub_modules = [os.path.join(module, sub_module) for sub_module in sub_modules]
     return sub_modules
 
@@ -37,11 +38,12 @@ def get_integration_test_all_modules():
     v1_module = 'bitsail-test/bitsail-test-integration'
     test_module_v1 = list_sub_modules(v1_module,
                                       'bitsail-test-integration-.*',
-                                      'bitsail-test-integration-connector-legacy')
+                                      ['bitsail-test-integration-connector-legacy',
+                                       'bitsail-test-integration-kudu'])  # kudu test cannot be applied to all platforms
     # print('v1 connector integration test modules:\n' + '\n'.join(test_module_v1) + '')
 
     legacy_module = 'bitsail-test/bitsail-test-integration/bitsail-test-integration-connector-legacy'
-    test_module_legacy = list_sub_modules(legacy_module, 'bitsail-test-integration-.*-legacy', None)
+    test_module_legacy = list_sub_modules(legacy_module, 'bitsail-test-integration-.*-legacy')
     # print('legacy connector integration test modules:\n' + '\n'.join(test_module_legacy) + '')
 
     all_test_module = test_module_v1 + test_module_legacy
@@ -52,7 +54,7 @@ def get_integration_test_all_modules():
 # v1 connector e2e test modules
 def get_e2e_test_all_modules():
     v1_module = 'bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-connector-v1'
-    test_module_v1 = list_sub_modules(v1_module, 'bitsail-test-e2e-connector-v1-.*', None)
+    test_module_v1 = list_sub_modules(v1_module, 'bitsail-test-e2e-connector-v1-.*')
     test_module_v1 = ','.join(test_module_v1)
     # print('all e2e test modules: ' + test_module_v1)
     return test_module_v1

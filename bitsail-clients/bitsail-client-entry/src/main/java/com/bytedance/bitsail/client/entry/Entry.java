@@ -21,19 +21,20 @@ import com.bytedance.bitsail.client.api.command.CommandAction;
 import com.bytedance.bitsail.client.api.command.CommandArgsParser;
 import com.bytedance.bitsail.client.api.engine.EngineRunner;
 import com.bytedance.bitsail.client.entry.constants.EntryConstants;
+import com.bytedance.bitsail.client.entry.plugins.ClientPluginFinder;
 import com.bytedance.bitsail.client.entry.security.SecurityContextFactory;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.configuration.BitSailSystemConfiguration;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 
-import com.beust.jcommander.internal.Maps;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URLClassLoader;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
 
@@ -45,8 +46,6 @@ import static java.util.Locale.US;
  */
 public class Entry {
   private static final Logger LOG = LoggerFactory.getLogger(Entry.class);
-
-  private static final Map<String, EngineRunner> RUNNERS = Maps.newHashMap();
   private static final Class<EngineRunner> ENGINE_SPI_CLASS = EngineRunner.class;
 
   private static final Object LOCK = new Object();
@@ -56,21 +55,16 @@ public class Entry {
   private final URLClassLoader classloader;
   private final BitSailConfiguration sysConfiguration;
   private final BaseCommandArgs baseCommandArgs;
-
-  private static void loadAllEngines() {
-    for (EngineRunner runner : ServiceLoader.load(ENGINE_SPI_CLASS)) {
-      String engineName = runner.engineName();
-      LOG.info("Load engine {} from classpath.", engineName);
-      RUNNERS.put(StringUtils.upperCase(engineName), runner);
-    }
-  }
+  private final ClientPluginFinder clientPluginFinder;
+  private EngineRunner engineRunner;
 
   private Entry(BitSailConfiguration sysConfiguration,
                 BaseCommandArgs baseCommandArgs) {
     this.sysConfiguration = sysConfiguration;
     this.baseCommandArgs = baseCommandArgs;
     this.classloader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
-    loadAllEngines();
+    this.clientPluginFinder = new ClientPluginFinder(classloader);
+    this.clientPluginFinder.configure(sysConfiguration);
   }
 
   @SuppressWarnings("checkstyle:EmptyLineSeparator")
@@ -105,7 +99,7 @@ public class Entry {
     if (args.length < 1) {
       CommandArgsParser.printHelp();
       System.out.println(String.format(US, "Please specify an action. Supported action are [%s], [%s]",
-              RUN_COMMAND, CommandAction.STOP_COMMAND));
+          RUN_COMMAND, CommandAction.STOP_COMMAND));
       System.exit(EntryConstants.ERROR_EXIT_CODE_COMMAND_ERROR);
     }
     final String mainCommand = args[0];
@@ -117,19 +111,34 @@ public class Entry {
     return baseCommandArgs;
   }
 
+  private void prepareEnginPlugins(String engine) {
+    if (Objects.nonNull(engineRunner)) {
+      return;
+    }
+    engine = StringUtils.trim(engine);
+    LOG.info("Try to prepare engine's client entry: {}.", engine);
+    clientPluginFinder.loadPlugin(engine);
+    for (EngineRunner runner : ServiceLoader.load(ENGINE_SPI_CLASS, clientPluginFinder.getClassloader())) {
+      LOG.info("Founded engine runner: {}.", runner.engineName());
+      if (StringUtils.equalsIgnoreCase(runner.engineName(), engine)) {
+        this.engineRunner = runner;
+        break;
+      }
+    }
+    LOG.info("Finished load engine's client.");
+    if (Objects.isNull(engineRunner)) {
+      throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR, "");
+    }
+  }
+
   private int runCommand() throws IOException, InterruptedException {
+    prepareEnginPlugins(baseCommandArgs.getEngineName());
     ProcessBuilder processBuilder = buildProcessBuilder(sysConfiguration, baseCommandArgs);
     return startProcessBuilder(processBuilder, baseCommandArgs);
   }
 
   private ProcessBuilder buildProcessBuilder(BitSailConfiguration sysConfiguration,
                                              BaseCommandArgs baseCommandArgs) throws IOException {
-    String engineName = baseCommandArgs.getEngineName();
-    LOG.info("Final engine: {}.", engineName);
-    EngineRunner engineRunner = RUNNERS.get(StringUtils.upperCase(engineName));
-    if (Objects.isNull(engineRunner)) {
-      throw new IllegalArgumentException(String.format("Engine %s not support now.", engineName));
-    }
     engineRunner.initializeEngine(sysConfiguration);
     engineRunner.loadLibrary(classloader);
 
