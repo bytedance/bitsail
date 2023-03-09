@@ -53,14 +53,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- engine -->
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-core-flink-bridge</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-
         <!-- clients -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
@@ -68,17 +60,37 @@
             <version>${revision}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-client-entry</artifactId>
             <version>${revision}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-client-entry-flink</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
+
+
+    <profiles>
+        <profile>
+            <id>flink-1.11</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.bytedance.bitsail</groupId>
+                    <artifactId>bitsail-core-flink-1.11-bridge</artifactId>
+                    <version>${revision}</version>
+                    <scope>test</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.bytedance.bitsail</groupId>
+                    <artifactId>bitsail-client-flink-1.11</artifactId>
+                    <version>${revision}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
 </project>

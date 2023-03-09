@@ -26,18 +26,20 @@
 
     <dependencySets>
 
-        <!-- Client Jars  -->
+        <!-- Flink Client Jars  -->
         <dependencySet>
-            <outputDirectory>libs/clients</outputDirectory>
+            <outputDirectory>libs/clients/engines</outputDirectory>
             <unpack>false</unpack>
             <useProjectArtifact>false</useProjectArtifact>
             <useProjectAttachments>false</useProjectAttachments>
             <useTransitiveDependencies>false</useTransitiveDependencies>
             <scope>provided</scope>
             <includes>
-                <include>com.bytedance.bitsail:bitsail-client-entry-*</include>
-                <include>com.bytedance.bitsail:bitsail-client-entry:*</include>
+                <include>com.bytedance.bitsail:bitsail-client-flink-*</include>
             </includes>
+            <excludes>
+                <exclude>com.bytedance.bitsail:bitsail-client-flink-base</exclude>
+            </excludes>
         </dependencySet>
 
         <!--  Legacy & Unified Connector Jars   -->
@@ -67,7 +69,7 @@
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <scope>provided</scope>
             <includes>
-                <include>com.bytedance.bitsail:bitsail-core-*</include>
+                <include>com.bytedance.bitsail:bitsail-core-flink-*</include>
             </includes>
             <excludes>
                 <exclude>com.bytedance.bitsail:bitsail-core-api</exclude>
@@ -161,7 +163,7 @@
         <moduleSet>
             <useAllReactorProjects>true</useAllReactorProjects>
             <includes>
-                <include>com.bytedance.bitsail:bitsail-core-*-bridge</include>
+                <include>com.bytedance.bitsail:bitsail-core-flink-*</include>
             </includes>
             <sources>
                 <includeModuleDirectory>false</includeModuleDirectory>
@@ -177,6 +179,26 @@
                 </fileSets>
             </sources>
         </moduleSet>
+
+        <moduleSet>
+            <useAllReactorProjects>true</useAllReactorProjects>
+            <includes>
+                <include>com.bytedance.bitsail:bitsail-client-flink-*</include>
+            </includes>
+            <sources>
+                <includeModuleDirectory>false</includeModuleDirectory>
+                <fileSets>
+                    <fileSet>
+                        <directory>src/main/resources</directory>
+                        <useDefaultExcludes>true</useDefaultExcludes>
+                        <includes>
+                            <include>*.json</include>
+                        </includes>
+                        <outputDirectory>libs/clients/mapping/</outputDirectory>
+                    </fileSet>
+                </fileSets>
+            </sources>
+        </moduleSet>
     </moduleSets>
 
 
@@ -188,5 +210,11 @@
             <fileMode>0644</fileMode>
         </file>
 
+        <!--    client    -->
+        <file>
+            <source>../bitsail-clients/bitsail-client-entry/target/bitsail-client-entry-${revision}.jar</source>
+            <destName>libs/clients/bitsail-client-${revision}.jar</destName>
+            <fileMode>0644</fileMode>
+        </file>
     </files>
 </assembly>
