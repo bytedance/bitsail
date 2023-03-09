@@ -20,7 +20,6 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.BasicArrayTypeInfo;
-import com.bytedance.bitsail.common.typeinfo.BasicTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
@@ -58,10 +57,6 @@ public class KuduRowDeserializer {
   }
 
   private Function<RowResult, Object> initConverter(String columnName, TypeInfo<?> typeInfo) {
-    if (!(typeInfo instanceof BasicTypeInfo)) {
-      throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_COLUMN_TYPE, typeInfo.getTypeClass().getName() + " is not supported yet.");
-    }
-
     Class<?> curClass = typeInfo.getTypeClass();
     if (TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass() == curClass) {
       return rowResult -> rowResult.getBoolean(columnName);
@@ -97,8 +92,8 @@ public class KuduRowDeserializer {
       return rowResult -> rowResult.getString(columnName);
     }
     if (BasicArrayTypeInfo.BINARY_TYPE_INFO.getTypeClass() == curClass) {
-      return rowResult -> rowResult.getBinary(columnName);
+      return rowResult -> rowResult.getBinary(columnName).array();
     }
-    throw new UnsupportedOperationException("Unsupported data type: " + typeInfo);
+    throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_COLUMN_TYPE, typeInfo.getTypeClass().getName() + " is not supported yet.");
   }
 }
