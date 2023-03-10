@@ -64,9 +64,10 @@
 
         <!--    project version    -->
         <revision>0.2.0-SNAPSHOT</revision>
-        <flink.version>1.11.6</flink.version>
-        <scala.version>2.11.12</scala.version>
-        <scala.binary.version>2.11</scala.binary.version>
+        <flink-1.11.version>1.11.6</flink-1.11.version>
+        <flink-1.16.version>1.16.1</flink-1.16.version>
+        <scala-2.12.version>2.12.7</scala-2.12.version>
+        <scala-2.11.version>2.11.12</scala-2.11.version>
 
         <!--   base packages version     -->
         <lombok.version>1.18.2</lombok.version>
@@ -752,8 +753,8 @@
                                         <exclude>org.slf4j:*</exclude>
                                         <exclude>ch.qos.logback:*</exclude>
                                         <exclude>org.apache.logging.log4j:*</exclude>
-                                        <exclude>org.apache.flink:flink-runtime_${scala.binary.version}</exclude>
-                                        <exclude>org.apache.flink:flink-streaming-java_${scala.binary.version}</exclude>
+                                        <exclude>org.apache.flink:flink-runtime_*</exclude>
+                                        <exclude>org.apache.flink:flink-streaming-java_*</exclude>
                                         <exclude>org.apache.flink:force-shading</exclude>
                                     </excludes>
                                 </artifactSet>

@@ -81,12 +81,7 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-hadoop-compatibility_${scala.binary.version}</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jedis</artifactId>
-                    <groupId>redis.clients</groupId>
-                </exclusion>
-            </exclusions>
+            <version>${flink.version}</version>
         </dependency>
     </dependencies>
 </project>

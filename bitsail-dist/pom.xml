@@ -296,6 +296,9 @@
     <profiles>
         <profile>
             <id>flink-1.11</id>
+            <properties>
+                <scala.version>${scala-2.11.version}</scala.version>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>com.bytedance.bitsail</groupId>
@@ -318,6 +321,9 @@
 
         <profile>
             <id>flink-1.16</id>
+            <properties>
+                <scala.version>${scala-2.12.version}</scala.version>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>com.bytedance.bitsail</groupId>
@@ -328,34 +334,34 @@
             </dependencies>
         </profile>
 
-        <profile>
-            <id>flink-embedded</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.googlecode.maven-download-plugin</groupId>
-                        <artifactId>download-maven-plugin</artifactId>
-                        <version>1.6.8</version>
-                        <executions>
-                            <execution>
-                                <!-- the wget goal actually binds itself to this phase by default -->
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>wget</goal>
-                                </goals>
-                                <configuration>
-                                    <url>
-                                        https://archive.apache.org/dist/flink/flink-${flink.version}/flink-${flink.version}-bin-scala_${scala.binary.version}.tgz
-                                    </url>
-                                    <unpack>true</unpack>
-                                    <!-- default target location, just to demonstrate the parameter -->
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
+        <!--        <profile>-->
+        <!--            <id>flink-1.11-embedded</id>-->
+        <!--            <build>-->
+        <!--                <plugins>-->
+        <!--                    <plugin>-->
+        <!--                        <groupId>com.googlecode.maven-download-plugin</groupId>-->
+        <!--                        <artifactId>download-maven-plugin</artifactId>-->
+        <!--                        <version>1.6.8</version>-->
+        <!--                        <executions>-->
+        <!--                            <execution>-->
+        <!--                                &lt;!&ndash; the wget goal actually binds itself to this phase by default &ndash;&gt;-->
+        <!--                                <phase>process-resources</phase>-->
+        <!--                                <goals>-->
+        <!--                                    <goal>wget</goal>-->
+        <!--                                </goals>-->
+        <!--                                <configuration>-->
+        <!--                                    <url>-->
+        <!--                                        https://archive.apache.org/dist/flink/flink-${flink.version}/flink-${flink.version}-bin-scala_${scala.binary.version}.tgz-->
+        <!--                                    </url>-->
+        <!--                                    <unpack>true</unpack>-->
+        <!--                                    &lt;!&ndash; default target location, just to demonstrate the parameter &ndash;&gt;-->
+        <!--                                    <outputDirectory>${project.build.directory}</outputDirectory>-->
+        <!--                                </configuration>-->
+        <!--                            </execution>-->
+        <!--                        </executions>-->
+        <!--                    </plugin>-->
+        <!--                </plugins>-->
+        <!--            </build>-->
+        <!--        </profile>-->
     </profiles>
 </project>
