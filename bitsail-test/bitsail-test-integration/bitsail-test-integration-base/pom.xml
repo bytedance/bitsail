@@ -79,9 +79,17 @@
                     <version>${revision}</version>
                 </dependency>
             </dependencies>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+        </profile>
+
+        <profile>
+            <id>flink-1.16</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.bytedance.bitsail</groupId>
+                    <artifactId>bitsail-core-flink-1.16-bridge</artifactId>
+                    <version>${revision}</version>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>

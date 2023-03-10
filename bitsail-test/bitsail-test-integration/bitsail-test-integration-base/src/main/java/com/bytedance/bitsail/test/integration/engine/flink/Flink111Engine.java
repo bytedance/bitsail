@@ -23,18 +23,30 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.core.api.command.CoreCommandArgs;
 import com.bytedance.bitsail.core.api.program.UnifiedProgram;
-import com.bytedance.bitsail.core.flink.bridge.program.FlinkProgram;
 import com.bytedance.bitsail.test.integration.engine.IntegrationEngine;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
-public class Flink11Engine implements IntegrationEngine {
-  private static final Logger LOG = LoggerFactory.getLogger(Flink11Engine.class);
+public class Flink111Engine implements IntegrationEngine {
+  private static final Logger LOG = LoggerFactory.getLogger(Flink111Engine.class);
 
   private static final long DEFAULT_JOB_ID = -1L;
+  public static final String CLASS_NAME = "com.bytedance.bitsail.core.flink.bridge.program.FlinkProgram";
+  private Class<?> clazz;
+
+  @Override
+  public boolean available() {
+    try {
+      clazz = ClassUtils.getClass(CLASS_NAME);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
 
   @Override
   public void submitJob(BitSailConfiguration jobConf) throws Exception {
@@ -46,7 +58,7 @@ public class Flink11Engine implements IntegrationEngine {
     LOG.info("Final Configuration: {}.\n", jobConf.desensitizedBeautify());
     CoreCommandArgs coreCommandArgs = new CoreCommandArgs();
     coreCommandArgs.setEngineName("flink");
-    UnifiedProgram unifiedProgram = new FlinkProgram();
+    UnifiedProgram unifiedProgram = (UnifiedProgram) clazz.newInstance();
     PluginFinder pluginFinder = PluginFinderFactory.getPluginFinder(jobConf.get(CommonOptions.PLUGIN_FINDER_NAME));
     pluginFinder.configure(jobConf);
     unifiedProgram.configure(pluginFinder, jobConf, coreCommandArgs);

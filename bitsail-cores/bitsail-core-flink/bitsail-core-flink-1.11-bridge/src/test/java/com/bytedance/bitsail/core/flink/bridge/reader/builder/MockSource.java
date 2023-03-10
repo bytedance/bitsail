@@ -105,7 +105,7 @@ public class MockSource implements Source<Void, MockSource.MockSourceSplit, Stri
       }
 
       @Override
-      public String snapshotState() {
+      public String snapshotState(long checkpoint) {
         return null;
       }
 

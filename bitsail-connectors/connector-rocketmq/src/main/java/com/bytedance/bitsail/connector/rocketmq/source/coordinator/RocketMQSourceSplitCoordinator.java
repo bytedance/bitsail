@@ -273,7 +273,7 @@ public class RocketMQSourceSplitCoordinator implements
   }
 
   @Override
-  public RocketMQState snapshotState() throws Exception {
+  public RocketMQState snapshotState(long checkpointId) throws Exception {
     return new RocketMQState(assignedPartitions);
   }
 

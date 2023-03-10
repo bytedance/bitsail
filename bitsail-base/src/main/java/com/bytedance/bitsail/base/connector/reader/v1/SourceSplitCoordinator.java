@@ -37,7 +37,7 @@ public interface SourceSplitCoordinator<SplitT extends SourceSplit, StateT> exte
   default void handleSourceEvent(int subtaskId, SourceEvent sourceEvent) {
   }
 
-  StateT snapshotState() throws Exception;
+  StateT snapshotState(long checkpoint) throws Exception;
 
   default void notifyCheckpointComplete(long checkpointId) throws Exception {
   }
