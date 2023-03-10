@@ -108,5 +108,12 @@ public interface WriterOptions {
     ConfigOption<String> WRITE_MODE =
         key(WRITER_PREFIX + "write_mode")
             .defaultValue("overwrite");
+
+    /**
+     * Whether to align schema during data writing
+     */
+    ConfigOption<Boolean> SCHEMA_ALIGN =
+        key(WRITER_PREFIX + "schema_align")
+            .defaultValue(false);
   }
 }

@@ -27,7 +27,8 @@ public enum KuduErrorCode implements ErrorCode {
   UNSUPPORTED_TYPE("Kudu-04", "Type is not supported"),
   ILLEGAL_VALUE("Kudu-05", "Value type is illegal"),
   SPLIT_ERROR("Kudu-06", "Something wrong with creating splits."),
-  PREDICATE_ERROR("Kudu-07", "Something wrong with kudu predicates.");
+  PREDICATE_ERROR("Kudu-07", "Something wrong with kudu predicates."),
+  ALTER_TABLE_ERROR("Kudu-08", "Something wrong when alter table.");
 
   private final String code;
 
