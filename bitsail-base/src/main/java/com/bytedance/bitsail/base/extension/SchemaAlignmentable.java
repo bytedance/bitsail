@@ -19,5 +19,7 @@ package com.bytedance.bitsail.base.extension;
 import java.io.Serializable;
 
 public interface SchemaAlignmentable<T> extends Serializable {
+
   void align(T currentSchema, T targetSchema) throws Exception;
+
 }
