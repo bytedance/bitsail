@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static com.bytedance.bitsail.connector.kafka.constant.KafkaConstants.KAFKA_CONNECTOR_NAME;
+import static com.bytedance.bitsail.connector.kafka.constants.KafkaConstants.CONNECTOR_TYPE_VALUE_KAFKA;
 
 public class KafkaSource implements Source<Row, KafkaSplit, KafkaState>, ParallelismComputable {
 
@@ -80,7 +80,7 @@ public class KafkaSource implements Source<Row, KafkaSplit, KafkaState>, Paralle
 
   @Override
   public String getReaderName() {
-    return KAFKA_CONNECTOR_NAME;
+    return CONNECTOR_TYPE_VALUE_KAFKA;
   }
 
   @Override

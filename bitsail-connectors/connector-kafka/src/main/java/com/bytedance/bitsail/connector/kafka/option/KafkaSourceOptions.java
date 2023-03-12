@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
 import static com.bytedance.bitsail.connector.kafka.constant.KafkaConstants.CONSUMER_OFFSET_LATEST_KEY;
-import static com.bytedance.bitsail.connector.kafka.constant.KafkaConstants.JSON_FORMAT;
+import static com.bytedance.bitsail.connector.kafka.constants.KafkaConstants.JSON_FORMAT;
 
 public interface KafkaSourceOptions extends ReaderOptions.BaseReaderOptions {
 

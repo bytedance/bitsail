@@ -22,7 +22,7 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.connector.base.source.split.SplitAssigner;
-import com.bytedance.bitsail.connector.kafka.constant.KafkaConstants;
+import com.bytedance.bitsail.connector.kafka.constants.KafkaConstants;
 import com.bytedance.bitsail.connector.kafka.error.KafkaErrorCode;
 import com.bytedance.bitsail.connector.kafka.option.KafkaSourceOptions;
 import com.bytedance.bitsail.connector.kafka.source.split.KafkaSplit;
@@ -35,7 +35,6 @@ import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.OffsetSpec;
 import org.apache.kafka.clients.admin.TopicDescription;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.TopicPartitionInfo;
@@ -55,7 +54,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import static com.bytedance.bitsail.connector.kafka.constant.KafkaConstants.CONSUMER_OFFSET_TIMESTAMP_KEY;
+import static com.bytedance.bitsail.connector.kafka.constants.KafkaConstants.CONSUMER_OFFSET_TIMESTAMP_KEY;
+
 
 public class KafkaSourceSplitCoordinator implements SourceSplitCoordinator<KafkaSplit, KafkaState> {
 

@@ -20,15 +20,5 @@ public class KafkaConstants {
 
   public static String KAFKA_CONNECTOR_NAME = "kafka";
 
-  public static final String CONSUMER_OFFSET_LATEST_KEY = "latest";
 
-  public static final String CONSUMER_OFFSET_EARLIEST_KEY = "earliest";
-
-  public static final String CONSUMER_OFFSET_TIMESTAMP_KEY = "timestamp";
-
-  public static final Long CONSUMER_STOPPING_OFFSET = Long.MAX_VALUE;
-
-  public static final String DEFAULT_CLIENT_ID = "-coordinator-admin-client-";
-
-  public static final String JSON_FORMAT = "json";
 }
