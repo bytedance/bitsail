@@ -209,7 +209,7 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
       }
     } catch (Exception e) {
       metricManager.reportRecord(0, MessageType.FAILED);
-      throw new IOException("Couldn't write date - " + value, e);
+      throw new IOException("Couldn't write data - " + value, e);
     }
 
     try (CallTracer ignore = metricManager.recordTimer(RECORD_CHANNEL_FLOW_CONTROL).get()) {
