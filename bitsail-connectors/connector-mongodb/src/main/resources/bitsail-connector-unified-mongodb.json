@@ -1,0 +1,9 @@
+{
+  "name": "bitsail-connector-unified-mongodb",
+  "classes": [
+    "com.bytedance.bitsail.connector.mongodb.source.MongoDBSource"
+  ],
+  "libs": [
+    "connector-mongodb-${version}.jar"
+  ]
+}

@@ -23,7 +23,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 
 @Slf4j
 public class EntryTest {
@@ -38,11 +41,37 @@ public class EntryTest {
   }
 
   @Test
+  public void testBuildCommandArgsCancel() {
+    String[] args = new String[] {"cancel", "--engine", "flink"};
+    BaseCommandArgs baseCommandArgs = Entry.loadCommandArguments(args);
+    Assert.assertEquals(baseCommandArgs.getUnknownOptions().length, 0);
+    Assert.assertEquals(baseCommandArgs.getEngineName(), "flink");
+    Assert.assertEquals(baseCommandArgs.getMainAction(), "cancel");
+  }
+
+  @Test
   public void testBuildFakeEngine() throws Exception {
     String jobConfPath = Paths.get(
         EntryTest.class.getResource("/test_job_conf.json").toURI()
     ).toFile().getAbsolutePath();
     String[] args = new String[] {"run", "--engine", "fake", "--conf", jobConfPath};
+    SystemLambda.catchSystemExit(() -> Entry.main(args));
+  }
+
+  @Test
+  public void testBuildFakeEngineWithCancel() throws Exception {
+    String[] args = new String[] {"stop", "--engine", "fake"};
+    SystemLambda.catchSystemExit(() -> Entry.main(args));
+  }
+
+  @Test
+  public void testBuildFakeEngineWithConfInBase64() throws Exception {
+    Path jobConfPath = Paths.get(
+            EntryTest.class.getResource("/test_job_conf.json").toURI()
+    ).toFile().toPath();
+    byte[] fileContent = Files.readAllBytes(jobConfPath);
+    String jobConfInBase64 = Base64.getEncoder().encodeToString(fileContent);
+    String[] args = new String[] {"run", "--engine", "fake", "--conf-in-base64", jobConfInBase64};
     SystemLambda.catchSystemExit(() -> Entry.main(args));
   }
 }

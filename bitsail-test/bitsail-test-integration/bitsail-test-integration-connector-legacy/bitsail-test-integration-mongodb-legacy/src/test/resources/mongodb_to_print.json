@@ -1,0 +1,31 @@
+{
+  "job": {
+    "common": {
+      "job_id": -2501346,
+      "job_name": "bitsail_test_integration_legacy_mongodb_to_print",
+      "instance_id": -20501346,
+      "user_name": "user"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.legacy.mongodb.source.MongoDBInputFormat",
+      "columns": [
+        {
+          "name": "_id",
+          "type": "objectid"
+        },
+        {
+          "name": "string_field",
+          "type": "string"
+        },
+        {
+          "name": "int_field",
+          "type": "long"
+        }
+      ],
+      "reader_parallelism_num":1
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink"
+    }
+  }
+}

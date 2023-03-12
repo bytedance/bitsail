@@ -158,3 +158,11 @@ dir:
 > - [commons-cli](https://repo1.maven.org/maven2/commons-cli/commons-cli/1.5.0/commons-cli-1.5.0.jar)
 > 
 > 下载完成后，即可在output目录提交测试任务。
+
+32. **如何在非linux/amd64和linux/arm64架构的设备上运行flink相关的E2E测试？**
+
+> 目前E2E使用的Flink Executor仅支持linux/amd64和linux/arm64。
+> 
+> 如果你想要在其他OS/ARCH上运行Flink相关的E2E测试，那么需要手动构建一个适合OS/ARCH的Flink镜像，并替换相应Flink executor中的镜像版本。
+> 
+> 在文档[Support multi-arch flink docker image](https://github.com/bytedance/bitsail/blob/master/bitsail-test/bitsail-test-end-to-end/bitsail-test-e2e-base/src/main/resources/docker/flink/README.md)中详细介绍了如何构建Flink镜像，可以参考此文档操作。

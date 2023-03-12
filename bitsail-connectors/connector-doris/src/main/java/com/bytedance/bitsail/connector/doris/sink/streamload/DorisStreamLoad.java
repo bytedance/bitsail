@@ -18,6 +18,7 @@ package com.bytedance.bitsail.connector.doris.sink.streamload;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.model.ColumnInfo;
+import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.doris.config.DorisExecutionOptions;
 import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 import com.bytedance.bitsail.connector.doris.error.DorisErrorCode;
@@ -37,7 +38,6 @@ import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.apache.flink.util.Preconditions;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;

@@ -41,52 +41,11 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--   engine jars     -->
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-core-flink-bridge</artifactId>
-            <version>${revision}</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!--   client jars     -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-client-entry</artifactId>
             <version>${revision}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-client-entry-flink</artifactId>
-            <version>${revision}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!--   logs    -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-access</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -272,7 +231,7 @@
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>connector-localfilesystem</artifactId>
@@ -303,7 +262,7 @@
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>connector-kafka</artifactId>
+            <artifactId>connector-mongodb</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>
@@ -335,6 +294,28 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>flink-1.11</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.bytedance.bitsail</groupId>
+                    <artifactId>bitsail-core-flink-1.11-bridge</artifactId>
+                    <version>${revision}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.bytedance.bitsail</groupId>
+                    <artifactId>bitsail-client-flink-1.11</artifactId>
+                    <version>${revision}</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+
         <profile>
             <id>flink-embedded</id>
             <build>

@@ -26,6 +26,7 @@ import com.bytedance.bitsail.base.extension.ParallelismComputable;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
+import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.rocketmq.option.RocketMQSourceOptions;
 import com.bytedance.bitsail.connector.rocketmq.source.coordinator.RocketMQSourceSplitCoordinator;
@@ -91,6 +92,7 @@ public class RocketMQSource
   public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConfiguration,
                                                 BitSailConfiguration rocketmqConfiguration,
                                                 ParallelismAdvice upstreamAdvice) throws Exception {
+
     String cluster = rocketmqConfiguration.get(RocketMQSourceOptions.CLUSTER);
     String topic = rocketmqConfiguration.get(RocketMQSourceOptions.TOPIC);
     String consumerGroup = rocketmqConfiguration.get(RocketMQSourceOptions.CONSUMER_GROUP);
@@ -100,17 +102,29 @@ public class RocketMQSource
         consumerGroup,
         UUID.randomUUID()
     ));
+
+    int messageQueueCount;
     try {
       consumer.start();
       Collection<MessageQueue> messageQueues = consumer.fetchMessageQueues(topic);
-      int adviceParallelism = Math.max(CollectionUtils.size(messageQueues) / DEFAULT_ROCKETMQ_PARALLELISM_THRESHOLD, 1);
-
-      return ParallelismAdvice.builder()
-          .adviceParallelism(adviceParallelism)
-          .enforceDownStreamChain(true)
-          .build();
+      messageQueueCount = CollectionUtils.size(messageQueues);
     } finally {
       consumer.shutdown();
     }
+
+    int adviceParallelism = -1;
+    if (rocketmqConfiguration.fieldExists(ReaderOptions.BaseReaderOptions.READER_PARALLELISM_NUM)) {
+      adviceParallelism = rocketmqConfiguration.get(ReaderOptions.BaseReaderOptions.READER_PARALLELISM_NUM);
+      adviceParallelism = Math.min(adviceParallelism, messageQueueCount);
+    }
+
+    if (adviceParallelism <= 0) {
+      adviceParallelism = Math.max(messageQueueCount / DEFAULT_ROCKETMQ_PARALLELISM_THRESHOLD, 1);
+    }
+
+    return ParallelismAdvice.builder()
+        .adviceParallelism(adviceParallelism)
+        .enforceDownStreamChain(true)
+        .build();
   }
 }

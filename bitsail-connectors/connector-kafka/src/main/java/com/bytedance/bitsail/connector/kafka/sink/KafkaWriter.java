@@ -105,6 +105,9 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
       partitionFieldsIndices = getPartitionFieldsIndices(fieldNames, partitionFieldsNames);
     }
 
+    if (format.equals("debezium")) {
+      optionalConfig.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArraySerializer");
+    }
     this.kafkaProducer = new KafkaProducer(this.bootstrapServers, this.kafkaTopic, optionalConfig);
     if (logFailuresOnly) {
       callback = (metadata, e) -> {
@@ -126,7 +129,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     checkErroneous();
     //TODO: refactor this as a format factory
     if (format.equals("debezium")) {
-      writeDebezium((BinlogRow) record);
+      writeDebezium(record);
     } else {
       String result = jsonConverter.convert(record).toString();
       // get partition id to insert if 'partitionFieldsIndices' is not empty
@@ -145,17 +148,17 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   }
 
   @SuppressWarnings("checkstyle:MagicNumber")
-  public void writeDebezium(BinlogRow record) {
+  public void writeDebezium(Row record) {
     String[] partitionFieldsValues = new String[1];
-    String key = record.getKey();
+    String key = record.getString(BinlogRow.KEY_INDEX);
     partitionFieldsValues[0] = key;
     int partitionId = choosePartitionIdByFields(partitionFieldsValues);
     Map<String, String> headers = new HashMap<>(4);
-    headers.put("db", record.getDatabase());
-    headers.put("table", record.getTable());
-    headers.put("ddl_flag", String.valueOf(record.getDDL()));
-    headers.put("version", String.valueOf(record.getVersion()));
-    byte[] value = record.getValue();
+    headers.put("db", record.getString(BinlogRow.DATABASE_INDEX));
+    headers.put("table", record.getString(BinlogRow.TABLE_INDEX));
+    headers.put("ddl_flag", String.valueOf(record.getBoolean(BinlogRow.DDL_FLAG_INDEX)));
+    headers.put("version", String.valueOf(record.getInt(BinlogRow.VERSION_INDEX)));
+    byte[] value = record.getBinary(BinlogRow.VALUE_INDEX);
     sendWithHeaders(key, value, partitionId, headers);
   }
 

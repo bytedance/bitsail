@@ -34,7 +34,7 @@ public class DebeziumHelperTest {
     BinlogSplit split = new BinlogSplit("split-0",
         BinlogOffset.earliest(),
         BinlogOffset.boundless());
-    MySqlOffsetContext offsetContext = DebeziumHelper.loadOffsetContext(connectorConfig, split);
+    MySqlOffsetContext offsetContext = DebeziumHelper.loadOffsetContext(connectorConfig, split, null);
     Assert.assertEquals("", offsetContext.getSource().binlogFilename());
     Assert.assertEquals(0L, offsetContext.getSource().binlogPosition());
   }
@@ -52,7 +52,7 @@ public class DebeziumHelperTest {
     BinlogSplit split = new BinlogSplit("split-0",
         offset,
         BinlogOffset.boundless());
-    MySqlOffsetContext offsetContext = DebeziumHelper.loadOffsetContext(connectorConfig, split);
+    MySqlOffsetContext offsetContext = DebeziumHelper.loadOffsetContext(connectorConfig, split, null);
     Assert.assertEquals(filename, offsetContext.getSource().binlogFilename());
     Assert.assertEquals(Long.parseLong(binlogOffset), offsetContext.getSource().binlogPosition());
   }

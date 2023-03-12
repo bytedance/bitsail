@@ -74,7 +74,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
+        os: [ ubuntu-latest ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - run: git config --global core.longpaths true
@@ -111,5 +111,31 @@ jobs:
           architecture: x64
           cache: 'maven'
       - name: Maven Verify Integration Test
-        run:
-          mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=false
+        run: |
+          all_integration_test_modules=`python tools/test/list-test-modules.py integration`
+          mvn clean verify -pl $all_integration_test_modules -DskipUT=true -DskipITCase=false -DskipE2E=true -D"checkstyle.skip"=true -am
+
+    # This workflow contains a single job called "integration-tests"
+  end-to-end-tests:
+    name: End-to-End Test
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - run: git config --global core.longpaths true
+      - uses: actions/checkout@v3
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          architecture: x64
+          cache: 'maven'
+
+      - name: Maven Verify End-to-End Test
+        run: |
+          all_e2e_test_modules=`python tools/test/list-test-modules.py e2e`
+          mvn clean verify -pl $all_e2e_test_modules -DskipUT=true -DskipITCase=true -DskipE2E=false -D"checkstyle.skip"=true -am

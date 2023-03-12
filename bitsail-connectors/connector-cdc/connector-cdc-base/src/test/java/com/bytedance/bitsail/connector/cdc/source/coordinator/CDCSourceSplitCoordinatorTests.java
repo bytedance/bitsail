@@ -28,6 +28,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,6 +43,7 @@ public class CDCSourceSplitCoordinatorTests {
     SourceSplitCoordinator.Context context = getContext(false, null, assigned);
     CDCSourceSplitCoordinator coordinator = new CDCSourceSplitCoordinator(context, jobConf);
     coordinator.start();
+    coordinator.addReader(0);
     Assert.assertEquals(1, assigned.get(0).size());
     Assert.assertEquals(BinlogOffsetType.EARLIEST, assigned.get(0).get(0).getBeginOffset().getOffsetType());
     BinlogAssignmentState state = (BinlogAssignmentState) coordinator.snapshotState();
@@ -64,6 +66,7 @@ public class CDCSourceSplitCoordinatorTests {
 
   SourceSplitCoordinator.Context<BinlogSplit, BaseAssignmentState> getContext(
       boolean isRestore, BaseAssignmentState restoredState, Map<Integer, List<BinlogSplit>> assigned) {
+    //TODO: Create a general test context
     SourceSplitCoordinator.Context<BinlogSplit, BaseAssignmentState> context = new SourceSplitCoordinator.Context<BinlogSplit, BaseAssignmentState>() {
       @Override
       public boolean isRestored() {
@@ -82,7 +85,9 @@ public class CDCSourceSplitCoordinatorTests {
 
       @Override
       public Set<Integer> registeredReaders() {
-        return null;
+        Set<Integer> registeredReaders = new HashSet<>();
+        registeredReaders.add(0);
+        return registeredReaders;
       }
 
       @Override

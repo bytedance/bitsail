@@ -35,7 +35,7 @@ export const enNavbar = navbar([
   },
   {
     text: "Download",
-    link: "https://github.com/bytedance/bitsail",
+    link: "https://github.com/bytedance/bitsail/releases",
     activeMatch: "^/en/release",
   },
   {
