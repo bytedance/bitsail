@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -65,7 +64,7 @@ public class KuduSourceSplitCoordinator implements SourceSplitCoordinator<KuduSo
       KuduClient client = kuduFactory.getClient();
       AbstractKuduSplitConstructor splitConstructor = KuduSplitFactory.getSplitConstructor(jobConf, client);
       splitList = splitConstructor.construct(client);
-    } catch (IOException e) {
+    } catch (Exception e) {
       throw new BitSailException(KuduErrorCode.SPLIT_ERROR, "Failed to create splits.");
     }
 

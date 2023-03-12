@@ -20,6 +20,8 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
 import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
+import com.bytedance.bitsail.connector.kudu.source.split.strategy.PartitionDivideSplitConstructor;
+import com.bytedance.bitsail.connector.kudu.source.split.strategy.PredicationDivideSplitConstructor;
 import com.bytedance.bitsail.connector.kudu.source.split.strategy.SimpleDivideSplitConstructor;
 
 import org.apache.kudu.client.KuduClient;
@@ -32,7 +34,9 @@ public class KuduSplitFactory {
   private static final Logger LOG = LoggerFactory.getLogger(KuduSplitFactory.class);
 
   public enum KuduSplitStrategy {
-    SIMPLE_DIVIDE
+    SIMPLE_DIVIDE,
+    PARTITION_DIVIDE,
+    PREDICATION_DIVIDE
   }
 
   @SuppressWarnings("checkstyle:FallThrough")
@@ -50,6 +54,24 @@ public class KuduSplitFactory {
           }
         } catch (IOException e) {
           LOG.warn("Failed to create SimpleDivideSplitConstructor, will try the next constructor type.", e);
+        }
+      case PARTITION_DIVIDE:
+        try {
+          constructor = new PartitionDivideSplitConstructor(jobConf, client);
+          if (constructor.isAvailable()) {
+            break;
+          }
+        } catch (IOException e) {
+          LOG.warn("Failed to create PartitionDivideSplitConstructor, will try the next constructor type.", e);
+        }
+      case PREDICATION_DIVIDE:
+        try {
+          constructor = new PredicationDivideSplitConstructor(jobConf, client);
+          if (constructor.isAvailable()) {
+            break;
+          }
+        } catch (IOException e) {
+          LOG.warn("Failed to create PredicationDivideSplitConstructor, will try the next constructor type.", e);
         }
       default:
         throw new BitSailException(KuduErrorCode.SPLIT_ERROR, "Cannot create a split constructor.");

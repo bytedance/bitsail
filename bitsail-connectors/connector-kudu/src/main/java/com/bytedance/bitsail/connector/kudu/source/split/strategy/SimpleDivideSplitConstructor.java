@@ -140,7 +140,7 @@ public class SimpleDivideSplitConstructor extends AbstractKuduSplitConstructor {
   }
 
   @Override
-  public List<KuduSourceSplit> construct(KuduClient kuduClient) throws IOException {
+  public List<KuduSourceSplit> construct(KuduClient kuduClient) throws Exception {
     List<KuduSourceSplit> splits = new ArrayList<>(splitConf.getSplitNum());
 
     int index = 0;

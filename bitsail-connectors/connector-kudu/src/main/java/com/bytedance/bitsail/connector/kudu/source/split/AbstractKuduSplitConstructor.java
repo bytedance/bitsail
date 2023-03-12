@@ -48,7 +48,7 @@ public abstract class AbstractKuduSplitConstructor {
 
   protected abstract boolean fillSplitConf(BitSailConfiguration jobConf, KuduClient client) throws IOException;
 
-  public abstract List<KuduSourceSplit> construct(KuduClient kuduClient) throws IOException;
+  public abstract List<KuduSourceSplit> construct(KuduClient kuduClient) throws Exception;
 
   /**
    * Used for determine parallelism num.
