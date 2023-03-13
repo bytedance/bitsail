@@ -36,7 +36,6 @@ public class PrintWriter implements Writer<Row, String, Integer> {
 
   private final int subTaskId;
 
-  private final int batchSize;
   private final String[] fieldNames;
   private final boolean sampleWrite;
   private final int sampleLimit;
@@ -52,8 +51,6 @@ public class PrintWriter implements Writer<Row, String, Integer> {
   }
 
   public PrintWriter(BitSailConfiguration writerConfiguration, Writer.Context<Integer> context, int alreadyPrintCount) {
-    this.batchSize = writerConfiguration.get(PrintWriterOptions.BATCH_SIZE);
-    Preconditions.checkState(this.batchSize > 0, "batch size must be larger than 0");
 
     this.sampleWrite = writerConfiguration.get(PrintWriterOptions.SAMPLE_WRITE);
     this.sampleLimit = writerConfiguration.get(PrintWriterOptions.SAMPLE_LIMIT);
