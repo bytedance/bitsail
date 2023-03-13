@@ -71,4 +71,12 @@ public interface KafkaSourceOptions extends ReaderOptions.BaseReaderOptions {
       ConfigOptions.key(READER_PREFIX + "properties")
           .onlyReference(new TypeReference<Map<String, String>>() {
           });
+
+  ConfigOption<Integer> POLL_BATCH_SIZE =
+      ConfigOptions.key(READER_PREFIX + "poll_batch_size")
+          .defaultValue(2048);
+
+  ConfigOption<Long> POLL_TIMEOUT =
+      ConfigOptions.key(READER_PREFIX + "poll_timeout")
+          .defaultValue(TimeUnit.MINUTES.toMillis(1L));
 }
