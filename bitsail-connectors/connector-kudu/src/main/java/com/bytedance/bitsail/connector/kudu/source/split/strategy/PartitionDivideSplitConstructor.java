@@ -129,7 +129,7 @@ public class PartitionDivideSplitConstructor extends AbstractKuduSplitConstructo
   @NoArgsConstructor
   @AllArgsConstructor
   @Data
-  @ToString(of = {"partitionKey", "type", "splitNum", "timeOut"})
+  @ToString(of = {"partitionKey", "splitNum", "timeOut", "partitionKeyIndex"})
   public static class SplitConfiguration {
     @JsonProperty("partitionKey")
     private String partitionKey;
@@ -172,7 +172,7 @@ public class PartitionDivideSplitConstructor extends AbstractKuduSplitConstructo
         }
       }
       if (idx == -1) {
-        LOG.warn("Split column {} cannot be found in range schema.", partitionKey);
+        LOG.warn("Split column {} cannot be found in partition range schema.", partitionKey);
         return false;
       }
       partitionKeyIndex = idx;
