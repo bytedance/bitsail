@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,9 +54,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
-
 import static com.bytedance.bitsail.connector.kafka.constants.KafkaConstants.CONSUMER_OFFSET_TIMESTAMP_KEY;
-
 
 public class KafkaSourceSplitCoordinator implements SourceSplitCoordinator<KafkaSplit, KafkaState> {
 
@@ -178,7 +175,6 @@ public class KafkaSourceSplitCoordinator implements SourceSplitCoordinator<Kafka
     }
   }
 
-
   private Set<KafkaSplit> fetchTopicPartitions() {
     String[] splits = this.topic.split(",");
     List<TopicPartition> allPartitionForTopic = getAllPartitionForTopic(Arrays.asList(splits));
@@ -219,62 +215,16 @@ public class KafkaSourceSplitCoordinator implements SourceSplitCoordinator<Kafka
         consumer.seekToEnd(Collections.singletonList(topicPartition));
         return consumer.position(topicPartition);
       case CONSUMER_OFFSET_TIMESTAMP_KEY:
-        consumer.offsetsForTimes(null);
+        HashMap<TopicPartition, Long> timestampsToSearch = new HashMap<>();
+        timestampsToSearch.put(topicPartition, consumerOffsetTimestamp);
+        consumer.offsetsForTimes(timestampsToSearch);
+        return consumer.position(topicPartition);
       default:
         throw BitSailException.asBitSailException(
             KafkaErrorCode.CONSUMER_FETCH_OFFSET_FAILED,
             String.format("Consumer startup mode = %s not support right now.", startupMode));
     }
   }
-
-  // private Map<TopicPartition, Long> getStartOffset(Collection<TopicPartition> fetchedTopicPartitions)
-  //     throws ExecutionException, InterruptedException {
-  //   Map<TopicPartition, Long> topicPartitionOffsets = null;
-  //   switch (startupMode) {
-  //     case KafkaConstants.CONSUMER_OFFSET_EARLIEST_KEY:
-  //       topicPartitionOffsets = beginningOffsets(fetchedTopicPartitions);
-  //       break;
-  //     case KafkaConstants.CONSUMER_OFFSET_LATEST_KEY:
-  //       topicPartitionOffsets = endOffsets(fetchedTopicPartitions);
-  //       break;
-  //     case KafkaConstants.CONSUMER_OFFSET_TIMESTAMP_KEY:
-  //       topicPartitionOffsets = listOffsets(fetchedTopicPartitions, OffsetSpec.forTimestamp(consumerOffsetTimestamp));
-  //       break;
-  //     default:
-  //       throw BitSailException.asBitSailException(
-  //           KafkaErrorCode.CONSUMER_FETCH_OFFSET_FAILED,
-  //           String.format("Consumer startup mode = %s not support right now.", startupMode));
-  //   }
-  //   return topicPartitionOffsets;
-  // }
-
-  // private Map<String, TopicDescription> getTopicMetadata(
-  //     AdminClient adminClient, Set<String> topicNames) {
-  //   try {
-  //     return adminClient.describeTopics(topicNames).allTopicNames().get();
-  //   } catch (Exception e) {
-  //     throw new RuntimeException(
-  //         String.format("Failed to get metadata for topics %s.", topicNames), e);
-  //   }
-  // }
-
-  // private Set<TopicPartition> getSubscribedTopicPartitions(AdminClient adminClient) {
-  //   LOG.debug("Fetching descriptions for topics: {}", this.topic);
-  //   final Map<String, TopicDescription> topicMetadata =
-  //       getTopicMetadata(adminClient, new HashSet<>(Collections.singletonList(topic)));
-  //
-  //   Set<TopicPartition> subscribedPartitions = new HashSet<>();
-  //   for (TopicDescription topic : topicMetadata.values()) {
-  //     for (TopicPartitionInfo partition : topic.partitions()) {
-  //       subscribedPartitions.add(new TopicPartition(topic.name(), partition.partition()));
-  //     }
-  //   }
-  //   return subscribedPartitions;
-  // }
-
-  // private Set<KafkaSplit> getTopicPartitions() {
-  //
-  // }
 
   private List<TopicPartition> getAllPartitionForTopic(List<String> topics) {
     final List<TopicPartition> partitions = new LinkedList<>();
