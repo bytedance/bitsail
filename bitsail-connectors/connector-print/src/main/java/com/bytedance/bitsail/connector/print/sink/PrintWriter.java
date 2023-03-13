@@ -19,7 +19,6 @@ package com.bytedance.bitsail.connector.print.sink;
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.print.sink.option.PrintWriterOptions;
 
 import org.slf4j.Logger;
