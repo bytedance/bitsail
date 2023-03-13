@@ -39,7 +39,6 @@
     },
     "writer": {
       "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
-      "batch_size": 10,
       "sample_write": true,
       "sample_limit": 10,
       "columns": [
