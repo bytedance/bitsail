@@ -46,7 +46,7 @@ public abstract class AbstractKuduSplitConstructor {
 
   public abstract boolean isAvailable();
 
-  protected abstract boolean fillSplitConf(BitSailConfiguration jobConf, KuduClient client) throws IOException;
+  protected abstract boolean fillSplitConf(BitSailConfiguration jobConf, KuduClient client) throws Exception;
 
   public abstract List<KuduSourceSplit> construct(KuduClient kuduClient) throws Exception;
 

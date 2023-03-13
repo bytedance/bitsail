@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PredicationDivideSplitConstructor extends AbstractKuduSplitConstructor {
-  private static final Logger LOG = LoggerFactory.getLogger(SimpleDivideSplitConstructor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PartitionDivideSplitConstructor.class);
 
   private SplitConfiguration splitConf = null;
   private boolean available = false;
@@ -58,7 +58,6 @@ public class PredicationDivideSplitConstructor extends AbstractKuduSplitConstruc
       LOG.warn("{} cannot work because split configuration is invalid.", this.getClass().getSimpleName());
       return;
     }
-
     this.available = fillSplitConf(jobConf, client);
     if (!available) {
       return;

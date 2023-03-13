@@ -61,7 +61,7 @@ public class KuduSplitFactory {
           if (constructor.isAvailable()) {
             break;
           }
-        } catch (IOException e) {
+        } catch (Exception e) {
           LOG.warn("Failed to create PartitionDivideSplitConstructor, will try the next constructor type.", e);
         }
       case PREDICATION_DIVIDE:
