@@ -21,6 +21,7 @@ import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
 import com.bytedance.bitsail.connector.kudu.source.split.AbstractKuduSplitConstructor;
 import com.bytedance.bitsail.connector.kudu.source.split.KuduSourceSplit;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -37,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PredicationDivideSplitConstructor extends AbstractKuduSplitConstructor {
-  private static final Logger LOG = LoggerFactory.getLogger(PartitionDivideSplitConstructor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PredicationDivideSplitConstructor.class);
 
   private SplitConfiguration splitConf = null;
   private boolean available = false;
@@ -52,7 +53,7 @@ public class PredicationDivideSplitConstructor extends AbstractKuduSplitConstruc
     }
     String splitConfStr = jobConf.get(KuduReaderOptions.SPLIT_CONFIGURATION);
     this.splitConf = new ObjectMapper().readValue(splitConfStr, SplitConfiguration.class);
-    predicates = KuduPredicate.deserialize(schema, this.splitConf.predications);
+    this.predicates = KuduPredicate.deserialize(schema, this.splitConf.predications);
     this.available = splitConf.isValid();
     if (!available) {
       LOG.warn("{} cannot work because split configuration is invalid.", this.getClass().getSimpleName());
@@ -121,6 +122,7 @@ public class PredicationDivideSplitConstructor extends AbstractKuduSplitConstruc
     @JsonProperty("split_num")
     private Integer splitNum;
 
+    @JsonIgnore
     public boolean isValid() {
       if (predications == null || predications.length == 0) {
         LOG.warn("Predications configurations cannot be empty.");
