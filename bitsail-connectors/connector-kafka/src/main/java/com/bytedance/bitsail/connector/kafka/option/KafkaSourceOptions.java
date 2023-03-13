@@ -26,13 +26,13 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
-import static com.bytedance.bitsail.connector.kafka.constant.KafkaConstants.CONSUMER_OFFSET_LATEST_KEY;
+import static com.bytedance.bitsail.connector.kafka.constants.KafkaConstants.CONSUMER_OFFSET_LATEST_KEY;
 import static com.bytedance.bitsail.connector.kafka.constants.KafkaConstants.JSON_FORMAT;
 
 public interface KafkaSourceOptions extends ReaderOptions.BaseReaderOptions {
 
   ConfigOption<String> BOOTSTRAP_SERVERS =
-      ConfigOptions.key(READER_PREFIX + "bootstrap.servers")
+      ConfigOptions.key(READER_PREFIX + "bootstrap_servers")
           .noDefaultValue(String.class);
 
   ConfigOption<String> TOPIC =

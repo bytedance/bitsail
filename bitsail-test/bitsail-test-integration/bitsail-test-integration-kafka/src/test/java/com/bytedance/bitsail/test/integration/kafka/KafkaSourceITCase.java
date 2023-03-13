@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.kafka.source;
+package com.bytedance.bitsail.test.integration.kafka;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.testcontainers.kafka.KafkaCluster;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.kafka.container.KafkaCluster;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Ignore
-public class KafkaSourceITCase {
+public class KafkaSourceITCase extends AbstractIntegrationTest {
   private static final Logger LOG = LoggerFactory.getLogger(KafkaSourceITCase.class);
 
   private static final int TOTAL_SEND_COUNT = 5000;
@@ -83,7 +83,7 @@ public class KafkaSourceITCase {
   public void testKafkaSource() throws Exception {
     BitSailConfiguration configuration = JobConfUtils.fromClasspath("kafka_to_print.json");
     updateConfiguration(configuration);
-    EmbeddedFlinkCluster.submitJob(configuration);
+    submitJob(configuration);
   }
 
   protected void updateConfiguration(BitSailConfiguration jobConfiguration) {

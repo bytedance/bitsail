@@ -20,6 +20,7 @@ import com.bytedance.bitsail.common.exception.ErrorCode;
 
 public enum KafkaErrorCode implements ErrorCode {
 
+  TOPIC_NOT_EXISTS("Kafka-0", "Kafka fetch partitions failed."),
   CONSUMER_CREATE_FAILED("Kafka-1", "Kafka AdminClient create failed."),
   CONSUMER_FETCH_OFFSET_FAILED("Kafka-2", "Kafka AdminClient fetch offset failed."),
   CONSUMER_SEEK_OFFSET_FAILED("Kafka-3", "Kafka AdminClient seek offset failed.");

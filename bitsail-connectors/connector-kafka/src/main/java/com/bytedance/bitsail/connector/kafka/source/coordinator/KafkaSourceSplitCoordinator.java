@@ -34,25 +34,27 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.TopicDescription;
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.TopicPartitionInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
+
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
+
 
 import static com.bytedance.bitsail.connector.kafka.constants.KafkaConstants.CONSUMER_OFFSET_TIMESTAMP_KEY;
 
@@ -79,7 +81,7 @@ public class KafkaSourceSplitCoordinator implements SourceSplitCoordinator<Kafka
   private Map<TopicPartition, Long> consumerStopOffset;
 
   private transient SplitAssigner<TopicPartition> splitAssigner;
-  private transient AdminClient adminClient;
+  private transient Consumer<?, ?> consumer;
 
   public KafkaSourceSplitCoordinator(
       SourceSplitCoordinator.Context<KafkaSplit, KafkaState> context,
@@ -106,95 +108,8 @@ public class KafkaSourceSplitCoordinator implements SourceSplitCoordinator<Kafka
   }
 
   @Override
-  public void addReader(int subtaskId) {
-    LOG.info(
-        "Adding reader {} to Kafka Split Coordinator for consumer group {}.",
-        subtaskId,
-        consumerGroup);
-    notifyReaderAssignmentResult();
-  }
-
-  @Override
-  public void addSplitsBack(List<KafkaSplit> splits, int subtaskId) {
-    LOG.info("Source reader {} return splits {}.", subtaskId, splits);
-    addSplitChangeToPendingAssignment(new HashSet<>(splits));
-    notifyReaderAssignmentResult();
-  }
-
-  private Map<TopicPartition, Long> listOffsets(Collection<TopicPartition> partitions, OffsetSpec offsetSpec)
-      throws ExecutionException, InterruptedException {
-    Map<TopicPartition, OffsetSpec> topicPartitionOffsets =
-        partitions.stream()
-            .collect(
-                Collectors.toMap(
-                    partition -> partition, __ -> offsetSpec));
-
-    return adminClient
-        .listOffsets(topicPartitionOffsets)
-        .all()
-        .thenApply(
-            result -> {
-              Map<TopicPartition, Long> offsets = new HashMap<>();
-              result.forEach(
-                  (tp, offsetsResultInfo) -> {
-                    if (offsetsResultInfo != null) {
-                      offsets.put(tp, offsetsResultInfo.offset());
-                    }
-                  });
-              return offsets;
-            })
-        .get();
-  }
-
-  public Map<TopicPartition, Long> endOffsets(Collection<TopicPartition> partitions)
-      throws ExecutionException, InterruptedException {
-    return listOffsets(partitions, OffsetSpec.latest());
-  }
-
-  public Map<TopicPartition, Long> beginningOffsets(Collection<TopicPartition> partitions)
-      throws ExecutionException, InterruptedException {
-    return listOffsets(partitions, OffsetSpec.earliest());
-  }
-
-  @Override
-  public void handleSplitRequest(int subtaskId, @Nullable String requesterHostname) {
-    // empty
-  }
-
-  @Override
-  public KafkaState snapshotState() throws Exception {
-    return new KafkaState(assignedPartitions);
-  }
-
-  @Override
-  public void close() {
-    if (adminClient != null) {
-      adminClient.close();
-    }
-  }
-
-  // TODO: add more check
-  private void prepareConsumerProperties() {
-    bootstrapServers = jobConfiguration.get(KafkaSourceOptions.BOOTSTRAP_SERVERS);
-    topic = jobConfiguration.get(KafkaSourceOptions.TOPIC);
-    consumerGroup = jobConfiguration.get(KafkaSourceOptions.CONSUMER_GROUP);
-    startupMode = jobConfiguration.get(KafkaSourceOptions.STARTUP_MODE);
-    if (StringUtils.equalsIgnoreCase(startupMode, CONSUMER_OFFSET_TIMESTAMP_KEY)) {
-      consumerOffsetTimestamp = jobConfiguration.get(KafkaSourceOptions.STARTUP_MODE_TIMESTAMP);
-    }
-  }
-
-  private void prepareKafkaAdminClient() {
-    try {
-      adminClient = KafkaUtils.prepareKafkaAdminClient(jobConfiguration, properties);
-    } catch (Exception e) {
-      throw BitSailException.asBitSailException(KafkaErrorCode.CONSUMER_CREATE_FAILED, e);
-    }
-  }
-
-  @Override
   public void start() {
-    prepareKafkaAdminClient();
+    prepareKafkaConsumer();
     splitAssigner = new FairKafkaSplitAssigner(jobConfiguration, assignedPartitions);
     if (discoveryInternal > 0) {
       context.runAsync(
@@ -211,12 +126,66 @@ public class KafkaSourceSplitCoordinator implements SourceSplitCoordinator<Kafka
     }
   }
 
-  private Set<KafkaSplit> fetchTopicPartitions() throws ExecutionException, InterruptedException {
-    Collection<TopicPartition> fetchedTopicPartitions = Sets.newHashSet(getSubscribedTopicPartitions(adminClient));
-    discoveredPartitions.addAll(fetchedTopicPartitions);
+  @Override
+  public void addReader(int subtaskId) {
+    LOG.info(
+        "Adding reader {} to Kafka Split Coordinator for consumer group {}.",
+        subtaskId,
+        consumerGroup);
+    notifyReaderAssignmentResult();
+  }
 
-    Map<TopicPartition, Long> beginningOffsets = getStartOffset(fetchedTopicPartitions);
-    Map<TopicPartition, Long> endOffsets = endOffsets(fetchedTopicPartitions);
+  @Override
+  public void addSplitsBack(List<KafkaSplit> splits, int subtaskId) {
+    LOG.info("Source reader {} return splits {}.", subtaskId, splits);
+    addSplitChangeToPendingAssignment(new HashSet<>(splits));
+    notifyReaderAssignmentResult();
+  }
+
+  @Override
+  public void handleSplitRequest(int subtaskId, @Nullable String requesterHostname) {
+    // empty
+  }
+
+  @Override
+  public KafkaState snapshotState() throws Exception {
+    return new KafkaState(assignedPartitions);
+  }
+
+  @Override
+  public void close() {
+    if (consumer != null) {
+      consumer.close();
+    }
+  }
+
+  // TODO: add more check
+  private void prepareConsumerProperties() {
+    this.bootstrapServers = jobConfiguration.get(KafkaSourceOptions.BOOTSTRAP_SERVERS);
+    this.topic = jobConfiguration.get(KafkaSourceOptions.TOPIC);
+    this.consumerGroup = jobConfiguration.get(KafkaSourceOptions.CONSUMER_GROUP);
+    this.startupMode = jobConfiguration.get(KafkaSourceOptions.STARTUP_MODE);
+    if (StringUtils.equalsIgnoreCase(startupMode, CONSUMER_OFFSET_TIMESTAMP_KEY)) {
+      consumerOffsetTimestamp = jobConfiguration.get(KafkaSourceOptions.STARTUP_MODE_TIMESTAMP);
+    }
+  }
+
+  private void prepareKafkaConsumer() {
+    try {
+      consumer = KafkaUtils.prepareKafkaConsumer(jobConfiguration, properties);
+    } catch (Exception e) {
+      throw BitSailException.asBitSailException(KafkaErrorCode.CONSUMER_CREATE_FAILED, e);
+    }
+  }
+
+
+  private Set<KafkaSplit> fetchTopicPartitions() {
+    String[] splits = this.topic.split(",");
+    List<TopicPartition> allPartitionForTopic = getAllPartitionForTopic(Arrays.asList(splits));
+    Collection<TopicPartition> fetchedTopicPartitions = Sets.newHashSet(allPartitionForTopic);
+
+    discoveredPartitions.addAll(fetchedTopicPartitions);
+    consumer.assign(fetchedTopicPartitions);
 
     Set<KafkaSplit> pendingAssignedPartitions = Sets.newHashSet();
     for (TopicPartition topicPartition : fetchedTopicPartitions) {
@@ -227,8 +196,8 @@ public class KafkaSourceSplitCoordinator implements SourceSplitCoordinator<Kafka
       pendingAssignedPartitions.add(
           KafkaSplit.builder()
               .topicPartition(topicPartition)
-              .startOffset(beginningOffsets.get(topicPartition))
-              .endOffset(endOffsets.get(topicPartition))
+              .startOffset(getStartOffset(topicPartition))
+              .endOffset(getEndOffset(topicPartition))
               .splitId(splitAssigner.assignSplitId(topicPartition))
               .build()
       );
@@ -236,49 +205,102 @@ public class KafkaSourceSplitCoordinator implements SourceSplitCoordinator<Kafka
     return pendingAssignedPartitions;
   }
 
-  private Map<TopicPartition, Long> getStartOffset(Collection<TopicPartition> fetchedTopicPartitions)
-      throws ExecutionException, InterruptedException {
-    Map<TopicPartition, Long> topicPartitionOffsets = null;
+  private long getEndOffset(TopicPartition topicPartition) {
+    return consumerStopOffset.getOrDefault(topicPartition,
+        KafkaConstants.CONSUMER_STOPPING_OFFSET);
+  }
+
+  private long getStartOffset(TopicPartition topicPartition) {
     switch (startupMode) {
       case KafkaConstants.CONSUMER_OFFSET_EARLIEST_KEY:
-        topicPartitionOffsets = beginningOffsets(fetchedTopicPartitions);
-        break;
+        consumer.seekToBeginning(Collections.singletonList(topicPartition));
+        return consumer.position(topicPartition);
       case KafkaConstants.CONSUMER_OFFSET_LATEST_KEY:
-        topicPartitionOffsets = endOffsets(fetchedTopicPartitions);
-        break;
-      case KafkaConstants.CONSUMER_OFFSET_TIMESTAMP_KEY:
-        topicPartitionOffsets = listOffsets(fetchedTopicPartitions, OffsetSpec.forTimestamp(consumerOffsetTimestamp));
-        break;
+        consumer.seekToEnd(Collections.singletonList(topicPartition));
+        return consumer.position(topicPartition);
+      case CONSUMER_OFFSET_TIMESTAMP_KEY:
+        consumer.offsetsForTimes(null);
       default:
         throw BitSailException.asBitSailException(
             KafkaErrorCode.CONSUMER_FETCH_OFFSET_FAILED,
             String.format("Consumer startup mode = %s not support right now.", startupMode));
     }
-    return topicPartitionOffsets;
   }
 
-  private Map<String, TopicDescription> getTopicMetadata(
-      AdminClient adminClient, Set<String> topicNames) {
-    try {
-      return adminClient.describeTopics(topicNames).allTopicNames().get();
-    } catch (Exception e) {
-      throw new RuntimeException(
-          String.format("Failed to get metadata for topics %s.", topicNames), e);
-    }
-  }
+  // private Map<TopicPartition, Long> getStartOffset(Collection<TopicPartition> fetchedTopicPartitions)
+  //     throws ExecutionException, InterruptedException {
+  //   Map<TopicPartition, Long> topicPartitionOffsets = null;
+  //   switch (startupMode) {
+  //     case KafkaConstants.CONSUMER_OFFSET_EARLIEST_KEY:
+  //       topicPartitionOffsets = beginningOffsets(fetchedTopicPartitions);
+  //       break;
+  //     case KafkaConstants.CONSUMER_OFFSET_LATEST_KEY:
+  //       topicPartitionOffsets = endOffsets(fetchedTopicPartitions);
+  //       break;
+  //     case KafkaConstants.CONSUMER_OFFSET_TIMESTAMP_KEY:
+  //       topicPartitionOffsets = listOffsets(fetchedTopicPartitions, OffsetSpec.forTimestamp(consumerOffsetTimestamp));
+  //       break;
+  //     default:
+  //       throw BitSailException.asBitSailException(
+  //           KafkaErrorCode.CONSUMER_FETCH_OFFSET_FAILED,
+  //           String.format("Consumer startup mode = %s not support right now.", startupMode));
+  //   }
+  //   return topicPartitionOffsets;
+  // }
 
-  private Set<TopicPartition> getSubscribedTopicPartitions(AdminClient adminClient) {
-    LOG.debug("Fetching descriptions for topics: {}", this.topic);
-    final Map<String, TopicDescription> topicMetadata =
-        getTopicMetadata(adminClient, new HashSet<>(Collections.singletonList(topic)));
+  // private Map<String, TopicDescription> getTopicMetadata(
+  //     AdminClient adminClient, Set<String> topicNames) {
+  //   try {
+  //     return adminClient.describeTopics(topicNames).allTopicNames().get();
+  //   } catch (Exception e) {
+  //     throw new RuntimeException(
+  //         String.format("Failed to get metadata for topics %s.", topicNames), e);
+  //   }
+  // }
 
-    Set<TopicPartition> subscribedPartitions = new HashSet<>();
-    for (TopicDescription topic : topicMetadata.values()) {
-      for (TopicPartitionInfo partition : topic.partitions()) {
-        subscribedPartitions.add(new TopicPartition(topic.name(), partition.partition()));
+  // private Set<TopicPartition> getSubscribedTopicPartitions(AdminClient adminClient) {
+  //   LOG.debug("Fetching descriptions for topics: {}", this.topic);
+  //   final Map<String, TopicDescription> topicMetadata =
+  //       getTopicMetadata(adminClient, new HashSet<>(Collections.singletonList(topic)));
+  //
+  //   Set<TopicPartition> subscribedPartitions = new HashSet<>();
+  //   for (TopicDescription topic : topicMetadata.values()) {
+  //     for (TopicPartitionInfo partition : topic.partitions()) {
+  //       subscribedPartitions.add(new TopicPartition(topic.name(), partition.partition()));
+  //     }
+  //   }
+  //   return subscribedPartitions;
+  // }
+
+  // private Set<KafkaSplit> getTopicPartitions() {
+  //
+  // }
+
+  private List<TopicPartition> getAllPartitionForTopic(List<String> topics) {
+    final List<TopicPartition> partitions = new LinkedList<>();
+
+    for (String topic : topics) {
+      List<PartitionInfo> kafkaPartitions = this.consumer.partitionsFor(topic);
+
+      if (Objects.isNull(kafkaPartitions)) {
+        throw new BitSailException(KafkaErrorCode.TOPIC_NOT_EXISTS,
+            String.format(
+                "Could not fetch partitions for %s. Make sure that the topic exists.",
+                topic));
+      }
+
+      for (PartitionInfo partitionInfo : kafkaPartitions) {
+        partitions.add(
+            new TopicPartition(partitionInfo.topic(), partitionInfo.partition())
+        );
       }
     }
-    return subscribedPartitions;
+    return partitions;
+  }
+
+  private List<String> getAllTopics() {
+    Set<String> topics = this.consumer.listTopics().keySet();
+    return Lists.newArrayList(topics);
   }
 
   private void handleTopicPartitionChanged(Set<KafkaSplit> pendingAssignedSplits,

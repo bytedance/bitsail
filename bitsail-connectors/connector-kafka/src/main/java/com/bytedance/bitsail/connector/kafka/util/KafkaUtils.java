@@ -21,8 +21,13 @@ import com.bytedance.bitsail.connector.kafka.option.KafkaSourceOptions;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.StringDeserializer;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 public class KafkaUtils {
@@ -38,5 +43,26 @@ public class KafkaUtils {
     props.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, clientIdPrefix);
 
     return AdminClient.create(props);
+  }
+
+  public static Consumer<String, String> prepareKafkaConsumer(BitSailConfiguration kafkaConfiguration,
+                                                              Properties properties) {
+    String bootstrapServers = kafkaConfiguration.get(KafkaSourceOptions.BOOTSTRAP_SERVERS);
+    String topic = kafkaConfiguration.get(KafkaSourceOptions.TOPIC);
+    String consumerGroup = kafkaConfiguration.get(KafkaSourceOptions.CONSUMER_GROUP);
+
+    Properties props = new Properties();
+    props.putAll(properties);
+    props.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+    props.setProperty(ConsumerConfig.GROUP_ID_CONFIG, consumerGroup);
+    props.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+    props.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+
+    Consumer<String, String> kafkaConsumer = new KafkaConsumer<>(props);
+
+    List<String> topics = Collections.singletonList(topic);
+    kafkaConsumer.subscribe(topics);
+
+    return kafkaConsumer;
   }
 }
