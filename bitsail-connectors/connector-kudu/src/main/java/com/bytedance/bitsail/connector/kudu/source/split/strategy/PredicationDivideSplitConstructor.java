@@ -129,11 +129,10 @@ public class PredicationDivideSplitConstructor extends AbstractKuduSplitConstruc
         return false;
       }
       for (byte[] predication : predications) {
-
         try {
           KuduPredicate.deserialize(schema, predication);
         } catch (Exception e) {
-          LOG.warn("Predication {} cannot be correct deserialize, error is {}.", predication, e.getMessage());
+          LOG.warn("Predication {} cannot be correctly deserialized, error is {}.", predication, e.getMessage());
           return false;
         }
       }
