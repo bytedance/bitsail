@@ -641,17 +641,6 @@
                 <version>${servlet.api.version}</version>
                 <scope>provided</scope>
             </dependency>
-
-            <dependency>
-                <groupId>org.scala-lang</groupId>
-                <artifactId>scala-compiler</artifactId>
-                <version>${scala.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.scala-lang</groupId>
-                <artifactId>scala-reflect</artifactId>
-                <version>${scala.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 

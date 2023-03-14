@@ -45,21 +45,6 @@
         <module>bitsail-connector-ftp</module>
     </modules>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.scala-lang.modules</groupId>
-                <artifactId>scala-parser-combinators_${scala.binary.version}</artifactId>
-                <version>1.1.1</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-    <dependencies>
-
-
-    </dependencies>
-
     <profiles>
         <profile>
             <id>flink-1.11</id>
@@ -246,4 +231,14 @@
             </dependencies>
         </profile>
     </profiles>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.scala-lang.modules</groupId>
+                <artifactId>scala-parser-combinators_${scala.binary.version}</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
