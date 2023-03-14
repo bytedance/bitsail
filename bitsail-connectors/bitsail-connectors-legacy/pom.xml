@@ -110,6 +110,12 @@
                     <version>${flink.version}</version>
                     <type>test-jar</type>
                     <scope>test</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.scala-lang.modules</groupId>
+                            <artifactId>scala-parser-combinators_${scala.binary.version}</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
             </dependencies>
         </profile>
@@ -231,14 +237,4 @@
             </dependencies>
         </profile>
     </profiles>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.scala-lang.modules</groupId>
-                <artifactId>scala-parser-combinators_${scala.binary.version}</artifactId>
-                <version>1.1.1</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 </project>
