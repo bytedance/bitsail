@@ -27,8 +27,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Schema;
 import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.client.KuduPredicate;
@@ -81,14 +79,15 @@ public class PartitionDivideSplitConstructor extends AbstractKuduSplitConstructo
     if (splitConf.getSplitNum() == null || splitConf.getSplitNum() <= 0) {
       splitConf.setSplitNum(jobConf.getUnNecessaryOption(KuduReaderOptions.READER_PARALLELISM_NUM, 1));
     }
+    if (splitConf.timeOutMills == null || splitConf.timeOutMills <= 0) {
+      splitConf.setTimeOutMills(3000L);
+    }
     KuduTable kuduTable = client.openTable(this.tableName);
-    this.partitions = kuduTable.getRangePartitions(splitConf.getTimeOut());
+    this.partitions = kuduTable.getRangePartitions(splitConf.getTimeOutMills());
+
     if (this.partitions.size() < splitConf.getSplitNum()) {
       this.splitConf.setSplitNum(this.partitions.size());
       LOG.info("Resize split num to {}.", splitConf.getSplitNum());
-    }
-    if (splitConf.timeOut == null || splitConf.timeOut <= 0) {
-      splitConf.setTimeOut(3000L);
     }
     return true;
   }
@@ -96,18 +95,23 @@ public class PartitionDivideSplitConstructor extends AbstractKuduSplitConstructo
   @Override
   public List <KuduSourceSplit> construct(KuduClient kuduClient) throws Exception {
     List<KuduSourceSplit> splits = new ArrayList <>();
-    ColumnSchema partitionColumn = schema.getColumn(splitConf.getPartitionKey());
 
-    for (int i = 0; i < partitions.size(); i++) {
+    KuduTable kuduTable = kuduClient.openTable(this.tableName);
+    PartitionSchema partitionSchema = kuduTable.getPartitionSchema();
+    List<Integer> partitionColumnIds = partitionSchema.getRangeSchema().getColumnIds();
+
+    for (int i = 0; i < this.partitions.size(); i++) {
       KuduSourceSplit split = new KuduSourceSplit(i);
-      split.addPredicate(KuduPredicate.newComparisonPredicate(
-          partitionColumn,
-          KuduPredicate.ComparisonOp.GREATER_EQUAL,
-          partitions.get(i).getPartitionKeyStart()[splitConf.partitionKeyIndex]));
-      split.addPredicate(KuduPredicate.newComparisonPredicate(
-          partitionColumn,
-          KuduPredicate.ComparisonOp.LESS,
-          partitions.get(i).getPartitionKeyEnd()[splitConf.partitionKeyIndex]));
+      for (int j = 0; j < partitionColumnIds.size(); j++) {
+        split.addPredicate(KuduPredicate.newComparisonPredicate(
+            schema.getColumnByIndex(schema.getColumnIndex(partitionColumnIds.get(j))),
+            KuduPredicate.ComparisonOp.GREATER_EQUAL,
+            partitions.get(i).getPartitionKeyStart()[j]));
+        split.addPredicate(KuduPredicate.newComparisonPredicate(
+            schema.getColumnByIndex(schema.getColumnIndex(partitionColumnIds.get(j))),
+            KuduPredicate.ComparisonOp.LESS,
+            partitions.get(i).getPartitionKeyEnd()[j]));
+      }
       splits.add(split);
       LOG.info(">>> the {}-th split is: {}", i, splits.get(i).toFormatString(schema));
     }
@@ -129,31 +133,18 @@ public class PartitionDivideSplitConstructor extends AbstractKuduSplitConstructo
   @NoArgsConstructor
   @AllArgsConstructor
   @Data
-  @ToString(of = {"partitionKey", "splitNum", "timeOut", "partitionKeyIndex"})
+  @ToString(of = {"splitNum", "timeOutMills"})
   public static class SplitConfiguration {
-    @JsonProperty("partitionKey")
-    private String partitionKey;
-
     @JsonProperty("split_num")
     private Integer splitNum;
 
     @JsonProperty("time_out_mills")
-    private Long timeOut;
-
-    @JsonProperty("partitionKeyIndex")
-    private int partitionKeyIndex;
+    private Long timeOutMills;
 
     public boolean isValid(KuduTable table) {
-      if (StringUtils.isEmpty(partitionKey)) {
-        LOG.warn("Split partition key cannot be empty.");
-        return false;
-      }
       PartitionSchema partitionSchema = table.getPartitionSchema();
       Schema schema = table.getSchema();
-      if (schema.getColumn(partitionKey) == null) {
-        LOG.warn("Split column {} cannot be found in schema.", partitionKey);
-        return false;
-      }
+
       if (partitionSchema == null || partitionSchema.getRangeSchema() == null) {
         LOG.warn("Partition schema cannot be empty.");
         return false;
@@ -164,18 +155,6 @@ public class PartitionDivideSplitConstructor extends AbstractKuduSplitConstructo
         LOG.warn("Partition divide split strategy just support simple range partition mode.");
         return false;
       }
-      PartitionSchema.RangeSchema rangeSchema = partitionSchema.getRangeSchema();
-      int idx = -1;
-      for (int i = 0; i < rangeSchema.getColumnIds().size(); i++) {
-        if (partitionKey.equals(schema.getColumnByIndex(i).getName())) {
-          idx = i;
-        }
-      }
-      if (idx == -1) {
-        LOG.warn("Split column {} cannot be found in partition range schema.", partitionKey);
-        return false;
-      }
-      partitionKeyIndex = idx;
       return true;
     }
 
