@@ -34,6 +34,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings("checkstyle:MagicNumber")
@@ -49,10 +51,18 @@ public class PredicationDivideSplitConstructorTest {
   KuduTable mockTable = Mockito.mock(KuduTable.class);
   KuduClient mockClient = Mockito.mock(KuduClient.class);
 
-  List<KuduPredicate> predicates = Lists.newArrayList(
+  List<KuduPredicate> singlePredicates = Lists.newArrayList(
+      KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.EQUAL, 334),
+      KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.EQUAL, 668),
+      KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.EQUAL, 1002)
+  );
+
+  List<KuduPredicate> lowerPredicates = Lists.newArrayList(
       KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.GREATER_EQUAL, 0),
       KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.GREATER_EQUAL, 334),
-      KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.GREATER_EQUAL, 668),
+      KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.GREATER_EQUAL, 668)
+  );
+  List<KuduPredicate> upperPredicates = Lists.newArrayList(
       KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.LESS, 334),
       KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.LESS, 668),
       KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.LESS, 1002)
@@ -65,10 +75,41 @@ public class PredicationDivideSplitConstructorTest {
   }
 
   @Test
-  public void testParseSplitConf() throws Exception {
+  public void testSingleParseSplitConf() throws Exception {
     SplitConfiguration splitConf = new SplitConfiguration();
-    splitConf.setPredications(KuduPredicate.serialize(predicates));
+    List<byte[]> predications = new ArrayList<>();
+    for (int i = 0; i < 3; i++) {
+      predications.add(KuduPredicate.serialize(Collections.singletonList(singlePredicates.get(i))));
+    }
+    splitConf.setPredications(predications);
     splitConf.setSplitNum(3);
+
+    BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
+    jobConf.set(KuduReaderOptions.KUDU_TABLE_NAME, tableName);
+    jobConf.set(KuduReaderOptions.SPLIT_CONFIGURATION, new ObjectMapper().writeValueAsString(splitConf));
+    jobConf.set(KuduReaderOptions.READER_PARALLELISM_NUM, 3);
+
+    PredicationDivideSplitConstructor constructor = new PredicationDivideSplitConstructor(jobConf, mockClient);
+    Assert.assertEquals(3, constructor.estimateSplitNum());
+    List<KuduSourceSplit> splits = constructor.construct(mockClient);
+    Assert.assertEquals(3, splits.size());
+
+    for (int i = 0; i < 3; ++i) {
+      List<KuduPredicate> predicates = splits.get(i).deserializePredicates(schema);
+      Assert.assertEquals(1, predicates.size());
+      Assert.assertEquals(singlePredicates.get(i), predicates.get(0));
+    }
+  }
+
+  @Test
+  public void testParseMutilSplitConf() throws Exception {
+    SplitConfiguration splitConf = new SplitConfiguration();
+    List<byte[]> predications = new ArrayList <>();
+    for (int i = 0; i < 3; i++) {
+      predications.add(KuduPredicate.serialize(Lists.newArrayList(lowerPredicates.get(i), upperPredicates.get(i))));
+    }
+    splitConf.setPredications(predications);
+    splitConf.setSplitNum(4);
 
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
     jobConf.set(KuduReaderOptions.KUDU_TABLE_NAME, tableName);
@@ -80,37 +121,11 @@ public class PredicationDivideSplitConstructorTest {
     List<KuduSourceSplit> splits = constructor.construct(mockClient);
     Assert.assertEquals(3, splits.size());
 
-    List<KuduPredicate> lowerPredicates = Lists.newArrayList(
-        KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.GREATER_EQUAL, 0),
-        KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.GREATER_EQUAL, 334),
-        KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.GREATER_EQUAL, 668)
-    );
-    List<KuduPredicate> upperPredicates = Lists.newArrayList(
-        KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.LESS, 334),
-        KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.LESS, 668),
-        KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.LESS, 1002)
-    );
-
     for (int i = 0; i < 3; ++i) {
       List<KuduPredicate> predicates = splits.get(i).deserializePredicates(schema);
       Assert.assertEquals(2, predicates.size());
-      Assert.assertTrue(lowerPredicates.get(i).equals(predicates.get(0)) || lowerPredicates.get(i).equals(predicates.get(1)));
-      Assert.assertTrue(upperPredicates.get(i).equals(predicates.get(0)) || upperPredicates.get(i).equals(predicates.get(1)));
+      Assert.assertTrue(lowerPredicates.get(i).equals(predicates.get(0)) || upperPredicates.get(i).equals(predicates.get(1)));
     }
-  }
 
-  @Test
-  public void testParsePartialSplitConf() throws Exception {
-    SplitConfiguration splitConf = new SplitConfiguration();
-    splitConf.setPredications(KuduPredicate.serialize(predicates));
-    splitConf.setSplitNum(3);
-
-    BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
-    jobConf.set(KuduReaderOptions.KUDU_TABLE_NAME, tableName);
-    jobConf.set(KuduReaderOptions.SPLIT_CONFIGURATION, new ObjectMapper().writeValueAsString(splitConf));
-    jobConf.set(KuduReaderOptions.READER_PARALLELISM_NUM, 3);
-
-    PredicationDivideSplitConstructor constructor = new PredicationDivideSplitConstructor(jobConf, mockClient);
-    Assert.assertEquals(3, constructor.estimateSplitNum());
   }
 }

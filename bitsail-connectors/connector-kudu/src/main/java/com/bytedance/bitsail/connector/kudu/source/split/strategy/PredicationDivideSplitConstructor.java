@@ -28,6 +28,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.kudu.Schema;
 import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.client.KuduPredicate;
 import org.slf4j.Logger;
@@ -42,7 +43,6 @@ public class PredicationDivideSplitConstructor extends AbstractKuduSplitConstruc
 
   private SplitConfiguration splitConf = null;
   private boolean available = false;
-  private List<KuduPredicate> predicates = null;
 
   public PredicationDivideSplitConstructor(BitSailConfiguration jobConf, KuduClient client) throws IOException {
     super(jobConf, client);
@@ -53,8 +53,7 @@ public class PredicationDivideSplitConstructor extends AbstractKuduSplitConstruc
     }
     String splitConfStr = jobConf.get(KuduReaderOptions.SPLIT_CONFIGURATION);
     this.splitConf = new ObjectMapper().readValue(splitConfStr, SplitConfiguration.class);
-    this.predicates = KuduPredicate.deserialize(schema, this.splitConf.predications);
-    this.available = splitConf.isValid();
+    this.available = splitConf.isValid(schema);
     if (!available) {
       LOG.warn("{} cannot work because split configuration is invalid.", this.getClass().getSimpleName());
       return;
@@ -77,8 +76,8 @@ public class PredicationDivideSplitConstructor extends AbstractKuduSplitConstruc
     if (splitConf.getSplitNum() == null || splitConf.getSplitNum() <= 0) {
       splitConf.setSplitNum(jobConf.getUnNecessaryOption(KuduReaderOptions.READER_PARALLELISM_NUM, 1));
     }
-    if (splitConf.getSplitNum() > predicates.size()) {
-      splitConf.setSplitNum(predicates.size());
+    if (splitConf.getSplitNum() > splitConf.predications.size()) {
+      splitConf.setSplitNum(splitConf.predications.size());
       LOG.info("Resize split num to {}.", splitConf.getSplitNum());
     }
     return true;
@@ -88,9 +87,10 @@ public class PredicationDivideSplitConstructor extends AbstractKuduSplitConstruc
   public List<KuduSourceSplit> construct(KuduClient kuduClient) throws Exception {
     List<KuduSourceSplit> splits = new ArrayList<>(splitConf.getSplitNum());
 
-    for (int i = 0; i < predicates.size(); i++) {
-      KuduSourceSplit split = new KuduSourceSplit(i++);
-      split.addPredicate(predicates.get(i));
+    List<byte[]> predications = this.splitConf.predications;
+    for (int i = 0; i < predications.size(); i++) {
+      KuduSourceSplit split = new KuduSourceSplit(i);
+      split.addSerializedPredicates(predications.get(i));
       splits.add(split);
     }
 
@@ -117,16 +117,25 @@ public class PredicationDivideSplitConstructor extends AbstractKuduSplitConstruc
   @ToString(of = {"predications", "splitNum"})
   public static class SplitConfiguration {
     @JsonProperty("predications")
-    private byte[] predications;
+    private List<byte[]> predications;
 
     @JsonProperty("split_num")
     private Integer splitNum;
 
     @JsonIgnore
-    public boolean isValid() {
-      if (predications == null || predications.length == 0) {
+    public boolean isValid(Schema schema) {
+      if (predications == null || predications.size() == 0) {
         LOG.warn("Predications configurations cannot be empty.");
         return false;
+      }
+      for (byte[] predication : predications) {
+
+        try {
+          KuduPredicate.deserialize(schema, predication);
+        } catch (Exception e) {
+          LOG.warn("Predication {} cannot be correct deserialize, error is {}.", predication, e.getMessage());
+          return false;
+        }
       }
       return true;
     }
