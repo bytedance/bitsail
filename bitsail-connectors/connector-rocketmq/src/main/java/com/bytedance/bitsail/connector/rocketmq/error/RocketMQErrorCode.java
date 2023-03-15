@@ -22,7 +22,9 @@ public enum RocketMQErrorCode implements ErrorCode {
 
   CONSUMER_CREATE_FAILED("RocketMQ-1", "RocketMQ Consumer create failed."),
   CONSUMER_FETCH_OFFSET_FAILED("RocketMQ-2", "RocketMQ Consumer fetch offset failed."),
-  CONSUMER_SEEK_OFFSET_FAILED("RocketMQ-3", "RocketMQ Consumer seek offset failed.");
+  CONSUMER_SEEK_OFFSET_FAILED("RocketMQ-3", "RocketMQ Consumer seek offset failed."),
+  REQUIRED_VALUE("RocketMQ-4", "You missed parameter which is required, please check your configuration."),
+  UNSUPPORTED_FORMAT("RocketMQ-5", "Unsupported output format.");
 
   public String code;
   public String description;
