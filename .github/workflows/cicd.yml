@@ -125,6 +125,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
+        engine: [ flink-1.11 ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - run: git config --global core.longpaths true
@@ -140,4 +141,4 @@ jobs:
       - name: Maven Verify End-to-End Test
         run: |
           all_e2e_test_modules=`python tools/test/list-test-modules.py e2e`
-          mvn clean verify -pl $all_e2e_test_modules -DskipUT=true -DskipITCase=true -DskipE2E=false -D"checkstyle.skip"=true -am
+          mvn clean verify -pl $all_e2e_test_modules -DskipUT=true -DskipITCase=true -DskipE2E=false -D"checkstyle.skip"=true -am -P${{ matrix.engine }}
