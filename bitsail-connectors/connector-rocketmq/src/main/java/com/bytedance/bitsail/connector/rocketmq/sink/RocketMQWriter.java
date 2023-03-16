@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -47,40 +46,31 @@ public class RocketMQWriter<CommitT> implements Writer<Row, CommitT, EmptyState>
   
   private final RocketMQProducer rocketmqProducer;
 
-  private RocketMQSinkConfig sinkConfig;
-
   private final String topic;
   private final String tag;
 
-  private List<Integer> partitionIndices;
-
-  private final transient Writer.Context context;
-
-  protected Map <String, Object> optionalConfig;
-
+  private final List<Integer> partitionIndices;
 
   /* serialize row(s) based on user-defined format */
-  private RocketMQSerializationSchema serializationSchema;
+  private final RocketMQSerializationSchema serializationSchema;
 
   public RocketMQWriter(BitSailConfiguration commonConf, BitSailConfiguration writerConf,
-                        Context<EmptyState> context) {
-    this.context = context;
-    this.sinkConfig = new RocketMQSinkConfig(writerConf);
+                        Context<EmptyState> context) throws IOException {
+    RocketMQSinkConfig sinkConfig = new RocketMQSinkConfig(writerConf);
     this.topic = sinkConfig.getTopic();
     this.tag = sinkConfig.getTag();
+    this.rocketmqProducer = new RocketMQProducer(sinkConfig);
 
     List<ColumnInfo> columns = writerConf.getNecessaryOption(RocketMQWriterOptions.COLUMNS,
         RocketMQErrorCode.REQUIRED_VALUE);
 
-    // get partition fields
     String partitionFields = writerConf.getNecessaryOption(RocketMQWriterOptions.PARTITION_FIELDS, RocketMQErrorCode.REQUIRED_VALUE);
     this.partitionIndices = getIndicesByFieldNames(columns, partitionFields);
 
-    // get key index
     String keyFields = writerConf.getNecessaryOption(RocketMQWriterOptions.KEY_FIELDS, RocketMQErrorCode.REQUIRED_VALUE);
     List<Integer> keyIndices = getIndicesByFieldNames(columns, keyFields);
+    this.open();
 
-    // get output format type (support only json now)
     String formatType = writerConf.getNecessaryOption(RocketMQWriterOptions.FORMAT, RocketMQErrorCode.REQUIRED_VALUE);
     RocketMQSinkFormat sinkFormat = RocketMQSinkFormat.valueOf(formatType.toUpperCase());
 
@@ -88,11 +78,22 @@ public class RocketMQWriter<CommitT> implements Writer<Row, CommitT, EmptyState>
     LOG.info("RocketMQ partition fields indices: " + partitionIndices);
     LOG.info("RocketMQ key indices: " + keyIndices);
     LOG.info("RocketMQ sink format type: " + sinkFormat);
-    this.rocketmqProducer = new RocketMQProducer(sinkConfig);
 
-    //todo
     RocketMQSerializationFactory factory = new RocketMQSerializationFactory(context.getRowTypeInfo(), partitionIndices, keyIndices);
     this.serializationSchema = factory.getSerializationSchemaByFormat(writerConf, sinkFormat);
+  }
+
+  public void open() throws IOException {
+    if (partitionIndices != null && !partitionIndices.isEmpty()) {
+      rocketmqProducer.setEnableQueueSelector(true);
+    }
+    rocketmqProducer.validateParams();
+
+    try {
+      this.rocketmqProducer.open();
+    } catch (Exception e) {
+      throw new IOException("failed to open rocketmq producer: " + e.getMessage(), e);
+    }
   }
 
   @Override
@@ -110,7 +111,7 @@ public class RocketMQWriter<CommitT> implements Writer<Row, CommitT, EmptyState>
   public void flush(boolean endOfInput) throws IOException {
     synchronized (this) {
       if (Objects.nonNull(rocketmqProducer)) {
-        rocketmqProducer.flushMessages(endOfInput);
+        rocketmqProducer.flushMessages(!endOfInput);
       }
       if (endOfInput) {
         LOG.info("all records are sent to commit buffer.");
