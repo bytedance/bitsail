@@ -17,6 +17,7 @@
 package com.bytedance.bitsail.connector.kudu.source.split.strategy;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.connector.kudu.constants.KuduConstants;
 import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
 import com.bytedance.bitsail.connector.kudu.source.split.AbstractKuduSplitConstructor;
 import com.bytedance.bitsail.connector.kudu.source.split.KuduSourceSplit;
@@ -86,7 +87,7 @@ public class PartitionDivideSplitConstructor extends AbstractKuduSplitConstructo
       splitConf.setSplitNum(jobConf.getUnNecessaryOption(KuduReaderOptions.READER_PARALLELISM_NUM, 1));
     }
     if (splitConf.timeOutMills == null || splitConf.timeOutMills <= 0) {
-      splitConf.setTimeOutMills(3000L);
+      splitConf.setTimeOutMills(KuduConstants.DEFAULT_TIME_OUT_MILLS);
     }
     KuduTable kuduTable = client.openTable(this.tableName);
     this.rangePartitions = kuduTable.getRangePartitions(splitConf.getTimeOutMills());
