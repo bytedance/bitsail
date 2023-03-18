@@ -20,6 +20,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
 import com.bytedance.bitsail.connector.kudu.source.split.AbstractKuduSplitConstructor;
 import com.bytedance.bitsail.connector.kudu.source.split.KuduSourceSplit;
+import com.bytedance.bitsail.connector.kudu.util.KuduKeyEncoderUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,15 +28,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Schema;
 import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.client.KuduPredicate;
 import org.apache.kudu.client.KuduTable;
+import org.apache.kudu.client.PartialRow;
 import org.apache.kudu.client.Partition;
 import org.apache.kudu.client.PartitionSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +50,7 @@ public class PartitionDivideSplitConstructor extends AbstractKuduSplitConstructo
 
   private SplitConfiguration splitConf = null;
   private boolean available = false;
-  private transient List<Partition> partitions = null;
+  private transient List<Partition> rangePartitions = null;
 
   public PartitionDivideSplitConstructor(BitSailConfiguration jobConf, KuduClient client) throws Exception {
     super(jobConf, client);
@@ -83,10 +89,13 @@ public class PartitionDivideSplitConstructor extends AbstractKuduSplitConstructo
       splitConf.setTimeOutMills(3000L);
     }
     KuduTable kuduTable = client.openTable(this.tableName);
-    this.partitions = kuduTable.getRangePartitions(splitConf.getTimeOutMills());
-
-    if (this.partitions.size() < splitConf.getSplitNum()) {
-      this.splitConf.setSplitNum(this.partitions.size());
+    this.rangePartitions = kuduTable.getRangePartitions(splitConf.getTimeOutMills());
+    if (rangePartitions.size() <= 0) {
+      LOG.warn("Partition cannot be empty.");
+      return false;
+    }
+    if (this.rangePartitions.size() < splitConf.getSplitNum()) {
+      this.splitConf.setSplitNum(this.rangePartitions.size());
       LOG.info("Resize split num to {}.", splitConf.getSplitNum());
     }
     return true;
@@ -98,26 +107,71 @@ public class PartitionDivideSplitConstructor extends AbstractKuduSplitConstructo
 
     KuduTable kuduTable = kuduClient.openTable(this.tableName);
     PartitionSchema partitionSchema = kuduTable.getPartitionSchema();
-    List<Integer> partitionColumnIds = partitionSchema.getRangeSchema().getColumnIds();
+    PartitionSchema.RangeSchema rangeSchema = partitionSchema.getRangeSchema();
 
-    for (int i = 0; i < this.partitions.size(); i++) {
+    for (int i = 0; i < this.rangePartitions.size(); i++) {
       KuduSourceSplit split = new KuduSourceSplit(i);
-      for (int j = 0; j < partitionColumnIds.size(); j++) {
+      PartialRow lowerPartialRow = KuduKeyEncoderUtils.decodeRangePartitionKey(schema, partitionSchema,
+          ByteBuffer.wrap(rangePartitions.get(i).getPartitionKeyStart()).order(ByteOrder.BIG_ENDIAN));
+      PartialRow upperPartialRow = KuduKeyEncoderUtils.decodeRangePartitionKey(schema, partitionSchema,
+          ByteBuffer.wrap(rangePartitions.get(i).getPartitionKeyEnd()).order(ByteOrder.BIG_ENDIAN));
+
+      for (int columnId : rangeSchema.getColumnIds()) {
         split.addPredicate(KuduPredicate.newComparisonPredicate(
-            schema.getColumnByIndex(schema.getColumnIndex(partitionColumnIds.get(j))),
+            schema.getColumnByIndex(schema.getColumnIndex(columnId)),
             KuduPredicate.ComparisonOp.GREATER_EQUAL,
-            partitions.get(i).getPartitionKeyStart()[j]));
+            getColumnValueInPartialRow(schema, columnId, lowerPartialRow)));
         split.addPredicate(KuduPredicate.newComparisonPredicate(
-            schema.getColumnByIndex(schema.getColumnIndex(partitionColumnIds.get(j))),
+            schema.getColumnByIndex(schema.getColumnIndex(columnId)),
             KuduPredicate.ComparisonOp.LESS,
-            partitions.get(i).getPartitionKeyEnd()[j]));
+            getColumnValueInPartialRow(schema, columnId, upperPartialRow)));
       }
       splits.add(split);
       LOG.info(">>> the {}-th split is: {}", i, splits.get(i).toFormatString(schema));
     }
-    LOG.info("Finally get {} splits.", partitions.size());
-
+    LOG.info("Finally get {} splits.", splits.size());
     return splits;
+  }
+
+  private Object getColumnValueInPartialRow(Schema schema, int columnId, PartialRow partialRow) {
+    Object val;
+    ColumnSchema columnSchema = schema.getColumnByIndex(schema.getColumnIndex(columnId));
+    switch (columnSchema.getType()) {
+      case INT8:
+      case INT16:
+      case INT32:
+        val = partialRow.getInt(columnSchema.getName());
+        break;
+      case DATE: {
+        val = partialRow.getDate(columnSchema.getName());
+        break;
+      }
+      case INT64:
+      case UNIXTIME_MICROS:
+        val = partialRow.getLong(columnSchema.getName());
+        break;
+      case BINARY: {
+        val = partialRow.getBinary(columnSchema.getName());
+        break;
+      }
+      case VARCHAR: {
+        val = partialRow.getVarchar(columnSchema.getName());
+        break;
+      }
+      case STRING: {
+        val = partialRow.getString(columnSchema.getName());
+        break;
+      }
+      case DECIMAL: {
+        val = partialRow.getDecimal(columnSchema.getName());
+        break;
+      }
+      default:
+        throw new IllegalArgumentException(String.format(
+            "The column type %s is not a valid key component type",
+            columnSchema.getType()));
+    }
+    return val;
   }
 
   @Override
@@ -143,34 +197,16 @@ public class PartitionDivideSplitConstructor extends AbstractKuduSplitConstructo
 
     public boolean isValid(KuduTable table) {
       PartitionSchema partitionSchema = table.getPartitionSchema();
-      Schema schema = table.getSchema();
 
-      if (partitionSchema == null || partitionSchema.getRangeSchema() == null) {
+      if (partitionSchema == null) {
         LOG.warn("Partition schema cannot be empty.");
         return false;
       }
-      // check is simple range partition mode
-      boolean isSimple = isSimpleMode(partitionSchema, schema);
-      if (!isSimple) {
-        LOG.warn("Partition divide split strategy just support simple range partition mode.");
+      if (partitionSchema.getRangeSchema() == null || CollectionUtils.isEmpty(partitionSchema.getRangeSchema().getColumnIds())) {
+        LOG.warn("Partition rangeSchema cannot be empty.");
         return false;
       }
       return true;
-    }
-
-    private boolean isSimpleMode(PartitionSchema partitionSchema, Schema schema) {
-      boolean isSimple = partitionSchema.getHashBucketSchemas().isEmpty() &&
-          partitionSchema.getRangeSchema().getColumnIds().size() == schema.getPrimaryKeyColumnCount();
-      if (isSimple) {
-        int i = 0;
-        for (Integer id : partitionSchema.getRangeSchema().getColumnIds()) {
-          if (schema.getColumnIndex(id) != i++) {
-            isSimple = false;
-            break;
-          }
-        }
-      }
-      return isSimple;
     }
   }
 }

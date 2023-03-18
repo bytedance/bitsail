@@ -28,6 +28,7 @@ import org.apache.kudu.Type;
 import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.client.KuduPredicate;
 import org.apache.kudu.client.KuduTable;
+import org.apache.kudu.client.PartialRow;
 import org.apache.kudu.client.Partition;
 import org.apache.kudu.client.PartitionSchema;
 import org.junit.Assert;
@@ -42,47 +43,47 @@ import java.util.List;
 public class PartitionDivideSplitConstructorTest {
 
   List<ColumnSchema> columnSchemaList = Lists.newArrayList(
-      new ColumnSchema.ColumnSchemaBuilder("key", Type.INT32).key(true).build(),
-      new ColumnSchema.ColumnSchemaBuilder("field_long", Type.INT64).key(true).build(),
+      new ColumnSchema.ColumnSchemaBuilder("id", Type.INT32).key(true).build(),
+      new ColumnSchema.ColumnSchemaBuilder("field_long", Type.INT64).build(),
       new ColumnSchema.ColumnSchemaBuilder("field_string", Type.STRING).build()
   );
   List<Integer> columnIds = Lists.newArrayList(0, 1, 2);
   Schema schema = new Schema(columnSchemaList, columnIds);
-
-  Partition partition1 = new Partition(new byte[]{1, 0}, new byte[]{4, 3}, Lists.newArrayList());
-  Partition partition2 = new Partition(new byte[]{4, 3}, new byte[]{7, 6}, Lists.newArrayList());
-  List<Partition> partitions = Lists.newArrayList(partition1, partition2);
-  PartitionSchema.RangeSchema rangeSchema = new PartitionSchema.RangeSchema(Lists.newArrayList(0, 1));
-  PartitionSchema partitionSchema = new PartitionSchema(rangeSchema, new ArrayList<>(), schema);
 
   String tableName = "test_kudu_table";
   KuduTable mockTable = Mockito.mock(KuduTable.class);
   KuduClient mockClient = Mockito.mock(KuduClient.class);
 
   List<KuduPredicate> lowerPredicates = Lists.newArrayList(
-      KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.GREATER_EQUAL, 1),
-      KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.GREATER_EQUAL, 4)
+      KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.GREATER_EQUAL, 100),
+      KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.GREATER_EQUAL, 400)
   );
   List<KuduPredicate> upperPredicates = Lists.newArrayList(
-      KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.LESS, 4),
-      KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.LESS, 7)
+      KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.LESS, 400),
+      KuduPredicate.newComparisonPredicate(columnSchemaList.get(0), KuduPredicate.ComparisonOp.LESS, 700)
   );
-
-  List<KuduPredicate> lowerPredicates1 = Lists.newArrayList(
-      KuduPredicate.newComparisonPredicate(columnSchemaList.get(1), KuduPredicate.ComparisonOp.GREATER_EQUAL, 0),
-      KuduPredicate.newComparisonPredicate(columnSchemaList.get(1), KuduPredicate.ComparisonOp.GREATER_EQUAL, 3)
-  );
-  List<KuduPredicate> upperPredicates1 = Lists.newArrayList(
-      KuduPredicate.newComparisonPredicate(columnSchemaList.get(1), KuduPredicate.ComparisonOp.LESS, 3),
-      KuduPredicate.newComparisonPredicate(columnSchemaList.get(1), KuduPredicate.ComparisonOp.LESS, 6)
-  );
-
+  PartitionSchema.RangeSchema rangeSchema = new PartitionSchema.RangeSchema(Lists.newArrayList(0));
+  PartitionSchema partitionSchema = new PartitionSchema(rangeSchema, new ArrayList <>(), schema);
   @Before
   public void init() throws Exception {
+    PartialRow lowerPartialRow1 = new PartialRow(schema);
+    lowerPartialRow1.addInt(0, 100);
+    PartialRow upperPartialRow1 = new PartialRow(schema);
+    upperPartialRow1.addInt(0, 400);
+
+    PartialRow lowerPartialRow2 = new PartialRow(schema);
+    lowerPartialRow2.addInt(0, 400);
+    PartialRow upperPartialRow2 = new PartialRow(schema);
+    upperPartialRow2.addInt(0, 700);
+
+    Partition partition1 = new Partition(lowerPartialRow1.encodePrimaryKey(), upperPartialRow1.encodePrimaryKey(), Lists.newArrayList());
+    Partition partition2 = new Partition(lowerPartialRow2.encodePrimaryKey(), upperPartialRow2.encodePrimaryKey(), Lists.newArrayList());
+    List<Partition> partitions = Lists.newArrayList(partition1, partition2);
+
     Mockito.when(mockTable.getSchema()).thenReturn(schema);
-    Mockito.when(mockTable.getRangePartitions(3000L)).thenReturn(partitions);
-    Mockito.when(mockTable.getPartitionSchema()).thenReturn(partitionSchema);
     Mockito.when(mockClient.openTable(tableName)).thenReturn(mockTable);
+    Mockito.when(mockTable.getPartitionSchema()).thenReturn(partitionSchema);
+    Mockito.when(mockTable.getRangePartitions(3000L)).thenReturn(partitions);
   }
 
   @Test
@@ -101,13 +102,11 @@ public class PartitionDivideSplitConstructorTest {
     List<KuduSourceSplit> splits = constructor.construct(mockClient);
     Assert.assertEquals(2, splits.size());
 
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < splits.size(); ++i) {
       List<KuduPredicate> predicates = splits.get(i).deserializePredicates(schema);
-      Assert.assertEquals(4, predicates.size());
-      Assert.assertTrue(lowerPredicates.get(i).equals(predicates.get(0)) || lowerPredicates.get(i).equals(predicates.get(1)));
-      Assert.assertTrue(upperPredicates.get(i).equals(predicates.get(0)) || upperPredicates.get(i).equals(predicates.get(1)));
-      Assert.assertTrue(lowerPredicates1.get(i).equals(predicates.get(2)) || lowerPredicates1.get(i).equals(predicates.get(3)));
-      Assert.assertTrue(upperPredicates1.get(i).equals(predicates.get(2)) || upperPredicates1.get(i).equals(predicates.get(3)));
+      Assert.assertEquals(2, predicates.size());
+      Assert.assertEquals(lowerPredicates.get(i), predicates.get(0));
+      Assert.assertEquals(upperPredicates.get(i), predicates.get(1));
     }
 
   }
