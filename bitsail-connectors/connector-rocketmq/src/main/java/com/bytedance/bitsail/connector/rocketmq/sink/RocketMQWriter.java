@@ -71,7 +71,7 @@ public class RocketMQWriter<CommitT> implements Writer<Row, CommitT, EmptyState>
     List<Integer> keyIndices = getIndicesByFieldNames(columns, keyFields);
     this.open();
 
-    String formatType = writerConf.getNecessaryOption(RocketMQWriterOptions.FORMAT, RocketMQErrorCode.REQUIRED_VALUE);
+    String formatType = writerConf.get(RocketMQWriterOptions.FORMAT);
     RocketMQSinkFormat sinkFormat = RocketMQSinkFormat.valueOf(formatType.toUpperCase());
 
     LOG.info("RocketMQ producer settings: " + sinkConfig);

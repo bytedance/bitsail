@@ -24,7 +24,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
-import com.bytedance.bitsail.connector.rocketmq.contant.RocketMQConstants;
+import com.bytedance.bitsail.connector.rocketmq.constants.RocketMQConstants;
 
 import java.io.IOException;
 import java.io.Serializable;

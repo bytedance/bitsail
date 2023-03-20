@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.rocketmq.contant;
+package com.bytedance.bitsail.connector.rocketmq.constants;
 
 public class RocketMQConstants {
 
   public static final String CONNECTOR_NAME = "rocketmq";
 
-  public static final int MAX_PARALLELISM_OUTPUT_ROCKETMQ = 5;
 }
