@@ -56,13 +56,13 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
   private KuduScanner currentScanner;
   private long currentScanCount;
 
-  public KuduSourceReader(BitSailConfiguration jobConf, int subTaskId) {
-    this.subTaskId = subTaskId;
+  public KuduSourceReader(BitSailConfiguration jobConf, SourceReader.Context readerContext) {
+    this.subTaskId = readerContext.getIndexOfSubtask();
     this.tableName = jobConf.getNecessaryOption(KuduReaderOptions.KUDU_TABLE_NAME, KuduErrorCode.REQUIRED_VALUE);
 
     this.kuduFactory = KuduFactory.initReaderFactory(jobConf);
     this.scannerConstructor = new KuduScannerConstructor(jobConf);
-    this.rowDeserializer = new KuduRowDeserializer(jobConf);
+    this.rowDeserializer = new KuduRowDeserializer(readerContext.getRowTypeInfo());
     this.splits = new LinkedList<>();
     LOG.info("KuduReader is initialized.");
   }
