@@ -29,6 +29,8 @@
 
     <properties>
         <flink.version>1.11.6</flink.version>
+        <scala.version>${scala-2.11.version}</scala.version>
+        <scala.binary.version>2.11</scala.binary.version>
     </properties>
 
     <dependencies>
@@ -165,6 +167,20 @@
                     <artifactId>hamcrest-core</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-fake</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-print</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

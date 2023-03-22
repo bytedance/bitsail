@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 /**
  * Note: If you extend  {@link AbstractIntegrationTest}, the class name should end with "ITCase".
  */
-@AbstractIntegrationTest.RunWith(with = {EngineType.FLINK_1_11})
+@AbstractIntegrationTest.RunWith(with = {EngineType.FLINK_1_11, EngineType.FLINK_1_16})
 public abstract class AbstractIntegrationTest {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractIntegrationTest.class);
 
@@ -78,15 +78,17 @@ public abstract class AbstractIntegrationTest {
 
     for (EngineType engineType : engineTypes) {
       IntegrationEngine engine = engineType.getInstance();
-      try {
-        LOG.info("Running test [{}] on engine [{}].", jobName, engineType.name());
-        engine.submitJob(jobConf);
-      } catch (Throwable t) {
-        LOG.error("Integration test [{}] Failed on engine [{}].", jobName, engineType.name(), t);
-        if (exitUponException) {
-          throw t;
+      if (engine.available()) {
+        try {
+          LOG.info("Running test [{}] on engine [{}].", jobName, engineType.name());
+          engine.submitJob(jobConf);
+        } catch (Throwable t) {
+          LOG.error("Integration test [{}] Failed on engine [{}].", jobName, engineType.name(), t);
+          if (exitUponException) {
+            throw t;
+          }
+          throwableList.add(Pair.newPair(engineType, t));
         }
-        throwableList.add(Pair.newPair(engineType, t));
       }
     }
 

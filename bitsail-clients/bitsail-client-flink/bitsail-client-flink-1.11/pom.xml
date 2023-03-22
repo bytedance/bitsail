@@ -28,7 +28,7 @@
     <artifactId>bitsail-client-flink-1.11</artifactId>
 
     <properties>
-        <flink.version>1.11.6</flink.version>
+        <flink.version>${flink-1.11.version}</flink.version>
     </properties>
 
     <dependencies>
