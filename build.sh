@@ -16,15 +16,20 @@
 #
 
 set -e
+profile=$1
+if [[ -z $profile ]]; then
+  profile="flink-1.11,flink-1.11-embedded"
+fi
+revision="0.2.0-SNAPSHOT" # modify ${revision} when version updated
 
-mvnProfile=flink-embedded,flink-1.11
-revision="0.2.0-SNAPSHOT"   # modify ${revision} when version updated
-
-echo "mvn profile = ${mvnProfile}"
-mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true -U -P${mvnProfile}
+echo "mvn profile = ${profile}"
+mvn clean package -pl bitsail-dist -am -Dmaven.test.skip=true -U -P${profile}
 
 # Copy bitsail files into `output` directory
 rm -rf output
 mkdir -p output
 
-cp -r bitsail-dist/target/bitsail-dist-${revision}-bin/bitsail-archive-${revision}/* output/ || { echo 'cp bitsail-dist failed' ; exit 1; }
+cp -r bitsail-dist/target/bitsail-dist-${revision}-bin/bitsail-archive-${revision}/* output/ || {
+  echo 'cp bitsail-dist failed'
+  exit 1
+}
