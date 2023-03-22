@@ -17,6 +17,7 @@
 package com.bytedance.bitsail.connector.rocketmq.sink;
 
 import com.bytedance.bitsail.common.util.Preconditions;
+import com.bytedance.bitsail.connector.rocketmq.constants.OptionalProducerConfig;
 import com.bytedance.bitsail.connector.rocketmq.sink.config.RocketMQSinkConfig;
 
 import lombok.Setter;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class RocketMQProducer implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(RocketMQProducer.class);
@@ -72,6 +74,7 @@ public class RocketMQProducer implements Serializable {
   @Setter
   private boolean enableQueueSelector;
   private transient HashQueueSelector queueSelector;
+  private final Map<String, Object> optionalProducerProperties;
 
   public RocketMQProducer(RocketMQSinkConfig sinkConfig) {
     this.nameServerAddress = sinkConfig.getNameServerAddress();
@@ -89,6 +92,7 @@ public class RocketMQProducer implements Serializable {
 
     this.enableQueueSelector = false;
     this.messageList = new ArrayList<>();
+    this.optionalProducerProperties = sinkConfig.getOptionalProducerProperties();
   }
 
   /**
@@ -132,6 +136,19 @@ public class RocketMQProducer implements Serializable {
       this.producer = new DefaultMQProducer(producerGroup);
     }
 
+    for (Map.Entry<String, Object> entry : this.optionalProducerProperties.entrySet()) {
+      if (OptionalProducerConfig.INSTANCE_NAME.equals(entry.getKey())) {
+        producer.setInstanceName((String) entry.getValue());
+      } else if (OptionalProducerConfig.COMPRESS_SG_BODY_OVER.equals(entry.getKey())) {
+        producer.setCompressMsgBodyOverHowmuch((int) entry.getValue());
+      } else if (OptionalProducerConfig.DEFAULT_TOPIC_QUEUE_NUMS.equals(entry.getKey())) {
+        producer.setDefaultTopicQueueNums((int) entry.getValue());
+      } else if (OptionalProducerConfig.HEARTBEAT_BROKER_INTERVAL.equals(entry.getKey())) {
+        producer.setHeartbeatBrokerInterval((int) entry.getValue());
+      } else if (OptionalProducerConfig.VIP_CHANNEL.equals(entry.getKey())) {
+        producer.setVipChannelEnabled((boolean) entry.getValue());
+      }
+    }
     producer.setNamesrvAddr(nameServerAddress);
     producer.setRetryTimesWhenSendFailed(failureRetryTimes);
     producer.setSendMsgTimeout(sendMsgTimeout);

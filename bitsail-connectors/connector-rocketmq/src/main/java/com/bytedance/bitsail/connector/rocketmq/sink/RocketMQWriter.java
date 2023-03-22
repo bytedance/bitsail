@@ -23,10 +23,10 @@ import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.rocketmq.error.RocketMQErrorCode;
+import com.bytedance.bitsail.connector.rocketmq.format.RocketMQSerializationFactory;
+import com.bytedance.bitsail.connector.rocketmq.format.RocketMQSerializationSchema;
 import com.bytedance.bitsail.connector.rocketmq.option.RocketMQWriterOptions;
 import com.bytedance.bitsail.connector.rocketmq.sink.config.RocketMQSinkConfig;
-import com.bytedance.bitsail.connector.rocketmq.sink.format.RocketMQSerializationFactory;
-import com.bytedance.bitsail.connector.rocketmq.sink.format.RocketMQSerializationSchema;
 import com.bytedance.bitsail.connector.rocketmq.sink.format.RocketMQSinkFormat;
 
 import org.apache.commons.lang3.StringUtils;
@@ -51,7 +51,6 @@ public class RocketMQWriter<CommitT> implements Writer<Row, CommitT, EmptyState>
 
   private final List<Integer> partitionIndices;
 
-  /* serialize row(s) based on user-defined format */
   private final RocketMQSerializationSchema serializationSchema;
 
   public RocketMQWriter(BitSailConfiguration commonConf, BitSailConfiguration writerConf,

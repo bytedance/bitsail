@@ -23,7 +23,6 @@ import com.bytedance.bitsail.connector.rocketmq.option.RocketMQWriterOptions;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -48,6 +47,7 @@ public class RocketMQSinkConfig implements Serializable {
   private int failureRetryTimes;
   private int sendMsgTimeout;
   private int maxMessageSize;
+  private Map<String, Object> optionalProducerProperties;
 
   public RocketMQSinkConfig(BitSailConfiguration outputSliceConfig) {
     this.nameServerAddress = outputSliceConfig.getNecessaryOption(RocketMQWriterOptions.NAME_SERVER_ADDRESS,
@@ -70,24 +70,27 @@ public class RocketMQSinkConfig implements Serializable {
     this.failureRetryTimes = outputSliceConfig.get(RocketMQWriterOptions.SEND_FAILURE_RETRY_TIMES);
     this.sendMsgTimeout = outputSliceConfig.get(RocketMQWriterOptions.SEND_MESSAGE_TIMEOUT);
     this.maxMessageSize = outputSliceConfig.get(RocketMQWriterOptions.MAX_MESSAGE_SIZE);
+    this.optionalProducerProperties = outputSliceConfig.get(RocketMQWriterOptions.OPTIONAL_PRODUCER_PROPERTIES);
   }
 
   @Override
   public String toString() {
-    Map<String, String> configMap = new HashMap<>();
-    configMap.put("nameServerAddress", this.nameServerAddress);
-    configMap.put("producerGroup", this.producerGroup);
-    configMap.put("topic", this.topic);
-    configMap.put("tag", this.tag);
-    configMap.put("batchSize", this.batchSize + "");
-    configMap.put("enableBatchFlush", this.enableBatchFlush + "");
-    configMap.put("logFailuresOnly", this.logFailuresOnly + "");
-    configMap.put("enableSyncSend", this.enableSyncSend + "");
-    configMap.put("failureRetryTimes", this.failureRetryTimes + "");
-    configMap.put("sendMsgTimeout", this.sendMsgTimeout + "");
-    configMap.put("maxMessageSize", this.maxMessageSize + "");
-    return configMap.toString();
+    return "RocketMQSinkConfig{" +
+        "nameServerAddress='" + nameServerAddress + '\'' +
+        ", producerGroup='" + producerGroup + '\'' +
+        ", topic='" + topic + '\'' +
+        ", tag='" + tag + '\'' +
+        ", enableBatchFlush=" + enableBatchFlush +
+        ", batchSize=" + batchSize +
+        ", accessKey='" + accessKey + '\'' +
+        ", secretKey='" + secretKey + '\'' +
+        ", logFailuresOnly=" + logFailuresOnly +
+        ", enableSyncSend=" + enableSyncSend +
+        ", failureRetryTimes=" + failureRetryTimes +
+        ", sendMsgTimeout=" + sendMsgTimeout +
+        ", maxMessageSize=" + maxMessageSize +
+        ", optionalProducerProperties=" + optionalProducerProperties +
+        '}';
   }
-
 }
 

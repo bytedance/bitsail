@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.rocketmq.sink.format.json;
+package com.bytedance.bitsail.connector.rocketmq.format;
 
-import com.bytedance.bitsail.base.format.SerializationSchema;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.connector.rocketmq.sink.format.RocketMQSerializationSchema;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
+import com.bytedance.bitsail.component.format.json.JsonRowSerializationSchema;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -28,19 +29,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JsonSerializationSchema implements RocketMQSerializationSchema {
-  private static final Logger LOG = LoggerFactory.getLogger(JsonSerializationSchema.class);
+public class JsonRocketMQSerializationSchema implements RocketMQSerializationSchema {
+  private static final Logger LOG = LoggerFactory.getLogger(JsonRocketMQSerializationSchema.class);
 
   private static final long serialVersionUID = 3L;
 
-  private final SerializationSchema<Row> serializationSchema;
   private final List<Integer> partitionKeyIndices;
   private final List<Integer> keyIndices;
+  private final transient JsonRowSerializationSchema rowSerializationSchema;
 
-  public JsonSerializationSchema(SerializationSchema <Row> serializationSchema, List<Integer> partitionKeyIndices, List<Integer> keyIndices) {
-    this.serializationSchema = serializationSchema;
+  public JsonRocketMQSerializationSchema(BitSailConfiguration bitSailConfiguration, RowTypeInfo rowTypeInfo,
+                                         List<Integer> partitionKeyIndices, List<Integer> keyIndices) {
     this.partitionKeyIndices = partitionKeyIndices;
     this.keyIndices = keyIndices;
+    this.rowSerializationSchema = new JsonRowSerializationSchema(bitSailConfiguration, rowTypeInfo);
   }
 
   @Override
@@ -65,7 +67,7 @@ public class JsonSerializationSchema implements RocketMQSerializationSchema {
 
   @Override
   public byte[] serializeValue(Row row) {
-    return serializationSchema.serialize(row);
+    return rowSerializationSchema.serialize(row);
   }
 
   @Override

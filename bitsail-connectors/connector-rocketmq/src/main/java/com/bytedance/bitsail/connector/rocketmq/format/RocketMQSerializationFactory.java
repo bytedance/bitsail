@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.rocketmq.sink.format;
+package com.bytedance.bitsail.connector.rocketmq.format;
 
-import com.bytedance.bitsail.base.format.SerializationSchema;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
-import com.bytedance.bitsail.component.format.json.JsonRowSerializationSchema;
 import com.bytedance.bitsail.connector.rocketmq.error.RocketMQErrorCode;
-import com.bytedance.bitsail.connector.rocketmq.sink.format.json.JsonSerializationSchema;
+import com.bytedance.bitsail.connector.rocketmq.sink.format.RocketMQSinkFormat;
 
 import java.util.List;
 
@@ -41,8 +38,7 @@ public class RocketMQSerializationFactory {
 
   public RocketMQSerializationSchema getSerializationSchemaByFormat(BitSailConfiguration bitSailConfiguration, RocketMQSinkFormat format) {
     if (format == RocketMQSinkFormat.JSON) {
-      SerializationSchema <Row> jsonSerialSchema = new JsonRowSerializationSchema(bitSailConfiguration, rowTypeInfo);
-      return new JsonSerializationSchema(jsonSerialSchema, partitionIndices, keyIndices);
+      return new JsonRocketMQSerializationSchema(bitSailConfiguration, rowTypeInfo, partitionIndices, keyIndices);
     }
     throw BitSailException.asBitSailException(RocketMQErrorCode.UNSUPPORTED_FORMAT,
         "unsupported sink format: " + format);

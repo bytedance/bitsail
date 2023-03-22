@@ -20,6 +20,10 @@ import com.bytedance.bitsail.common.annotation.Essential;
 import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.WriterOptions;
 
+import com.alibaba.fastjson.TypeReference;
+
+import java.util.Map;
+
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
 
@@ -95,4 +99,9 @@ public interface RocketMQWriterOptions extends WriterOptions.BaseWriterOptions {
   ConfigOption<String> FORMAT =
       key(WRITER_PREFIX + "format")
           .defaultValue("json");
+
+  ConfigOption<Map <String, Object>> OPTIONAL_PRODUCER_PROPERTIES =
+      key(WRITER_PREFIX + "optional_producer_properties")
+          .onlyReference(new TypeReference <Map<String, Object>>() {
+          });
 }

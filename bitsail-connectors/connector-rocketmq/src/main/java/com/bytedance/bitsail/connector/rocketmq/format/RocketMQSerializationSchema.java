@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.rocketmq.sink.format;
+package com.bytedance.bitsail.connector.rocketmq.format;
 
 import com.bytedance.bitsail.common.row.Row;
 
-import java.io.Serializable;
-
-public interface RocketMQSerializationSchema extends Serializable {
+public interface RocketMQSerializationSchema {
 
   byte[] serializeKey(Row row);
 
