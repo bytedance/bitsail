@@ -55,7 +55,7 @@ public class MockConnectionsTest {
   private MySQLContainer<?> container;
 
   @Before
-  public void before () {
+  public void before() {
     container = new MySQLContainerMariadbAdapter<>(DockerImageName.parse(MYSQL_DOCKER_IMAGER))
         .withUrlParam("permitMysqlScheme", null)
         .withInitScript("scripts/insert_test.sql")
@@ -94,7 +94,6 @@ public class MockConnectionsTest {
         new MySqlConnection.MySqlConnectionConfiguration(dbzConfiguration), new MysqlTextProtocolFieldReader());
 
     Map<TableId, TableChanges.TableChange> schema = SchemaUtils.discoverCapturedTableSchemas(connection, connectorConfig, connectorConfig.getTableFilters());
-    schema.forEach((k,v) -> System.out.println(k.toString() + v.toString()));
     Assert.assertEquals(1, schema.keySet().stream().filter(k -> k.toString().equals("test.jdbc_source_test")).count());
     Table table = schema.values().stream().findFirst().get().getTable();
     Assert.assertEquals(6, table.columns().size());

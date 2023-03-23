@@ -48,10 +48,9 @@ public class MysqlTableDescriberTest {
     fields.add(pk);
     fields.add(field1);
     primaryKeys.add("key_field");
-    String DDL = new MysqlTableDescriber("`db.table`", fields, primaryKeys).toDdl();
-    System.out.println(DDL);
+    String ddl = new MysqlTableDescriber("`db.table`", fields, primaryKeys).toDdl();
     Assert.assertEquals("CREATE TABLE `db.table` (\n" +
         "\t `key_field` INT NOT NULL, \n" +
-        "\t`first_field` VARCHAR(1024) CHARSET utf8mb4  ,PRIMARY KEY ( `key_field` ) );", DDL);
+        "\t`first_field` VARCHAR(1024) CHARSET utf8mb4  ,PRIMARY KEY ( `key_field` ) );", ddl);
   }
 }
