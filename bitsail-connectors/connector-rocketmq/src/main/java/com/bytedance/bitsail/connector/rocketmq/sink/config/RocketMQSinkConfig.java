@@ -23,7 +23,6 @@ import com.bytedance.bitsail.connector.rocketmq.option.RocketMQWriterOptions;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Map;
 import java.util.UUID;
 
 @Data
@@ -47,7 +46,11 @@ public class RocketMQSinkConfig implements Serializable {
   private int failureRetryTimes;
   private int sendMsgTimeout;
   private int maxMessageSize;
-  private Map<String, Object> optionalProducerProperties;
+  private String instanceName;
+  private boolean vipChannelEnabled;
+  private int defaultTopicQueueNums;
+  private int compressMsgBodyOverHowmuch;
+  private int heartbeatBrokerInterval;
 
   public RocketMQSinkConfig(BitSailConfiguration outputSliceConfig) {
     this.nameServerAddress = outputSliceConfig.getNecessaryOption(RocketMQWriterOptions.NAME_SERVER_ADDRESS,
@@ -70,7 +73,11 @@ public class RocketMQSinkConfig implements Serializable {
     this.failureRetryTimes = outputSliceConfig.get(RocketMQWriterOptions.SEND_FAILURE_RETRY_TIMES);
     this.sendMsgTimeout = outputSliceConfig.get(RocketMQWriterOptions.SEND_MESSAGE_TIMEOUT);
     this.maxMessageSize = outputSliceConfig.get(RocketMQWriterOptions.MAX_MESSAGE_SIZE);
-    this.optionalProducerProperties = outputSliceConfig.get(RocketMQWriterOptions.OPTIONAL_PRODUCER_PROPERTIES);
+    this.instanceName = outputSliceConfig.get(RocketMQWriterOptions.INSTANCE_NAME);
+    this.vipChannelEnabled = outputSliceConfig.get(RocketMQWriterOptions.VIP_CHANNEL_ENABLED);
+    this.defaultTopicQueueNums = outputSliceConfig.get(RocketMQWriterOptions.DEFAULT_TOPIC_QUEUE_NUMS);
+    this.compressMsgBodyOverHowmuch = outputSliceConfig.get(RocketMQWriterOptions.COMPRESS_MSG_BODY_SIZE);
+    this.heartbeatBrokerInterval = outputSliceConfig.get(RocketMQWriterOptions.HEART_BEAT_BROKER_INTERVAL);
   }
 
   @Override
@@ -89,7 +96,11 @@ public class RocketMQSinkConfig implements Serializable {
         ", failureRetryTimes=" + failureRetryTimes +
         ", sendMsgTimeout=" + sendMsgTimeout +
         ", maxMessageSize=" + maxMessageSize +
-        ", optionalProducerProperties=" + optionalProducerProperties +
+        ", instanceName='" + instanceName + '\'' +
+        ", vipChannelEnabled=" + vipChannelEnabled +
+        ", defaultTopicQueueNums=" + defaultTopicQueueNums +
+        ", compressMsgBodyOverHowmuch=" + compressMsgBodyOverHowmuch +
+        ", heartbeatBrokerInterval=" + heartbeatBrokerInterval +
         '}';
   }
 }

@@ -20,10 +20,6 @@ import com.bytedance.bitsail.common.annotation.Essential;
 import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.WriterOptions;
 
-import com.alibaba.fastjson.TypeReference;
-
-import java.util.Map;
-
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
 
@@ -100,8 +96,24 @@ public interface RocketMQWriterOptions extends WriterOptions.BaseWriterOptions {
       key(WRITER_PREFIX + "format")
           .defaultValue("json");
 
-  ConfigOption<Map <String, Object>> OPTIONAL_PRODUCER_PROPERTIES =
-      key(WRITER_PREFIX + "optional_producer_properties")
-          .onlyReference(new TypeReference <Map<String, Object>>() {
-          });
+  ConfigOption<Integer> DEFAULT_TOPIC_QUEUE_NUMS =
+      key(WRITER_PREFIX + "default_topic_queue_nums")
+          .defaultValue(4);
+
+  ConfigOption<Integer> COMPRESS_MSG_BODY_SIZE =
+      key(WRITER_PREFIX + "compress_msg_body_over_how_much")
+          .defaultValue(4096);
+
+  ConfigOption<Integer> HEART_BEAT_BROKER_INTERVAL =
+      key(WRITER_PREFIX + "heart_beat_broker_interval")
+          .defaultValue(30000);
+
+  ConfigOption<String> INSTANCE_NAME =
+      key(WRITER_PREFIX + "instance_name")
+          .defaultValue("bitsail_rocketmq_instance");
+
+  ConfigOption<Boolean> VIP_CHANNEL_ENABLED =
+      key(WRITER_PREFIX + "vip_channel_enabled")
+          .defaultValue(false);
+
 }
