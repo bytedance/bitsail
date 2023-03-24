@@ -21,9 +21,7 @@ import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
-import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.connector.hbase.HBaseHelper;
 import com.bytedance.bitsail.connector.hbase.auth.KerberosAuthenticator;
 import com.bytedance.bitsail.connector.hbase.constant.NullMode;
@@ -56,7 +54,6 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   private static final Logger LOG = LoggerFactory.getLogger(HBaseWriter.class);
@@ -68,7 +65,6 @@ public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   protected NullMode nullMode;
   protected boolean walFlag;
   protected long writeBufferSize;
-  protected List<String> columnTypes;
   protected List<String> columnNames;
   protected String rowKeyExpress;
   protected Integer versionColumnIndex;
@@ -93,9 +89,9 @@ public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   /**
    * Initiate DruidWriter with BitSailConfiguration.
    */
-  public HBaseWriter(final BitSailConfiguration writerConfig, final TypeInfoConverter typeInfoConverter) throws IOException {
+  public HBaseWriter(final BitSailConfiguration writerConfig, final Context<EmptyState> context) throws IOException {
     try {
-      init(writerConfig, typeInfoConverter);
+      init(writerConfig, context);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -177,7 +173,6 @@ public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
           continue;
         }
 
-        String type = columnTypes.get(i);
         String name = columnNames.get(i);
         String[] cfAndQualifier = nameMaps.get(name);
         byte[][] cfAndQualifierBytes = nameByteMaps.get(name);
@@ -258,7 +253,7 @@ public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     return "HBaseWriter writeRecord error: when converting field[" + columnNames.get(pos) + "] in Row(" + row + ")";
   }
 
-  private void init(final BitSailConfiguration writerConfig, final TypeInfoConverter typeInfoConverter) throws Exception {
+  private void init(final BitSailConfiguration writerConfig, final Context<EmptyState> context) throws Exception {
     tableName = writerConfig.getNecessaryOption(HBaseWriterOptions.TABLE_NAME, HBasePluginErrorCode.REQUIRED_VALUE);
     encoding = writerConfig.get(HBaseWriterOptions.ENCODING);
     nullMode = NullMode.valueOf(writerConfig.get(HBaseWriterOptions.NULL_MODE).toUpperCase());
@@ -286,11 +281,7 @@ public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     if (openPlatformKerberos && !openUserKerberos) {
       KerberosAuthenticator.addHBaseKerberosConf(hbaseConf);
     }
-
-    List<ColumnInfo> columns = writerConfig.getNecessaryOption(
-        HBaseWriterOptions.COLUMNS, HBasePluginErrorCode.REQUIRED_VALUE);
-    columnNames = columns.stream().map(ColumnInfo::getName).collect(Collectors.toList());
-    columnTypes = columns.stream().map(ColumnInfo::getType).collect(Collectors.toList());
+    columnNames = Lists.newArrayList(context.getRowTypeInfo().getFieldNames());
   }
 
   private void sleepRandomTime() {
@@ -362,7 +353,7 @@ public class HBaseWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
       if (record.getField(index) == null) {
         throw new IllegalArgumentException("null verison column!");
       }
-      timestamp = (long)record.getField(index);
+      timestamp = (long) record.getField(index);
     }
     return timestamp;
   }

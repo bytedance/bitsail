@@ -16,7 +16,6 @@
 
 package com.bytedance.bitsail.connector.hbase.source.split.coordinator;
 
-import com.bytedance.bitsail.base.connector.reader.v1.SourceEvent;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
@@ -107,12 +106,7 @@ public class HBaseSourceSplitCoordinator implements SourceSplitCoordinator<HBase
   }
 
   @Override
-  public void handleSourceEvent(int subtaskId, SourceEvent sourceEvent) {
-    SourceSplitCoordinator.super.handleSourceEvent(subtaskId, sourceEvent);
-  }
-
-  @Override
-  public EmptyState snapshotState() throws Exception {
+  public EmptyState snapshotState(long checkpointId) throws Exception {
     return new EmptyState();
   }
 

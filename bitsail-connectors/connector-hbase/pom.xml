@@ -94,24 +94,17 @@
             </exclusions>
         </dependency>
 
-        <!-- dependency for test-->
+        <!--  hadoop  -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-test</artifactId>
+            <artifactId>bitsail-shaded-hadoop</artifactId>
             <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-fake</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-print</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>htrace-core4</artifactId>
+                    <groupId>org.apache.htrace</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

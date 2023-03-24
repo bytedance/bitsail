@@ -52,6 +52,6 @@ public class HBaseSink<CommitT extends Serializable> implements Sink<Row, Commit
 
   @Override
   public Writer<Row, CommitT, EmptyState> createWriter(Writer.Context<EmptyState> context) throws IOException {
-    return new HBaseWriter<>(this.writerConf, createTypeInfoConverter());
+    return new HBaseWriter<>(this.writerConf, context);
   }
 }

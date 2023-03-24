@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.hbase.source;
+package com.bytedance.bitsail.test.integration.hbase;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.testcontainers.hbase.HbaseCluster;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.hbase.container.HbaseCluster;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -27,7 +27,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-public class HBaseSourceITCase {
+public class HBaseSourceITCase extends AbstractIntegrationTest {
 
   private HbaseCluster hbaseCluster;
 
@@ -49,7 +49,7 @@ public class HBaseSourceITCase {
   @Test
   public void testFakeToHBase() throws Exception {
     BitSailConfiguration conf = JobConfUtils.fromClasspath("hbase_to_print.json");
-    EmbeddedFlinkCluster.submitJob(conf);
+    submitJob(conf);
   }
 
   @After

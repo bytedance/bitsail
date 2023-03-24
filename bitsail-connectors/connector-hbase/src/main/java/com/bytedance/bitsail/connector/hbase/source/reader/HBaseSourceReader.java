@@ -44,7 +44,6 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +117,7 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
     // Check if input column names are in format: [ columnFamily:column ].
     this.columnNames.stream().peek(column -> Preconditions.checkArgument(
             (column.contains(":") && column.split(":").length == 2) ||
-                    this.ROW_KEY.equalsIgnoreCase(column),
+                this.ROW_KEY.equalsIgnoreCase(column),
             "Invalid column names, it should be [ColumnFamily:Column] format"))
         .forEach(column -> this.columnFamilies.add(column.split(":")[0]));
 
@@ -129,7 +128,7 @@ public class HBaseSourceReader implements SourceReader<Row, HBaseSourceSplit> {
     this.splits = new ConcurrentLinkedDeque<>();
     this.namesMap = Maps.newConcurrentMap();
     this.deserializationFormat = new HBaseDeserializationFormat(jobConf);
-    this.deserializationSchema = this.deserializationFormat.createRuntimeDeserializationSchema(this.rowTypeInfo.getTypeInfos());
+    this.deserializationSchema = deserializationFormat.createRuntimeDeserializationSchema(this.rowTypeInfo.getTypeInfos());
 
     LOG.info("HBase source reader {} is initialized.", subTaskId);
   }
