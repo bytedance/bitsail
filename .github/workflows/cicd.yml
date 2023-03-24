@@ -51,7 +51,7 @@ jobs:
     strategy:
       matrix:
         os: [ windows-latest ]
-        engine: [ flink-1.11 ]
+        engine: [ "flink-1.11" ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - run: git config --global core.longpaths true
