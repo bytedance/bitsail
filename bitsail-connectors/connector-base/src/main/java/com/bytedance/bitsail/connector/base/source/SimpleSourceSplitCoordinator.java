@@ -58,7 +58,7 @@ public class SimpleSourceSplitCoordinator
   }
 
   @Override
-  public SimpleSourceState snapshotState() throws Exception {
+  public SimpleSourceState snapshotState(long checkpointId) throws Exception {
     return null;
   }
 

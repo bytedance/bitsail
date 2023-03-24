@@ -18,10 +18,12 @@ package com.bytedance.bitsail.test.integration.engine;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
-import com.bytedance.bitsail.test.integration.engine.flink.Flink11Engine;
+import com.bytedance.bitsail.test.integration.engine.flink.Flink111Engine;
+import com.bytedance.bitsail.test.integration.engine.flink.Flink116Engine;
 
 public enum EngineType {
-  FLINK_1_11(Flink11Engine.class);
+  FLINK_1_11(Flink111Engine.class),
+  FLINK_1_16(Flink116Engine.class);
 
   private final Class<? extends IntegrationEngine> clazz;
 
