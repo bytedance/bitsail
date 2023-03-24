@@ -46,6 +46,7 @@
     </modules>
     <properties>
         <scala.binary.version>2.11</scala.binary.version>
+        <flink.version>${flink-1.11.version}</flink.version>
     </properties>
 
     <dependencyManagement>
