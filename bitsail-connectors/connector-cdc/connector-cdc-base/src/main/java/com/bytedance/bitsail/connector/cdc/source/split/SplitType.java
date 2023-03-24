@@ -14,21 +14,9 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.cdc.source.coordinator.state;
+package com.bytedance.bitsail.connector.cdc.source.split;
 
-import com.bytedance.bitsail.connector.cdc.source.split.SplitType;
-
-/**
- * Store the snapshot assignment status.
- */
-public class SnapshotAssignmentState extends BaseAssignmentState {
-
-  public SnapshotAssignmentState() {
-
-  }
-
-  @Override
-  public int getType() {
-    return SplitType.SNAPSHOT_SPLIT_TYPE;
-  }
+public class SplitType {
+  public static final int BINLOG_SPLIT_TYPE = 1;
+  public static final int SNAPSHOT_SPLIT_TYPE = 2;
 }
