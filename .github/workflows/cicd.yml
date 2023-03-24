@@ -50,7 +50,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ windows-latest ]
         engine: [ flink-1.11 ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -65,7 +65,7 @@ jobs:
           cache: 'maven'
       - name: Compile
         run:
-          mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=true -P${{ matrix.engine }}
+          mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=true -P"${{ matrix.engine }}"
 
   # This workflow contains a single job called "unit-test"
   unit-test:
