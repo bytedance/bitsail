@@ -26,11 +26,16 @@ import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 import io.debezium.DebeziumException;
 import io.debezium.connector.mysql.MySqlConnection;
 import io.debezium.connector.mysql.MySqlConnectorConfig;
+import io.debezium.connector.mysql.MySqlDatabaseSchema;
 import io.debezium.connector.mysql.MySqlOffsetContext;
+import io.debezium.connector.mysql.MySqlTopicSelector;
 import io.debezium.connector.mysql.MySqlValueConverters;
 import io.debezium.connector.mysql.SourceInfo;
 import io.debezium.jdbc.JdbcValueConverters;
 import io.debezium.jdbc.TemporalPrecisionMode;
+import io.debezium.relational.TableId;
+import io.debezium.schema.TopicSelector;
+import io.debezium.util.SchemaNameAdjuster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,5 +162,18 @@ public class DebeziumHelper {
       throw new BitSailException(BinlogReaderErrorCode.OFFSET_ERROR,
           "Load latest offset failed, please check your mysql connection is working");
     }
+  }
+
+  public static MySqlDatabaseSchema createMySqlDatabaseSchema(
+      MySqlConnectorConfig dbzMySqlConfig, boolean isTableIdCaseSensitive) {
+    TopicSelector<TableId> topicSelector = MySqlTopicSelector.defaultSelector(dbzMySqlConfig);
+    SchemaNameAdjuster schemaNameAdjuster = SchemaNameAdjuster.create();
+    MySqlValueConverters valueConverters = getValueConverters(dbzMySqlConfig);
+    return new MySqlDatabaseSchema(
+        dbzMySqlConfig,
+        valueConverters,
+        topicSelector,
+        schemaNameAdjuster,
+        isTableIdCaseSensitive);
   }
 }
