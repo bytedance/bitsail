@@ -21,12 +21,14 @@ import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.elasticsearch.doc.parameter.EsDocParameters;
 import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchWriterOptions;
 import com.bytedance.bitsail.connector.elasticsearch.rest.EsRequestEmitter;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.File;
+import java.nio.file.Paths;
 
 public class EsDocConstructorTest {
 
@@ -44,7 +46,8 @@ public class EsDocConstructorTest {
 
   @Test
   public void testConstructDoc() throws Exception {
-    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("es_doc_parameter_test.json");
+    BitSailConfiguration jobConf = BitSailConfiguration.from(new File(
+        Paths.get(getClass().getClassLoader().getResource("es_doc_parameter_test.json").toURI()).toString()));
     jobConf.set(ElasticsearchWriterOptions.DOC_EXCLUDE_FIELDS,
         "op_type,version");
 

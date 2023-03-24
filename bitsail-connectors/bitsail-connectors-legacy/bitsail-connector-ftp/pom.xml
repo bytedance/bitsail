@@ -59,28 +59,6 @@
             <version>0.1.54</version>
             <scope>compile</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.mockftpserver</groupId>
-            <artifactId>MockFtpServer</artifactId>
-            <version>2.7.1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-print</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-test</artifactId>
-            <version>${revision}</version>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
 </project>

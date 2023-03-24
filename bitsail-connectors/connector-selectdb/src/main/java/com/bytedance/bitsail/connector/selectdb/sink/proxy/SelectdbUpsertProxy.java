@@ -16,6 +16,7 @@
 
 package com.bytedance.bitsail.connector.selectdb.sink.proxy;
 
+import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.selectdb.committer.SelectdbCommittable;
 import com.bytedance.bitsail.connector.selectdb.config.SelectdbExecutionOptions;
 import com.bytedance.bitsail.connector.selectdb.config.SelectdbOptions;
@@ -25,7 +26,6 @@ import com.bytedance.bitsail.connector.selectdb.sink.label.LabelGenerator;
 import com.bytedance.bitsail.connector.selectdb.sink.uploadload.SelectdbUploadLoad;
 
 import com.google.common.collect.ImmutableList;
-import org.apache.flink.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

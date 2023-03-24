@@ -1,0 +1,87 @@
+{
+  "job": {
+    "common": {
+      "job_id": -2413,
+      "job_name": "bitsail_test_integration_fake_to_selectdb",
+      "instance_id": -20413,
+      "user_name": "user"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 100,
+      "from_timestamp": "2022-10-10 01:00:00",
+      "to_timestamp": "2022-10-10 23:59:59",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "properties": "unique"
+        },
+        {
+          "name": "bigint_type",
+          "type": "bigint"
+        },
+        {
+          "name": "string_type",
+          "type": "string"
+        },
+        {
+          "name": "double_type",
+          "type": "double"
+        },
+        {
+          "name": "decimal_type",
+          "type": "double"
+        },
+        {
+          "name": "date_type",
+          "type": "date.date"
+        },
+        {
+          "name": "partition_date",
+          "type": "string"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.selectdb.sink.SelectdbSink",
+      "load_url": "<your selectdb http hosts>",
+      "jdbc_url": "<your selectdb mysql hosts>",
+      "cluster_name": "<selectdb cluster name>",
+      "user": "<user name>",
+      "password": "<password>",
+      "table_identifier": "<selectdb table identifier, like: test_db.test_selectdb_table>",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint"
+        },
+        {
+          "name": "bigint_type",
+          "type": "bigint"
+        },
+        {
+          "name": "string_type",
+          "type": "varchar"
+        },
+        {
+          "name": "double_type",
+          "type": "double"
+        },
+        {
+          "name": "decimal_type",
+          "type": "double"
+        },
+        {
+          "name": "date_type",
+          "type": "date"
+        },
+        {
+          "name": "partition_date",
+          "type": "date"
+        }
+      ]
+    }
+  }
+}

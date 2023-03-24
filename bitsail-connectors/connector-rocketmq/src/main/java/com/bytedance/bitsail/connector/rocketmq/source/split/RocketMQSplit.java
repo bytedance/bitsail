@@ -36,6 +36,10 @@ public class RocketMQSplit implements SourceSplit {
 
   private String splitId;
 
+  public long getStartOffset() {
+    return Math.max(0, startOffset);
+  }
+
   @Override
   public String uniqSplitId() {
     return splitId;

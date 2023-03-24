@@ -106,7 +106,7 @@ public class JdbcValueConverter implements Serializable {
       case Types.NULL:
       case Types.OTHER:
       case Types.STRUCT:
-        return extractObjectValue(rs, columnType);
+        return extractObjectValue(rs, columnIndex);
       default:
         throw BitSailException
             .asBitSailException(

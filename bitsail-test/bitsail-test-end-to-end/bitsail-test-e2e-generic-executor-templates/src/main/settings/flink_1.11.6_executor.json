@@ -1,0 +1,17 @@
+{
+  "name": "example-flink-1.11.6",
+  "executor-image": "flink:1.11.6",
+  "client-module": "bitsail-clients/bitsail-client-flink/bitsail-client-flink-1.11",
+  "core-module": "bitsail-cores/bitsail-core-flink/bitsail-core-flink-1.11-bridge",
+  "exec-commands": [
+    "bin/bitsail run",
+    "--engine flink",
+    "--execution-mode run",
+    "--deployment-mode local",
+    "--conf /opt/bitsail/jobConf.json"
+  ],
+  "failure-handle-commands": [
+    "cat /opt/flink/log/flink-*-client-*.log"
+  ],
+  "global-job-config": "{\"job\":{\"reader\":{\"reader_parallelism_num\":1},\"writer\":{\"writer_parallelism_num\":1}}}"
+}

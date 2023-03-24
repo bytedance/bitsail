@@ -1,0 +1,57 @@
+{
+  "job": {
+    "common": {
+      "cid": 0,
+      "domain": "test",
+      "job_id": -24,
+      "job_name": "bitsail_test_integration_assert_sink_col_check",
+      "instance_id": -720,
+      "user_name": "root"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
+      "total_count": 17,
+      "lower_limit": 5.2,
+      "upper_limit": 22.3,
+      "columns": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "price",
+          "type": "double"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.assertion.sink.AssertSink",
+      "columns": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "price",
+          "type": "double"
+        }
+      ],
+      "row_rules": {
+        "min_row": 10,
+        "max_row": 20
+      },
+      "column_rules": {
+        "name": {
+          "not_null": true,
+          "min_len": 1,
+          "max_len": 1000
+        },
+        "price": {
+          "not_null": true,
+          "min": 10,
+          "max": 20
+        }
+      }
+    }
+  }
+}

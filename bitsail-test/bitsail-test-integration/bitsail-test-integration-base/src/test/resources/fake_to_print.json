@@ -1,0 +1,52 @@
+{
+  "job": {
+    "common": {
+      "cid": 0,
+      "domain": "test",
+      "job_id": -23,
+      "job_name": "bitsail_test_integration_fake_to_print",
+      "instance_id": -203,
+      "user_name": "root",
+      "bitsail_location": "./"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 100,
+      "columns": [
+        {
+          "name": "varchar_type",
+          "type": "string"
+        },
+        {
+          "name": "text_type",
+          "type": "string"
+        },
+        {
+          "name": "bigint_type",
+          "type": "long"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
+      "content_type": "json",
+      "sample_write": true,
+      "sample_limit": 10,
+      "columns": [
+        {
+          "name": "varchar_type",
+          "type": "string"
+        },
+        {
+          "name": "text_type",
+          "type": "string"
+        },
+        {
+          "name": "bigint_type",
+          "type": "long"
+        }
+      ]
+    }
+  }
+}

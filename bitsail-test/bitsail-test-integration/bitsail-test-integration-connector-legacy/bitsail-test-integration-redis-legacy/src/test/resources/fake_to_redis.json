@@ -1,0 +1,33 @@
+{
+  "job": {
+    "common": {
+      "job_id": -2413,
+      "job_name": "bitsail_test_integration_legacy_fake_to_redis",
+      "instance_id": -20413,
+      "user_name": "user"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 100000,
+      "random_null_rate": 0,
+      "unique_fields": "fake_key",
+      "columns": [
+        {
+          "name": "fake_key",
+          "type": "string"
+        },
+        {
+          "name": "fake_value",
+          "type": "string"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.legacy.redis.sink.RedisOutputFormat",
+      "redis_data_type": "string",
+      "redis_host": "localhost",
+      "redis_port": 6379
+    }
+  }
+}

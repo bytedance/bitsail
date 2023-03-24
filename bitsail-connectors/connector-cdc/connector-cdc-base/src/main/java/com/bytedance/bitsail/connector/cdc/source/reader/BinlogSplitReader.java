@@ -24,6 +24,9 @@ import java.util.Map;
 public interface BinlogSplitReader<T> extends Serializable {
   void readSplit(BinlogSplit split);
 
+  /**
+   * return the binlog offset being processed
+   */
   Map<String, String> getOffset();
 
   void close();
@@ -32,5 +35,5 @@ public interface BinlogSplitReader<T> extends Serializable {
 
   boolean hasNext();
 
-  boolean isCompleted();
+  boolean isRunning();
 }

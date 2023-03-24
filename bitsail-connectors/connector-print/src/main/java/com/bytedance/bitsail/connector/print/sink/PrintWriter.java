@@ -81,7 +81,8 @@ public class PrintWriter implements Writer<Row, String, Integer> {
   private String stringByRow(Row element) {
     String[] fields = new String[element.getFields().length];
     for (int i = 0; i < element.getFields().length; ++i) {
-      fields[i] = String.format("\"%s\":\"%s\"", fieldNames[i], element.getField(i).toString());
+      fields[i] = String.format("\"%s\":\"%s\"", fieldNames[i],
+          element.getField(i) == null ? null : element.getField(i).toString());
     }
     return String.format("[%s]", String.join(",", fields));
   }
