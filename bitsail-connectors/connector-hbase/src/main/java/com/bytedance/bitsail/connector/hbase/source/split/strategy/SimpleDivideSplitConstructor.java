@@ -27,12 +27,15 @@ import com.bytedance.bitsail.connector.hbase.source.split.HBaseSourceSplit;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.RegionLocator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SimpleDivideSplitConstructor {
@@ -52,14 +55,14 @@ public class SimpleDivideSplitConstructor {
 
     this.columnFamilies = new LinkedHashSet<>();
     List<ColumnInfo> columnInfos = jobConf.getNecessaryOption(
-            HBaseReaderOptions.COLUMNS, HBasePluginErrorCode.REQUIRED_VALUE);
+        HBaseReaderOptions.COLUMNS, HBasePluginErrorCode.REQUIRED_VALUE);
     this.columnNames = columnInfos.stream().map(ColumnInfo::getName).collect(Collectors.toList());
     // Check if input column names are in format: [ columnFamily:column ].
     this.columnNames.stream().peek(column -> Preconditions.checkArgument(
-                    (column.contains(":") && column.split(":").length == 2) ||
-                            ROW_KEY.equalsIgnoreCase(column),
-                    "Invalid column names, it should be [ColumnFamily:Column] format"))
-            .forEach(column -> this.columnFamilies.add(column.split(":")[0]));
+            (column.contains(":") && column.split(":").length == 2) ||
+                ROW_KEY.equalsIgnoreCase(column),
+            "Invalid column names, it should be [ColumnFamily:Column] format"))
+        .forEach(column -> this.columnFamilies.add(column.split(":")[0]));
 
     HBaseHelper hbaseHelper = new HBaseHelper();
     this.connection = hbaseHelper.getHbaseConnection(hbaseConfig);
