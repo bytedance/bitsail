@@ -21,6 +21,7 @@ import com.bytedance.bitsail.core.flink.bridge.reader.builder.MockSource;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.flink.api.connector.source.SplitEnumeratorContext;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,8 +35,8 @@ public class DelegateFlinkSourceSplitTest {
   @Before
   public void init() {
     source = new MockSource();
-
-    splitEnumerateContext = Mockito.mock(SplitEnumeratorContext.class);
+    splitEnumerateContext = (SplitEnumeratorContext<DelegateFlinkSourceSplit<MockSource.MockSourceSplit>>)
+        Mockito.mock(SplitEnumeratorContext.class);
   }
 
   @Test
@@ -43,14 +44,13 @@ public class DelegateFlinkSourceSplitTest {
     Throwable caught = null;
 
     try {
-      String checkpoint = "cp-1";
+      Tuple2<Long, String> checkpoint = Tuple2.of(1L, "cp-1");
       DelegateFlinkSourceSplitEnumerator<MockSource.MockSourceSplit, String> enumerator =
           new DelegateFlinkSourceSplitEnumerator<>(
               source::createSplitCoordinator,
               splitEnumerateContext,
               checkpoint
           );
-
       enumerator.start();
       enumerator.handleSplitRequest(0, "127.0.0.1");
       enumerator.addSplitsBack(ImmutableList.of(

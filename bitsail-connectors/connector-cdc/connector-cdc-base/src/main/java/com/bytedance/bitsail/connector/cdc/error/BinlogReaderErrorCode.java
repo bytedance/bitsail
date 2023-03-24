@@ -24,7 +24,9 @@ public enum BinlogReaderErrorCode implements ErrorCode {
   CONFIG_ERROR("Cdc-01", "The configuration has wrong option"),
   CONVERT_ERROR("Cdc-02", "Failed to convert mysql cdc result to row"),
   UNSUPPORTED_ERROR("Cdc-03", "Operation is not supported yet"),
-  OFFSET_ERROR("Cdc-04", "Failed to load binlog offset");
+  OFFSET_ERROR("Cdc-04", "Failed to load binlog offset"),
+
+  SQL_ERROR("Cdc-05", "Failed to executing SQL");
 
   private final String code;
 

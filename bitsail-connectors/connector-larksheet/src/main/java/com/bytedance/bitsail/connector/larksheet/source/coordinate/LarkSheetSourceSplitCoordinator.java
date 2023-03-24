@@ -170,7 +170,7 @@ public class LarkSheetSourceSplitCoordinator implements SourceSplitCoordinator<L
   }
 
   @Override
-  public EmptyState snapshotState() throws Exception {
+  public EmptyState snapshotState(long checkpointId) throws Exception {
     return new EmptyState();
   }
 

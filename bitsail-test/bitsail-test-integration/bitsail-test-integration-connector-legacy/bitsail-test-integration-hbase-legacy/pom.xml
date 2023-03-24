@@ -52,6 +52,23 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-shaded-hive</artifactId>
+            <version>${revision}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.tukaani</groupId>
+                    <artifactId>xz</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>htrace-core4</artifactId>
+                    <groupId>org.apache.htrace</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <!-- deps for create hbase data source -->
         <dependency>
             <groupId>org.testcontainers</groupId>

@@ -126,7 +126,7 @@ public class KuduSourceSplitCoordinator implements SourceSplitCoordinator<KuduSo
   }
 
   @Override
-  public EmptyState snapshotState() {
+  public EmptyState snapshotState(long checkpointId) {
     return new EmptyState();
   }
 

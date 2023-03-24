@@ -24,8 +24,8 @@ import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfoUtils;
+import com.bytedance.bitsail.core.flink.bridge.serializer.DelegateCheckpointVersionedSerializer;
 import com.bytedance.bitsail.core.flink.bridge.serializer.DelegateFlinkSourceSplitSerializer;
-import com.bytedance.bitsail.core.flink.bridge.serializer.DelegateSimpleVersionedSerializer;
 import com.bytedance.bitsail.flink.core.delagate.translation.BoundednessTranslation;
 import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 
@@ -36,6 +36,7 @@ import org.apache.flink.api.connector.source.SourceReader;
 import org.apache.flink.api.connector.source.SourceReaderContext;
 import org.apache.flink.api.connector.source.SplitEnumerator;
 import org.apache.flink.api.connector.source.SplitEnumeratorContext;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.core.io.SimpleVersionedSerializer;
 
@@ -43,7 +44,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends Serializable>
-    implements Source<T, DelegateFlinkSourceSplit<SplitT>, StateT>, ResultTypeQueryable<T> {
+    implements Source<T, DelegateFlinkSourceSplit<SplitT>, Tuple2<Long, StateT>>, ResultTypeQueryable<T> {
 
   public final com.bytedance.bitsail.base.connector.reader.v1.Source<T, SplitT, StateT> source;
 
@@ -90,15 +91,15 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
   }
 
   @Override
-  public SplitEnumerator<DelegateFlinkSourceSplit<SplitT>, StateT> createEnumerator(SplitEnumeratorContext<DelegateFlinkSourceSplit<SplitT>> enumContext)
+  public SplitEnumerator<DelegateFlinkSourceSplit<SplitT>, Tuple2<Long, StateT>> createEnumerator(SplitEnumeratorContext<DelegateFlinkSourceSplit<SplitT>> enumContext)
       throws Exception {
     return restoreEnumerator(enumContext, null);
   }
 
   @Override
-  public SplitEnumerator<DelegateFlinkSourceSplit<SplitT>, StateT> restoreEnumerator(SplitEnumeratorContext<DelegateFlinkSourceSplit<SplitT>> enumContext,
-                                                                                     StateT checkpoint) throws Exception {
-    return new DelegateFlinkSourceSplitEnumerator<>(source::createSplitCoordinator, enumContext, checkpoint);
+  public SplitEnumerator<DelegateFlinkSourceSplit<SplitT>, Tuple2<Long, StateT>> restoreEnumerator(SplitEnumeratorContext<DelegateFlinkSourceSplit<SplitT>> enumContext,
+                                                                                                   Tuple2<Long, StateT> checkpointTuple) throws Exception {
+    return new DelegateFlinkSourceSplitEnumerator<>(source::createSplitCoordinator, enumContext, checkpointTuple);
   }
 
   @Override
@@ -108,8 +109,8 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
   }
 
   @Override
-  public SimpleVersionedSerializer<StateT> getEnumeratorCheckpointSerializer() {
-    return DelegateSimpleVersionedSerializer.delegate(source.getSplitCoordinatorCheckpointSerializer());
+  public SimpleVersionedSerializer<Tuple2<Long, StateT>> getEnumeratorCheckpointSerializer() {
+    return new DelegateCheckpointVersionedSerializer<>(source.getSplitCoordinatorCheckpointSerializer());
   }
 
   @Override

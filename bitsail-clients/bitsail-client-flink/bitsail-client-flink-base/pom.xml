@@ -26,6 +26,10 @@
 
     <artifactId>bitsail-client-flink-base</artifactId>
 
+    <properties>
+        <flink.version>${flink-1.11.version}</flink.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>

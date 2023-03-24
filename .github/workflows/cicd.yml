@@ -51,6 +51,7 @@ jobs:
     strategy:
       matrix:
         os: [ windows-latest ]
+        engine: [ flink-1.11 ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - run: git config --global core.longpaths true
@@ -62,10 +63,9 @@ jobs:
           distribution: 'adopt'
           architecture: x64
           cache: 'maven'
-
       - name: Compile
         run:
-          mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=true
+          mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=true -P"${{ matrix.engine }}"
 
   # This workflow contains a single job called "unit-test"
   unit-test:
@@ -75,6 +75,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
+        engine: [ flink-1.11 ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - run: git config --global core.longpaths true
@@ -89,7 +90,7 @@ jobs:
 
       - name: Maven Verify Unit Test
         run:
-          mvn clean verify -pl bitsail-dist -am -DskipUT=false -DskipITCase=true
+          mvn clean verify -pl bitsail-dist -am -DskipUT=false -DskipITCase=true -P${{ matrix.engine }}
 
     # This workflow contains a single job called "integration-tests"
   integration-tests:
@@ -99,6 +100,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
+        engine: [ flink-1.11 ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - run: git config --global core.longpaths true
@@ -113,7 +115,7 @@ jobs:
       - name: Maven Verify Integration Test
         run: |
           all_integration_test_modules=`python tools/test/list-test-modules.py integration`
-          mvn clean verify -pl $all_integration_test_modules -DskipUT=true -DskipITCase=false -DskipE2E=true -D"checkstyle.skip"=true -am
+          mvn clean verify -pl $all_integration_test_modules -DskipUT=true -DskipITCase=false -DskipE2E=true -D"checkstyle.skip"=true -am -P${{ matrix.engine }}
 
     # This workflow contains a single job called "integration-tests"
   end-to-end-tests:
@@ -123,6 +125,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
+        engine: [ flink-1.11 ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - run: git config --global core.longpaths true
@@ -138,4 +141,4 @@ jobs:
       - name: Maven Verify End-to-End Test
         run: |
           all_e2e_test_modules=`python tools/test/list-test-modules.py e2e`
-          mvn clean verify -pl $all_e2e_test_modules -DskipUT=true -DskipITCase=true -DskipE2E=false -D"checkstyle.skip"=true -am
+          mvn clean verify -pl $all_e2e_test_modules -DskipUT=true -DskipITCase=true -DskipE2E=false -D"checkstyle.skip"=true -am -P${{ matrix.engine }}
