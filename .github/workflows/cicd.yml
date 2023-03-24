@@ -51,7 +51,7 @@ jobs:
     strategy:
       matrix:
         os: [ windows-latest ]
-        engine: [ "flink-1.11" ]
+        engine: [ flink-1.11 ]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - run: git config --global core.longpaths true
@@ -65,7 +65,7 @@ jobs:
           cache: 'maven'
       - name: Compile
         run:
-          mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=true -P${{ matrix.engine }}
+          mvn clean verify -pl bitsail-dist -am -DskipUT=true -DskipITCase=true -P"${{ matrix.engine }}"
 
   # This workflow contains a single job called "unit-test"
   unit-test:
