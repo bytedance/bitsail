@@ -47,6 +47,12 @@
         <module>bitsail-test-integration-connector-legacy</module>
     </modules>
 
+    <properties>
+        <flink.version>${flink-1.11.version}</flink.version>
+        <scala.version>${scala-2.11.version}</scala.version>
+        <scala.binary.version>2.11</scala.binary.version>
+    </properties>
+
     <dependencies>
         <!-- bitsail framework -->
         <dependency>
