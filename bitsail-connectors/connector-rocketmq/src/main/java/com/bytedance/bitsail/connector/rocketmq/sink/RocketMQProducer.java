@@ -61,7 +61,6 @@ public class RocketMQProducer implements Serializable {
   private final int failureRetryTimes;
   private final int sendMsgTimeout;
   private final int maxMessageSize;
-  private final String instanceName;
   private final boolean vipChannelEnabled;
   private final int defaultTopicQueueNums;
   private final int compressMsgBodyOverHowmuch;
@@ -94,7 +93,6 @@ public class RocketMQProducer implements Serializable {
 
     this.enableQueueSelector = false;
     this.messageList = new ArrayList<>();
-    this.instanceName = sinkConfig.getInstanceName();
     this.compressMsgBodyOverHowmuch = sinkConfig.getCompressMsgBodyOverHowmuch();
     this.defaultTopicQueueNums = sinkConfig.getDefaultTopicQueueNums();
     this.heartbeatBrokerInterval = sinkConfig.getHeartbeatBrokerInterval();
@@ -146,7 +144,6 @@ public class RocketMQProducer implements Serializable {
     producer.setRetryTimesWhenSendFailed(failureRetryTimes);
     producer.setSendMsgTimeout(sendMsgTimeout);
     producer.setMaxMessageSize(maxMessageSize);
-    producer.setInstanceName(instanceName);
     producer.setCompressMsgBodyOverHowmuch(compressMsgBodyOverHowmuch);
     producer.setDefaultTopicQueueNums(defaultTopicQueueNums);
     producer.setHeartbeatBrokerInterval(heartbeatBrokerInterval);

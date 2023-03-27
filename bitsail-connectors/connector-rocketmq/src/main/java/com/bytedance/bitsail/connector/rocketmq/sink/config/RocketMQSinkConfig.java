@@ -46,7 +46,6 @@ public class RocketMQSinkConfig implements Serializable {
   private int failureRetryTimes;
   private int sendMsgTimeout;
   private int maxMessageSize;
-  private String instanceName;
   private boolean vipChannelEnabled;
   private int defaultTopicQueueNums;
   private int compressMsgBodyOverHowmuch;
@@ -73,7 +72,6 @@ public class RocketMQSinkConfig implements Serializable {
     this.failureRetryTimes = outputSliceConfig.get(RocketMQWriterOptions.SEND_FAILURE_RETRY_TIMES);
     this.sendMsgTimeout = outputSliceConfig.get(RocketMQWriterOptions.SEND_MESSAGE_TIMEOUT);
     this.maxMessageSize = outputSliceConfig.get(RocketMQWriterOptions.MAX_MESSAGE_SIZE);
-    this.instanceName = outputSliceConfig.get(RocketMQWriterOptions.INSTANCE_NAME);
     this.vipChannelEnabled = outputSliceConfig.get(RocketMQWriterOptions.VIP_CHANNEL_ENABLED);
     this.defaultTopicQueueNums = outputSliceConfig.get(RocketMQWriterOptions.DEFAULT_TOPIC_QUEUE_NUMS);
     this.compressMsgBodyOverHowmuch = outputSliceConfig.get(RocketMQWriterOptions.COMPRESS_MSG_BODY_SIZE);
@@ -96,7 +94,6 @@ public class RocketMQSinkConfig implements Serializable {
         ", failureRetryTimes=" + failureRetryTimes +
         ", sendMsgTimeout=" + sendMsgTimeout +
         ", maxMessageSize=" + maxMessageSize +
-        ", instanceName='" + instanceName + '\'' +
         ", vipChannelEnabled=" + vipChannelEnabled +
         ", defaultTopicQueueNums=" + defaultTopicQueueNums +
         ", compressMsgBodyOverHowmuch=" + compressMsgBodyOverHowmuch +

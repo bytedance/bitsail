@@ -108,10 +108,6 @@ public interface RocketMQWriterOptions extends WriterOptions.BaseWriterOptions {
       key(WRITER_PREFIX + "heart_beat_broker_interval")
           .defaultValue(30000);
 
-  ConfigOption<String> INSTANCE_NAME =
-      key(WRITER_PREFIX + "instance_name")
-          .defaultValue("bitsail_rocketmq_instance");
-
   ConfigOption<Boolean> VIP_CHANNEL_ENABLED =
       key(WRITER_PREFIX + "vip_channel_enabled")
           .defaultValue(false);
