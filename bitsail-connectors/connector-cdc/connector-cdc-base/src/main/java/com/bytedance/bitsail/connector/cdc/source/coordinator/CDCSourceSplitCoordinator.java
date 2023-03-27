@@ -96,7 +96,7 @@ public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BinlogS
   }
 
   @Override
-  public BaseAssignmentState snapshotState() {
+  public BaseAssignmentState snapshotState(long checkpoint) {
     // store whether the binlog split was assigned to reader
     return new BinlogAssignmentState(this.isBinlogAssigned);
   }

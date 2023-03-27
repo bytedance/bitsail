@@ -59,6 +59,15 @@
             <artifactId>mariadb-java-client</artifactId>
             <version>${maridb.version}</version>
         </dependency>
+
+        <!-- dependencies for test -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mysql</artifactId>
+            <version>1.17.5</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>
