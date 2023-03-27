@@ -36,7 +36,7 @@ import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfoUtils;
 import com.bytedance.bitsail.common.util.Pair;
 import com.bytedance.bitsail.core.flink116.bridge.serializer.DelegateSimpleVersionedSerializer;
-import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConvertSerializer;
+import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConverter;
 import com.bytedance.bitsail.flink.core.runtime.RuntimeContextInjectable;
 
 import com.google.common.collect.ImmutableList;
@@ -81,7 +81,7 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
   private final Sink<InputT, CommitT, WriterStateT> sink;
   private final BitSailConfiguration writerConfiguration;
   private final BitSailConfiguration commonConfiguration;
-  private final FlinkRowConvertSerializer flinkRowConvertSerializer;
+  private final FlinkRowConverter flinkRowConvertSerializer;
   private final RowTypeInfo rowTypeInfo;
   private transient Writer<InputT, CommitT, WriterStateT> writer;
   private transient ListState<WriterStateT> writeState;
@@ -117,7 +117,7 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
           .getRowTypeInfo(sink.createTypeInfoConverter(), columnInfos);
     }
 
-    this.flinkRowConvertSerializer = new FlinkRowConvertSerializer(
+    this.flinkRowConvertSerializer = new FlinkRowConverter(
         this.rowTypeInfo,
         this.commonConfiguration);
   }
@@ -191,7 +191,7 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
       try {
         if (value instanceof Row) {
           // convert flink row to BitSail row.
-          com.bytedance.bitsail.common.row.Row deserializer = flinkRowConvertSerializer.deserialize((Row) value);
+          com.bytedance.bitsail.common.row.Row deserializer = flinkRowConvertSerializer.from((Row) value);
           writer.write((InputT) deserializer);
         } else {
           writer.write(element.getValue());

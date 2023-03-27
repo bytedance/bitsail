@@ -21,6 +21,6 @@ import com.bytedance.bitsail.common.row.Row;
 /**
  * Created 2022/6/21
  */
-public interface RowSerializer<Output> extends Serializer<Row, Output> {
+public interface RowConverter<Input> extends Converter<Input, Row> {
 
 }

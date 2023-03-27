@@ -25,7 +25,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.util.Pair;
-import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConvertSerializer;
+import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConverter;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -53,7 +53,7 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
 
   private transient com.bytedance.bitsail.base.connector.reader.v1.SourceReader<T, SplitT> sourceReader;
   private transient DelegateSourcePipeline<T> pipeline;
-  private transient FlinkRowConvertSerializer flinkRowConvertSerializer;
+  private transient FlinkRowConverter flinkRowConvertSerializer;
   private transient CompletableFuture<Void> available;
 
   private transient Messenger messenger;
@@ -111,7 +111,7 @@ public class DelegateFlinkSourceReader<T, SplitT extends com.bytedance.bitsail.b
     this.sourceReader = sourceReaderFunction
         .apply(context);
     this.available = new CompletableFuture<>();
-    this.flinkRowConvertSerializer = new FlinkRowConvertSerializer(
+    this.flinkRowConvertSerializer = new FlinkRowConverter(
         rowTypeInfo,
         commonConfiguration);
   }

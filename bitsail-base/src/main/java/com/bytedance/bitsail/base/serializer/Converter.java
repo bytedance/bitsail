@@ -22,9 +22,9 @@ import java.io.Serializable;
 /**
  * Created 2022/6/14
  */
-public interface Serializer<SerializeT, DeserializeT> extends Serializable {
+public interface Converter<SerializeT, DeserializeT> extends Serializable {
 
-  DeserializeT serialize(SerializeT obj) throws IOException;
+  DeserializeT from(SerializeT obj) throws IOException;
 
-  SerializeT deserialize(DeserializeT serialized) throws IOException;
+  SerializeT to(DeserializeT serialized) throws IOException;
 }
