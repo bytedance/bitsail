@@ -35,7 +35,6 @@
         <module>bitsail-test-e2e-connector-v1-elasticsearch</module>
         <module>bitsail-test-e2e-connector-v1-clickhouse</module>
         <module>bitsail-test-e2e-connector-v1-rocketmq</module>
-        <module>bitsail-test-e2e-connector-v1-hbase</module>
     </modules>
 
     <dependencies>

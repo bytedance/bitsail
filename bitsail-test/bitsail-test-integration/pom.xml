@@ -45,6 +45,7 @@
         <module>bitsail-test-integration-rocketmq</module>
         <module>bitsail-test-integration-selectdb</module>
         <module>bitsail-test-integration-connector-legacy</module>
+        <module>bitsail-test-integration-hbase</module>
     </modules>
 
     <properties>
