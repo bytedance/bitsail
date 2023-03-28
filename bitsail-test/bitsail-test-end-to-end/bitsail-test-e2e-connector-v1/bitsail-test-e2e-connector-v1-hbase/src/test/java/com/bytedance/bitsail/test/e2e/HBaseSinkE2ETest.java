@@ -23,7 +23,7 @@ import org.junit.Test;
 import java.io.File;
 import java.nio.file.Paths;
 
-public class HBaseSinkITCase extends AbstractE2ETest {
+public class HBaseSinkE2ETest extends AbstractE2ETest {
 
   @Test
   public void testFakeToHBase() throws Exception {

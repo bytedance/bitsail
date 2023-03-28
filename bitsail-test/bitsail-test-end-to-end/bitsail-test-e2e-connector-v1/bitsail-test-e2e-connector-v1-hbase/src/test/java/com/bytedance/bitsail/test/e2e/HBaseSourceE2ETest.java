@@ -18,32 +18,12 @@ package com.bytedance.bitsail.test.e2e;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
-public class HBaseSourceITCase extends AbstractE2ETest {
-
-  private HbaseCluster hbaseCluster;
-
-  @Before
-  public void initHbase() {
-    hbaseCluster = new HbaseCluster();
-    hbaseCluster.startService();
-    hbaseCluster.createTable("test_table", Arrays.asList("cf1", "cf2", "cf3"));
-    hbaseCluster.putRow("test_table", "row1", "cf1", "int1", "10");
-    hbaseCluster.putRow("test_table", "row1", "cf1", "str1", "aaaaa");
-    hbaseCluster.putRow("test_table", "row1", "cf2", "int2", "0");
-    hbaseCluster.putRow("test_table", "row1", "cf3", "str2", "ccccc");
-    hbaseCluster.putRow("test_table", "row2", "cf1", "int1", "10");
-    hbaseCluster.putRow("test_table", "row2", "cf1", "str1", "bbbbb");
-    hbaseCluster.putRow("test_table", "row2", "cf2", "int2", "0");
-    hbaseCluster.putRow("test_table", "row2", "cf3", "str2", "ddddd");
-  }
+public class HBaseSourceE2ETest extends AbstractE2ETest {
 
   @Test
   public void testFakeToHBase() throws Exception {
@@ -52,11 +32,6 @@ public class HBaseSourceITCase extends AbstractE2ETest {
             .getResource("hbase_to_print.json")
             .toURI()).toString()));
     submitJob(jobConf, "hbase_to_print");
-  }
-
-  @After
-  public void closeHbase() {
-    hbaseCluster.stopService();
   }
 
 }
