@@ -100,7 +100,7 @@ public class ColumnFlinkTypeInfoUtil {
     return TypeInfoColumnBridge.bridgeTypeInfo(typeInfo);
   }
 
-  private static TypeInfo<?> toTypeInfo(TypeInformation<?> typeInformation) {
+  public static TypeInfo<?> toTypeInfo(TypeInformation<?> typeInformation) {
     if (typeInformation instanceof MapColumnTypeInfo) {
       MapColumnTypeInfo<?, ?> mapTypeInfo = (MapColumnTypeInfo<?, ?>) typeInformation;
       TypeInformation<?> keyTypeInfo = mapTypeInfo.getKeyTypeInfo();
