@@ -177,11 +177,11 @@ public class RocketMQSourceSplitCoordinator implements
   private long getStartOffset(MessageQueue messageQueue) throws MQClientException {
     switch (consumerOffsetMode) {
       case RocketMQSourceOptions.CONSUMER_OFFSET_EARLIEST_KEY:
-        consumer.seekToEnd(messageQueue);
+        consumer.seekToBegin(messageQueue);
         return consumer.getOffsetStore()
             .readOffset(messageQueue, READ_FROM_MEMORY);
       case RocketMQSourceOptions.CONSUMER_OFFSET_LATEST_KEY:
-        consumer.seekToBegin(messageQueue);
+        consumer.seekToEnd(messageQueue);
         return consumer.getOffsetStore()
             .readOffset(messageQueue, READ_FROM_MEMORY);
       case RocketMQSourceOptions.CONSUMER_OFFSET_TIMESTAMP_KEY:
@@ -273,7 +273,7 @@ public class RocketMQSourceSplitCoordinator implements
   }
 
   @Override
-  public RocketMQState snapshotState() throws Exception {
+  public RocketMQState snapshotState(long checkpointId) throws Exception {
     return new RocketMQState(assignedPartitions);
   }
 

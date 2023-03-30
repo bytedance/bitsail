@@ -266,6 +266,13 @@
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-hbase</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -296,6 +303,9 @@
     <profiles>
         <profile>
             <id>flink-1.11</id>
+            <properties>
+                <scala.version>${scala-2.11.version}</scala.version>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>com.bytedance.bitsail</groupId>
@@ -317,7 +327,60 @@
         </profile>
 
         <profile>
-            <id>flink-embedded</id>
+            <id>flink-1.16</id>
+            <properties>
+                <scala.version>${scala-2.12.version}</scala.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.bytedance.bitsail</groupId>
+                    <artifactId>bitsail-core-flink-1.16-bridge</artifactId>
+                    <version>${revision}</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>flink-1.11-embedded</id>
+            <properties>
+                <flink.version>${flink-1.11.version}</flink.version>
+                <scala.binary.version>2.11</scala.binary.version>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.googlecode.maven-download-plugin</groupId>
+                        <artifactId>download-maven-plugin</artifactId>
+                        <version>1.6.8</version>
+                        <executions>
+                            <execution>
+                                <!-- the wget goal actually binds itself to this phase by default -->
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>wget</goal>
+                                </goals>
+                                <configuration>
+                                    <url>
+                                        https://archive.apache.org/dist/flink/flink-${flink.version}/flink-${flink.version}-bin-scala_${scala.binary.version}.tgz
+                                    </url>
+                                    <unpack>true</unpack>
+                                    <!-- default target location, just to demonstrate the parameter -->
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>flink-1.16-embedded</id>
+            <properties>
+                <flink.version>${flink-1.16.version}</flink.version>
+                <scala.binary.version>2.12</scala.binary.version>
+            </properties>
             <build>
                 <plugins>
                     <plugin>

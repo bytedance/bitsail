@@ -20,5 +20,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
 public interface IntegrationEngine {
 
-  public void submitJob(BitSailConfiguration jobConf) throws Exception;
+  boolean available();
+
+  void submitJob(BitSailConfiguration jobConf) throws Exception;
 }

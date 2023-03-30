@@ -138,74 +138,11 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
-        <!-- Flink -->
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
-            <version>${flink.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Flink Table -->
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-common</artifactId>
-            <version>${flink.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-metrics-dropwizard</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-api-java-bridge_${scala.binary.version}</artifactId>
-            <version>${flink.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>calcite-core</artifactId>
-                    <groupId>org.apache.calcite</groupId>
-                </exclusion>
-            </exclusions>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-core</artifactId>
-            <version>${flink.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.objenesis</groupId>
-                    <artifactId>objenesis</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>provided</scope>
-        </dependency>
         <!-- Modules -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-common</artifactId>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.bytedance.las</groupId>
-                    <artifactId>las-sdk-tunnel</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>ojdbc6</artifactId>
-                    <groupId>com.oracle</groupId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-metrics-dropwizard</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>

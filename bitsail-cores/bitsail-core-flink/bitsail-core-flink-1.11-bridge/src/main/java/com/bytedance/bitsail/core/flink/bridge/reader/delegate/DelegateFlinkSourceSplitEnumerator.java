@@ -26,6 +26,7 @@ import org.apache.flink.api.connector.source.SourceEvent;
 import org.apache.flink.api.connector.source.SplitEnumerator;
 import org.apache.flink.api.connector.source.SplitEnumeratorContext;
 import org.apache.flink.api.connector.source.SplitsAssignment;
+import org.apache.flink.api.java.tuple.Tuple2;
 
 import javax.annotation.Nullable;
 
@@ -40,26 +41,35 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DelegateFlinkSourceSplitEnumerator<SplitT extends SourceSplit,
-    StateT> implements SplitEnumerator<DelegateFlinkSourceSplit<SplitT>, StateT> {
+    StateT> implements SplitEnumerator<DelegateFlinkSourceSplit<SplitT>, Tuple2<Long, StateT>> {
+
+  private static final long DEFAULT_CHECKPOINT_ID = 0;
 
   private final Function<SourceSplitCoordinator.Context<SplitT, StateT>, SourceSplitCoordinator
       <SplitT, StateT>> splitCoordinatorFunction;
   private final SplitEnumeratorContext<DelegateFlinkSourceSplit<SplitT>> splitEnumeratorContext;
   private final StateT checkpoint;
+  private long checkpointId;
 
   private transient SourceSplitCoordinator<SplitT, StateT> coordinator;
 
   public DelegateFlinkSourceSplitEnumerator(Function<SourceSplitCoordinator
       .Context<SplitT, StateT>, SourceSplitCoordinator<SplitT, StateT>> coordinatorFunction,
                                             SplitEnumeratorContext<DelegateFlinkSourceSplit<SplitT>> splitEnumeratorContext,
-                                            StateT checkpoint) {
+                                            Tuple2<Long, StateT> checkpointTuple) {
     this.splitCoordinatorFunction = coordinatorFunction;
     this.splitEnumeratorContext = splitEnumeratorContext;
-    this.checkpoint = checkpoint;
-    prepareSplitEnumerator();
+    checkpoint = Objects.nonNull(checkpointTuple) ? checkpointTuple.f1
+        : null;
+    checkpointId = Objects.nonNull(checkpointTuple) ? checkpointTuple.f0
+        : DEFAULT_CHECKPOINT_ID;
+    checkpointId++;
+    prepareSplitEnumerator(checkpointTuple);
+
   }
 
-  private void prepareSplitEnumerator() {
+  private void prepareSplitEnumerator(Tuple2<Long, StateT> checkpointTuple) {
+
     SourceSplitCoordinator.Context<SplitT, StateT> context = new SourceSplitCoordinator.Context<SplitT, StateT>() {
 
       @Override
@@ -145,13 +155,15 @@ public class DelegateFlinkSourceSplitEnumerator<SplitT extends SourceSplit,
       return;
     }
     throw BitSailException.asBitSailException(CommonErrorCode.RUNTIME_ERROR,
-         "Source event in not instanceof delegate source event, it's always runtime bug.");
+        "Source event in not instanceof delegate source event, it's always runtime bug.");
   }
 
   @Override
-  public StateT snapshotState() throws Exception {
-    //TODO checkpoint
-    return coordinator.snapshotState();
+  public Tuple2<Long, StateT> snapshotState() throws Exception {
+    long triggerCheckpointId = checkpointId;
+    StateT stateT = coordinator.snapshotState(triggerCheckpointId);
+    checkpointId++;
+    return Tuple2.of(triggerCheckpointId, stateT);
   }
 
   @Override

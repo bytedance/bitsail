@@ -125,7 +125,7 @@ public class ClickhouseSourceSplitCoordinator implements SourceSplitCoordinator<
   }
 
   @Override
-  public EmptyState snapshotState() {
+  public EmptyState snapshotState(long checkpointId) {
     return new EmptyState();
   }
 

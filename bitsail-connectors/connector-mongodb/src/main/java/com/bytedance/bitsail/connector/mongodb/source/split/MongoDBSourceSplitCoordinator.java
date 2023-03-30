@@ -117,7 +117,7 @@ public class MongoDBSourceSplitCoordinator implements SourceSplitCoordinator<Mon
   }
 
   @Override
-  public EmptyState snapshotState() {
+  public EmptyState snapshotState(long checkpointId) {
     return new EmptyState();
   }
 

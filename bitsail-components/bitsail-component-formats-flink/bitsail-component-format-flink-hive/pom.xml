@@ -45,18 +45,6 @@
 
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-core-flink-base</artifactId>
-            <version>${revision}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-shaded-hive</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>

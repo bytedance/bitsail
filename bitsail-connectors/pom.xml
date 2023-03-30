@@ -48,6 +48,7 @@
         <module>connector-selectdb</module>
         <module>connector-localfilesystem</module>
         <module>connector-larksheet</module>
+        <module>connector-hbase</module>
         <module>connector-cdc</module>
         <module>connector-kafka</module>
         <module>connector-mongodb</module>

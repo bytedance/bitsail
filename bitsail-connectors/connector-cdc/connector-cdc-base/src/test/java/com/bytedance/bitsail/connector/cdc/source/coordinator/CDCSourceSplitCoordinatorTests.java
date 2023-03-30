@@ -46,7 +46,7 @@ public class CDCSourceSplitCoordinatorTests {
     coordinator.addReader(0);
     Assert.assertEquals(1, assigned.get(0).size());
     Assert.assertEquals(BinlogOffsetType.EARLIEST, assigned.get(0).get(0).getBeginOffset().getOffsetType());
-    BinlogAssignmentState state = (BinlogAssignmentState) coordinator.snapshotState();
+    BinlogAssignmentState state = (BinlogAssignmentState) coordinator.snapshotState(1);
     Assert.assertTrue(state.isAssigned());
   }
 
@@ -60,7 +60,7 @@ public class CDCSourceSplitCoordinatorTests {
     coordinator.start();
     // no split was assigned
     Assert.assertEquals(0, assigned.size());
-    BinlogAssignmentState newState = (BinlogAssignmentState) coordinator.snapshotState();
+    BinlogAssignmentState newState = (BinlogAssignmentState) coordinator.snapshotState(1);
     Assert.assertTrue(newState.isAssigned());
   }
 
