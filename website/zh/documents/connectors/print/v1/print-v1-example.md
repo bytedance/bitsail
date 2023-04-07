@@ -1,6 +1,6 @@
-# Print连接器配置示例
+# Print-V1 连接器配置示例
 
-父目录: [print-connector](./print.md)
+父目录: [print-connector](./print-v1.md)
 
 -----
 
@@ -12,8 +12,9 @@
 {
   "job": {
     "writer": {
-      "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink",
-      "batch_size": "10"
+      "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
+      "sample_write": true,
+      "sample_limit": 10
     }
   }
 }

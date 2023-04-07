@@ -4,22 +4,21 @@
 
 ***BitSail*** Print写连接器将上游过来的数据打印出来，目前在Flink Task Manager的Stdout中可以看到。
 
-
 ## 依赖引入
 
 ```xml
 <dependency>
-   <groupId>com.bytedance.bitsail</groupId>
-   <artifactId>bitsail-connector-print</artifactId>
-   <version>${revision}</version>
+    <groupId>com.bytedance.bitsail</groupId>
+    <artifactId>bitsail-connector-print</artifactId>
+    <version>${revision}</version>
 </dependency>
 ```
 
 ## Print输出
 
 ### 支持数据类型
-Print连接器对数据类型没有限制
 
+Print连接器对数据类型没有限制
 
 ### 主要参数
 
@@ -38,18 +37,15 @@ Print连接器对数据类型没有限制
 
 #### 必需参数
 
-| 参数名称              | 是否必填 | 参数枚举值 | 参数含义                                                                       |
-|:------------------|:-----|:------|:---------------------------------------------------------------------------|
-| class             | 是  |       | Print写连接器类型, `com.bytedance.bitsail.connector.legacy.print.sink.PrintSink` |
-
-
+| 参数名称  | 是否必填 | 参数枚举值 | 参数含义                                                                       |
+|:------|:-----|:------|:---------------------------------------------------------------------------|
+| class | 是    |       | Print写连接器类型, `com.bytedance.bitsail.connector.legacy.print.sink.PrintSink` |
 
 #### 可选参数
 
-| 参数名称                                    | 是否必填  | 参数枚举值 | 参数含义        | 默认值 |
-|:----------------------------------------|:------|:------|:------------|:----|
-| batch_size | 否 |       | 指定每次写入的批次大小 | 10  |
-
+| 参数名称       | 是否必填 | 参数枚举值 | 参数含义        | 默认值 |
+|:-----------|:-----|:------|:------------|:----|
+| batch_size | 否    |       | 指定每次写入的批次大小 | 10  |
 
 ## 相关文档
 
