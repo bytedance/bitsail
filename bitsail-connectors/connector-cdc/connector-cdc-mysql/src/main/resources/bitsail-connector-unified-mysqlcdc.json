@@ -1,0 +1,9 @@
+{
+  "name": "bitsail-connector-unified-mysqlcdc",
+  "classes": [
+    "com.bytedance.bitsail.connector.cdc.mysql.source.MysqlCDCSource"
+  ],
+  "libs": [
+    "connector-cdc-mysql-${version}.jar"
+  ]
+}

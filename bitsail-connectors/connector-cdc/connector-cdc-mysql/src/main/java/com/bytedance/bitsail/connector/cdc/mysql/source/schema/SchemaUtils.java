@@ -92,7 +92,8 @@ public class SchemaUtils {
   }
 
   public static Map<TableId, TableChanges.TableChange> discoverCapturedTableSchemas(
-      MySqlConnection jdbc, MySqlConnectorConfig connectorConfig, RelationalTableFilters tableFilters) {
+      MySqlConnection jdbc, MySqlConnectorConfig connectorConfig) {
+    RelationalTableFilters tableFilters = connectorConfig.getTableFilters();
     final List<TableId> capturedTableIds;
     try {
       capturedTableIds = listTables(jdbc, tableFilters);

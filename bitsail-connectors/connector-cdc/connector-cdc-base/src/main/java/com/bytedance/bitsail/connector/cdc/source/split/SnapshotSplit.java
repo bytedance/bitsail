@@ -14,21 +14,29 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.cdc.source.coordinator.state;
+package com.bytedance.bitsail.connector.cdc.source.split;
 
-import com.bytedance.bitsail.connector.cdc.source.split.SplitType;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * Store the snapshot assignment status.
- */
-public class SnapshotAssignmentState extends BaseAssignmentState {
+public class SnapshotSplit extends BaseCDCSplit {
+  private static final long serialVersionUID = 1L;
 
-  public SnapshotAssignmentState() {
+  private final Map<String, String> schemas;
 
+  //TODO: optimize serialization for each checkpoint
+  transient byte[] cache;
+
+  public SnapshotSplit(String splitId) {
+    this(splitId, new HashMap<>());
   }
 
-  @Override
-  public int getType() {
-    return SplitType.SNAPSHOT_SPLIT_TYPE;
+  public Map<String, String> getSchemas() {
+    return schemas;
+  }
+
+  public SnapshotSplit(String splitId, Map<String, String> schemas) {
+    super(splitId, SplitType.SNAPSHOT_SPLIT_TYPE);
+    this.schemas = schemas;
   }
 }

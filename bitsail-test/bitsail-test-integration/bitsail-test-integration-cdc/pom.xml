@@ -29,6 +29,7 @@
 
     <properties>
         <debezium.version>1.6.4.Final</debezium.version>
+        <kafka.clients.version>2.7.1</kafka.clients.version>
     </properties>
 
     <dependencies>

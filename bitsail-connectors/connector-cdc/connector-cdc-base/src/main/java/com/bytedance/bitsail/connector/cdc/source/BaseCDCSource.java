@@ -24,27 +24,31 @@ import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.extension.ParallelismComputable;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
-import com.bytedance.bitsail.base.serializer.SimpleVersionedBinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.connector.cdc.source.coordinator.CDCSourceSplitCoordinator;
+import com.bytedance.bitsail.connector.cdc.source.coordinator.state.AssignmentStateSerializer;
 import com.bytedance.bitsail.connector.cdc.source.coordinator.state.BaseAssignmentState;
-import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
+import com.bytedance.bitsail.connector.cdc.source.split.BaseCDCSplit;
+import com.bytedance.bitsail.connector.cdc.source.split.BaseSplitSerializer;
 
 import java.io.IOException;
 
 /**
- * WIP: Source to read mysql binlog.
+ * Source to read mysql binlog.
  */
-public abstract class BinlogSource implements Source<Row, BinlogSplit, BaseAssignmentState>, ParallelismComputable {
+public abstract class BaseCDCSource implements Source<Row, BaseCDCSplit, BaseAssignmentState>, ParallelismComputable {
 
   protected BitSailConfiguration jobConf;
+
+  protected BaseSplitSerializer splitSerializer;
 
   @Override
   public void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration) throws IOException {
     this.jobConf = readerConfiguration;
+    this.splitSerializer = createSplitSerializer();
   }
 
   @Override
@@ -53,23 +57,25 @@ public abstract class BinlogSource implements Source<Row, BinlogSplit, BaseAssig
     return Boundedness.UNBOUNDEDNESS;
   }
 
-  @Override
-  public abstract SourceReader<Row, BinlogSplit> createReader(SourceReader.Context readerContext);
+  public abstract BaseSplitSerializer createSplitSerializer();
 
   @Override
-  public SourceSplitCoordinator<BinlogSplit, BaseAssignmentState> createSplitCoordinator(
-      SourceSplitCoordinator.Context<BinlogSplit, BaseAssignmentState> coordinatorContext) {
+  public abstract SourceReader<Row, BaseCDCSplit> createReader(SourceReader.Context readerContext);
+
+  @Override
+  public SourceSplitCoordinator<BaseCDCSplit, BaseAssignmentState> createSplitCoordinator(
+      SourceSplitCoordinator.Context<BaseCDCSplit, BaseAssignmentState> coordinatorContext) {
     return new CDCSourceSplitCoordinator(coordinatorContext, jobConf);
   }
 
   @Override
-  public BinarySerializer<BinlogSplit> getSplitSerializer() {
-    return new SimpleVersionedBinarySerializer<>();
+  public BinarySerializer<BaseCDCSplit> getSplitSerializer() {
+    return splitSerializer;
   }
 
   @Override
   public BinarySerializer<BaseAssignmentState> getSplitCoordinatorCheckpointSerializer() {
-    return new SimpleVersionedBinarySerializer<>();
+    return new AssignmentStateSerializer();
   }
 
   @Override

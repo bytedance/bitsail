@@ -14,9 +14,15 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.cdc.source.coordinator.state;
+package com.bytedance.bitsail.connector.cdc.mysql.source.split;
 
-public class SplitType {
-  public static final int BINLOG_SPLIT_TYPE = 1;
-  public static final int SNAPSHOT_SPLIT_TYPE = 2;
+import com.bytedance.bitsail.connector.cdc.source.split.BaseSplitSerializer;
+
+/**
+ * Serializer for MysqlSplit, currently remain the same as BaseSplitSerializer.
+ */
+public class MysqlSplitSerializer extends BaseSplitSerializer {
+  public MysqlSplitSerializer() {
+    super();
+  }
 }

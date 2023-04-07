@@ -16,6 +16,8 @@
 
 package com.bytedance.bitsail.connector.cdc.source.coordinator.state;
 
+import com.bytedance.bitsail.connector.cdc.source.split.SplitType;
+
 /**
  * State to store whether the binlog split was already assigned by coordinator.
  */
