@@ -27,10 +27,24 @@ import com.bytedance.bitsail.test.e2e.executor.AbstractExecutor;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.nio.file.Paths;
-import java.util.Set;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class GenericExecutorTest {
+  public String transformHostFilePath(String hostFilePath) {
+    File module = Paths.get(AbstractExecutor.getLocalRootDir(),
+            "bitsail-test",
+            "bitsail-test-end-to-end",
+            "bitsail-test-e2e-base").toFile();
+    File jarFolder = Paths.get(module.getAbsolutePath(),
+            "src", "test", "resources", "executor", "generic", "host_file").toFile();
+    return Paths.get(
+            jarFolder.getAbsolutePath(),
+            Paths.get(hostFilePath).getFileName().toString()
+    ).toString();
+  }
 
   @Test
   public void testCreateGenericExecutor() throws Exception {
@@ -38,21 +52,25 @@ public class GenericExecutorTest {
         .getResource("executor/generic/TestGenericExecutorSetting.json")
         .toURI()).toString();
 
-    GenericExecutor executor = new GenericExecutor(GenericExecutorSetting.initFromFile(settingFilePath));
+    GenericExecutorSetting executorSetting = GenericExecutorSetting.initFromFile(settingFilePath);
+    List<TransferableFile> collect = executorSetting.getAdditionalFiles()
+            .stream()
+            .map(x -> new TransferableFile(transformHostFilePath(x.getHostPath()), x.getContainerPath()))
+            .collect(Collectors.toList());
+    executorSetting.setAdditionalFiles(collect);
+    GenericExecutor executor = new GenericExecutor(executorSetting);
     Assert.assertEquals("test-executor", executor.getContainerName());
 
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
     jobConf.set(ReaderOptions.READER_CLASS, FakeSource.class.getName());
     jobConf.set(WriterOptions.WRITER_CLASS, PrintSink.class.getName());
     executor.configure(jobConf);
-    Set<TransferableFile> transferableFiles = executor.getTransferableFiles();
+    executor.addJobConf(jobConf);
+    executor.init();
 
-    String localRootPath = AbstractExecutor.getLocalRootDir();
-    TransferableFile file1 = new TransferableFile(Paths.get(localRootPath, "/local/1.jar").toAbsolutePath().toString(),
-        "/executor/1.jar");
-    TransferableFile file2 = new TransferableFile(Paths.get(localRootPath, "/local/2.jar").toAbsolutePath().toString(),
-        "/executor/2.jar");
-    Assert.assertTrue(transferableFiles.contains(file1));
-    Assert.assertTrue(transferableFiles.contains(file2));
+    int exitCode = executor.run("testID");
+    Assert.assertEquals(exitCode, 0);
+
+    executor.close();
   }
 }

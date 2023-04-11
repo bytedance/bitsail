@@ -33,6 +33,7 @@ import org.testcontainers.utility.DockerLoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -61,6 +62,7 @@ public class GenericExecutor extends AbstractExecutor {
   @Override
   public void configure(BitSailConfiguration executorConf) {
     this.conf = executorConf;
+    super.transferableFiles = new HashSet<>(setting.getAdditionalFiles());
   }
 
   @Override
@@ -81,7 +83,7 @@ public class GenericExecutor extends AbstractExecutor {
             DockerLoggerFactory.getLogger(setting.getExecutorImage())).withSeparateOutputStreams())
         .withStartupAttempts(1)
         .withWorkingDirectory(EXECUTOR_ROOT_DIR.toAbsolutePath().toString())
-        .withCommand("bash", "-c", String.join(" ;", initCommands))
+        .withCommand("sh", "-c", String.join(" ;", initCommands))
         .waitingFor(new LogMessageWaitStrategy()
             .withRegEx(".*" + EXECUTOR_READY_MSG + ".*")
             .withStartupTimeout(Duration.ofSeconds(EXECUTOR_READY_TIMEOUT)));
@@ -104,7 +106,7 @@ public class GenericExecutor extends AbstractExecutor {
             + "============================================\n",
         testId, getContainerName());
 
-    Container.ExecResult result = executor.execInContainer("bash", "-c", commands);
+    Container.ExecResult result = executor.execInContainer("sh", "-c", commands);
 
     String stdOut = result.getStdout();
     String stdErr = result.getStderr();
@@ -120,7 +122,7 @@ public class GenericExecutor extends AbstractExecutor {
 
     if (exitCode != 0 && CollectionUtils.isNotEmpty(setting.getFailureHandleCommands())) {
       commands = String.join(" ", setting.getFailureHandleCommands());
-      result = executor.execInContainer("bash", "-c", commands);
+      result = executor.execInContainer("sh", "-c", commands);
 
       LOG.error("Job exited with code {}, will execute the failure handle commands now:\n"
               + "=========== FAILURE HANDLE COMMANDS ============\n"
