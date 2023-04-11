@@ -57,12 +57,12 @@ public class GenericExecutor extends AbstractExecutor {
 
   public GenericExecutor(GenericExecutorSetting setting) {
     this.setting = setting;
+    super.transferableFiles = new HashSet<>(setting.getAdditionalFiles());
   }
 
   @Override
   public void configure(BitSailConfiguration executorConf) {
     this.conf = executorConf;
-    super.transferableFiles = new HashSet<>(setting.getAdditionalFiles());
   }
 
   @Override
