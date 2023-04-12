@@ -16,9 +16,18 @@
 
 package com.bytedance.bitsail.connector.cdc.mysql.source;
 
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.connector.cdc.model.ClusterInfo;
+import com.bytedance.bitsail.connector.cdc.model.ConnectionInfo;
 import com.bytedance.bitsail.connector.cdc.mysql.source.container.MySQLContainerMariadbAdapter;
+import com.bytedance.bitsail.connector.cdc.mysql.source.debezium.MysqlBinlogSplitReader;
 import com.bytedance.bitsail.connector.cdc.mysql.source.schema.SchemaUtils;
+import com.bytedance.bitsail.connector.cdc.option.BinlogReaderOptions;
+import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
+import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 
+import com.google.common.collect.Lists;
 import io.debezium.config.Configuration;
 import io.debezium.connector.mysql.MySqlConnection;
 import io.debezium.connector.mysql.MySqlConnectorConfig;
@@ -38,8 +47,10 @@ import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 /**
@@ -93,11 +104,43 @@ public class MockConnectionsTest {
     MySqlConnection connection = new MySqlConnection(
         new MySqlConnection.MySqlConnectionConfiguration(dbzConfiguration), new MysqlTextProtocolFieldReader());
 
-    Map<TableId, TableChanges.TableChange> schema = SchemaUtils.discoverCapturedTableSchemas(connection, connectorConfig, connectorConfig.getTableFilters());
+    Map<TableId, TableChanges.TableChange> schema = SchemaUtils.discoverCapturedTableSchemas(connection, connectorConfig);
     Assert.assertEquals(1, schema.keySet().stream().filter(k -> k.toString().equals("test.jdbc_source_test")).count());
     Table table = schema.values().stream().findFirst().get().getTable();
     Assert.assertEquals(6, table.columns().size());
     Assert.assertTrue(table.primaryKeyColumnNames().contains("id"));
     Assert.assertEquals("utf8mb4", table.defaultCharsetName());
+  }
+
+  @Test
+  public void testBinlogSplitReader() throws InterruptedException {
+    BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
+    ConnectionInfo connectionInfo = ConnectionInfo.builder()
+        .host(container.getHost())
+        .port(container.getFirstMappedPort())
+        .url(container.getJdbcUrl())
+        .build();
+    ClusterInfo clusterInfo = ClusterInfo.builder()
+        .master(connectionInfo)
+        .build();
+
+    jobConf.set(BinlogReaderOptions.CONNECTIONS, Lists.newArrayList(clusterInfo));
+    jobConf.set(BinlogReaderOptions.USER_NAME, "root");
+    jobConf.set(BinlogReaderOptions.PASSWORD, TEST_PASSWORD);
+    jobConf.set(BinlogReaderOptions.INITIAL_OFFSET_TYPE, "latest");
+
+    MysqlBinlogSplitReader reader = new MysqlBinlogSplitReader(jobConf, 0);
+    BinlogSplit split = new BinlogSplit("split-1", BinlogOffset.earliest(), BinlogOffset.boundless());
+    reader.readSplit(split);
+    int maxPeriod = 0;
+    while (maxPeriod <= 5) {
+      if (reader.hasNext()) {
+        Row row = reader.poll();
+        Arrays.stream(row.getFields()).forEach(o -> LOG.info(o.toString()));
+        maxPeriod++;
+      }
+      TimeUnit.SECONDS.sleep(1);
+    }
+    reader.close();
   }
 }

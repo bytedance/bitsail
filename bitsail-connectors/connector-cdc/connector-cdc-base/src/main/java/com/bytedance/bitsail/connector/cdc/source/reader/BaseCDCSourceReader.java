@@ -20,8 +20,10 @@ import com.bytedance.bitsail.base.connector.reader.v1.SourceEvent;
 import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.cdc.source.event.BinlogCompleteAckEvent;
+import com.bytedance.bitsail.connector.cdc.source.split.BaseCDCSplit;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 
 import org.slf4j.Logger;
@@ -31,26 +33,29 @@ import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
 
-public abstract class BinlogSourceReader implements SourceReader<Row, BinlogSplit> {
+public abstract class BaseCDCSourceReader implements SourceReader<Row, BaseCDCSplit> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(BinlogSourceReader.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BaseCDCSourceReader.class);
 
   protected BitSailConfiguration jobConf;
 
   protected Context readerContext;
 
-  private final Queue<BinlogSplit> remainSplits;
+  private final Queue<BaseCDCSplit> remainSplits;
 
   protected final BinlogSplitReader<Row> reader;
 
   private boolean splitSubmitted;
 
-  public BinlogSourceReader(BitSailConfiguration jobConf, SourceReader.Context readerContext) {
+  private boolean isStreaming;
+
+  public BaseCDCSourceReader(BitSailConfiguration jobConf, SourceReader.Context readerContext) {
     this.jobConf = jobConf;
     this.readerContext = readerContext;
     this.remainSplits = new ArrayDeque<>();
     this.reader = getReader();
     this.splitSubmitted = false;
+    this.isStreaming = jobConf.get(CommonOptions.JOB_TYPE).equalsIgnoreCase("streaming");
   }
 
   public abstract BinlogSplitReader<Row> getReader();
@@ -70,7 +75,7 @@ public abstract class BinlogSourceReader implements SourceReader<Row, BinlogSpli
   }
 
   @Override
-  public void addSplits(List<BinlogSplit> splits) {
+  public void addSplits(List<BaseCDCSplit> splits) {
     LOG.info("Received splits from coordinator.");
     splits.forEach(e -> LOG.info("Add split: {}", e.toString()));
     remainSplits.addAll(splits);
@@ -82,6 +87,9 @@ public abstract class BinlogSourceReader implements SourceReader<Row, BinlogSpli
 
   @Override
   public boolean hasMoreElements() {
+    if (isStreaming) {
+      return true;
+    }
     if (!splitSubmitted) {
       return true;
     } else {
@@ -105,7 +113,7 @@ public abstract class BinlogSourceReader implements SourceReader<Row, BinlogSpli
    * Snapshot the offset into state.
    */
   @Override
-  public abstract List<BinlogSplit> snapshotState(long checkpointId);
+  public abstract List<BaseCDCSplit> snapshotState(long checkpointId);
 
   @Override
   public void notifyCheckpointComplete(long checkpointId) throws Exception {
@@ -122,7 +130,7 @@ public abstract class BinlogSourceReader implements SourceReader<Row, BinlogSpli
 
   private void submitSplit() {
     if (!remainSplits.isEmpty()) {
-      BinlogSplit curSplit = remainSplits.poll();
+      BinlogSplit curSplit = (BinlogSplit) remainSplits.poll();
       LOG.info("submit split to binlog reader: {}, size of the remaining splits: {}", curSplit.toString(), remainSplits.size());
       this.reader.readSplit(curSplit);
     }

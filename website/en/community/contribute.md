@@ -122,3 +122,11 @@ yarn docs:dev
 
 # visit http://localhost:8080/bitsail/
 ```
+
+> The default port is 8080, if the port conflicts, you can use `--port` to specify the port
+
+```bash
+yarn docs:dev --port 9090
+
+# visit http://localhost:9090/bitsail/
+```

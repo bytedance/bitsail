@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class PrintWriterCommitter implements WriterCommitter<String> {
-  private static Logger LOG = LoggerFactory.getLogger(PrintWriterCommitter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PrintWriterCommitter.class);
 
   @Override
   public List<String> commit(List<String> committables) {

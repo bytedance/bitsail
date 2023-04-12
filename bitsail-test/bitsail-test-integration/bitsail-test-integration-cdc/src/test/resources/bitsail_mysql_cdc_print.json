@@ -1,7 +1,7 @@
 {
   "job": {
     "common": {
-      "job_type": "STREAMING",
+      "job_type": "BATCH",
       "job_plugin_lib_dir": "plugin",
       "job_plugin_conf_dir": "plugin_conf",
       "enable_dynamic_loader": true,
@@ -13,7 +13,7 @@
       "job_name": "bitsail_test_integration_cdc_to_print"
     },
     "reader": {
-      "class": "com.bytedance.bitsail.connector.cdc.mysql.source.MysqlBinlogSource",
+      "class": "com.bytedance.bitsail.connector.cdc.mysql.source.MysqlCDCSource",
       "db_name": "test",
       "table_name": "jdbc_source_test",
       "connections": [
