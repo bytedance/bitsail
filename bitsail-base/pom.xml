@@ -162,6 +162,28 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>de.shadowhunt.maven.plugins</groupId>
+                <artifactId>package-info-maven-plugin</artifactId>
+                <version>2.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>package-info</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <packages>
+                        <package regex="com.bytedance.bitsail.base.version">
+                            <annotations>
+                                <annotation>@com.bytedance.bitsail.base.version.VersionInfoAnnotation(version = "${revision}")</annotation>
+                            </annotations>
+                        </package>
+                    </packages>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

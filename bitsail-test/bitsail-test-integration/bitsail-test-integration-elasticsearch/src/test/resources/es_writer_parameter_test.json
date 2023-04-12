@@ -1,0 +1,29 @@
+{
+  "job": {
+    "writer": {
+      "es_id_fields": "id",
+      "columns": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "varchar_type",
+          "type": "string"
+        },
+        {
+          "name": "text_type",
+          "type": "string"
+        },
+        {
+          "name": "bigint_type",
+          "type": "bigint"
+        },
+        {
+          "name": "date",
+          "type": "string"
+        }
+      ]
+    }
+  }
+}

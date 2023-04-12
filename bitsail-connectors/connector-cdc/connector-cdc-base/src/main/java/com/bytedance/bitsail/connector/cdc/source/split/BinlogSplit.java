@@ -16,28 +16,45 @@
 
 package com.bytedance.bitsail.connector.cdc.source.split;
 
-import com.bytedance.bitsail.base.connector.reader.v1.SourceSplit;
 import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import java.util.HashMap;
+import java.util.Map;
 
-@Builder
-@Getter
-@AllArgsConstructor
-public class BinlogSplit implements SourceSplit {
+public class BinlogSplit extends BaseCDCSplit {
   private static final long serialVersionUID = 2L;
-
-  private final String splitId;
 
   private final BinlogOffset beginOffset;
 
   private final BinlogOffset endOffset;
 
-  @Override
-  public String uniqSplitId() {
-    return splitId;
+  //Store schema of each table
+  private final Map<String, String> schemas;
+
+  //TODO: optimize serialization for each checkpoint
+  transient byte[] cache;
+
+  public BinlogSplit(String splitId, BinlogOffset begin, BinlogOffset end) {
+    this(splitId, begin, end, new HashMap<>());
+  }
+
+  public BinlogSplit(String splitId, BinlogOffset begin, BinlogOffset end, Map<String, String> schemas) {
+    super(splitId, SplitType.BINLOG_SPLIT_TYPE);
+    this.beginOffset = begin;
+    this.endOffset = end;
+    this.schemas = schemas;
+  }
+
+  public BinlogOffset getBeginOffset() {
+    return beginOffset;
+  }
+
+  public BinlogOffset getEndOffset() {
+    return endOffset;
+  }
+
+  public Map<String, String> getSchemas() {
+    return schemas;
   }
 
   @Override

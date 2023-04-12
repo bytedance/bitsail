@@ -35,7 +35,7 @@ export const zhNavbar = navbar([
   },
   {
     text: "下载",
-    link: "https://github.com/bytedance/bitsail",
+    link: "https://github.com/bytedance/bitsail/releases",
     activeMatch: "^/zh/release",
   },
   {

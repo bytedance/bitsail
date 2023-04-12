@@ -16,16 +16,29 @@
 
 package com.bytedance.bitsail.connector.elasticsearch.base;
 
-import lombok.extern.slf4j.Slf4j;
+import com.bytedance.bitsail.common.util.Preconditions;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Slf4j
 public class NetUtil {
 
-  private static final String IPV4_HTTP_PORT_FORMAT = "([.0-9]*):(\\d+)";
   private static final String IPV6_HTTP_PORT_FORMAT = "(\\[.*\\]):(\\d+)";
+
+  public static boolean isIpv4Address(String h) {
+    String[] tok = h.split(":");
+    return tok.length == 2;
+  }
+
+  public static String getIpv4Ip(String h) {
+    Preconditions.checkState(isIpv4Address(h));
+    return h.split(":")[0];
+  }
+
+  public static int getIpv4Port(String h) {
+    Preconditions.checkState(isIpv4Address(h));
+    return Integer.parseInt(h.split(":")[1]);
+  }
 
   public static boolean isIpv6Address(String h) {
     Matcher httpMatcher = Pattern.compile(IPV6_HTTP_PORT_FORMAT).matcher(h);
@@ -33,27 +46,14 @@ public class NetUtil {
   }
 
   public static String getIpv6Ip(String h) {
+    Preconditions.checkState(isIpv6Address(h));
     Matcher httpMatcher = Pattern.compile(IPV6_HTTP_PORT_FORMAT).matcher(h);
     return httpMatcher.find() ? httpMatcher.group(1) : null;
   }
 
   public static int getIpv6Port(String h) {
+    Preconditions.checkState(isIpv6Address(h));
     Matcher httpMatcher = Pattern.compile(IPV6_HTTP_PORT_FORMAT).matcher(h);
-    return httpMatcher.find() ? Integer.parseInt(httpMatcher.group(2)) : 0;
-  }
-
-  public static boolean isIpv4Address(String h) {
-    Matcher httpMatcher = Pattern.compile(IPV4_HTTP_PORT_FORMAT).matcher(h);
-    return httpMatcher.find();
-  }
-
-  public static String getIpv4Ip(String h) {
-    Matcher httpMatcher = Pattern.compile(IPV4_HTTP_PORT_FORMAT).matcher(h);
-    return httpMatcher.find() ? httpMatcher.group(1) : null;
-  }
-
-  public static int getIpv4Port(String h) {
-    Matcher httpMatcher = Pattern.compile(IPV4_HTTP_PORT_FORMAT).matcher(h);
     return httpMatcher.find() ? Integer.parseInt(httpMatcher.group(2)) : 0;
   }
 }

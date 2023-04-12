@@ -41,52 +41,11 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--   engine jars     -->
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-core-flink-bridge</artifactId>
-            <version>${revision}</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!--   client jars     -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-client-entry</artifactId>
             <version>${revision}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-client-entry-flink</artifactId>
-            <version>${revision}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!--   logs    -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-access</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -272,7 +231,7 @@
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>connector-localfilesystem</artifactId>
@@ -297,6 +256,20 @@
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>connector-cdc-mysql</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-mongodb</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>connector-hbase</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>
@@ -329,7 +302,85 @@
 
     <profiles>
         <profile>
-            <id>flink-embedded</id>
+            <id>flink-1.11</id>
+            <properties>
+                <scala.version>${scala-2.11.version}</scala.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.bytedance.bitsail</groupId>
+                    <artifactId>bitsail-core-flink-1.11-bridge</artifactId>
+                    <version>${revision}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.bytedance.bitsail</groupId>
+                    <artifactId>bitsail-client-flink-1.11</artifactId>
+                    <version>${revision}</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+
+        <profile>
+            <id>flink-1.16</id>
+            <properties>
+                <scala.version>${scala-2.12.version}</scala.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.bytedance.bitsail</groupId>
+                    <artifactId>bitsail-core-flink-1.16-bridge</artifactId>
+                    <version>${revision}</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>flink-1.11-embedded</id>
+            <properties>
+                <flink.version>${flink-1.11.version}</flink.version>
+                <scala.binary.version>2.11</scala.binary.version>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.googlecode.maven-download-plugin</groupId>
+                        <artifactId>download-maven-plugin</artifactId>
+                        <version>1.6.8</version>
+                        <executions>
+                            <execution>
+                                <!-- the wget goal actually binds itself to this phase by default -->
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>wget</goal>
+                                </goals>
+                                <configuration>
+                                    <url>
+                                        https://archive.apache.org/dist/flink/flink-${flink.version}/flink-${flink.version}-bin-scala_${scala.binary.version}.tgz
+                                    </url>
+                                    <unpack>true</unpack>
+                                    <!-- default target location, just to demonstrate the parameter -->
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>flink-1.16-embedded</id>
+            <properties>
+                <flink.version>${flink-1.16.version}</flink.version>
+                <scala.binary.version>2.12</scala.binary.version>
+            </properties>
             <build>
                 <plugins>
                     <plugin>

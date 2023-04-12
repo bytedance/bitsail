@@ -16,8 +16,9 @@
 
 package com.bytedance.bitsail.connector.selectdb.http;
 
+import com.bytedance.bitsail.common.util.Preconditions;
+
 import org.apache.commons.codec.binary.Base64;
-import org.apache.flink.util.Preconditions;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.HttpPut;

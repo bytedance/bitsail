@@ -17,6 +17,7 @@
 package com.bytedance.bitsail.connector.selectdb.serialize.converter;
 
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.selectdb.typeinfo.SelectdbDataType;
 
 import java.io.Serializable;
@@ -28,15 +29,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.TimeZone;
 
-import static org.apache.flink.util.Preconditions.checkNotNull;
-
 public class SelectdbRowConverter implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private final SerializationConverter[] serializationConverters;
 
   public SelectdbRowConverter(SelectdbDataType[] dataTypes) {
-    checkNotNull(dataTypes);
+    Preconditions.checkNotNull(dataTypes);
     this.serializationConverters = new SerializationConverter[dataTypes.length];
     for (int i = 0; i < dataTypes.length; i++) {
       SelectdbDataType selectdbDataType = dataTypes[i];

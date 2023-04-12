@@ -16,6 +16,8 @@
 
 package com.bytedance.bitsail.connector.cdc.source.coordinator.state;
 
+import com.bytedance.bitsail.connector.cdc.source.split.SplitType;
+
 import org.junit.Assert;
 import org.junit.Test;
 

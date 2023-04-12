@@ -1,0 +1,60 @@
+{
+  "job": {
+    "common": {
+      "cid": 0,
+      "domain": "test",
+      "job_id": -25,
+      "job_name": "bitsail_test_integration_fake_to_elasticsearch",
+      "instance_id": -205,
+      "user_name": "root",
+      "checkpoint_interval": "10000",
+      "bitsail_location": "./"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 10,
+      "columns": [
+        {
+          "name": "id",
+          "type": "long",
+          "properties": "unique"
+        },
+        {
+          "name": "varchar_type",
+          "type": "string"
+        },
+        {
+          "name": "text_type",
+          "type": "string"
+        },
+        {
+          "name": "bigint_type",
+          "type": "bigint"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchSink",
+      "es_id_fields": "id",
+      "columns": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "varchar_type",
+          "type": "string"
+        },
+        {
+          "name": "text_type",
+          "type": "string"
+        },
+        {
+          "name": "bigint_type",
+          "type": "bigint"
+        }
+      ]
+    }
+  }
+}

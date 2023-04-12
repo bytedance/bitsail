@@ -1,0 +1,70 @@
+{
+  "job": {
+    "common": {
+      "job_id": -2413,
+      "job_name": "bitsail_test_integration_fake_to_rockermq",
+      "instance_id": -20413,
+      "user_name": "user"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 100000,
+      "random_null_rate": 0,
+      "unique_fields": "id",
+      "columns": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "string_field",
+          "type": "string"
+        },
+        {
+          "name": "int_field",
+          "type": "bigint"
+        },
+        {
+          "name": "double_field",
+          "type": "double"
+        },
+        {
+          "name": "date_field",
+          "type": "date.date"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.rocketmq.sink.RocketMQSink",
+      "name_server_address": "127.0.0.1:10911",
+      "producer_group": "test_producer_group",
+      "topic": "test_topic",
+      "tag": "itcase_test",
+      "key": "id",
+      "partition_fields": "id,date_field",
+      "columns": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "string_field",
+          "type": "string"
+        },
+        {
+          "name": "int_field",
+          "type": "long"
+        },
+        {
+          "name": "double_field",
+          "type": "double"
+        },
+        {
+          "name": "date_field",
+          "type": "date"
+        }
+      ]
+    }
+  }
+}

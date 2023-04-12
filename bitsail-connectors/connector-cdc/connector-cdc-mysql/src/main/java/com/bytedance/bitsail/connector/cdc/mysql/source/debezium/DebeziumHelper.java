@@ -17,6 +17,7 @@
 package com.bytedance.bitsail.connector.cdc.mysql.source.debezium;
 
 import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.util.Pair;
 import com.bytedance.bitsail.connector.cdc.error.BinlogReaderErrorCode;
 import com.bytedance.bitsail.connector.cdc.mysql.source.constant.MysqlConstant;
 import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
@@ -25,11 +26,16 @@ import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 import io.debezium.DebeziumException;
 import io.debezium.connector.mysql.MySqlConnection;
 import io.debezium.connector.mysql.MySqlConnectorConfig;
+import io.debezium.connector.mysql.MySqlDatabaseSchema;
 import io.debezium.connector.mysql.MySqlOffsetContext;
+import io.debezium.connector.mysql.MySqlTopicSelector;
 import io.debezium.connector.mysql.MySqlValueConverters;
 import io.debezium.connector.mysql.SourceInfo;
 import io.debezium.jdbc.JdbcValueConverters;
 import io.debezium.jdbc.TemporalPrecisionMode;
+import io.debezium.relational.TableId;
+import io.debezium.schema.TopicSelector;
+import io.debezium.util.SchemaNameAdjuster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,15 +120,15 @@ public class DebeziumHelper {
     return offset;
   }
 
-  public static MySqlOffsetContext loadOffsetContext(MySqlConnectorConfig config, BinlogSplit split) {
+  public static MySqlOffsetContext loadOffsetContext(MySqlConnectorConfig config, BinlogSplit split, MySqlConnection connection) {
     final MySqlOffsetContext offsetContext = new MySqlOffsetContext(config, false, false, new SourceInfo(config));
     switch (split.getBeginOffset().getOffsetType()) {
       case EARLIEST:
         offsetContext.setBinlogStartPoint("", 0L);
         break;
       case LATEST:
-        //TODO: support latest offset
-        offsetContext.setBinlogStartPoint("", 0L);
+        Pair<String, Long> latestOffset = getLatestOffset(connection);
+        offsetContext.setBinlogStartPoint(latestOffset.getFirst(), latestOffset.getSecond());
         break;
       case SPECIFIED:
         BinlogOffset offset = split.getBeginOffset();
@@ -135,5 +141,39 @@ public class DebeziumHelper {
             String.format("the begin binlog type %s is not supported", split.getBeginOffset().getOffsetType()));
     }
     return offsetContext;
+  }
+
+  /**
+   * Get the latest offset of mysql.
+   */
+  public static Pair<String, Long> getLatestOffset(MySqlConnection connection) {
+    try {
+      return connection.queryAndMap("SHOW MASTER STATUS", rs -> {
+        if (rs.next()) {
+          String binlogFilename = rs.getString(1);
+          long binlogOffset = rs.getLong(2);
+          return new Pair<>(binlogFilename, binlogOffset);
+        } else {
+          throw new BitSailException(BinlogReaderErrorCode.OFFSET_ERROR,
+              "Load latest offset failed, please check your mysql connection is working");
+        }
+      });
+    } catch (SQLException e) {
+      throw new BitSailException(BinlogReaderErrorCode.OFFSET_ERROR,
+          "Load latest offset failed, please check your mysql connection is working");
+    }
+  }
+
+  public static MySqlDatabaseSchema createMySqlDatabaseSchema(
+      MySqlConnectorConfig dbzMySqlConfig, boolean isTableIdCaseSensitive) {
+    TopicSelector<TableId> topicSelector = MySqlTopicSelector.defaultSelector(dbzMySqlConfig);
+    SchemaNameAdjuster schemaNameAdjuster = SchemaNameAdjuster.create();
+    MySqlValueConverters valueConverters = getValueConverters(dbzMySqlConfig);
+    return new MySqlDatabaseSchema(
+        dbzMySqlConfig,
+        valueConverters,
+        topicSelector,
+        schemaNameAdjuster,
+        isTableIdCaseSensitive);
   }
 }

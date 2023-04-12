@@ -28,16 +28,27 @@ public interface SourceSplitCoordinator<SplitT extends SourceSplit, StateT> exte
 
   void start();
 
+  /**
+   * Add a new source reader with the given subtask ID.
+   */
   void addReader(int subtaskId);
 
+  /**
+   * Add splits back to the split enumerator. This will only happen when a SourceReader fails and there are splits
+   * assigned to it after the last successful checkpoint.
+   */
   void addSplitsBack(List<SplitT> splits, int subtaskId);
 
+  /**
+   * Handles the request for a split. This method is called when the reader with the given subtask id calls the
+   * SourceReader.Context.sendSplitRequest() method.
+   */
   void handleSplitRequest(int subtaskId, @Nullable String requesterHostname);
 
   default void handleSourceEvent(int subtaskId, SourceEvent sourceEvent) {
   }
 
-  StateT snapshotState() throws Exception;
+  StateT snapshotState(long checkpoint) throws Exception;
 
   default void notifyCheckpointComplete(long checkpointId) throws Exception {
   }

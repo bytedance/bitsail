@@ -29,7 +29,7 @@
 
     <modules>
         <module>bitsail-client-entry</module>
-        <module>bitsail-client-entry-flink</module>
+        <module>bitsail-client-flink</module>
         <module>bitsail-client-api</module>
     </modules>
 

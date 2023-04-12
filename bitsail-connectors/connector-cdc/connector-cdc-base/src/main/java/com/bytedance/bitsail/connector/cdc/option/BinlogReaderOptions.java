@@ -54,6 +54,7 @@ public interface BinlogReaderOptions extends ReaderOptions.BaseReaderOptions {
       key(READER_PREFIX + "query_retry_times")
           .defaultValue(3);
 
+  // CDC related options
   ConfigOption<String> INITIAL_OFFSET_TYPE =
       key(READER_PREFIX + "initial_offset_type")
           .defaultValue(String.valueOf(BinlogOffsetType.EARLIEST).toLowerCase());
@@ -62,4 +63,22 @@ public interface BinlogReaderOptions extends ReaderOptions.BaseReaderOptions {
       key(READER_PREFIX + "initial_offset_props")
           .onlyReference(new TypeReference<Map<String, String>>() {
           });
+
+  /**
+   * Interval to attempt polling message from debezium queue, if there is no record in the queue.
+   */
+  ConfigOption<Long> POLL_INTERVAL_MS =
+      key(READER_PREFIX + "poll_interval_ms")
+          .defaultValue(5000L);
+
+  /**
+   * Max batch size of debezium message queue.
+   */
+  ConfigOption<Integer> MAX_BATCH_SIZE =
+      key(READER_PREFIX + "max_batch_size")
+          .defaultValue(2048);
+
+  ConfigOption<Integer> MAX_QUEUE_SIZE =
+      key(READER_PREFIX + "max_queue_size")
+          .defaultValue(8192);
 }

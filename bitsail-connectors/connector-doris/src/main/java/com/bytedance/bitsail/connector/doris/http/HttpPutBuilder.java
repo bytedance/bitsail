@@ -16,11 +16,11 @@
 
 package com.bytedance.bitsail.connector.doris.http;
 
+import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 import com.bytedance.bitsail.connector.doris.constant.DorisConstants;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.flink.util.Preconditions;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.HttpPut;

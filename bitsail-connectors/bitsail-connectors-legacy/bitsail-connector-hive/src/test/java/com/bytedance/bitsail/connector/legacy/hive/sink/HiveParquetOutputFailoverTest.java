@@ -48,7 +48,6 @@ import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.File;
@@ -68,8 +67,7 @@ import static org.mockito.ArgumentMatchers.any;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({HiveMetaClientUtil.class})
-@PowerMockIgnore(value = {"javax.management.*", "org.apache.hive.*"})
-@SuppressStaticInitializationFor("javax.security.auth.kerberos.KeyTab")
+@PowerMockIgnore(value = {"javax.management.*", "org.apache.hive.*", "javax.xml.parsers.", "com.sun.org.apache.xerces.internal.jaxp.*", "org.slf4j.*"})
 public class HiveParquetOutputFailoverTest {
   static final BitSailConfiguration DEFAULT_CONF;
   static final BitSailConfiguration CONF_WITHOUT_COLUMNS;
@@ -77,15 +75,15 @@ public class HiveParquetOutputFailoverTest {
   static {
     try {
       DEFAULT_CONF = BitSailConfiguration.from(
-        new File(
-          Paths.get(
-            HiveParquetOutputFailoverTest.class.getClassLoader()
-              .getResource("hive/hive_writer.json").toURI()).toString()));
+          new File(
+              Paths.get(
+                  HiveParquetOutputFailoverTest.class.getClassLoader()
+                      .getResource("hive/hive_writer.json").toURI()).toString()));
 
       CONF_WITHOUT_COLUMNS = BitSailConfiguration.from(
-        new File(Paths.get(
-          HiveParquetOutputFailoverTest.class.getClassLoader()
-            .getResource("hive/hive_writer_without_columns.json").toURI()).toString()));
+          new File(Paths.get(
+              HiveParquetOutputFailoverTest.class.getClassLoader()
+                  .getResource("hive/hive_writer_without_columns.json").toURI()).toString()));
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }

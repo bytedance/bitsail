@@ -22,11 +22,12 @@ import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -38,7 +39,8 @@ public class LocalFileSystemSourceReaderTest {
   private void testUnifiedLocalFSSourceReader(String jobConfPath) throws Exception, Error {
     // Using CountDownLatch to mock multi-thread concurrency environment
     SimpleSourcePipeLine<Row> sourcePipeline = new SimpleSourcePipeLine<>();
-    BitSailConfiguration jobConf = JobConfUtils.fromClasspath(jobConfPath);
+    BitSailConfiguration jobConf = BitSailConfiguration.from(new File(
+        Paths.get(getClass().getClassLoader().getResource(jobConfPath).toURI()).toString()));
     SourceReader.Context context = new SourceReader.Context() {
       @Override
       public RowTypeInfo getRowTypeInfo() {
