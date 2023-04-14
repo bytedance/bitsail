@@ -125,11 +125,11 @@ public class MysqlConfig implements Serializable {
    * @param props
    */
   public static void fillDefaultProps(Properties props) {
-    props.put("database.serverTimezone", ZoneId.of("UTC").toString());
-    props.put("database.history", "io.debezium.relational.history.MemoryDatabaseHistory");
-    props.put("schema.history.internal", "io.debezium.relational.history.MemorySchemaHistory");
-    props.put("include.schema.changes", "false");
-    props.put("database.useSSL", "false");
-    props.put("database.allowPublicKeyRetrieval", "true");
+    props.putIfAbsent("database.serverTimezone", ZoneId.of("UTC").toString());
+    props.putIfAbsent("database.history", "com.bytedance.bitsail.connector.cdc.mysql.source.debezium.InMemoryDatabaseHistory");
+    props.putIfAbsent("database.history.instance.name", "default_database_history");
+    props.putIfAbsent("include.schema.changes", "false");
+    props.putIfAbsent("database.useSSL", "false");
+    props.putIfAbsent("database.allowPublicKeyRetrieval", "true");
   }
 }

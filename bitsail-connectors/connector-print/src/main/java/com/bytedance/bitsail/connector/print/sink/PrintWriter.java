@@ -19,7 +19,6 @@ package com.bytedance.bitsail.connector.print.sink;
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.print.sink.option.PrintWriterOptions;
 
 import org.slf4j.Logger;
@@ -36,7 +35,6 @@ public class PrintWriter implements Writer<Row, String, Integer> {
 
   private final int subTaskId;
 
-  private final int batchSize;
   private final String[] fieldNames;
   private final boolean sampleWrite;
   private final int sampleLimit;
@@ -52,8 +50,6 @@ public class PrintWriter implements Writer<Row, String, Integer> {
   }
 
   public PrintWriter(BitSailConfiguration writerConfiguration, Writer.Context<Integer> context, int alreadyPrintCount) {
-    this.batchSize = writerConfiguration.get(PrintWriterOptions.BATCH_SIZE);
-    Preconditions.checkState(this.batchSize > 0, "batch size must be larger than 0");
 
     this.sampleWrite = writerConfiguration.get(PrintWriterOptions.SAMPLE_WRITE);
     this.sampleLimit = writerConfiguration.get(PrintWriterOptions.SAMPLE_LIMIT);

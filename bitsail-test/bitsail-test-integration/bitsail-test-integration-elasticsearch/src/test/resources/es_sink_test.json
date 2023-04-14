@@ -17,7 +17,7 @@
       "columns": [
         {
           "name": "id",
-          "type": "string",
+          "type": "long",
           "properties": "unique"
         },
         {

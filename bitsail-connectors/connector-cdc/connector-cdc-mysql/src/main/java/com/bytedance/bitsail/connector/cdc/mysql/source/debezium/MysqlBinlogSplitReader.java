@@ -21,6 +21,8 @@ import com.bytedance.bitsail.common.row.BinlogRow;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.component.format.debezium.JsonDebeziumSerializationSchema;
 import com.bytedance.bitsail.connector.cdc.mysql.source.config.MysqlConfig;
+import com.bytedance.bitsail.connector.cdc.mysql.source.schema.SchemaUtils;
+import com.bytedance.bitsail.connector.cdc.mysql.source.schema.TableChangeConverter;
 import com.bytedance.bitsail.connector.cdc.option.BinlogReaderOptions;
 import com.bytedance.bitsail.connector.cdc.source.reader.BinlogSplitReader;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
@@ -46,6 +48,7 @@ import io.debezium.pipeline.ErrorHandler;
 import io.debezium.pipeline.EventDispatcher;
 import io.debezium.pipeline.source.spi.ChangeEventSource;
 import io.debezium.relational.TableId;
+import io.debezium.relational.history.TableChanges;
 import io.debezium.schema.TopicSelector;
 import io.debezium.util.Clock;
 import io.debezium.util.SchemaNameAdjuster;
@@ -55,6 +58,7 @@ import org.apache.kafka.connect.source.SourceRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -130,8 +134,6 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
   }
 
   public void readSplit(BinlogSplit split) {
-    this.split = split;
-    this.offset = new HashMap<>();
     this.topicSelector = MySqlTopicSelector.defaultSelector(connectorConfig);
 
     final MySqlValueConverters valueConverters = DebeziumHelper.getValueConverters(connectorConfig);
@@ -162,12 +164,31 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
     } catch (SQLException e) {
       throw new RuntimeException("Failed to connect", e);
     }
+
+    Map<TableId, TableChanges.TableChange> tableSchemas;
+    try {
+      if (split.getSchemas().isEmpty()) {
+        tableSchemas = SchemaUtils.discoverCapturedTableSchemas(connection, connectorConfig);
+        this.split = new BinlogSplit(split.uniqSplitId(), split.getBeginOffset(), split.getEndOffset(), TableChangeConverter.tableChangeToString(tableSchemas));
+      } else {
+        Map<String, String> rawSchema = split.getSchemas();
+        tableSchemas = TableChangeConverter.stringToTableChange(rawSchema);
+        this.split = split;
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    InMemoryDatabaseHistory.registerHistory(mysqlConfig.getDbzConfiguration().getString(InMemoryDatabaseHistory.DATABASE_HISTORY_INSTANCE_NAME),
+        tableSchemas.values());
+
     DebeziumHelper.validateBinlogConfiguration(connectorConfig, connection);
     MySqlOffsetContext offsetContext = DebeziumHelper.loadOffsetContext(connectorConfig, split, connection);
-
+    this.offset = offsetContext.getOffset();
     final boolean tableIdCaseInsensitive = connection.isTableIdCaseSensitive();
-
     this.schema = new MySqlDatabaseSchema(connectorConfig, valueConverters, topicSelector, schemaNameAdjuster, tableIdCaseInsensitive);
+    schema.initializeStorage();
+    schema.recover(offsetContext);
     this.taskContext = new MySqlTaskContext(connectorConfig, schema);
 
     this.binaryLogClient = this.taskContext.getBinaryLogClient();
@@ -275,14 +296,12 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
     }
   }
 
-  @SuppressWarnings("checkstyle:MagicNumber")
   private boolean pollNextBatch() {
     if (isRunning) {
       try {
         List<DataChangeEvent> dbzRecords = queue.poll();
-        while (dbzRecords.isEmpty()) {
-          LOG.debug("No record found, sleep for {} ms", jobConf.get(BinlogReaderOptions.POLL_INTERVAL_MS));
-          dbzRecords = queue.poll();
+        if (dbzRecords.isEmpty()) {
+          return false;
         }
         this.batch = new ArrayList<>();
         for (DataChangeEvent event : dbzRecords) {

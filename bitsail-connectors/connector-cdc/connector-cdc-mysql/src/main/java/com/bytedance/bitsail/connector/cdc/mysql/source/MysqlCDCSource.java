@@ -18,18 +18,25 @@ package com.bytedance.bitsail.connector.cdc.mysql.source;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.connector.cdc.mysql.source.reader.MysqlBinlogSourceReader;
-import com.bytedance.bitsail.connector.cdc.source.BinlogSource;
-import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
+import com.bytedance.bitsail.connector.cdc.mysql.source.reader.MysqlCDCSourceReader;
+import com.bytedance.bitsail.connector.cdc.mysql.source.split.MysqlSplitSerializer;
+import com.bytedance.bitsail.connector.cdc.source.BaseCDCSource;
+import com.bytedance.bitsail.connector.cdc.source.split.BaseCDCSplit;
+import com.bytedance.bitsail.connector.cdc.source.split.BaseSplitSerializer;
 
 /**
- * WIP: Source to read mysql binlog.
+ * Source to read mysql binlog.
  */
-public class MysqlBinlogSource extends BinlogSource {
+public class MysqlCDCSource extends BaseCDCSource {
 
   @Override
-  public SourceReader<Row, BinlogSplit> createReader(SourceReader.Context readerContext) {
-    return new MysqlBinlogSourceReader(jobConf, readerContext);
+  public SourceReader<Row, BaseCDCSplit> createReader(SourceReader.Context readerContext) {
+    return new MysqlCDCSourceReader(jobConf, readerContext);
+  }
+
+  @Override
+  public BaseSplitSerializer createSplitSerializer() {
+    return new MysqlSplitSerializer();
   }
 
   @Override

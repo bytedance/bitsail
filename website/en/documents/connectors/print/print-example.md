@@ -8,7 +8,6 @@ Parent documents: [print-connector](./print.md)
 
 the data can be printed out with the following configuration.
 
-
 ```json
 {
   "job": {

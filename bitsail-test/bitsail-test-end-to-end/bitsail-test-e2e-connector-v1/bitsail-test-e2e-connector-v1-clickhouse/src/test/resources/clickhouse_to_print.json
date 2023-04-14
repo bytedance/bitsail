@@ -47,7 +47,6 @@
     },
     "writer": {
       "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
-      "batch_size": 10,
       "columns": [
         {
           "name": "id",

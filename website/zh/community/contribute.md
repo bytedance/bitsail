@@ -117,3 +117,11 @@ yarn docs:dev
 
 # 通过 http://localhost:8080/bitsail/ 访问测试主页
 ```
+
+> 默认端口是8080, 如果端口冲突, 可以使用 `--port` 来指定端口
+
+```bash
+yarn docs:dev --port 9090
+
+# visit http://localhost:9090/bitsail/
+```

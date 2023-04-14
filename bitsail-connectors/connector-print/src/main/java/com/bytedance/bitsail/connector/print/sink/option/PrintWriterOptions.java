@@ -25,9 +25,6 @@ import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
  * Created 2022/8/16
  */
 public interface PrintWriterOptions {
-  ConfigOption<Integer> BATCH_SIZE =
-      key(WRITER_PREFIX + "batch_size")
-          .defaultValue(10);
 
   ConfigOption<Boolean> SAMPLE_WRITE =
       key(WRITER_PREFIX + "sample_write")
