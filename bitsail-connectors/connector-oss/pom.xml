@@ -27,46 +27,23 @@
     <artifactId>connector-oss</artifactId>
 
     <properties>
-        <hadoop-aliyun.version>2.9.2</hadoop-aliyun.version>
+        <hadoop-aliyun.version>3.1.1</hadoop-aliyun.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
     <dependencies>
-        <dependency>
-            <artifactId>hadoop-common</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>log4j</artifactId>
-                    <groupId>log4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
-            <groupId>org.apache.hadoop</groupId>
-            <version>2.9.2</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-aliyun</artifactId>
             <version>${hadoop-aliyun.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>commons-configuration</artifactId>
-                    <groupId>commons-configuration</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>slf4j-log4j12</artifactId>
                     <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>log4j</artifactId>
                     <groupId>log4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>hadoop-common</artifactId>
-                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>log4j</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

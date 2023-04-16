@@ -16,7 +16,8 @@
 
 package com.bytedance.bitsail.connector.oss.util;
 
-import com.bytedance.bitsail.connector.oss.config.HadoopConf;
+import com.bytedance.bitsail.connector.oss.config.OssConf;
+import com.bytedance.bitsail.connector.oss.constant.OssConstants;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
@@ -29,19 +30,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OssUtil {
-  static FileSystem fs;
-  public static Configuration getConfiguration(HadoopConf hadoopConf) {
+  public static Configuration getConfiguration(OssConf ossConf) {
     Configuration configuration = new Configuration();
-    configuration.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY, hadoopConf.getHdfsNameKey());
+    configuration.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY, ossConf.getHdfsNameKey());
     configuration.set(
-        String.format("fs.%s.impl", hadoopConf.getSchema()), hadoopConf.getHdfsImpl());
-    hadoopConf.setExtraOptionsForConfiguration(configuration);
+        String.format("fs.%s.impl", ossConf.getSchema()), ossConf.getHdfsImpl());
+    ossConf.setExtraOptionsForConfiguration(configuration);
     return configuration;
   }
 
-  public static List<String> getFileNamesByPath(HadoopConf hadoopConf, String path) throws IOException {
+  public static List<String> getFileNamesByPath(OssConf hadoopConf, String path) throws IOException {
     Configuration configuration = getConfiguration(hadoopConf);
-    fs = FileSystem.get(configuration);
+    FileSystem fs = FileSystem.get(configuration);
     ArrayList<String> fileNames = new ArrayList<>();
     Path listFiles = new Path(path);
     FileStatus[] stats = fs.listStatus(listFiles);
@@ -51,7 +51,7 @@ public class OssUtil {
         continue;
       }
       if (fileStatus.isFile()) {
-        if (!fileStatus.getPath().getName().equals("_SUCCESS")) {
+        if (!fileStatus.getPath().getName().equals(OssConstants.OSS_SOURCE_IGNORE_FILENAME)) {
           String filePath = fileStatus.getPath().toString();
           fileNames.add(filePath);
         }

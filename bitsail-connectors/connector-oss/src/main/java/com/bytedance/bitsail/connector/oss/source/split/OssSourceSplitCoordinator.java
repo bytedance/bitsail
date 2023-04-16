@@ -21,7 +21,6 @@ import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.connector.oss.config.HadoopConf;
 import com.bytedance.bitsail.connector.oss.config.OssConf;
 import com.bytedance.bitsail.connector.oss.config.OssConfig;
 import com.bytedance.bitsail.connector.oss.exception.OssConnectorErrorCode;
@@ -60,7 +59,7 @@ public class OssSourceSplitCoordinator implements SourceSplitCoordinator<OssSour
   }
 
   private List<OssSourceSplit> constructSplit() throws IOException {
-    HadoopConf conf = OssConf.buildWithConfig(this.jobConf);
+    OssConf conf = OssConf.buildWithConfig(this.jobConf);
     String path = ossConfig.getFilePath();
     List<String> fileList = OssUtil.getFileNamesByPath(conf, path);
     LOG.info("OssSourceSplitCoordinator fileList: {}", fileList);
@@ -71,7 +70,7 @@ public class OssSourceSplitCoordinator implements SourceSplitCoordinator<OssSour
 
   @Override
   public void start() {
-    List<OssSourceSplit> splits = new ArrayList<>();
+    List<OssSourceSplit> splits;
     try {
       splits = constructSplit();
     } catch (IOException e) {
@@ -80,7 +79,7 @@ public class OssSourceSplitCoordinator implements SourceSplitCoordinator<OssSour
     int readerNum = context.totalParallelism();
     LOG.info("Found {} readers and {} splits.", readerNum, splits.size());
     if (readerNum > splits.size()) {
-      LOG.error("Reader number {} is larger than split number {}.", readerNum, splits.size());
+      LOG.warn("Reader number {} is larger than split number {}.", readerNum, splits.size());
     }
     for (OssSourceSplit split : splits) {
       int readerIndex = ReaderSelector.getReaderIndex(readerNum);

@@ -1,0 +1,9 @@
+{
+  "name": "bitsail-connector-unified-oss",
+  "classes": [
+    "com.bytedance.bitsail.connector.oss.source.OssSource"
+  ],
+  "libs": [
+    "connector-oss-${version}.jar"
+  ]
+}

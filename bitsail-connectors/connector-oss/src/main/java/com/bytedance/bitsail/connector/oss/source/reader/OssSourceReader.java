@@ -22,7 +22,6 @@ import com.bytedance.bitsail.base.format.DeserializationSchema;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.connector.oss.config.HadoopConf;
 import com.bytedance.bitsail.connector.oss.config.OssConf;
 import com.bytedance.bitsail.connector.oss.config.OssConfig;
 import com.bytedance.bitsail.connector.oss.constant.OssConstants;
@@ -31,7 +30,6 @@ import com.bytedance.bitsail.connector.oss.source.split.OssSourceSplit;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
-import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
@@ -41,7 +39,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -49,11 +46,10 @@ import java.util.List;
 
 public class OssSourceReader implements SourceReader<Row, OssSourceSplit> {
   private static final Logger LOG = LoggerFactory.getLogger(OssSourceReader.class);
-  protected HadoopConf hadoopConf;
+  protected OssConf ossConf;
   private final transient DeserializationSchema<byte[], Row> deserializationSchema;
   private final OssConfig ossConfig;
   private final transient Context context;
-  private long currentReadCount = 0;
   private final Deque<OssSourceSplit> splits;
   private boolean skipFirstLine = false;
   private boolean hasNoMoreSplits = false;
@@ -67,14 +63,14 @@ public class OssSourceReader implements SourceReader<Row, OssSourceSplit> {
     this.context = context;
     this.deserializationSchema = DeserializationSchemaFactory.createDeserializationSchema(jobConf, context, ossConfig);
     this.splits = new LinkedList<>();
-    this.hadoopConf = OssConf.buildWithConfig(jobConf);
+    this.ossConf = OssConf.buildWithConfig(jobConf);
     LOG.info("OssSourceReader is initialized.");
   }
 
   @Override
   public void start() {
     if (this.ossConfig.getSkipFirstLine()) {
-      this.skipFirstLine = true;
+      skipFirstLine = true;
       this.skipFirstLineNums = 1;
     }
   }
@@ -103,7 +99,6 @@ public class OssSourceReader implements SourceReader<Row, OssSourceSplit> {
                   if (line != null) {
                     Row row = deserializationSchema.deserialize(line.getBytes());
                     pipeline.output(row);
-                    this.currentReadCount++;
                   }
                 } catch (IOException e) {
                   String errorMsg =
@@ -117,39 +112,16 @@ public class OssSourceReader implements SourceReader<Row, OssSourceSplit> {
     }
   }
 
-  public List<String> getFileNamesByPath(HadoopConf hadoopConf, String path) throws IOException {
-    LOG.info("start getFileNamesByPath path: {}", path);
-    Configuration configuration = getConfiguration(hadoopConf);
-    FileSystem hdfs = FileSystem.get(configuration);
-    ArrayList<String> fileNames = new ArrayList<>();
-    Path listFiles = new Path(path);
-    FileStatus[] stats = hdfs.listStatus(listFiles);
-    for (FileStatus fileStatus : stats) {
-      if (fileStatus.isDirectory()) {
-        LOG.info("getFileNamesByPath dir: {}", fileStatus.getPath());
-        fileNames.addAll(getFileNamesByPath(hadoopConf, fileStatus.getPath().toString()));
-        continue;
-      }
-      if (fileStatus.isFile()) {
-        if (!fileStatus.getPath().getName().equals("_SUCCESS")) {
-          String filePath = fileStatus.getPath().toString();
-          fileNames.add(filePath);
-        }
-      }
-    }
-    return fileNames;
-  }
-
   Configuration getConfiguration() {
-    return getConfiguration(this.hadoopConf);
+    return getConfiguration(this.ossConf);
   }
 
-  public Configuration getConfiguration(HadoopConf hadoopConf) {
+  public Configuration getConfiguration(OssConf ossConf) {
     Configuration configuration = new Configuration();
-    configuration.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY, hadoopConf.getHdfsNameKey());
+    configuration.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY, ossConf.getHdfsNameKey());
     configuration.set(
-        String.format("fs.%s.impl", hadoopConf.getSchema()), hadoopConf.getHdfsImpl());
-    hadoopConf.setExtraOptionsForConfiguration(configuration);
+        String.format("fs.%s.impl", ossConf.getSchema()), ossConf.getHdfsImpl());
+    ossConf.setExtraOptionsForConfiguration(configuration);
     return configuration;
   }
 

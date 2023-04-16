@@ -19,4 +19,5 @@ package com.bytedance.bitsail.connector.oss.constant;
 public class OssConstants {
   public static String OSS_CONNECTOR_NAME = "oss";
   public static final long OSS_SOURCE_SLEEP_MILL_SECS = 1000L;
+  public static final String OSS_SOURCE_IGNORE_FILENAME = "_SUCCESS";
 }
