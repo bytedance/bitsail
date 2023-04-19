@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.base.connector.transformer;
+package com.bytedance.bitsail.base.connector.transform;
+
+import com.bytedance.bitsail.base.execution.ExecutionEnviron;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+
+import java.io.Serializable;
 
 /**
  * Created 2022/4/22
  */
-public class DataTransformDAGBuilder {
+public interface DataTransformDAGBuilder extends Serializable {
+  default void configure(ExecutionEnviron execution,
+                         BitSailConfiguration writerConfiguration) throws Exception {
+  }
+
+  String getTransformName();
 }

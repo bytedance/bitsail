@@ -20,7 +20,7 @@ import com.bytedance.bitsail.base.catalog.TableCatalogFactory;
 import com.bytedance.bitsail.base.catalog.TableCatalogFactoryHelper;
 import com.bytedance.bitsail.base.connector.BuilderGroup;
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
-import com.bytedance.bitsail.base.connector.transformer.DataTransformDAGBuilder;
+import com.bytedance.bitsail.base.connector.transform.DataTransformDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.common.catalog.TableCatalogManager;

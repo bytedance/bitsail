@@ -17,7 +17,7 @@
 package com.bytedance.bitsail.core.api.program;
 
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
-import com.bytedance.bitsail.base.connector.transformer.DataTransformDAGBuilder;
+import com.bytedance.bitsail.base.connector.transform.DataTransformDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.Mode;
@@ -90,6 +90,12 @@ public abstract class UnifiedProgram implements Program {
 
     dataReaderDAGBuilders = programBuilderFactory
         .getDataReaderDAGBuilders(mode,
+            readerConfigurations,
+            pluginFinder);
+
+    dataTransformDAGBuilders = programBuilderFactory
+        .getDataTransformDAGBuilders(mode,
+            //TODO: placeholder, use transform conf instead
             readerConfigurations,
             pluginFinder);
 

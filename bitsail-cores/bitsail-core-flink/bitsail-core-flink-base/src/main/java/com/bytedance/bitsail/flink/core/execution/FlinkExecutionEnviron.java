@@ -17,7 +17,7 @@
 package com.bytedance.bitsail.flink.core.execution;
 
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
-import com.bytedance.bitsail.base.connector.transformer.DataTransformDAGBuilder;
+import com.bytedance.bitsail.base.connector.transform.DataTransformDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.Mode;
@@ -33,6 +33,7 @@ import com.bytedance.bitsail.flink.core.execution.configurer.FlinkDAGBuilderInte
 import com.bytedance.bitsail.flink.core.execution.utils.ExecutionUtils;
 import com.bytedance.bitsail.flink.core.parallelism.FlinkParallelismAdvisor;
 import com.bytedance.bitsail.flink.core.reader.FlinkDataReaderDAGBuilder;
+import com.bytedance.bitsail.flink.core.transform.FlinkDataTransformDAGBuilder;
 import com.bytedance.bitsail.flink.core.writer.FlinkDataWriterDAGBuilder;
 
 import com.alibaba.fastjson.JSONObject;
@@ -257,9 +258,15 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
       unionStream = ExecutionUtils.addExecutionPartitioner(unionStream, commonConfiguration);
     }
 
+    DataStream<T> transformStream = unionStream;
+    for (int i = 0; i < transformDAGBuilders.size(); ++i) {
+      FlinkDataTransformDAGBuilder<T> flinkDataTransformDAGBuilder = (FlinkDataTransformDAGBuilder<T>) transformDAGBuilders.get(i);
+      transformStream = flinkDataTransformDAGBuilder.addTransformer(unionStream);
+    }
+
     for (int i = 0; i < writerBuilders.size(); ++i) {
       FlinkDataWriterDAGBuilder<T> flinkDataWriterDAGBuilder = (FlinkDataWriterDAGBuilder<T>) writerBuilders.get(i);
-      flinkDataWriterDAGBuilder.addWriter(unionStream, parallelismAdvisor.getAdviceWriterParallelism(flinkDataWriterDAGBuilder));
+      flinkDataWriterDAGBuilder.addWriter(transformStream, parallelismAdvisor.getAdviceWriterParallelism(flinkDataWriterDAGBuilder));
     }
   }
 
