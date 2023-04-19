@@ -189,6 +189,9 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
     this.schema = new MySqlDatabaseSchema(connectorConfig, valueConverters, topicSelector, schemaNameAdjuster, tableIdCaseInsensitive);
     schema.initializeStorage();
     schema.recover(offsetContext);
+    for (TableId tableId : tableSchemas.keySet()) {
+      LOG.debug("Schema for TableId " + tableId.toString() + ":" + schema.schemaFor(tableId).toString());
+    }
     this.taskContext = new MySqlTaskContext(connectorConfig, schema);
 
     this.binaryLogClient = this.taskContext.getBinaryLogClient();
@@ -235,11 +238,17 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
   @Override
   public Map<String, String> getOffset() {
     Map<String, String> offsetToStore = new HashMap<>();
-    this.offset.forEach((k, v) -> offsetToStore.put(k, v.toString()));
+    this.offset.forEach((k, v) -> {
+      LOG.info("offset key:{}, offset value: {}", k, v);
+      if (v != null) {
+        offsetToStore.put(k, v.toString());
+      }
+    });
     return offsetToStore;
   }
 
   public void close() {
+    LOG.info("Received close signal on MysqlBinlogSplitReader");
     try {
       if (this.connection != null) {
         this.connection.close();

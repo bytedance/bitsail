@@ -26,6 +26,8 @@ import io.debezium.relational.history.DatabaseHistoryListener;
 import io.debezium.relational.history.HistoryRecord;
 import io.debezium.relational.history.HistoryRecordComparator;
 import io.debezium.relational.history.TableChanges;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +40,8 @@ import java.util.concurrent.ConcurrentMap;
  * Debezium DatabaseHistory instance that store in the memory of the reader task.
  */
 public class InMemoryDatabaseHistory implements DatabaseHistory {
+
+  private static final Logger LOG = LoggerFactory.getLogger(InMemoryDatabaseHistory.class);
 
   public static final String DATABASE_HISTORY_INSTANCE_NAME = "database.history.instance.name";
 
@@ -75,11 +79,13 @@ public class InMemoryDatabaseHistory implements DatabaseHistory {
       throws DatabaseHistoryException {
     final HistoryRecord record =
         new HistoryRecord(source, position, databaseName, schemaName, ddl, changes);
+    LOG.debug("Received DDL record {}", record);
     listener.onChangeApplied(record);
   }
 
   @Override
   public void recover(Map<String, ?> source, Map<String, ?> position, Tables schema, DdlParser ddlParser) {
+    LOG.debug("Recovering database history");
     listener.recoveryStarted();
     for (TableChanges.TableChange tableChange : tableSchemas.values()) {
       schema.overwriteTable(tableChange.getTable());
