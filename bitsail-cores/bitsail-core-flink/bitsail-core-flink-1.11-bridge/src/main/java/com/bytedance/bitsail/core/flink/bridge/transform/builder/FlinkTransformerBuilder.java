@@ -47,7 +47,7 @@ public class FlinkTransformerBuilder<T> extends FlinkDataTransformDAGBuilder<T> 
   @Override
   public DataStream<T> addTransformer(DataStream<T> source) {
     if (jobConf.get(ReaderOptions.BaseReaderOptions.ENABLE_PARTITION)) {
-      return source.partitionCustom(partitioner, keySelector).keyBy(keySelector);
+      return source.partitionCustom(partitioner, keySelector);
     }
     return source;
   }

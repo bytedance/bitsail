@@ -22,7 +22,7 @@ import com.bytedance.bitsail.common.row.Row;
 
 import org.apache.flink.api.java.functions.KeySelector;
 
-public class RowStringKeySelector<INPUT extends Object, KEY> implements KeySelector<INPUT, KEY> {
+public class RowStringKeySelector<INPUT extends Object, KEY extends Object> implements KeySelector<INPUT, KEY> {
 
   private final int keyIndex;
 

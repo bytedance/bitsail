@@ -22,7 +22,7 @@
     <parent>
         <groupId>com.bytedance.bitsail</groupId>
         <artifactId>bitsail-test-integration</artifactId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>bitsail-test-integration-print</artifactId>
