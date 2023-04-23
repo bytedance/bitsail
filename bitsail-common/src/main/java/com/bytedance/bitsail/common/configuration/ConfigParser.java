@@ -29,6 +29,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -107,8 +108,10 @@ public class ConfigParser {
   public static List<BitSailConfiguration> getTransformConfList(BitSailConfiguration conf) {
     if (conf.fieldExists(TransformOptions.TRANSFORM_CONFIG_LIST)) {
       return getConfList(conf, TransformOptions.TRANSFORM_CONFIG_LIST);
+    } else if (conf.fieldExists(TransformOptions.JOB_TRANSFORM)) {
+      return Arrays.asList(getTransformConf(conf));
     }
-    return Arrays.asList(getTransformConf(conf));
+    return new ArrayList<>();
   }
 
   public static List<BitSailConfiguration> getOutputConfList(BitSailConfiguration conf) {
