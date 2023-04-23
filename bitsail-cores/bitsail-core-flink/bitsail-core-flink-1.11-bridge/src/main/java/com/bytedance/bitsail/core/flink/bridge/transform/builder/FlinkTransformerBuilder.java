@@ -16,14 +16,19 @@
 
 package com.bytedance.bitsail.core.flink.bridge.transform.builder;
 
+import com.bytedance.bitsail.base.connector.transform.TransformType;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.option.ReaderOptions;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.option.TransformOptions;
 import com.bytedance.bitsail.core.flink.bridge.transform.delegate.DelegateFlinkPartitioner;
-import com.bytedance.bitsail.core.flink.bridge.transform.delegate.RowStringKeySelector;
+import com.bytedance.bitsail.core.flink.bridge.transform.delegate.RowKeySelector;
 import com.bytedance.bitsail.flink.core.transform.FlinkDataTransformDAGBuilder;
 
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.datastream.DataStream;
+
+import java.util.Locale;
 
 public class FlinkTransformerBuilder<T> extends FlinkDataTransformDAGBuilder<T> {
 
@@ -36,7 +41,7 @@ public class FlinkTransformerBuilder<T> extends FlinkDataTransformDAGBuilder<T> 
   public FlinkTransformerBuilder(BitSailConfiguration jobConf) {
     this.jobConf = jobConf;
     this.partitioner = new DelegateFlinkPartitioner<>(jobConf);
-    this.keySelector = new RowStringKeySelector(RowStringKeySelector.DEFAULT_KEY_INDEX);
+    this.keySelector = new RowKeySelector<>(RowKeySelector.DEFAULT_KEY_INDEX);
   }
 
   @Override
@@ -46,9 +51,22 @@ public class FlinkTransformerBuilder<T> extends FlinkDataTransformDAGBuilder<T> 
 
   @Override
   public DataStream<T> addTransformer(DataStream<T> source) {
-    if (jobConf.get(ReaderOptions.BaseReaderOptions.ENABLE_PARTITION)) {
-      return source.partitionCustom(partitioner, keySelector);
+    TransformType transformType = TransformType.valueOf(
+        jobConf.get(TransformOptions.BaseTransformOptions.TRANSFORM_TYPE).toUpperCase(Locale.ROOT));
+
+    switch (transformType) {
+      case PARTITION_BY:
+        return addPartitioner(source);
+      default:
+        throw BitSailException.asBitSailException(
+            CommonErrorCode.UNSUPPORTED_TRANSFORM_TYPE, String.format("transform type %s is currently unsupported", transformType));
     }
-    return source;
+  }
+
+  private DataStream<T> addPartitioner(DataStream<T> source) {
+    DelegateFlinkPartitioner<T> partitioner = new DelegateFlinkPartitioner<>(jobConf);
+    KeySelector keySelector = new RowKeySelector<>(jobConf.get(
+        TransformOptions.BaseTransformOptions.PARTITION_KEY_INDEX));
+    return source.partitionCustom(partitioner, keySelector);
   }
 }

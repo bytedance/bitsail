@@ -22,13 +22,13 @@ import com.bytedance.bitsail.common.row.Row;
 
 import org.apache.flink.api.java.functions.KeySelector;
 
-public class RowStringKeySelector<INPUT extends Object, KEY extends Object> implements KeySelector<INPUT, KEY> {
+public class RowKeySelector<INPUT extends Object, KEY extends Object> implements KeySelector<INPUT, KEY> {
 
   private final int keyIndex;
 
   public static int DEFAULT_KEY_INDEX = 0;
 
-  public RowStringKeySelector(int keyIndex) {
+  public RowKeySelector(int keyIndex) {
     this.keyIndex = keyIndex;
   }
 

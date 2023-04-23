@@ -44,7 +44,7 @@ public interface ProgramDAGBuilderFactory extends Serializable {
                                                       PluginFinder pluginFinder);
 
   /**
-   * Get transformer builders from configuration.
+   * Get data transform builders from configuration.
    */
   default List<DataTransformDAGBuilder> getDataTransformDAGBuilders(Mode mode,
                                                                     List<BitSailConfiguration> configurations,

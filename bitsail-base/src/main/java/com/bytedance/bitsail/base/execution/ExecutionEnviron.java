@@ -33,6 +33,7 @@ public abstract class ExecutionEnviron implements BaseExecutionEnviron {
   protected BitSailConfiguration globalConfiguration;
   protected BitSailConfiguration commonConfiguration;
   protected List<BitSailConfiguration> readerConfigurations;
+  protected List<BitSailConfiguration> transformConfigurations;
   protected List<BitSailConfiguration> writerConfigurations;
   protected Mode mode;
   protected PluginFinder pluginFinder;
@@ -49,6 +50,7 @@ public abstract class ExecutionEnviron implements BaseExecutionEnviron {
     this.pluginFinder = pluginFinder;
     this.commonConfiguration = ConfigParser.getSysCommonConf(globalConfiguration);
     this.readerConfigurations = ConfigParser.getInputConfList(globalConfiguration);
+    this.transformConfigurations = ConfigParser.getTransformConfList(globalConfiguration);
     this.writerConfigurations = ConfigParser.getOutputConfList(globalConfiguration);
     this.mode = mode;
   }
@@ -59,6 +61,7 @@ public abstract class ExecutionEnviron implements BaseExecutionEnviron {
   public void refreshConfiguration() {
     this.commonConfiguration = ConfigParser.getCommonConf(commonConfiguration);
     this.readerConfigurations = ConfigParser.getInputConfList(globalConfiguration);
+    this.transformConfigurations = ConfigParser.getTransformConfList(globalConfiguration);
     this.writerConfigurations = ConfigParser.getOutputConfList(globalConfiguration);
   }
 }

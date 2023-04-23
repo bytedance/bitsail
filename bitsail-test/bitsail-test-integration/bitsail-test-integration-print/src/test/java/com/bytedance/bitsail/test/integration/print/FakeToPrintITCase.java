@@ -30,8 +30,8 @@ public class FakeToPrintITCase extends AbstractIntegrationTest {
   }
 
   @Test
-  public void testPrintWriter() throws Exception {
-    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("fake_to_print.json");
+  public void testChainPartitioner() throws Exception {
+    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("chain_partitioner_print.json");
     submitJob(jobConf);
   }
 }

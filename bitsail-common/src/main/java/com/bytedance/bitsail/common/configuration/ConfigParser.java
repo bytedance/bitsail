@@ -22,6 +22,7 @@ import com.bytedance.bitsail.common.exception.FrameworkErrorCode;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.ReaderOptions;
+import com.bytedance.bitsail.common.option.TransformOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
 
 import org.apache.commons.io.FileUtils;
@@ -71,6 +72,10 @@ public class ConfigParser {
     return conf.getConfiguration(ReaderOptions.JOB_READER).clone();
   }
 
+  public static BitSailConfiguration getTransformConf(BitSailConfiguration conf) {
+    return conf.getConfiguration(TransformOptions.JOB_TRANSFORM).clone();
+  }
+
   public static BitSailConfiguration getOutputConf(BitSailConfiguration conf) {
     return conf.getConfiguration(WriterOptions.JOB_WRITER).clone();
   }
@@ -97,6 +102,13 @@ public class ConfigParser {
       return getConfList(conf, ReaderOptions.READER_CONFIG_LIST);
     }
     return Arrays.asList(getInputConf(conf));
+  }
+
+  public static List<BitSailConfiguration> getTransformConfList(BitSailConfiguration conf) {
+    if (conf.fieldExists(TransformOptions.TRANSFORM_CONFIG_LIST)) {
+      return getConfList(conf, TransformOptions.TRANSFORM_CONFIG_LIST);
+    }
+    return Arrays.asList(getTransformConf(conf));
   }
 
   public static List<BitSailConfiguration> getOutputConfList(BitSailConfiguration conf) {

@@ -39,6 +39,7 @@ public abstract class UnifiedProgram implements Program {
 
   private BitSailConfiguration globalConfiguration;
   private List<BitSailConfiguration> readerConfigurations;
+  private List<BitSailConfiguration> transformConfigurations;
   private List<BitSailConfiguration> writerConfigurations;
 
   private ExecutionEnviron execution;
@@ -50,9 +51,8 @@ public abstract class UnifiedProgram implements Program {
   private String jobName;
 
   private List<DataReaderDAGBuilder> dataReaderDAGBuilders = Lists.newArrayList();
-  private List<DataWriterDAGBuilder> dataWriterDAGBuilders = Lists.newArrayList();
   private List<DataTransformDAGBuilder> dataTransformDAGBuilders = Lists.newArrayList();
-
+  private List<DataWriterDAGBuilder> dataWriterDAGBuilders = Lists.newArrayList();
   @Override
   public void configure(PluginFinder pluginFinder,
                         BitSailConfiguration globalConfiguration,
@@ -80,6 +80,7 @@ public abstract class UnifiedProgram implements Program {
 
     this.globalConfiguration = globalConfiguration;
     this.readerConfigurations = execution.getReaderConfigurations();
+    this.transformConfigurations = execution.getTransformConfigurations();
     this.writerConfigurations = execution.getWriterConfigurations();
 
     prepare();
@@ -95,8 +96,7 @@ public abstract class UnifiedProgram implements Program {
 
     dataTransformDAGBuilders = programBuilderFactory
         .getDataTransformDAGBuilders(mode,
-            //TODO: placeholder, use transform conf instead
-            readerConfigurations,
+            transformConfigurations,
             pluginFinder);
 
     dataWriterDAGBuilders = programBuilderFactory

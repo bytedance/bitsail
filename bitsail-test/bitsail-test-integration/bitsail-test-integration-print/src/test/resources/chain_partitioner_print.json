@@ -12,7 +12,6 @@
       "rate": 10,
       "null_percentage": 20,
       "reader_parallelism_num": 2,
-      "enable_partition": true,
       "columns": [
         {
           "name": "name",
@@ -21,6 +20,27 @@
         {
           "name": "age",
           "type": "int"
+        }
+      ]
+    },
+    "transform": {
+      "transform_conf_list": [
+        {
+          "job": {
+            "transform": {
+              "transform_type": "partition_by",
+              "partition_key_index": 0,
+              "partitioner_type": "hash"
+            }
+          }
+        },
+        {
+          "job": {
+            "transform": {
+              "transform_type": "partition_by",
+              "partition_key_index": 1
+            }
+          }
         }
       ]
     },

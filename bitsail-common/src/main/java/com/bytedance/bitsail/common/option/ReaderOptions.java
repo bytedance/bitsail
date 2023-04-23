@@ -107,9 +107,5 @@ public interface ReaderOptions {
     ConfigOption<String> CONTENT_TYPE =
         key(READER_PREFIX + "content_type")
             .noDefaultValue(String.class);
-
-    ConfigOption<Boolean> ENABLE_PARTITION =
-        key(READER_PREFIX + "enable_partition")
-            .defaultValue(false);
   }
 }

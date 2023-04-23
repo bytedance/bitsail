@@ -23,10 +23,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class RowStringKeySelectorTest {
+public class RowKeySelectorTest {
   @Test
   public void testBitSailRowSelector() throws Exception {
-    KeySelector<Object, Object> keySelector = new RowStringKeySelector<>(0);
+    KeySelector<Object, Object> keySelector = new RowKeySelector<>(0);
     Row row = new Row(2);
     row.setField(0, "key");
     assertEquals("key", keySelector.getKey(row));
@@ -34,7 +34,7 @@ public class RowStringKeySelectorTest {
 
   @Test
   public void testFlinkRowSelector() throws Exception {
-    KeySelector<Object, Object> keySelector = new RowStringKeySelector<>(0);
+    KeySelector<Object, Object> keySelector = new RowKeySelector<>(0);
     org.apache.flink.types.Row row = new org.apache.flink.types.Row(2);
     row.setField(0, "key");
     assertEquals("key", keySelector.getKey(row));

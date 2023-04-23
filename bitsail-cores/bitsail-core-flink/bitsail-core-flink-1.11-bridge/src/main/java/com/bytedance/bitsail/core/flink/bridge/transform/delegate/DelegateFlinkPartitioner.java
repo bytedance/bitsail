@@ -16,25 +16,39 @@
 
 package com.bytedance.bitsail.core.flink.bridge.transform.delegate;
 
+import com.bytedance.bitsail.base.connector.transform.PartitionerType;
 import com.bytedance.bitsail.base.connector.transform.v1.BitSailPartitioner;
 import com.bytedance.bitsail.base.connector.transform.v1.SimpleHashCodePartitioner;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.option.TransformOptions;
 
 import org.apache.flink.api.common.functions.Partitioner;
 
+import java.util.Locale;
+
 public class DelegateFlinkPartitioner<T> implements Partitioner<T> {
-
-  BitSailConfiguration jobConf;
-
   BitSailPartitioner<T> realPartitioner;
 
   public DelegateFlinkPartitioner(BitSailConfiguration jobConf) {
-    this.jobConf = jobConf;
-    this.realPartitioner = new SimpleHashCodePartitioner<>();
+    this.realPartitioner = createPartitioner(jobConf);
   }
 
   @Override
   public int partition(T key, int numPartitions) {
     return realPartitioner.partition(key, numPartitions);
+  }
+
+  BitSailPartitioner<T> createPartitioner(BitSailConfiguration jobConf) {
+    PartitionerType partitionerType = PartitionerType.valueOf(
+        jobConf.get(TransformOptions.BaseTransformOptions.PARTITIONER_TYPE).trim().toUpperCase(Locale.ROOT));
+    switch (partitionerType) {
+      case HASH:
+        return new SimpleHashCodePartitioner<>();
+      default:
+        throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_TRANSFORM_TYPE,
+            String.format("partitioner type %s is not supported yet", partitionerType));
+    }
   }
 }
