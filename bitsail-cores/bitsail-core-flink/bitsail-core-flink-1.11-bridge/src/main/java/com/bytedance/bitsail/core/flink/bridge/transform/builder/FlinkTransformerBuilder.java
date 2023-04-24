@@ -24,8 +24,10 @@ import com.bytedance.bitsail.common.option.TransformOptions;
 import com.bytedance.bitsail.core.flink.bridge.transform.delegate.DelegateFlinkPartitioner;
 import com.bytedance.bitsail.core.flink.bridge.transform.delegate.RowKeySelector;
 import com.bytedance.bitsail.flink.core.transform.FlinkDataTransformDAGBuilder;
+import com.bytedance.bitsail.flink.core.typeutils.AutoDetectFlinkTypeInfoUtil;
 
 import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
 
 import java.util.Locale;
@@ -68,5 +70,11 @@ public class FlinkTransformerBuilder<T> extends FlinkDataTransformDAGBuilder<T> 
     KeySelector keySelector = new RowKeySelector<>(jobConf.get(
         TransformOptions.BaseTransformOptions.PARTITION_KEY_INDEX));
     return source.partitionCustom(partitioner, keySelector);
+  }
+
+  private DataStream<T> addMap(DataStream<T> source) {
+    com.bytedance.bitsail.common.typeinfo.RowTypeInfo bitSailRowType =
+        AutoDetectFlinkTypeInfoUtil.bridgeRowTypeInfo((RowTypeInfo) source.getType());
+    return source;
   }
 }

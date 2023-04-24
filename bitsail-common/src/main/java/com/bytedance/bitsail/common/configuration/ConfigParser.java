@@ -100,14 +100,14 @@ public class ConfigParser {
 
   public static List<BitSailConfiguration> getInputConfList(BitSailConfiguration conf) {
     if (conf.fieldExists(ReaderOptions.READER_CONFIG_LIST)) {
-      return getConfList(conf, ReaderOptions.READER_CONFIG_LIST);
+      return getConfList(conf, ReaderOptions.READER_CONFIG_LIST, ReaderOptions.READER_PREFIX);
     }
     return Arrays.asList(getInputConf(conf));
   }
 
   public static List<BitSailConfiguration> getTransformConfList(BitSailConfiguration conf) {
     if (conf.fieldExists(TransformOptions.TRANSFORM_CONFIG_LIST)) {
-      return getConfList(conf, TransformOptions.TRANSFORM_CONFIG_LIST);
+      return getConfList(conf, TransformOptions.TRANSFORM_CONFIG_LIST, TransformOptions.TRANSFORM_PREFIX);
     } else if (conf.fieldExists(TransformOptions.JOB_TRANSFORM)) {
       return Arrays.asList(getTransformConf(conf));
     }
@@ -116,17 +116,18 @@ public class ConfigParser {
 
   public static List<BitSailConfiguration> getOutputConfList(BitSailConfiguration conf) {
     if (conf.fieldExists(WriterOptions.WRITER_CONFIG_LIST)) {
-      return getConfList(conf, WriterOptions.WRITER_CONFIG_LIST);
+      return getConfList(conf, WriterOptions.WRITER_CONFIG_LIST, WriterOptions.WRITER_PREFIX);
     }
     return Arrays.asList(getOutputConf(conf));
   }
 
   private static List<BitSailConfiguration> getConfList(BitSailConfiguration conf,
-                                                        ConfigOption<List<Map<String, Object>>> option) {
+                                                       ConfigOption<List<Map<String, Object>>> option,
+                                                       String prefix) {
     List<Map<String, Object>> subConfMapList = conf.getNecessaryOption(option, CommonErrorCode.CONFIG_ERROR);
     return subConfMapList.stream().map(subConfMap -> {
       BitSailConfiguration subConf = BitSailConfiguration.newDefault();
-      subConfMap.forEach(subConf::set);
+      subConfMap.forEach((k, v) -> subConf.set(prefix + k, v));
       return subConf;
     }).collect(Collectors.toList());
   }
