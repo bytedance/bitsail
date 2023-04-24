@@ -19,5 +19,6 @@ package com.bytedance.bitsail.base.connector.transform;
 public enum TransformType {
   PARTITION_BY,
   MAP,
+  FLATMAP,
   FILTER
 }

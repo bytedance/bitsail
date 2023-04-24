@@ -16,19 +16,18 @@
 
 package com.bytedance.bitsail.base.connector.transform.v1;
 
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
+
 import java.io.Serializable;
 
 /**
- * Interface of BitSail partitioner.
- * @param <K>
+ * Interface of BitSail map function.
+ * @param <I>
+ * @param <O>
  */
-public interface BitSailPartitioner<K> extends Serializable {
-  /**
-   * Computes the partition for the given key.
-   *
-   * @param key The key.
-   * @param totalPartitions The total number of downstream partition.
-   * @return The partition of this key.
-   */
-  int partition(K key, int totalPartitions);
+public interface BitSailMapFunction<I, O> extends Serializable {
+
+  O map(I input) throws Exception;
+
+  RowTypeInfo getOutputType();
 }

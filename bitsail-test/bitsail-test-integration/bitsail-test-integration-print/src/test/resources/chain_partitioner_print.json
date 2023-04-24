@@ -8,7 +8,7 @@
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
-      "total_count": 30,
+      "total_count": 300,
       "rate": 10,
       "null_percentage": 20,
       "reader_parallelism_num": 2,
@@ -26,21 +26,15 @@
     "transform": {
       "transform_conf_list": [
         {
-          "job": {
-            "transform": {
-              "transform_type": "partition_by",
-              "partition_key_index": 0,
-              "partitioner_type": "hash"
-            }
-          }
+          "transform_type": "partition_by",
+          "partition_key_index": 0,
+          "partitioner_type": "hash"
         },
         {
-          "job": {
-            "transform": {
-              "transform_type": "partition_by",
-              "partition_key_index": 1
-            }
-          }
+          "transform_type": "map",
+          "map_function_type": "APPEND_STRING",
+          "append_string_indexes": [0],
+          "append_string_values": [" is working"]
         }
       ]
     },

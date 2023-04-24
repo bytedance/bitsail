@@ -54,5 +54,19 @@ public interface TransformOptions {
     ConfigOption<String> PARTITIONER_TYPE =
         key(TRANSFORM_PREFIX + "partitioner_type")
             .defaultValue("hash");
+
+    ConfigOption<String> MAP_FUNCTION_TYPE =
+        key(TRANSFORM_PREFIX + "map_function_type")
+            .noDefaultValue(String.class);
+
+    ConfigOption<List<Integer>> APPEND_STRING_INDEXES =
+        key(TRANSFORM_PREFIX + "append_string_indexes")
+            .onlyReference(new TypeReference<List<Integer>>() {
+            });
+
+    ConfigOption<List<String>> APPEND_STRING_VALUES =
+        key(TRANSFORM_PREFIX + "append_string_values")
+            .onlyReference(new TypeReference<List<String>>() {
+            });
   }
 }

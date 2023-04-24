@@ -21,11 +21,14 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.TransformOptions;
+import com.bytedance.bitsail.core.flink.bridge.transform.delegate.DelegateFlinkMapFunction;
 import com.bytedance.bitsail.core.flink.bridge.transform.delegate.DelegateFlinkPartitioner;
 import com.bytedance.bitsail.core.flink.bridge.transform.delegate.RowKeySelector;
 import com.bytedance.bitsail.flink.core.transform.FlinkDataTransformDAGBuilder;
 import com.bytedance.bitsail.flink.core.typeutils.AutoDetectFlinkTypeInfoUtil;
+import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -59,6 +62,8 @@ public class FlinkTransformerBuilder<T> extends FlinkDataTransformDAGBuilder<T> 
     switch (transformType) {
       case PARTITION_BY:
         return addPartitioner(source);
+      case MAP:
+        return addMap(source);
       default:
         throw BitSailException.asBitSailException(
             CommonErrorCode.UNSUPPORTED_TRANSFORM_TYPE, String.format("transform type %s is currently unsupported", transformType));
@@ -75,6 +80,8 @@ public class FlinkTransformerBuilder<T> extends FlinkDataTransformDAGBuilder<T> 
   private DataStream<T> addMap(DataStream<T> source) {
     com.bytedance.bitsail.common.typeinfo.RowTypeInfo bitSailRowType =
         AutoDetectFlinkTypeInfoUtil.bridgeRowTypeInfo((RowTypeInfo) source.getType());
-    return source;
+    DelegateFlinkMapFunction<T, T> mapFunction = new DelegateFlinkMapFunction<>(jobConf, bitSailRowType);
+    TypeInformation outputFlinkTypes = NativeFlinkTypeInfoUtil.getRowTypeInformation(mapFunction.getOutputType());
+    return source.map(mapFunction, outputFlinkTypes);
   }
 }

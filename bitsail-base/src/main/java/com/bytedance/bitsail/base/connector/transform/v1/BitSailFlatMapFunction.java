@@ -19,16 +19,10 @@ package com.bytedance.bitsail.base.connector.transform.v1;
 import java.io.Serializable;
 
 /**
- * Interface of BitSail partitioner.
- * @param <K>
+ * Interface for BitSail flatmap function.
+ * @param <I>
+ * @param <O>
  */
-public interface BitSailPartitioner<K> extends Serializable {
-  /**
-   * Computes the partition for the given key.
-   *
-   * @param key The key.
-   * @param totalPartitions The total number of downstream partition.
-   * @return The partition of this key.
-   */
-  int partition(K key, int totalPartitions);
+public interface BitSailFlatMapFunction <I, O> extends Serializable {
+  //TODO: design interface for flatmap
 }

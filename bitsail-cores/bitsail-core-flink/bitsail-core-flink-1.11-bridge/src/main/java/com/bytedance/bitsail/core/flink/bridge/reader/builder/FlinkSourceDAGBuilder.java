@@ -116,13 +116,13 @@ public class FlinkSourceDAGBuilder<T, SplitT extends SourceSplit, StateT extends
         .uid(source.getReaderName());
 
     //todo remove in future
-    TypeInformation<T> typeInformation = dataStream.getType();
-    InputAdapter inputAdapter = new InputAdapter();
-    inputAdapter.initFromConf(executionEnviron.getCommonConfiguration(), BitSailConfiguration.newDefault(), (RowTypeInfo) typeInformation);
-    dataStream = dataStream
-        .flatMap((FlatMapFunction) inputAdapter)
-        .name(inputAdapter.getType())
-        .setParallelism(dataStream.getParallelism());
+//    TypeInformation<T> typeInformation = dataStream.getType();
+//    InputAdapter inputAdapter = new InputAdapter();
+//    inputAdapter.initFromConf(executionEnviron.getCommonConfiguration(), BitSailConfiguration.newDefault(), (RowTypeInfo) typeInformation);
+//    dataStream = dataStream
+//        .flatMap((FlatMapFunction) inputAdapter)
+//        .name(inputAdapter.getType())
+//        .setParallelism(dataStream.getParallelism());
 
     return dataStream;
   }
