@@ -22,8 +22,8 @@ import org.apache.kafka.connect.source.SourceRecord;
 
 public interface DebeziumDeserializationSchema extends DeserializationSchema<byte[], SourceRecord> {
   @Override
-  public SourceRecord deserialize(byte[] message);
+  SourceRecord deserialize(byte[] message);
 
   @Override
-  public boolean isEndOfStream(SourceRecord nextElement);
+  boolean isEndOfStream(SourceRecord nextElement);
 }

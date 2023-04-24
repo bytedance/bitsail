@@ -34,6 +34,7 @@
     <modules>
         <module>bitsail-core-api</module>
         <module>bitsail-core-entry</module>
+        <module>bitsail-core-common</module>
         <module>bitsail-core-flink</module>
     </modules>
 </project>

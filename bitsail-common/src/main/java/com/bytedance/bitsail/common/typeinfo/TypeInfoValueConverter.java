@@ -22,6 +22,7 @@ import com.bytedance.bitsail.common.column.ListColumn;
 import com.bytedance.bitsail.common.column.MapColumn;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.option.CommonOptions;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -38,7 +39,6 @@ import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,14 +52,19 @@ import static com.bytedance.bitsail.common.typeinfo.TypeInfos.STRING_TYPE_INFO;
 public class TypeInfoValueConverter implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(TypeInfoValueConverter.class);
 
-  private BitSailConfiguration commonConfiguration;
-  private DateTimeFormatter dateFormatter;
-  private DateTimeFormatter timeFormatter;
-  private DateTimeFormatter dateTimeFormatter;
-  private ZoneId timezone;
+  private final BitSailConfiguration commonConfiguration;
+  private final DateTimeFormatter dateFormatter;
+  private final DateTimeFormatter timeFormatter;
+  private final DateTimeFormatter dateTimeFormatter;
 
   public TypeInfoValueConverter(BitSailConfiguration commonConfiguration) {
     this.commonConfiguration = commonConfiguration;
+    this.dateFormatter = DateTimeFormatter.ofPattern(commonConfiguration.get(CommonOptions
+        .DateFormatOptions.DATE_PATTERN));
+    this.timeFormatter = DateTimeFormatter.ofPattern(commonConfiguration.get(CommonOptions
+        .DateFormatOptions.TIME_PATTERN));
+    this.dateTimeFormatter = DateTimeFormatter.ofPattern(commonConfiguration.get(CommonOptions
+        .DateFormatOptions.DATE_TIME_PATTERN));
   }
 
   /**
@@ -71,13 +76,15 @@ public class TypeInfoValueConverter implements Serializable {
     if (Objects.isNull(value)) {
       return null;
     }
+
     if (value instanceof Column) {
       return convertColumnObject((Column) value, typeInfo);
     }
+
     if (compareValueTypeInfo(value, typeInfo)) {
       return value;
     }
-    return convertNormalObject(value, typeInfo);
+    return convertJavaObject(value, typeInfo);
   }
 
   private Object convertColumnObject(Column value,
@@ -184,8 +191,8 @@ public class TypeInfoValueConverter implements Serializable {
   /**
    * Compare object's value type match with type info's definition or not.
    */
-  private boolean compareValueTypeInfo(Object value,
-                                       TypeInfo<?> typeInfo) {
+  private static boolean compareValueTypeInfo(Object value,
+                                              TypeInfo<?> typeInfo) {
     if (Objects.isNull(value)) {
       return true;
     }
@@ -229,7 +236,7 @@ public class TypeInfoValueConverter implements Serializable {
     return value.getClass().isAssignableFrom(typeInfo.getTypeClass());
   }
 
-  private Object convertNormalObject(Object value, TypeInfo<?> typeInfo) {
+  private Object convertJavaObject(Object value, TypeInfo<?> typeInfo) {
     if (Objects.isNull(value)) {
       return null;
     }
@@ -240,25 +247,25 @@ public class TypeInfoValueConverter implements Serializable {
             "Object can't convert to map type.");
       }
       MapTypeInfo<?, ?> mapTypeInfo = (MapTypeInfo<?, ?>) typeInfo;
-      Map<?, ?> raw = (Map<?, ?>) value;
-      Map<Object, Object> map = Maps.newHashMap();
-      for (Object key : raw.keySet()) {
-        map.put(convertNormalObject(key, mapTypeInfo.getKeyTypeInfo()),
-            convertNormalObject(raw.get(key), mapTypeInfo.getValueTypeInfo()));
+      Map<?, ?> origin = (Map<?, ?>) value;
+      Map<Object, Object> converted = Maps.newHashMap();
+      for (Object key : origin.keySet()) {
+        converted.put(convertJavaObject(key, mapTypeInfo.getKeyTypeInfo()),
+            convertJavaObject(origin.get(key), mapTypeInfo.getValueTypeInfo()));
       }
-      return map;
+      return converted;
     } else if (typeInfo instanceof ListTypeInfo) {
       if (!(value instanceof List)) {
         throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
             "Object can't convert to list type.");
       }
       ListTypeInfo<?> listTypeInfo = (ListTypeInfo<?>) typeInfo;
-      List<?> raw = (List<?>) value;
-      List<Object> list = Lists.newArrayList();
-      for (Object key : raw) {
-        list.add(convertNormalObject(key, listTypeInfo.getElementTypeInfo()));
+      List<?> origin = (List<?>) value;
+      List<Object> converted = Lists.newArrayList();
+      for (Object key : origin) {
+        converted.add(convertJavaObject(key, listTypeInfo.getElementTypeInfo()));
       }
-      return list;
+      return converted;
 
     } else {
       return convertPrimitiveObject(value, typeInfo);
@@ -280,7 +287,7 @@ public class TypeInfoValueConverter implements Serializable {
       if (value instanceof byte[]) {
         return new String((byte[]) value, Charset.defaultCharset());
       }
-      return String.valueOf(value);
+      return value.toString();
     }
 
     if (TypeInfos.SHORT_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
@@ -291,6 +298,9 @@ public class TypeInfoValueConverter implements Serializable {
     }
 
     if (TypeInfos.INT_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      if (value instanceof Integer) {
+        return (Integer) value;
+      }
       if (value instanceof Number) {
         return ((Number) value).intValue();
       }
@@ -298,6 +308,9 @@ public class TypeInfoValueConverter implements Serializable {
     }
 
     if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      if (value instanceof Long) {
+        return (Long) value;
+      }
       if (value instanceof Number) {
         return ((Number) value).longValue();
       }
@@ -330,6 +343,12 @@ public class TypeInfoValueConverter implements Serializable {
     }
 
     if (TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
+      if (value instanceof Integer) {
+        return (Integer) value != 0;
+      }
+      if (value instanceof Long) {
+        return (Long) value != 0;
+      }
       String str = value.toString();
       return Boolean.parseBoolean(str);
     }

@@ -81,7 +81,7 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
   private final Sink<InputT, CommitT, WriterStateT> sink;
   private final BitSailConfiguration writerConfiguration;
   private final BitSailConfiguration commonConfiguration;
-  private final FlinkRowConverter flinkRowConvertSerializer;
+  private final FlinkRowConverter flinkRowConverter;
   private final RowTypeInfo rowTypeInfo;
   private transient Writer<InputT, CommitT, WriterStateT> writer;
   private transient ListState<WriterStateT> writeState;
@@ -117,7 +117,7 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
           .getRowTypeInfo(sink.createTypeInfoConverter(), columnInfos);
     }
 
-    this.flinkRowConvertSerializer = new FlinkRowConverter(
+    this.flinkRowConverter = new FlinkRowConverter(
         this.rowTypeInfo,
         this.commonConfiguration);
   }
@@ -191,7 +191,7 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
       try {
         if (value instanceof Row) {
           // convert flink row to BitSail row.
-          com.bytedance.bitsail.common.row.Row deserializer = flinkRowConvertSerializer.to((Row) value);
+          com.bytedance.bitsail.common.row.Row deserializer = flinkRowConverter.from((Row) value);
           writer.write((InputT) deserializer);
         } else {
           writer.write(element.getValue());

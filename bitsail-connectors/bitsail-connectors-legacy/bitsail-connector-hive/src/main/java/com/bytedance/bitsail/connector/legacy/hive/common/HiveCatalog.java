@@ -16,11 +16,11 @@
 
 package com.bytedance.bitsail.connector.legacy.hive.common;
 
+import com.bytedance.bitsail.common.catalog.table.Catalog;
 import com.bytedance.bitsail.common.catalog.table.CatalogTable;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableColumn;
-import com.bytedance.bitsail.common.catalog.table.CatalogTableDefinition;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableSchema;
-import com.bytedance.bitsail.common.catalog.table.TableCatalog;
+import com.bytedance.bitsail.common.catalog.table.TableId;
 import com.bytedance.bitsail.common.catalog.table.TableOperation;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
@@ -36,8 +36,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Builder
-public class HiveTableCatalog implements TableCatalog {
-  private static final Logger LOG = LoggerFactory.getLogger(HiveTableCatalog.class);
+public class HiveCatalog implements Catalog {
+  private static final Logger LOG = LoggerFactory.getLogger(HiveCatalog.class);
 
   private final String namespace;
   private final String database;
@@ -58,8 +58,8 @@ public class HiveTableCatalog implements TableCatalog {
   }
 
   @Override
-  public CatalogTableDefinition createCatalogTableDefinition() {
-    return CatalogTableDefinition
+  public TableId createCatalogTableDefinition() {
+    return TableId
         .builder()
         .database(database)
         .table(table)
@@ -67,20 +67,25 @@ public class HiveTableCatalog implements TableCatalog {
   }
 
   @Override
-  public boolean tableExists(CatalogTableDefinition catalogTableDefinition) {
+  public List<TableId> listTables() {
+    return null;
+  }
+
+  @Override
+  public boolean tableExists(TableId catalogTableDefinition) {
     //todo real check.
     return true;
   }
 
   @Override
-  public CatalogTable getCatalogTable(CatalogTableDefinition catalogTableDefinition) {
+  public CatalogTable getCatalogTable(TableId catalogTableDefinition) {
     try {
       List<ColumnInfo> columnInfo = HiveMetaClientUtil.getColumnInfo(hiveConf,
           catalogTableDefinition.getDatabase(),
           catalogTableDefinition.getTable());
 
       return CatalogTable.builder()
-          .catalogTableDefinition(catalogTableDefinition)
+          .tableId(catalogTableDefinition)
           .catalogTableSchema(getCatalogTableSchema(columnInfo))
           .build();
     } catch (Exception e) {
@@ -90,7 +95,7 @@ public class HiveTableCatalog implements TableCatalog {
   }
 
   @Override
-  public void createTable(CatalogTableDefinition catalogTableDefinition, CatalogTable catalogTable) {
+  public void createTable(TableId catalogTableDefinition, CatalogTable catalogTable) {
     throw new UnsupportedOperationException();
   }
 

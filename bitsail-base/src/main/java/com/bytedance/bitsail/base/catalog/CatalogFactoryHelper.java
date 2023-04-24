@@ -20,11 +20,11 @@ import com.bytedance.bitsail.base.component.DefaultComponentBuilderLoader;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class TableCatalogFactoryHelper {
+public class CatalogFactoryHelper {
 
-  public static TableCatalogFactory getTableCatalogFactory(String connectorName) {
-    DefaultComponentBuilderLoader<TableCatalogFactory> loader =
-        new DefaultComponentBuilderLoader<>(TableCatalogFactory.class);
+  public static CatalogFactory getTableCatalogFactory(String connectorName) {
+    DefaultComponentBuilderLoader<CatalogFactory> loader =
+        new DefaultComponentBuilderLoader<>(CatalogFactory.class);
 
     return loader.loadComponent(StringUtils.lowerCase(connectorName), false);
   }

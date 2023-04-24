@@ -226,6 +226,14 @@
         </dependencies>
     </dependencyManagement>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-core-common</artifactId>
+            <version>${revision}</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>

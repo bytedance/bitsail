@@ -16,8 +16,8 @@
 
 package com.bytedance.bitsail.core.flink.bridge.writer.builder;
 
+import com.bytedance.bitsail.base.catalog.CatalogFactoryHelper;
 import com.bytedance.bitsail.base.connector.writer.v1.Sink;
-import com.bytedance.bitsail.base.connector.writer.v1.WriterCommitter;
 import com.bytedance.bitsail.base.connector.writer.v1.comittable.CommittableMessage;
 import com.bytedance.bitsail.base.dirty.AbstractDirtyCollector;
 import com.bytedance.bitsail.base.dirty.DirtyCollectorFactory;
@@ -25,6 +25,7 @@ import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.Mode;
 import com.bytedance.bitsail.base.execution.ProcessResult;
 import com.bytedance.bitsail.base.extension.GlobalCommittable;
+import com.bytedance.bitsail.base.extension.SupportMultipleSinkTable;
 import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.base.messenger.Messenger;
 import com.bytedance.bitsail.base.messenger.checker.DirtyRecordChecker;
@@ -34,7 +35,9 @@ import com.bytedance.bitsail.base.messenger.context.SimpleMessengerContext;
 import com.bytedance.bitsail.base.ratelimit.Channel;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
+import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.core.common.sink.multiple.MultipleTableSink;
 import com.bytedance.bitsail.core.flink.bridge.writer.delegate.DelegateFlinkCommitter;
 import com.bytedance.bitsail.core.flink.bridge.writer.delegate.DelegateFlinkWriter;
 import com.bytedance.bitsail.flink.core.execution.FlinkExecutionEnviron;
@@ -48,6 +51,7 @@ import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.operators.OneInputStreamOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +66,7 @@ public class FlinkWriterBuilder<InputT, CommitT extends Serializable, WriterStat
 
   private static final Logger LOG = LoggerFactory.getLogger(FlinkWriterBuilder.class);
 
-  private final Sink<InputT, CommitT, WriterStateT> sink;
+  private Sink<?, ?, ?> sink;
 
   private boolean isBatchMode;
 
@@ -89,6 +93,16 @@ public class FlinkWriterBuilder<InputT, CommitT extends Serializable, WriterStat
     this.commonConfiguration = execution.getCommonConfiguration();
     this.writerConfiguration = writerConfiguration;
 
+    if (writerConfiguration.get(WriterOptions.BaseWriterOptions.MULTIPLE_TABLE_ENABLED)) {
+      if (sink instanceof SupportMultipleSinkTable) {
+        sink = new MultipleTableSink<>(sink, CatalogFactoryHelper
+            .getTableCatalogFactory(sink.getWriterName()));
+      } else {
+        LOG.info("Sink {} must implement interface SupportMultipleSinkTable when enabled option {}.",
+            sink.getWriterName(),
+            WriterOptions.BaseWriterOptions.MULTIPLE_TABLE_ENABLED.key());
+      }
+    }
     sink.configure(execution.getCommonConfiguration(), writerConfiguration);
 
     this.messengerContext = SimpleMessengerContext.builder()
@@ -111,7 +125,7 @@ public class FlinkWriterBuilder<InputT, CommitT extends Serializable, WriterStat
         .getCheckpointConfig()
         .isCheckpointingEnabled();
 
-    DelegateFlinkWriter<InputT, CommitT, WriterStateT> flinkWriter = new DelegateFlinkWriter<>(
+    DelegateFlinkWriter<?, ?, ?> flinkWriter = new DelegateFlinkWriter<>(
         commonConfiguration,
         writerConfiguration,
         sink,
@@ -122,22 +136,22 @@ public class FlinkWriterBuilder<InputT, CommitT extends Serializable, WriterStat
     flinkWriter.setDirtyCollector(dirtyCollector);
     flinkWriter.setChannel(channel);
 
-    DataStream<CommittableMessage<CommitT>> writeStream = source.transform(getWriterOperatorName(),
-            TypeInformation.of(new TypeHint<CommittableMessage<CommitT>>() {
-            }), flinkWriter)
+    DataStream<CommittableMessage<?>> writeStream = source.transform(getWriterOperatorName(),
+            (TypeInformation) TypeInformation.of(new TypeHint<CommittableMessage<CommitT>>() {
+            }), (OneInputStreamOperator) flinkWriter)
         .setParallelism(writerParallelism)
         .name(getWriterOperatorName())
         .uid(getWriterOperatorName());
 
-    Optional<WriterCommitter<CommitT>> committer = sink.createCommitter();
+    Optional committer = sink.createCommitter();
     if (committer.isPresent()) {
       LOG.info("Writer enabled committer.");
-      DataStream<CommittableMessage<CommitT>> commitStream = writeStream
+      DataStream<CommittableMessage<?>> commitStream = writeStream
           .transform(
               getWriterCommitterOperatorName(),
-              TypeInformation.of(new TypeHint<CommittableMessage<CommitT>>() {
+              (TypeInformation) TypeInformation.of(new TypeHint<CommittableMessage<CommitT>>() {
               }),
-              new DelegateFlinkCommitter<>(sink, isBatchMode, isCheckpointingEnabled))
+              (OneInputStreamOperator) new DelegateFlinkCommitter<>(sink, isBatchMode, isCheckpointingEnabled))
           .uid(getWriterCommitterOperatorName())
           .name(getWriterCommitterOperatorName())
           .setParallelism(writerParallelism);

@@ -16,11 +16,11 @@
 
 package com.bytedance.bitsail.common.catalog.fake;
 
+import com.bytedance.bitsail.common.catalog.table.Catalog;
 import com.bytedance.bitsail.common.catalog.table.CatalogTable;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableColumn;
-import com.bytedance.bitsail.common.catalog.table.CatalogTableDefinition;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableSchema;
-import com.bytedance.bitsail.common.catalog.table.TableCatalog;
+import com.bytedance.bitsail.common.catalog.table.TableId;
 import com.bytedance.bitsail.common.catalog.table.TableOperation;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
@@ -33,11 +33,11 @@ import lombok.Getter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FakeTableCatalog implements TableCatalog {
+public class FakeCatalog implements Catalog {
 
   private final List<ColumnInfo> columnInfos;
 
-  private final CatalogTableDefinition tableDefinition;
+  private final TableId tableDefinition;
 
   private final TypeInfoConverter typeInfoConverter;
 
@@ -50,8 +50,8 @@ public class FakeTableCatalog implements TableCatalog {
   @Getter
   private final List<CatalogTableColumn> deletedTableColumns;
 
-  public FakeTableCatalog(List<ColumnInfo> columnInfos,
-                          CatalogTableDefinition tableDefinition) {
+  public FakeCatalog(List<ColumnInfo> columnInfos,
+                     TableId tableDefinition) {
     this.columnInfos = columnInfos;
     this.tableDefinition = tableDefinition;
     this.typeInfoConverter = new BitSailTypeInfoConverter();
@@ -78,29 +78,34 @@ public class FakeTableCatalog implements TableCatalog {
   }
 
   @Override
-  public CatalogTableDefinition createCatalogTableDefinition() {
+  public TableId createCatalogTableDefinition() {
     return tableDefinition;
   }
 
   @Override
-  public boolean tableExists(CatalogTableDefinition catalogTableDefinition) {
+  public List<TableId> listTables() {
+    return null;
+  }
+
+  @Override
+  public boolean tableExists(TableId catalogTableDefinition) {
     return true;
   }
 
   @Override
-  public CatalogTable getCatalogTable(CatalogTableDefinition catalogTableDefinition) {
+  public CatalogTable getCatalogTable(TableId catalogTableDefinition) {
     CatalogTableSchema tableSchema = CatalogTableSchema.builder()
         .columns(catalogTableColumns)
         .primaryKeys(null)
         .build();
     return CatalogTable.builder()
-        .catalogTableDefinition(catalogTableDefinition)
+        .tableId(catalogTableDefinition)
         .catalogTableSchema(tableSchema)
         .build();
   }
 
   @Override
-  public void createTable(CatalogTableDefinition catalogTableDefinition, CatalogTable catalogTable) {
+  public void createTable(TableId catalogTableDefinition, CatalogTable catalogTable) {
 
   }
 
@@ -129,6 +134,6 @@ public class FakeTableCatalog implements TableCatalog {
 
   @Override
   public List<CatalogTableColumn> convertTableColumn(TypeInfoConverter typeInfoConverter, List<ColumnInfo> columnInfos) {
-    return TableCatalog.super.convertTableColumn(typeInfoConverter, columnInfos);
+    return Catalog.super.convertTableColumn(typeInfoConverter, columnInfos);
   }
 }

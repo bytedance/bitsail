@@ -16,7 +16,15 @@
 
 package com.bytedance.bitsail.component.format.debezium.option;
 
+import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.ReaderOptions;
 
+import static com.bytedance.bitsail.common.option.ConfigOptions.key;
+import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
+
 public interface DebeziumReaderOptions extends ReaderOptions.BaseReaderOptions {
+
+  ConfigOption<Boolean> DEBEZIUM_JSON_INCLUDE_SCHEMA =
+      key(READER_PREFIX + "debezium_json_include_schema")
+          .defaultValue(true);
 }

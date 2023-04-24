@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Table catalog only for the signal table for now.
  */
-public interface TableCatalog extends Serializable {
+public interface Catalog extends Serializable {
 
   /**
    * Open Table catalog
@@ -43,22 +43,27 @@ public interface TableCatalog extends Serializable {
   /**
    * Get the reference table for the table catalog.
    */
-  CatalogTableDefinition createCatalogTableDefinition();
+  TableId createCatalogTableDefinition();
+
+  /**
+   * List table under the database
+   */
+  List<TableId> listTables();
 
   /**
    * Check the table exits or not.
    */
-  boolean tableExists(CatalogTableDefinition catalogTableDefinition);
+  boolean tableExists(TableId catalogTableDefinition);
 
   /**
    * Acquire catalog table by the table definition.
    */
-  CatalogTable getCatalogTable(CatalogTableDefinition catalogTableDefinition);
+  CatalogTable getCatalogTable(TableId catalogTableDefinition);
 
   /**
    * Create table
    */
-  void createTable(CatalogTableDefinition catalogTableDefinition,
+  void createTable(TableId catalogTableDefinition,
                    CatalogTable catalogTable);
 
   /**

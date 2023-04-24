@@ -17,12 +17,12 @@
 package com.bytedance.bitsail.common.catalog;
 
 import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.catalog.table.Catalog;
 import com.bytedance.bitsail.common.catalog.table.CatalogTable;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableAlterDefinition;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableColumn;
-import com.bytedance.bitsail.common.catalog.table.CatalogTableDefinition;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableSchema;
-import com.bytedance.bitsail.common.catalog.table.TableCatalog;
+import com.bytedance.bitsail.common.catalog.table.TableId;
 import com.bytedance.bitsail.common.catalog.table.TableOperation;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
@@ -50,8 +50,8 @@ public class TableCatalogManager {
   private final TypeInfoConverter readerTypeInfoConverter;
   private final TypeInfoConverter writerTypeInfoConverter;
 
-  private final TableCatalog readerTableCatalog;
-  private final TableCatalog writerTableCatalog;
+  private final Catalog readerCatalog;
+  private final Catalog writerCatalog;
 
   private final BitSailConfiguration commonConfiguration;
   private final BitSailConfiguration readerConfiguration;
@@ -73,15 +73,15 @@ public class TableCatalogManager {
   @Builder
   public TableCatalogManager(TypeInfoConverter readerTypeInfoConverter,
                              TypeInfoConverter writerTypeInfoConverter,
-                             TableCatalog readerTableCatalog,
-                             TableCatalog writerTableCatalog,
+                             Catalog readerCatalog,
+                             Catalog writerCatalog,
                              BitSailConfiguration commonConfiguration,
                              BitSailConfiguration readerConfiguration,
                              BitSailConfiguration writerConfiguration) {
     this.readerTypeInfoConverter = readerTypeInfoConverter;
     this.writerTypeInfoConverter = writerTypeInfoConverter;
-    this.readerTableCatalog = readerTableCatalog;
-    this.writerTableCatalog = writerTableCatalog;
+    this.readerCatalog = readerCatalog;
+    this.writerCatalog = writerCatalog;
     this.commonConfiguration = commonConfiguration;
     this.readerConfiguration = readerConfiguration;
     this.writerConfiguration = writerConfiguration;
@@ -102,7 +102,7 @@ public class TableCatalogManager {
   }
 
   public void alignmentCatalogTable() throws Exception {
-    if (Objects.isNull(readerTableCatalog) || Objects.isNull(writerTableCatalog)) {
+    if (Objects.isNull(readerCatalog) || Objects.isNull(writerCatalog)) {
       return;
     }
 
@@ -114,28 +114,28 @@ public class TableCatalogManager {
     startTableCatalog();
 
     try {
-      CatalogTableDefinition readerTableDefinition = readerTableCatalog.createCatalogTableDefinition();
-      CatalogTableDefinition writerTableDefinition = readerTableCatalog.createCatalogTableDefinition();
-      if (!readerTableCatalog.tableExists(readerTableDefinition)) {
+      TableId readerTableDefinition = readerCatalog.createCatalogTableDefinition();
+      TableId writerTableDefinition = readerCatalog.createCatalogTableDefinition();
+      if (!readerCatalog.tableExists(readerTableDefinition)) {
         throw BitSailException.asBitSailException(TableCatalogErrorCode.TABLE_CATALOG_TABLE_NOT_EXISTS,
             String.format("Reader table definition %s not exists.", readerTableDefinition));
       }
 
       // get reader catalog table.
-      readerCatalogTable = readerTableCatalog.getCatalogTable(readerTableDefinition);
+      readerCatalogTable = readerCatalog.getCatalogTable(readerTableDefinition);
 
-      if (!writerTableCatalog.tableExists(writerTableDefinition)) {
+      if (!writerCatalog.tableExists(writerTableDefinition)) {
 
         if (!tableCatalogCreateTableNotExists) {
           throw BitSailException.asBitSailException(TableCatalogErrorCode.TABLE_CATALOG_TABLE_NOT_EXISTS,
               String.format("Writer table definition %s not exists.", writerTableDefinition));
         }
         // try to create table when not exists.
-        writerTableCatalog.createTable(writerTableDefinition, readerCatalogTable);
+        writerCatalog.createTable(writerTableDefinition, readerCatalogTable);
       }
 
       // get writer catalog table.
-      writerCatalogTable = writerTableCatalog.getCatalogTable(writerTableDefinition);
+      writerCatalogTable = writerCatalog.getCatalogTable(writerTableDefinition);
 
       // get base table schema.
       CatalogTableSchema catalogTableSchema = tableCatalogStrategy
@@ -190,7 +190,7 @@ public class TableCatalogManager {
         CollectionUtils.isNotEmpty(catalogTableAlterDefinition.getPendingAddColumns())) {
       LOG.info("Writer catalog table {} try to add column: {}.", writerCatalogTable,
           catalogTableAlterDefinition.getPendingAddColumns());
-      writerTableCatalog.alterTableColumns(
+      writerCatalog.alterTableColumns(
           TableOperation.ALTER_COLUMNS_ADD,
           catalogTableAlterDefinition.getPendingAddColumns()
       );
@@ -200,7 +200,7 @@ public class TableCatalogManager {
         CollectionUtils.isNotEmpty(catalogTableAlterDefinition.getPendingUpdateColumns())) {
       LOG.info("Writer catalog table {} try to update column: {}.", writerCatalogTable,
           catalogTableAlterDefinition.getPendingUpdateColumns());
-      writerTableCatalog.alterTableColumns(
+      writerCatalog.alterTableColumns(
           TableOperation.ALTER_COLUMNS_UPDATE,
           catalogTableAlterDefinition.getPendingUpdateColumns()
       );
@@ -210,7 +210,7 @@ public class TableCatalogManager {
         CollectionUtils.isNotEmpty(catalogTableAlterDefinition.getPendingDeleteColumns())) {
       LOG.info("Writer catalog table {} try to delete column: {}.", writerCatalogTable,
           catalogTableAlterDefinition.getPendingDeleteColumns());
-      writerTableCatalog.alterTableColumns(
+      writerCatalog.alterTableColumns(
           TableOperation.ALTER_COLUMNS_DELETE,
           catalogTableAlterDefinition.getPendingDeleteColumns()
       );
@@ -262,7 +262,7 @@ public class TableCatalogManager {
         TypeInfo<?> baseTypeInfo = catalogTableColumn.getType();
 
         finalCatalogColumns.add(catalogTableColumn);
-        if (!writerTableCatalog.compareTypeCompatible(writerTypeInfo, baseTypeInfo)) {
+        if (!writerCatalog.compareTypeCompatible(writerTypeInfo, baseTypeInfo)) {
           pendingUpdateTableColumns.add(catalogTableColumn);
         }
       } else {
@@ -279,13 +279,13 @@ public class TableCatalogManager {
   }
 
   private void startTableCatalog() {
-    readerTableCatalog.open(readerTypeInfoConverter);
-    writerTableCatalog.open(writerTypeInfoConverter);
+    readerCatalog.open(readerTypeInfoConverter);
+    writerCatalog.open(writerTypeInfoConverter);
   }
 
   private void closeTableCatalog() {
-    readerTableCatalog.close();
-    writerTableCatalog.close();
+    readerCatalog.close();
+    writerCatalog.close();
   }
 
 }

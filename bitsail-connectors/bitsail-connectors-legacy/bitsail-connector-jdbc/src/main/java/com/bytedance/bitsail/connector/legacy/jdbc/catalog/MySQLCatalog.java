@@ -17,11 +17,11 @@
 package com.bytedance.bitsail.connector.legacy.jdbc.catalog;
 
 import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.catalog.table.Catalog;
 import com.bytedance.bitsail.common.catalog.table.CatalogTable;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableColumn;
-import com.bytedance.bitsail.common.catalog.table.CatalogTableDefinition;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableSchema;
-import com.bytedance.bitsail.common.catalog.table.TableCatalog;
+import com.bytedance.bitsail.common.catalog.table.TableId;
 import com.bytedance.bitsail.common.catalog.table.TableOperation;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
@@ -36,8 +36,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class MySQLTableCatalog implements TableCatalog {
-  private static final Logger LOG = LoggerFactory.getLogger(MySQLTableCatalog.class);
+public class MySQLCatalog implements Catalog {
+  private static final Logger LOG = LoggerFactory.getLogger(MySQLCatalog.class);
 
   private final String database;
   private final String table;
@@ -50,13 +50,13 @@ public class MySQLTableCatalog implements TableCatalog {
   private TypeInfoConverter typeInfoConverter;
 
   @Builder
-  public MySQLTableCatalog(String database,
-                           String table,
-                           String schema,
-                           String username,
-                           String password,
-                           String url,
-                           String customizedSQL) {
+  public MySQLCatalog(String database,
+                      String table,
+                      String schema,
+                      String username,
+                      String password,
+                      String url,
+                      String customizedSQL) {
     this.database = database;
     this.table = table;
     this.schema = schema;
@@ -78,8 +78,8 @@ public class MySQLTableCatalog implements TableCatalog {
   }
 
   @Override
-  public CatalogTableDefinition createCatalogTableDefinition() {
-    return CatalogTableDefinition
+  public TableId createCatalogTableDefinition() {
+    return TableId
         .builder()
         .database(database)
         .table(table)
@@ -87,13 +87,18 @@ public class MySQLTableCatalog implements TableCatalog {
   }
 
   @Override
-  public boolean tableExists(CatalogTableDefinition catalogTableDefinition) {
+  public List<TableId> listTables() {
+    return null;
+  }
+
+  @Override
+  public boolean tableExists(TableId catalogTableDefinition) {
     //todo doesn't check
     return true;
   }
 
   @Override
-  public CatalogTable getCatalogTable(CatalogTableDefinition catalogTableDefinition) {
+  public CatalogTable getCatalogTable(TableId catalogTableDefinition) {
     TableInfo tableInfo;
     try {
       if (useCustomizedSQL) {
@@ -109,7 +114,7 @@ public class MySQLTableCatalog implements TableCatalog {
     }
     return CatalogTable
         .builder()
-        .catalogTableDefinition(catalogTableDefinition)
+        .tableId(catalogTableDefinition)
         .catalogTableSchema(CatalogTableSchema.builder()
             .columns(convertTableColumn(
                 typeInfoConverter,
@@ -119,7 +124,7 @@ public class MySQLTableCatalog implements TableCatalog {
   }
 
   @Override
-  public void createTable(CatalogTableDefinition catalogTableDefinition, CatalogTable catalogTable) {
+  public void createTable(TableId catalogTableDefinition, CatalogTable catalogTable) {
     throw new UnsupportedOperationException();
   }
 

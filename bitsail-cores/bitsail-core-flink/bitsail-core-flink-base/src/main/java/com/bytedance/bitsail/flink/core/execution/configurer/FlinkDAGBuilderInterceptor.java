@@ -16,8 +16,8 @@
 
 package com.bytedance.bitsail.flink.core.execution.configurer;
 
-import com.bytedance.bitsail.base.catalog.TableCatalogFactory;
-import com.bytedance.bitsail.base.catalog.TableCatalogFactoryHelper;
+import com.bytedance.bitsail.base.catalog.CatalogFactory;
+import com.bytedance.bitsail.base.catalog.CatalogFactoryHelper;
 import com.bytedance.bitsail.base.connector.BuilderGroup;
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
 import com.bytedance.bitsail.base.connector.transformer.DataTransformDAGBuilder;
@@ -69,10 +69,10 @@ public class FlinkDAGBuilderInterceptor {
     DataReaderDAGBuilder dataReaderDAGBuilder = readerBuilders.get(0);
     DataWriterDAGBuilder dataWriterDAGBuilder = writerBuilders.get(0);
 
-    TableCatalogFactory readerCatalogFactory = TableCatalogFactoryHelper
+    CatalogFactory readerCatalogFactory = CatalogFactoryHelper
         .getTableCatalogFactory(dataReaderDAGBuilder.getReaderName());
 
-    TableCatalogFactory writerCatalogFactory = TableCatalogFactoryHelper
+    CatalogFactory writerCatalogFactory = CatalogFactoryHelper
         .getTableCatalogFactory(dataWriterDAGBuilder.getWriterName());
 
     if (Objects.isNull(readerCatalogFactory) || Objects.isNull(writerCatalogFactory)) {
@@ -100,8 +100,8 @@ public class FlinkDAGBuilderInterceptor {
     BitSailConfiguration writerConfiguration = executionEnviron.getWriterConfigurations().get(0);
 
     TableCatalogManager catalogManager = TableCatalogManager.builder()
-        .readerTableCatalog(readerCatalogFactory.createTableCatalog(BuilderGroup.READER, executionEnviron, readerConfiguration))
-        .writerTableCatalog(writerCatalogFactory.createTableCatalog(BuilderGroup.WRITER, executionEnviron, writerConfiguration))
+        .readerCatalog(readerCatalogFactory.createTableCatalog(BuilderGroup.READER, readerConfiguration))
+        .writerCatalog(writerCatalogFactory.createTableCatalog(BuilderGroup.WRITER, writerConfiguration))
         .readerTypeInfoConverter(readerTypeInfoConverter)
         .writerTypeInfoConverter(writerTypeInfoConverter)
         .commonConfiguration(executionEnviron.getCommonConfiguration())

@@ -14,33 +14,26 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.common.catalog.table;
+package com.bytedance.bitsail.base.catalog;
 
-import lombok.Builder;
-import lombok.Getter;
+import com.bytedance.bitsail.base.component.ComponentBuilder;
+import com.bytedance.bitsail.base.connector.BuilderGroup;
+import com.bytedance.bitsail.common.catalog.table.Catalog;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
 import java.io.Serializable;
 
-@Getter
-@Builder
-public class CatalogTableDefinition implements Serializable {
+/**
+ * Created 2022/5/23
+ */
+public interface CatalogFactory extends Serializable, ComponentBuilder {
 
-  private final String database;
-  private final String schema;
-  private final String table;
+  /**
+   * Create a table catalog.
+   *
+   * @param connectorConfiguration configuration for the reader/writer
+   */
+  Catalog createTableCatalog(BuilderGroup builderGroup,
+                             BitSailConfiguration connectorConfiguration);
 
-  public CatalogTableDefinition(String database, String schema, String table) {
-    this.database = database;
-    this.schema = schema;
-    this.table = table;
-  }
-
-  @Override
-  public String toString() {
-    return "CatalogTableDefinition{" +
-        "database='" + database + '\'' +
-        ", schema='" + schema + '\'' +
-        ", table='" + table + '\'' +
-        '}';
-  }
 }
