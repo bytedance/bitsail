@@ -23,8 +23,11 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.TransformOptions;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
+import com.bytedance.bitsail.flink.core.typeutils.AutoDetectFlinkTypeInfoUtil;
+import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 
 import java.util.List;
 import java.util.Locale;
@@ -35,9 +38,9 @@ public class DelegateFlinkMapFunction<I, O> implements MapFunction<I, O> {
 
   private final RowTypeInfo inputType;
 
-  public DelegateFlinkMapFunction(BitSailConfiguration jobConf, RowTypeInfo inputType) {
+  public DelegateFlinkMapFunction(BitSailConfiguration jobConf, TypeInformation<?> flinkTypes) {
+    this.inputType = AutoDetectFlinkTypeInfoUtil.bridgeRowTypeInfo((org.apache.flink.api.java.typeutils.RowTypeInfo) flinkTypes);
     this.realMapFunction = createMapFunction(jobConf, inputType);
-    this.inputType = inputType;
   }
 
   @Override
@@ -45,8 +48,8 @@ public class DelegateFlinkMapFunction<I, O> implements MapFunction<I, O> {
     return this.realMapFunction.map(value);
   }
 
-  public RowTypeInfo getOutputType() {
-    return this.realMapFunction.getOutputType();
+  public TypeInformation getOutputType() {
+    return ColumnFlinkTypeInfoUtil.getRowTypeInformation(this.realMapFunction.getOutputType());
   }
 
   private BitSailMapFunction<I, O> createMapFunction(BitSailConfiguration jobConf, RowTypeInfo rowTypeInfo) {

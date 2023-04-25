@@ -17,6 +17,8 @@
 package com.bytedance.bitsail.core.flink.bridge.transform.delegate;
 
 import com.bytedance.bitsail.base.connector.transform.v1.BitSailMapFunction;
+import com.bytedance.bitsail.common.column.LongColumn;
+import com.bytedance.bitsail.common.column.StringColumn;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
@@ -54,13 +56,17 @@ public class AppendStringMapFunctionTest {
     // test flink row
     org.apache.flink.types.Row flinkRow = new org.apache.flink.types.Row(3);
     org.apache.flink.types.Row expectedFlinkRow = new org.apache.flink.types.Row(3);
-    for (int i = 0; i < vals.length; i++) {
-      flinkRow.setField(i, vals[i]);
-      expectedFlinkRow.setField(i, expected[i]);
-    }
+    flinkRow.setField(0, new LongColumn(1));
+    flinkRow.setField(1, new StringColumn("field1"));
+    flinkRow.setField(2, new StringColumn("field2"));
+
+    expectedFlinkRow.setField(0, new LongColumn(1));
+    expectedFlinkRow.setField(1, new StringColumn("field1_tail1"));
+    expectedFlinkRow.setField(2, new StringColumn("field2_tail2"));
+
     BitSailMapFunction<org.apache.flink.types.Row, org.apache.flink.types.Row> mapFunction2 = new AppendStringMapFunction<>(indexes, appendVals, rowTypeInfo);
     org.apache.flink.types.Row resultFlinkRow = mapFunction2.map(flinkRow);
-    Assert.assertEquals(expectedFlinkRow.getField(1), resultFlinkRow.getField(1));
-    Assert.assertEquals(expectedFlinkRow.getField(2), resultFlinkRow.getField(2));
+    Assert.assertEquals(expectedFlinkRow.getField(1).toString(), resultFlinkRow.getField(1).toString());
+    Assert.assertEquals(expectedFlinkRow.getField(2).toString(), resultFlinkRow.getField(2).toString());
   }
 }
