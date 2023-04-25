@@ -16,6 +16,7 @@
 
 package com.bytedance.bitsail.common.typeinfo;
 
+import com.bytedance.bitsail.common.util.JsonSerializer;
 import com.bytedance.bitsail.common.util.Preconditions;
 
 import java.util.Map;
@@ -67,6 +68,14 @@ public class MapTypeInfo<K, V> extends TypeInfo<Map<K, V>> {
 
   public TypeInfo<V> getValueTypeInfo() {
     return this.valueTypeInfo;
+  }
+
+  @Override
+  public Object compatibleTo(TypeInfo<?> target, Object value) {
+    if (TypeInfos.STRING_TYPE_INFO.getTypeClass() == target.getTypeClass()) {
+      return JsonSerializer.serialize(value);
+    }
+    return super.compatibleTo(target, value);
   }
 
   @Override

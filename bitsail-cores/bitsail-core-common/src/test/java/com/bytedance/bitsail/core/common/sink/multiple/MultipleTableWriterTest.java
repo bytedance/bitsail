@@ -107,7 +107,7 @@ public class MultipleTableWriterTest {
         .catalogTableSchema(CatalogTableSchema.builder()
             .columns(Lists.newArrayList(
                 CatalogTableColumn.builder()
-                    .type(TypeInfos.INT_TYPE_INFO)
+                    .type(TypeInfos.LONG_TYPE_INFO)
                     .name("int_type")
                     .build()
             )).build()
@@ -117,7 +117,7 @@ public class MultipleTableWriterTest {
         .catalogTableSchema(CatalogTableSchema.builder()
             .columns(Lists.newArrayList(
                 CatalogTableColumn.builder()
-                    .type(TypeInfos.DOUBLE_TYPE_INFO)
+                    .type(TypeInfos.BIG_DECIMAL_TYPE_INFO)
                     .name("double_type")
                     .build()
             )).build()
