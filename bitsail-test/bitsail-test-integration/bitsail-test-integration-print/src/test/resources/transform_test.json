@@ -35,6 +35,12 @@
           "map_function_type": "APPEND_STRING",
           "append_string_indexes": [0],
           "append_string_values": [" is working"]
+        },
+        {
+          "transform_type": "map",
+          "map_function_type": "APPEND_STRING",
+          "append_string_indexes": [0],
+          "append_string_values": [" at home"]
         }
       ]
     },

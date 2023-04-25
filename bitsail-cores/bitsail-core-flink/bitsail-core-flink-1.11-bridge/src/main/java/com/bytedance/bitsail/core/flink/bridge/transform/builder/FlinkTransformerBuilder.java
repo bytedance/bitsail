@@ -17,6 +17,8 @@
 package com.bytedance.bitsail.core.flink.bridge.transform.builder;
 
 import com.bytedance.bitsail.base.connector.transform.TransformType;
+import com.bytedance.bitsail.base.extension.ParallelismComputable;
+import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
@@ -31,7 +33,8 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 
 import java.util.Locale;
 
-public class FlinkTransformerBuilder<T> extends FlinkDataTransformDAGBuilder<T> {
+public class FlinkTransformerBuilder<T> extends FlinkDataTransformDAGBuilder<T>
+    implements ParallelismComputable {
 
   BitSailConfiguration jobConf;
 
@@ -74,7 +77,13 @@ public class FlinkTransformerBuilder<T> extends FlinkDataTransformDAGBuilder<T> 
   }
 
   private DataStream<T> addMap(DataStream<T> source) {
-    DelegateFlinkMapFunction<T, T> mapFunction = new DelegateFlinkMapFunction<>(jobConf, source.getType());
-    return source.map(mapFunction, mapFunction.getOutputType());
+    DelegateFlinkMapFunction<T, org.apache.flink.types.Row> mapFunction = new DelegateFlinkMapFunction<>(jobConf, source.getType());
+    return source.map(mapFunction, mapFunction.getOutputType()).setParallelism(source.getParallelism());
+  }
+
+  @Override
+  public ParallelismAdvice getParallelismAdvice(BitSailConfiguration commonConf, BitSailConfiguration selfConf, ParallelismAdvice upstreamAdvice) throws Exception {
+    //TODO: Support compute parallelism
+    return null;
   }
 }

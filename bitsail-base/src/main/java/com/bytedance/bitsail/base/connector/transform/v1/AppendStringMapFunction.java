@@ -14,11 +14,9 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.core.flink.bridge.transform.delegate;
+package com.bytedance.bitsail.base.connector.transform.v1;
 
-import com.bytedance.bitsail.base.connector.transform.v1.BitSailMapFunction;
 import com.bytedance.bitsail.common.BitSailException;
-import com.bytedance.bitsail.common.column.StringColumn;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
@@ -26,7 +24,7 @@ import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 
 import java.util.List;
 
-public class AppendStringMapFunction<I extends Object, O extends Object> implements BitSailMapFunction<I, O> {
+public class AppendStringMapFunction<I extends Row, O extends Row> implements BitSailMapFunction<I, O> {
 
   private final List<Integer> position;
   private final List<String> appendList;
@@ -52,15 +50,8 @@ public class AppendStringMapFunction<I extends Object, O extends Object> impleme
   }
 
   @Override
-  public Object map(Object input) throws Exception {
-    if (input instanceof Row) {
-      return handleRow((Row) input);
-    } else if (input instanceof org.apache.flink.types.Row) {
-      return handleFlinkRow((org.apache.flink.types.Row) input);
-    } else {
-      throw BitSailException.asBitSailException(
-          CommonErrorCode.RUNTIME_ERROR, "map function get unexpected type, only BitSail row type and Flink row type are supported");
-    }
+  public Row map(Row input) throws Exception {
+    return handleRow(input);
   }
 
   private Row handleRow(Row input) {
@@ -68,16 +59,6 @@ public class AppendStringMapFunction<I extends Object, O extends Object> impleme
       int curIndex = position.get(i);
       String appendVal = appendList.get(i);
       input.setField(curIndex, input.getString(curIndex).concat(appendVal));
-    }
-    return input;
-  }
-
-  private org.apache.flink.types.Row handleFlinkRow(org.apache.flink.types.Row input) {
-    for (int i = 0; i < position.size(); i++) {
-      int curIndex = position.get(i);
-      String appendVal = appendList.get(i);
-      String origin = ((StringColumn) input.getField(curIndex)).asString();
-      input.setField(curIndex, new StringColumn(origin.concat(appendVal)));
     }
     return input;
   }
