@@ -25,10 +25,8 @@ import com.bytedance.bitsail.core.flink.bridge.transform.delegate.DelegateFlinkM
 import com.bytedance.bitsail.core.flink.bridge.transform.delegate.DelegateFlinkPartitioner;
 import com.bytedance.bitsail.core.flink.bridge.transform.delegate.RowKeySelector;
 import com.bytedance.bitsail.flink.core.transform.FlinkDataTransformDAGBuilder;
-import com.bytedance.bitsail.flink.core.typeutils.AutoDetectFlinkTypeInfoUtil;
 
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
 
 import java.util.Locale;
