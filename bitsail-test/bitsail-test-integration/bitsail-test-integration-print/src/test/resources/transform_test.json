@@ -23,8 +23,7 @@
         }
       ]
     },
-    "transform": {
-      "transform_conf_list": [
+    "transform": [
         {
           "transform_type": "partition_by",
           "partition_key_index": 0,
@@ -42,8 +41,7 @@
           "append_string_indexes": [0],
           "append_string_values": [" at home"]
         }
-      ]
-    },
+      ],
     "writer": {
       "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
       "content_type": "json",
