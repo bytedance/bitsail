@@ -26,6 +26,7 @@ import com.bytedance.bitsail.core.flink.bridge.transform.delegate.DelegateFlinkP
 import com.bytedance.bitsail.core.flink.bridge.transform.delegate.RowKeySelector;
 import com.bytedance.bitsail.flink.core.transform.FlinkDataTransformDAGBuilder;
 import com.bytedance.bitsail.flink.core.typeutils.AutoDetectFlinkTypeInfoUtil;
+import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
 import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -81,7 +82,7 @@ public class FlinkTransformerBuilder<T> extends FlinkDataTransformDAGBuilder<T> 
     com.bytedance.bitsail.common.typeinfo.RowTypeInfo bitSailRowType =
         AutoDetectFlinkTypeInfoUtil.bridgeRowTypeInfo((RowTypeInfo) source.getType());
     DelegateFlinkMapFunction<T, T> mapFunction = new DelegateFlinkMapFunction<>(jobConf, bitSailRowType);
-    TypeInformation outputFlinkTypes = NativeFlinkTypeInfoUtil.getRowTypeInformation(mapFunction.getOutputType());
-    return source.map(mapFunction, outputFlinkTypes);
+    TypeInformation outputFlinkTypesInColumns = ColumnFlinkTypeInfoUtil.getRowTypeInformation(bitSailRowType);
+    return source.map(mapFunction, outputFlinkTypesInColumns);
   }
 }

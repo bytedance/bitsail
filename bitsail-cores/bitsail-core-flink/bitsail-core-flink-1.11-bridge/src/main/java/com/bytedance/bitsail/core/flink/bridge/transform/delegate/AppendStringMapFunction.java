@@ -18,6 +18,7 @@ package com.bytedance.bitsail.core.flink.bridge.transform.delegate;
 
 import com.bytedance.bitsail.base.connector.transform.v1.BitSailMapFunction;
 import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.column.StringColumn;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
@@ -75,7 +76,8 @@ public class AppendStringMapFunction<I extends Object, O extends Object> impleme
     for (int i = 0; i < position.size(); i++) {
       int curIndex = position.get(i);
       String appendVal = appendList.get(i);
-      input.setField(curIndex, ((String) input.getField(curIndex)).concat(appendVal));
+      String origin = ((StringColumn) input.getField(curIndex)).asString();
+      input.setField(curIndex, new StringColumn(origin.concat(appendVal)));
     }
     return input;
   }
