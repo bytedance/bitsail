@@ -27,7 +27,6 @@ import com.bytedance.bitsail.core.flink.bridge.transform.delegate.RowKeySelector
 import com.bytedance.bitsail.flink.core.transform.FlinkDataTransformDAGBuilder;
 import com.bytedance.bitsail.flink.core.typeutils.AutoDetectFlinkTypeInfoUtil;
 import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
-import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.KeySelector;
