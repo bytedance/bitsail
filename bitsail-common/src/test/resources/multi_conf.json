@@ -6,8 +6,7 @@
       "job_name": "BitSail_fake_to_print_e2e_test",
       "user_name": "test"
     },
-    "reader": {
-      "reader_conf_list": [
+    "reader": [
         {
           "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
           "total_count": 30,
@@ -45,10 +44,8 @@
             }
           ]
         }
-      ]
-    },
-    "transform": {
-      "transform_conf_list": [
+      ],
+    "transform": [
         {
           "transform_type": "partition_by",
           "partition_key_index": 0,
@@ -57,10 +54,8 @@
         {
           "transform_type": "map"
         }
-      ]
-    },
-    "writer": {
-      "writer_conf_list": [
+    ],
+    "writer": [
         {
           "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
           "content_type": "json",
@@ -95,6 +90,5 @@
           ]
         }
       ]
-    }
   }
 }

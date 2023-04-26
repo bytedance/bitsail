@@ -44,22 +44,18 @@ public class AppendStringMapFunction<I extends Row, O extends Row> implements Bi
   }
 
   @Override
-  public RowTypeInfo getOutputType() {
-    // this function doesn't change type
-    return inputType;
-  }
-
-  @Override
   public Row map(Row input) throws Exception {
-    return handleRow(input);
-  }
-
-  private Row handleRow(Row input) {
     for (int i = 0; i < position.size(); i++) {
       int curIndex = position.get(i);
       String appendVal = appendList.get(i);
       input.setField(curIndex, input.getString(curIndex).concat(appendVal));
     }
     return input;
+  }
+
+  @Override
+  public RowTypeInfo getOutputType() {
+    // this function doesn't change type
+    return inputType;
   }
 }

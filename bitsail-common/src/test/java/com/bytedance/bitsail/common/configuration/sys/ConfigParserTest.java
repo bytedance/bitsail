@@ -33,7 +33,7 @@ public class ConfigParserTest {
   public void testConfigList() {
     String classpath = ConfigParserTest.class.getClassLoader()
         .getResource("").getPath();
-    BitSailConfiguration jobConf = BitSailConfiguration.from(new File(classpath, "multi_conf_v2.json"));
+    BitSailConfiguration jobConf = BitSailConfiguration.from(new File(classpath, "multi_conf.json"));
     List<BitSailConfiguration> readerConfigs = ConfigParser.getInputConfList(jobConf);
     List<BitSailConfiguration> transformConfigs = ConfigParser.getTransformConfList(jobConf);
     List<BitSailConfiguration> writerConfigs = ConfigParser.getOutputConfList(jobConf);
