@@ -25,6 +25,7 @@ import com.bytedance.bitsail.base.extension.ParallelismComputable;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
@@ -41,20 +42,25 @@ import java.io.IOException;
  */
 public abstract class BaseCDCSource implements Source<Row, BaseCDCSplit, BaseAssignmentState>, ParallelismComputable {
 
-  protected BitSailConfiguration jobConf;
+  protected BitSailConfiguration commonConf;
+  protected BitSailConfiguration readerConf;
 
   protected BaseSplitSerializer splitSerializer;
 
   @Override
   public void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration) throws IOException {
-    this.jobConf = readerConfiguration;
+    this.readerConf = readerConfiguration;
+    this.commonConf = execution.getCommonConfiguration();
     this.splitSerializer = createSplitSerializer();
   }
 
   @Override
   public Boundedness getSourceBoundedness() {
-    //TODO: support batch
-    return Boundedness.UNBOUNDEDNESS;
+    if (commonConf.get(CommonOptions.JOB_TYPE).equalsIgnoreCase("streaming")) {
+      return Boundedness.UNBOUNDEDNESS;
+    } else {
+      return Boundedness.BOUNDEDNESS;
+    }
   }
 
   public abstract BaseSplitSerializer createSplitSerializer();
@@ -65,7 +71,7 @@ public abstract class BaseCDCSource implements Source<Row, BaseCDCSplit, BaseAss
   @Override
   public SourceSplitCoordinator<BaseCDCSplit, BaseAssignmentState> createSplitCoordinator(
       SourceSplitCoordinator.Context<BaseCDCSplit, BaseAssignmentState> coordinatorContext) {
-    return new CDCSourceSplitCoordinator(coordinatorContext, jobConf);
+    return new CDCSourceSplitCoordinator(coordinatorContext, readerConf);
   }
 
   @Override
