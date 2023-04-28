@@ -53,7 +53,7 @@
     },
     "writer": {
       "class": "com.bytedance.bitsail.connector.kafka.sink.KafkaSink",
-      "content_type": "debezium",
+      "content_type": "debezium-json",
       "columns": [
         {
           "name": "db",

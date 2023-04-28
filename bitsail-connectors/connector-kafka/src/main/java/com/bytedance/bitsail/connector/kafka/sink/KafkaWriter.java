@@ -153,7 +153,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     String key = record.getString(BinlogRow.KEY_INDEX);
     partitionFieldsValues[0] = key;
     int partitionId = choosePartitionIdByFields(partitionFieldsValues);
-    sendWithHeaders(null, record.getBinary(2), partitionId, null);
+    sendWithHeaders(null, record.getString(2), partitionId, null);
   }
 
   @Override
