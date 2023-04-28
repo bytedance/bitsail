@@ -30,7 +30,7 @@ import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfoValueConverter;
 import com.bytedance.bitsail.common.typeinfo.TypeInfos;
-import com.bytedance.bitsail.component.format.debezium.DebeziumRowDeserializationSchema;
+import com.bytedance.bitsail.component.format.debezium.DebeziumRowFilterNamesDeserializationSchema;
 import com.bytedance.bitsail.core.common.sink.MultiTablePrintSink;
 import com.bytedance.bitsail.core.common.sink.multiple.state.MultipleTableState;
 
@@ -98,7 +98,7 @@ public class MultipleTableWriterTest {
         (SupportMultipleSinkTable<Row, String, Integer>) multiTablePrintSink,
         catalogTables,
         Pattern.compile("\\.*"),
-        new DebeziumRowDeserializationSchema(jobConf));
+        new DebeziumRowFilterNamesDeserializationSchema(jobConf));
   }
 
   private Map<TableId, CatalogTable> mockCatalogTables() {

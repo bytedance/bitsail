@@ -16,14 +16,17 @@
 
 package com.bytedance.bitsail.component.format.debezium;
 
+import com.bytedance.bitsail.base.extension.SupportProducedType;
 import com.bytedance.bitsail.base.format.DeserializationSchema;
+import com.bytedance.bitsail.common.row.Row;
 
 import org.apache.kafka.connect.source.SourceRecord;
 
-public interface DebeziumDeserializationSchema extends DeserializationSchema<byte[], SourceRecord> {
-  @Override
-  SourceRecord deserialize(byte[] message);
+public interface DebeziumDeserializationSchema extends DeserializationSchema<SourceRecord, Row>, SupportProducedType {
 
   @Override
-  boolean isEndOfStream(SourceRecord nextElement);
+  Row deserialize(SourceRecord sourceRecord);
+
+  @Override
+  boolean isEndOfStream(Row nextElement);
 }

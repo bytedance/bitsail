@@ -22,6 +22,7 @@ import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.component.format.debezium.DebeziumDeserializationSchema;
 import com.bytedance.bitsail.connector.cdc.source.event.BinlogCompleteAckEvent;
 import com.bytedance.bitsail.connector.cdc.source.split.BaseCDCSplit;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
@@ -51,12 +52,16 @@ public abstract class BaseCDCSourceReader implements SourceReader<Row, BaseCDCSp
 
   private boolean isStreaming;
 
+  protected DebeziumDeserializationSchema deserializationSchema;
+
   public BaseCDCSourceReader(BitSailConfiguration readerConf,
                              BitSailConfiguration commonConf,
-                             SourceReader.Context readerContext) {
+                             SourceReader.Context context,
+                             DebeziumDeserializationSchema deserializationSchema) {
     this.readerConf = readerConf;
     this.commonConf = commonConf;
-    this.readerContext = readerContext;
+    this.readerContext = context;
+    this.deserializationSchema = deserializationSchema;
     this.remainSplits = new ArrayDeque<>();
     this.reader = getReader();
     this.splitSubmitted = false;

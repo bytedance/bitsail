@@ -81,4 +81,8 @@ public interface BinlogReaderOptions extends ReaderOptions.BaseReaderOptions {
   ConfigOption<Integer> MAX_QUEUE_SIZE =
       key(READER_PREFIX + "max_queue_size")
           .defaultValue(8192);
+
+  ConfigOption<String> FORMAT =
+      key(READER_PREFIX + "format")
+          .defaultValue("debezium-json");
 }

@@ -14,38 +14,33 @@
  *       limitations under the License.
  */
 
-package com.bytedance.bitsail.component.format.debezium;
+package com.bytedance.bitsail.test.integration.cdc.mysql.context;
 
-import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 
-import org.apache.kafka.connect.source.SourceRecord;
+public class SourceMockContext implements SourceReader.Context {
 
-public class DebeziumRowDeserializationSchema implements DebeziumDeserializationSchema {
-
-  private final BitSailConfiguration jobConf;
-
+  private final int id;
   private final RowTypeInfo rowTypeInfo;
 
-  public DebeziumRowDeserializationSchema(BitSailConfiguration jobConf, RowTypeInfo rowTypeInfo) {
-    this.jobConf = jobConf;
+  public SourceMockContext(int id, RowTypeInfo rowTypeInfo) {
+    this.id = id;
     this.rowTypeInfo = rowTypeInfo;
   }
 
   @Override
-  public Row deserialize(SourceRecord sourceRecord) {
-    //TODO
-    return null;
-  }
-
-  @Override
-  public boolean isEndOfStream(Row nextElement) {
-    return false;
-  }
-
-  @Override
-  public RowTypeInfo getProducedType() {
+  public RowTypeInfo getRowTypeInfo() {
     return rowTypeInfo;
+  }
+
+  @Override
+  public int getIndexOfSubtask() {
+    return id;
+  }
+
+  @Override
+  public void sendSplitRequest() {
+
   }
 }

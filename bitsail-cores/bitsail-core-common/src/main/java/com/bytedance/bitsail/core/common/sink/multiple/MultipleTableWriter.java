@@ -31,7 +31,7 @@ import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfoValueConverter;
-import com.bytedance.bitsail.component.format.debezium.DebeziumRowDeserializationSchema;
+import com.bytedance.bitsail.component.format.debezium.DebeziumRowFilterNamesDeserializationSchema;
 import com.bytedance.bitsail.core.common.sink.multiple.comittable.MultipleTableCommit;
 import com.bytedance.bitsail.core.common.sink.multiple.state.MultipleTableState;
 
@@ -60,7 +60,7 @@ public class MultipleTableWriter<InputT, CommT extends Serializable, WriterState
   private final Context<MultipleTableState<WriterStateT>> context;
   private final BitSailConfiguration templateConfiguration;
   private final Map<TableId, CatalogTable> catalogTables;
-  private final DebeziumRowDeserializationSchema deserializationSchema;
+  private final DebeziumRowFilterNamesDeserializationSchema deserializationSchema;
   private final TypeInfoValueConverter valueConverter;
   private final Pattern patternOfTable;
   private final String database;
@@ -75,7 +75,7 @@ public class MultipleTableWriter<InputT, CommT extends Serializable, WriterState
                              SupportMultipleSinkTable<InputT, CommT, WriterStateT> supplier,
                              Map<TableId, CatalogTable> catalogTables,
                              Pattern patternOfTable,
-                             DebeziumRowDeserializationSchema deserializationSchema) {
+                             DebeziumRowFilterNamesDeserializationSchema deserializationSchema) {
     this.templateConfiguration = templateConfiguration;
     this.context = context;
     this.supplier = supplier;

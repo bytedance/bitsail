@@ -33,18 +33,18 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Date;
 
-public class DebeziumRowDeserializationSchemaTest {
+public class DebeziumRowFilterNamesDeserializationSchemaTest {
 
-  private DebeziumRowDeserializationSchema deserializationSchema;
+  private DebeziumRowFilterNamesDeserializationSchema deserializationSchema;
 
   @Before
   public void before() {
-    deserializationSchema = new DebeziumRowDeserializationSchema(BitSailConfiguration.newDefault());
+    deserializationSchema = new DebeziumRowFilterNamesDeserializationSchema(BitSailConfiguration.newDefault());
   }
 
   @Test
   public void test() throws URISyntaxException, IOException {
-    byte[] bytes = Files.readAllBytes(Paths.get(DebeziumRowDeserializationSchemaTest
+    byte[] bytes = Files.readAllBytes(Paths.get(DebeziumRowFilterNamesDeserializationSchemaTest
         .class.getClassLoader().getResource("file/debezium.json")
         .toURI().getPath()));
 
@@ -57,7 +57,7 @@ public class DebeziumRowDeserializationSchemaTest {
 
   @Test
   public void testInsert() throws URISyntaxException, IOException {
-    byte[] bytes = Files.readAllBytes(Paths.get(DebeziumRowDeserializationSchemaTest
+    byte[] bytes = Files.readAllBytes(Paths.get(DebeziumRowFilterNamesDeserializationSchemaTest
         .class.getClassLoader().getResource("file/debezium_insert.json")
         .toURI().getPath()));
 
@@ -70,7 +70,7 @@ public class DebeziumRowDeserializationSchemaTest {
 
   @Test
   public void testUpsert() throws URISyntaxException, IOException {
-    byte[] bytes = Files.readAllBytes(Paths.get(DebeziumRowDeserializationSchemaTest
+    byte[] bytes = Files.readAllBytes(Paths.get(DebeziumRowFilterNamesDeserializationSchemaTest
         .class.getClassLoader().getResource("file/debezium_upsert.json")
         .toURI().getPath()));
 
@@ -85,7 +85,7 @@ public class DebeziumRowDeserializationSchemaTest {
 
   @Test
   public void testDelete() throws URISyntaxException, IOException {
-    byte[] bytes = Files.readAllBytes(Paths.get(DebeziumRowDeserializationSchemaTest
+    byte[] bytes = Files.readAllBytes(Paths.get(DebeziumRowFilterNamesDeserializationSchemaTest
         .class.getClassLoader().getResource("file/postgres/debezium_pg_delete.json")
         .toURI().getPath()));
 

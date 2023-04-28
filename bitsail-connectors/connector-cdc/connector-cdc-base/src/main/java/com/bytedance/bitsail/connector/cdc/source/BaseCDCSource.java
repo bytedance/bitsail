@@ -22,6 +22,7 @@ import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.extension.ParallelismComputable;
+import com.bytedance.bitsail.base.extension.SupportProducedType;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
@@ -29,6 +30,9 @@ import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
+import com.bytedance.bitsail.component.format.debezium.DebeziumDeserializationSchema;
+import com.bytedance.bitsail.connector.cdc.schema.DebeziumDeserializationFactory;
 import com.bytedance.bitsail.connector.cdc.source.coordinator.CDCSourceSplitCoordinator;
 import com.bytedance.bitsail.connector.cdc.source.coordinator.state.AssignmentStateSerializer;
 import com.bytedance.bitsail.connector.cdc.source.coordinator.state.BaseAssignmentState;
@@ -40,18 +44,20 @@ import java.io.IOException;
 /**
  * Source to read mysql binlog.
  */
-public abstract class BaseCDCSource implements Source<Row, BaseCDCSplit, BaseAssignmentState>, ParallelismComputable {
+public abstract class BaseCDCSource implements Source<Row, BaseCDCSplit, BaseAssignmentState>, ParallelismComputable, SupportProducedType {
 
   protected BitSailConfiguration commonConf;
   protected BitSailConfiguration readerConf;
 
   protected BaseSplitSerializer splitSerializer;
+  protected DebeziumDeserializationSchema deserializationSchema;
 
   @Override
   public void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration) throws IOException {
     this.readerConf = readerConfiguration;
     this.commonConf = execution.getCommonConfiguration();
     this.splitSerializer = createSplitSerializer();
+    this.deserializationSchema = DebeziumDeserializationFactory.getDebeziumDeserializationSchema(readerConf, createTypeInfoConverter());
   }
 
   @Override
@@ -96,5 +102,10 @@ public abstract class BaseCDCSource implements Source<Row, BaseCDCSplit, BaseAss
         .adviceParallelism(1)
         .enforceDownStreamChain(false)
         .build();
+  }
+
+  @Override
+  public RowTypeInfo getProducedType() {
+    return deserializationSchema.getProducedType();
   }
 }

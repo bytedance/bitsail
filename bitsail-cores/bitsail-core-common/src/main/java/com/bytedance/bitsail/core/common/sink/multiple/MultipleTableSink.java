@@ -31,7 +31,7 @@ import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.typeinfo.TypeInfoValueConverter;
-import com.bytedance.bitsail.component.format.debezium.DebeziumRowDeserializationSchema;
+import com.bytedance.bitsail.component.format.debezium.DebeziumRowFilterNamesDeserializationSchema;
 import com.bytedance.bitsail.core.common.serializer.multiple.MultipleTableCommitSerializer;
 import com.bytedance.bitsail.core.common.serializer.multiple.MultipleTableStateSerializer;
 import com.bytedance.bitsail.core.common.sink.multiple.comittable.MultipleTableCommit;
@@ -101,7 +101,7 @@ public class MultipleTableSink<InputT, CommitT extends Serializable, WriterState
         (SupportMultipleSinkTable<InputT, CommitT, WriterStateT>) realSink,
         catalogTables,
         patternOfTable,
-        new DebeziumRowDeserializationSchema(writerConfiguration));
+        new DebeziumRowFilterNamesDeserializationSchema(writerConfiguration));
   }
 
   @Override

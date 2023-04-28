@@ -16,11 +16,14 @@
 
 package com.bytedance.bitsail.connector.cdc.mysql.source;
 
+import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.component.format.debezium.DebeziumJsonDeserializationSchema;
 import com.bytedance.bitsail.connector.cdc.model.ClusterInfo;
 import com.bytedance.bitsail.connector.cdc.model.ConnectionInfo;
 import com.bytedance.bitsail.connector.cdc.mysql.source.container.MySQLContainerMariadbAdapter;
+import com.bytedance.bitsail.connector.cdc.mysql.source.context.SourceMockContext;
 import com.bytedance.bitsail.connector.cdc.mysql.source.debezium.MysqlBinlogSplitReader;
 import com.bytedance.bitsail.connector.cdc.mysql.source.schema.SchemaUtils;
 import com.bytedance.bitsail.connector.cdc.option.BinlogReaderOptions;
@@ -64,6 +67,8 @@ public class MockConnectionsTest {
   private static final String TEST_USERNAME = "user1";
   private static final String TEST_PASSWORD = "password1";
   private static MySQLContainer<?> container;
+  private static SourceReader.Context context;
+  private static DebeziumJsonDeserializationSchema deserializationSchema;
 
   @BeforeClass
   public static void before() {
@@ -74,6 +79,8 @@ public class MockConnectionsTest {
         .withPassword(TEST_PASSWORD)
         .withLogConsumer(new Slf4jLogConsumer(LOG));
 
+    deserializationSchema = new DebeziumJsonDeserializationSchema(BitSailConfiguration.newDefault());
+    context = new SourceMockContext(1, deserializationSchema.getProducedType());
     Startables.deepStart(Stream.of(container)).join();
   }
 
@@ -129,7 +136,7 @@ public class MockConnectionsTest {
     jobConf.set(BinlogReaderOptions.PASSWORD, TEST_PASSWORD);
     jobConf.set(BinlogReaderOptions.INITIAL_OFFSET_TYPE, "latest");
 
-    MysqlBinlogSplitReader reader = new MysqlBinlogSplitReader(jobConf, 0);
+    MysqlBinlogSplitReader reader = new MysqlBinlogSplitReader(jobConf, context, deserializationSchema);
     BinlogSplit split = new BinlogSplit("split-1", BinlogOffset.earliest(), BinlogOffset.boundless());
     reader.readSplit(split);
     int maxPeriod = 0;
