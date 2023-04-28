@@ -62,7 +62,6 @@ public class MultipleTableSink<InputT, CommitT extends Serializable, WriterState
   private BitSailConfiguration commonConfiguration;
   private BitSailConfiguration writerConfiguration;
   private Pattern patternOfTable;
-  private TypeInfoValueConverter valueConverter;
 
   public MultipleTableSink(Sink<InputT, CommitT, WriterStateT> realSink,
                            CatalogFactory factory) {
@@ -76,9 +75,9 @@ public class MultipleTableSink<InputT, CommitT extends Serializable, WriterState
   public void configure(BitSailConfiguration commonConfiguration, BitSailConfiguration writerConfiguration) throws Exception {
     this.commonConfiguration = commonConfiguration;
     this.writerConfiguration = writerConfiguration;
-    this.valueConverter = new TypeInfoValueConverter(commonConfiguration);
     this.patternOfTable = Pattern.compile(writerConfiguration.get(WriterOptions.BaseWriterOptions.TABLE_PATTERN));
     this.catalog = factory.createTableCatalog(BuilderGroup.WRITER, writerConfiguration);
+    this.catalog.open(realSink.createTypeInfoConverter());
     this.catalogTables = Maps.newHashMap();
 
     List<TableId> tableIds = catalog.listTables();
@@ -89,6 +88,7 @@ public class MultipleTableSink<InputT, CommitT extends Serializable, WriterState
         catalogTables.put(tableId, catalogTable);
       }
     }
+    this.realSink.configure(commonConfiguration, writerConfiguration);
   }
 
   @Override
@@ -97,7 +97,7 @@ public class MultipleTableSink<InputT, CommitT extends Serializable, WriterState
     return new MultipleTableWriter<>(
         writerConfiguration,
         context,
-        valueConverter,
+        new TypeInfoValueConverter(commonConfiguration),
         (SupportMultipleSinkTable<InputT, CommitT, WriterStateT>) realSink,
         catalogTables,
         patternOfTable,

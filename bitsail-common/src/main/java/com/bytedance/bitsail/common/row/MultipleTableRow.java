@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Builder
 public class MultipleTableRow implements Serializable {
 
-  private static final RowTypeInfo MULTIPLE_TABLE_ROW_TYPE_INFO =
+  public static final RowTypeInfo MULTIPLE_TABLE_ROW_TYPE_INFO =
       new RowTypeInfo(Arrays.stream(MultipleTableField.values())
           .map(MultipleTableField::getName)
           .collect(Collectors.toList())

@@ -25,6 +25,7 @@ import com.bytedance.bitsail.common.catalog.table.CatalogTableSchema;
 import com.bytedance.bitsail.common.catalog.table.TableId;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.row.MultipleTableRow;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
@@ -62,6 +63,7 @@ public class MultipleTableWriter<InputT, CommT extends Serializable, WriterState
   private final DebeziumRowDeserializationSchema deserializationSchema;
   private final TypeInfoValueConverter valueConverter;
   private final Pattern patternOfTable;
+  private final String database;
 
   private transient Map<TableId, Writer<InputT, CommT, WriterStateT>> restoredMultiTableWriters;
   private transient Map<TableId, Writer<InputT, CommT, WriterStateT>> processedMultiTableWriters;
@@ -84,6 +86,7 @@ public class MultipleTableWriter<InputT, CommT extends Serializable, WriterState
     this.restoredMultiTableWriters = Maps.newConcurrentMap();
     this.tableIdRowTypeInfos = Maps.newConcurrentMap();
     this.patternOfTable = patternOfTable;
+    this.database = templateConfiguration.get(WriterOptions.BaseWriterOptions.DB_NAME);
 
     restore();
   }
@@ -110,9 +113,10 @@ public class MultipleTableWriter<InputT, CommT extends Serializable, WriterState
   public void write(Row element) throws IOException {
     MultipleTableRow multipleTableRow = MultipleTableRow.of(element);
     TableId tableId = TableId.of(multipleTableRow.getTableId());
+    tableId = TableId.of(database, tableId.getTable());
 
     if (!(patternOfTable.matcher(tableId.getTable()).find())) {
-      LOG.warn("Table {} not match with pattern: {}.", tableId.getTable(), patternOfTable.pattern());
+      LOG.debug("Table {} not match with pattern: {}.", tableId.getTable(), patternOfTable.pattern());
       return;
     }
 
@@ -161,7 +165,7 @@ public class MultipleTableWriter<InputT, CommT extends Serializable, WriterState
             context.getIndexOfSubTaskId(),
             rowTypeInfo.getFieldNames()[index],
             deserialize.getField(index),
-            rowTypeInfo.getTypeInfos()[index]);
+            rowTypeInfo.getTypeInfos()[index], e);
         //handled as dirty record.
         throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
             String.format("Subtask %s failed to convert field name %s to dest type info %S.",

@@ -37,6 +37,8 @@ public class CatalogTableColumn implements Serializable {
 
   private String comment;
 
+  private Object defaultValue;
+
   public CatalogTableColumn(String name, TypeInfo<?> type) {
     this.name = name;
     this.type = type;

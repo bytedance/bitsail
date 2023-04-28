@@ -17,7 +17,10 @@
 package com.bytedance.bitsail.connector.cdc.mysql.source;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
+import com.bytedance.bitsail.base.extension.SupportProducedType;
+import com.bytedance.bitsail.common.row.MultipleTableRow;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.connector.cdc.mysql.source.reader.MysqlCDCSourceReader;
 import com.bytedance.bitsail.connector.cdc.mysql.source.split.MysqlSplitSerializer;
 import com.bytedance.bitsail.connector.cdc.source.BaseCDCSource;
@@ -30,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Source to read mysql binlog.
  */
-public class MysqlCDCSource extends BaseCDCSource {
+public class MysqlCDCSource extends BaseCDCSource implements SupportProducedType {
 
   private static final Logger LOG = LoggerFactory.getLogger(MysqlCDCSource.class);
   @Override
@@ -47,5 +50,10 @@ public class MysqlCDCSource extends BaseCDCSource {
   @Override
   public String getReaderName() {
     return "mysql_cdc";
+  }
+
+  @Override
+  public RowTypeInfo getProducedType() {
+    return MultipleTableRow.MULTIPLE_TABLE_ROW_TYPE_INFO;
   }
 }

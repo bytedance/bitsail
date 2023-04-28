@@ -124,13 +124,15 @@ public class DebeziumRowDeserializationSchema implements DeserializationSchema<S
     Row row = new Row(fieldNames.length);
     row.setKind(rowKind);
     for (int index = 0; index < fieldNames.length; index++) {
-      Object withoutDefault = struct.getWithoutDefault(fieldNames[index]);
       Field field = schema.field(fieldNames[index]);
-      if (Objects.isNull(withoutDefault)) {
+      if (Objects.isNull(field)) {
         row.setField(index, null);
       } else {
+        Object withoutDefault = struct.getWithoutDefault(fieldNames[index]);
         try {
-          row.setField(index, convert(field.schema(), withoutDefault));
+          withoutDefault = Objects.isNull(withoutDefault) ? null
+              : convert(field.schema(), withoutDefault);
+          row.setField(index, withoutDefault);
         } catch (BitSailException e) {
           LOG.error("Failed to parse field {} from value {}.", field.name(), withoutDefault);
           throw e;

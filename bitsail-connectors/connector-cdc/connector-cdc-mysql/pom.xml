@@ -31,7 +31,7 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <debezium.version>1.6.4.Final</debezium.version>
+
         <maridb.version>3.0.8</maridb.version>
     </properties>
 

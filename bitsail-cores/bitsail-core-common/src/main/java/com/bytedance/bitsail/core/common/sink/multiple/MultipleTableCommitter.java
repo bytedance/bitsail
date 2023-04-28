@@ -53,7 +53,8 @@ public class MultipleTableCommitter<CommitT extends Serializable> implements Wri
       if (Objects.isNull(realWriterCommitter)) {
         BitSailConfiguration configuration = supplier.applyTableId(templateConfiguration, tableId);
         Optional<WriterCommitter<CommitT>> committer = supplier.createCommitter(configuration);
-        multipleCommitters.put(tableId, committer.get());
+        realWriterCommitter = committer.get();
+        multipleCommitters.put(tableId, realWriterCommitter);
       }
       realWriterCommitter.commit(committable.getCommits());
     }

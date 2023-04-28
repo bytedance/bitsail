@@ -60,6 +60,28 @@ public class TableId implements Serializable {
     return new TableId(database, schema, table);
   }
 
+  public String getQuotedName() {
+    return getQuotedName("`");
+  }
+
+  public String getQuotedName(String quote) {
+    StringBuilder builder = new StringBuilder();
+    builder.append(quote)
+        .append(database)
+        .append(quote)
+        .append(".");
+    if (schema != null) {
+      builder.append(quote)
+          .append(schema)
+          .append(quote)
+          .append(".");
+    }
+    builder.append(quote)
+        .append(table)
+        .append(quote);
+    return builder.toString();
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {

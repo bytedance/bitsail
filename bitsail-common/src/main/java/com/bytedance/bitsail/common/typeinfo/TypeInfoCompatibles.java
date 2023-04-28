@@ -55,12 +55,12 @@ public class TypeInfoCompatibles implements Serializable {
 
   private final BitSailConfiguration commonConfiguration;
 
-  private final DateTimeFormatter dateFormatter;
-  private final DateTimeFormatter timeFormatter;
-  private final DateTimeFormatter dateTimeFormatter;
-  private final ZoneId dateTimeZone;
+  private final transient DateTimeFormatter dateFormatter;
+  private final transient DateTimeFormatter timeFormatter;
+  private final transient DateTimeFormatter dateTimeFormatter;
+  private final transient ZoneId dateTimeZone;
 
-  private final HashBasedTable<TypeInfo<?>, TypeInfo<?>, Function<Object, Object>> compatibles;
+  private final transient HashBasedTable<TypeInfo<?>, TypeInfo<?>, Function<Object, Object>> compatibles;
 
   public TypeInfoCompatibles(BitSailConfiguration commonConfiguration) {
     this.commonConfiguration = commonConfiguration;
