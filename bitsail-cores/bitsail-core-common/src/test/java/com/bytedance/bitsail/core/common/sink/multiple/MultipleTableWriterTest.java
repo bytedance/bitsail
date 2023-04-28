@@ -23,6 +23,7 @@ import com.bytedance.bitsail.common.catalog.table.CatalogTableColumn;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableSchema;
 import com.bytedance.bitsail.common.catalog.table.TableId;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.row.MultipleTableRow;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
@@ -66,6 +67,7 @@ public class MultipleTableWriterTest {
   public void before() {
     this.multiTablePrintSink = new MultiTablePrintSink();
     this.jobConf = BitSailConfiguration.newDefault();
+    this.jobConf.set(WriterOptions.BaseWriterOptions.DB_NAME, "default");
     this.catalogTables = mockCatalogTables();
     this.typeInfoValueConverter = new TypeInfoValueConverter(BitSailConfiguration.newDefault());
     this.context = new Writer.Context<MultipleTableState<Integer>>() {
