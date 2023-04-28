@@ -131,6 +131,7 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
     this.offset = new HashMap<>();
     this.isRunning = false;
     this.deserializationSchema = deserializationSchema;
+    this.deserializationSchema.open();
   }
 
   public void readSplit(BinlogSplit split) {

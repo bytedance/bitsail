@@ -128,7 +128,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   public void write(Row record) throws IOException {
     checkErroneous();
     //TODO: refactor this as a format factory
-    if (format.equals("debezium")) {
+    if (format.equals("debezium-json")) {
       writeDebezium(record);
     } else {
       String result = jsonConverter.convert(record).toString();
@@ -153,13 +153,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     String key = record.getString(BinlogRow.KEY_INDEX);
     partitionFieldsValues[0] = key;
     int partitionId = choosePartitionIdByFields(partitionFieldsValues);
-    Map<String, String> headers = new HashMap<>(4);
-    headers.put("db", record.getString(BinlogRow.DATABASE_INDEX));
-    headers.put("table", record.getString(BinlogRow.TABLE_INDEX));
-    headers.put("ddl_flag", String.valueOf(record.getBoolean(BinlogRow.DDL_FLAG_INDEX)));
-    headers.put("version", String.valueOf(record.getInt(BinlogRow.VERSION_INDEX)));
-    byte[] value = record.getBinary(BinlogRow.VALUE_INDEX);
-    sendWithHeaders(key, value, partitionId, headers);
+    sendWithHeaders(null, record.getBinary(2), partitionId, null);
   }
 
   @Override

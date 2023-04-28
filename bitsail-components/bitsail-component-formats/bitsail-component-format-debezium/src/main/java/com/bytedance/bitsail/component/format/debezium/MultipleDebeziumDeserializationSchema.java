@@ -39,8 +39,13 @@ import static io.debezium.data.Envelope.FieldName.SOURCE;
 public class MultipleDebeziumDeserializationSchema implements DebeziumDeserializationSchema, SupportProducedType {
 
   private transient JsonConverter jsonConverter;
+  private BitSailConfiguration jobConf;
 
   public MultipleDebeziumDeserializationSchema(BitSailConfiguration jobConf) {
+    this.jobConf = jobConf;
+  }
+
+  public void open() {
     this.jsonConverter = new JsonConverter();
     boolean includeSchema = jobConf.get(DebeziumWriterOptions.DEBEZIUM_JSON_INCLUDE_SCHEMA);
     final HashMap<String, Object> configs = new HashMap<>();

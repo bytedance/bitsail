@@ -34,6 +34,11 @@ public class DebeziumRowDeserializationSchema implements DebeziumDeserialization
   }
 
   @Override
+  public void open() {
+
+  }
+
+  @Override
   public Row deserialize(SourceRecord sourceRecord) {
     //TODO
     return null;

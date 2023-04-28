@@ -42,20 +42,26 @@ public class DebeziumJsonDeserializationSchema implements DebeziumDeserializatio
               TypeInfos.STRING_TYPE_INFO, TypeInfos.STRING_TYPE_INFO, TypeInfos.STRING_TYPE_INFO, TypeInfos.LONG_TYPE_INFO
           });
 
+  private BitSailConfiguration jobConf;
   private transient JsonConverter jsonConverter;
 
   public DebeziumJsonDeserializationSchema(BitSailConfiguration jobConf) {
+    this.jobConf = jobConf;
+  }
+
+  @Override
+  public RowTypeInfo getProducedType() {
+    return DEBEZIUM_JSON_ROW_TYPE;
+  }
+
+  @Override
+  public void open() {
     this.jsonConverter = new JsonConverter();
     boolean includeSchema = jobConf.get(DebeziumWriterOptions.DEBEZIUM_JSON_INCLUDE_SCHEMA);
     final HashMap<String, Object> configs = new HashMap<>();
     configs.put(ConverterConfig.TYPE_CONFIG, ConverterType.VALUE.getName());
     configs.put(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, includeSchema);
     jsonConverter.configure(configs);
-  }
-
-  @Override
-  public RowTypeInfo getProducedType() {
-    return DEBEZIUM_JSON_ROW_TYPE;
   }
 
   @SuppressWarnings("checkstyle:MagicNumber")

@@ -24,6 +24,8 @@ import org.apache.kafka.connect.source.SourceRecord;
 
 public interface DebeziumDeserializationSchema extends DeserializationSchema<SourceRecord, Row>, SupportProducedType {
 
+  void open();
+
   @Override
   Row deserialize(SourceRecord sourceRecord);
 
