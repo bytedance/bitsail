@@ -47,7 +47,7 @@ public class DelegateFlinkPartitioner<T> implements Partitioner<T> {
       case HASH:
         return new SimpleHashCodePartitioner<>();
       default:
-        throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_TRANSFORM_TYPE,
+        throw BitSailException.asBitSailException(CommonErrorCode.TRANSFORM_ERROR,
             String.format("partitioner type %s is not supported yet", partitionerType));
     }
   }

@@ -17,8 +17,10 @@
 package com.bytedance.bitsail.core.flink.bridge.transform.delegate;
 
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfos;
 
-import org.apache.flink.api.java.functions.KeySelector;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -26,17 +28,25 @@ import static org.junit.Assert.assertEquals;
 public class RowKeySelectorTest {
   @Test
   public void testBitSailRowSelector() throws Exception {
-    KeySelector<Object, Object> keySelector = new RowKeySelector<>(0);
+    String[] fieldNames = {"c1", "c2"};
+    TypeInfo<?>[] typeInfos = {TypeInfos.INT_TYPE_INFO, TypeInfos.STRING_TYPE_INFO};
+    RowTypeInfo rowTypeInfo = new RowTypeInfo(fieldNames, typeInfos);
     Row row = new Row(2);
-    row.setField(0, "key");
-    assertEquals("key", keySelector.getKey(row));
+    row.setField(0, 1);
+    row.setField(1, "key");
+    assertEquals(1, new RowKeySelector(rowTypeInfo, "c1").getKey(row));
+    assertEquals("key", new RowKeySelector(rowTypeInfo, "c2").getKey(row));
   }
 
   @Test
   public void testFlinkRowSelector() throws Exception {
-    KeySelector<Object, Object> keySelector = new RowKeySelector<>(0);
+    String[] fieldNames = {"c1", "c2"};
+    TypeInfo<?>[] typeInfos = {TypeInfos.INT_TYPE_INFO, TypeInfos.STRING_TYPE_INFO};
+    RowTypeInfo rowTypeInfo = new RowTypeInfo(fieldNames, typeInfos);
     org.apache.flink.types.Row row = new org.apache.flink.types.Row(2);
-    row.setField(0, "key");
-    assertEquals("key", keySelector.getKey(row));
+    row.setField(0, 1);
+    row.setField(1, "key");
+    assertEquals(1, new RowKeySelector(rowTypeInfo, "c1").getKey(row));
+    assertEquals("key", new RowKeySelector(rowTypeInfo, "c2").getKey(row));
   }
 }

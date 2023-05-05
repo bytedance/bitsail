@@ -68,11 +68,13 @@ public class DelegateFlinkMapFunction<I, O extends org.apache.flink.types.Row> i
         jobConf.get(TransformOptions.BaseTransformOptions.MAP_FUNCTION_TYPE).trim().toUpperCase(Locale.ROOT));
     switch (mapFunctionType) {
       case APPEND_STRING:
-        List<Integer> indexes = jobConf.get(TransformOptions.BaseTransformOptions.APPEND_STRING_INDEXES);
-        List<String> values = jobConf.get(TransformOptions.BaseTransformOptions.APPEND_STRING_VALUES);
-        return new AppendStringMapFunction(indexes, values, rowTypeInfo);
+        List<String> columns = jobConf.getNecessaryOption(
+            TransformOptions.BaseTransformOptions.APPEND_STRING_COLUMNS, CommonErrorCode.LACK_NECESSARY_FIELDS);
+        List<String> values = jobConf.getNecessaryOption(
+            TransformOptions.BaseTransformOptions.APPEND_STRING_VALUES, CommonErrorCode.LACK_NECESSARY_FIELDS);
+        return new AppendStringMapFunction(columns, values, rowTypeInfo);
       default:
-        throw BitSailException.asBitSailException(CommonErrorCode.UNSUPPORTED_TRANSFORM_TYPE,
+        throw BitSailException.asBitSailException(CommonErrorCode.TRANSFORM_ERROR,
             String.format("map function type %s is not supported yet", mapFunctionType));
     }
   }

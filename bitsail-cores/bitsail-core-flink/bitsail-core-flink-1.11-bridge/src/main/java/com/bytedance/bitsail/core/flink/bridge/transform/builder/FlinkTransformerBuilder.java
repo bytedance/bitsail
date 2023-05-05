@@ -27,6 +27,7 @@ import com.bytedance.bitsail.core.flink.bridge.transform.delegate.DelegateFlinkM
 import com.bytedance.bitsail.core.flink.bridge.transform.delegate.DelegateFlinkPartitioner;
 import com.bytedance.bitsail.core.flink.bridge.transform.delegate.RowKeySelector;
 import com.bytedance.bitsail.flink.core.transform.FlinkDataTransformDAGBuilder;
+import com.bytedance.bitsail.flink.core.typeutils.AutoDetectFlinkTypeInfoUtil;
 
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -40,12 +41,9 @@ public class FlinkTransformerBuilder<T> extends FlinkDataTransformDAGBuilder<T>
 
   DelegateFlinkPartitioner<T> partitioner;
 
-  KeySelector keySelector;
-
   public FlinkTransformerBuilder(BitSailConfiguration jobConf) {
     this.jobConf = jobConf;
     this.partitioner = new DelegateFlinkPartitioner<>(jobConf);
-    this.keySelector = new RowKeySelector<>(RowKeySelector.DEFAULT_KEY_INDEX);
   }
 
   @Override
@@ -65,14 +63,14 @@ public class FlinkTransformerBuilder<T> extends FlinkDataTransformDAGBuilder<T>
         return addMap(source);
       default:
         throw BitSailException.asBitSailException(
-            CommonErrorCode.UNSUPPORTED_TRANSFORM_TYPE, String.format("transform type %s is currently unsupported", transformType));
+            CommonErrorCode.TRANSFORM_ERROR, String.format("transform type %s is currently unsupported", transformType));
     }
   }
 
   private DataStream<T> addPartitioner(DataStream<T> source) {
     DelegateFlinkPartitioner<T> partitioner = new DelegateFlinkPartitioner<>(jobConf);
-    KeySelector keySelector = new RowKeySelector<>(jobConf.get(
-        TransformOptions.BaseTransformOptions.PARTITION_KEY_INDEX));
+    KeySelector keySelector = new RowKeySelector<>(AutoDetectFlinkTypeInfoUtil.bridgeRowTypeInfo((org.apache.flink.api.java.typeutils.RowTypeInfo) source.getType()),
+        jobConf.get(TransformOptions.BaseTransformOptions.PARTITION_COLUMN_NAME));
     return source.partitionCustom(partitioner, keySelector);
   }
 

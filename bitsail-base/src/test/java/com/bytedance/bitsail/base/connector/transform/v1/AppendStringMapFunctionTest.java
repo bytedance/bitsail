@@ -30,9 +30,9 @@ import java.util.List;
 public class AppendStringMapFunctionTest {
   @Test
   public void testAppendString() throws Exception {
-    List<Integer> indexes = new ArrayList<>();
-    indexes.add(1);
-    indexes.add(2);
+    List<String> indexes = new ArrayList<>();
+    indexes.add("c2");
+    indexes.add("c3");
     List<String> appendVals = new ArrayList<>();
     appendVals.add("_tail1");
     appendVals.add("_tail2");

@@ -47,9 +47,9 @@ public interface TransformOptions {
         key(TRANSFORM_PREFIX + "transform_type")
             .noDefaultValue(String.class);
 
-    ConfigOption<Integer> PARTITION_KEY_INDEX =
-        key(TRANSFORM_PREFIX + "partition_key_index")
-            .defaultValue(0);
+    ConfigOption<String> PARTITION_COLUMN_NAME =
+        key(TRANSFORM_PREFIX + "partition_column_name")
+            .noDefaultValue(String.class);
 
     ConfigOption<String> PARTITIONER_TYPE =
         key(TRANSFORM_PREFIX + "partitioner_type")
@@ -59,9 +59,9 @@ public interface TransformOptions {
         key(TRANSFORM_PREFIX + "map_function_type")
             .noDefaultValue(String.class);
 
-    ConfigOption<List<Integer>> APPEND_STRING_INDEXES =
-        key(TRANSFORM_PREFIX + "append_string_indexes")
-            .onlyReference(new TypeReference<List<Integer>>() {
+    ConfigOption<List<String>> APPEND_STRING_COLUMNS =
+        key(TRANSFORM_PREFIX + "append_string_columns")
+            .onlyReference(new TypeReference<List<String>>() {
             });
 
     ConfigOption<List<String>> APPEND_STRING_VALUES =

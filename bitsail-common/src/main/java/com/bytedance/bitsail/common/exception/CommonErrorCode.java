@@ -32,7 +32,7 @@ public enum CommonErrorCode implements ErrorCode {
   HDFS_EXCEPTION("Common-11", "HDFS error."),
   HIVE_METASTORE_EXCEPTION("Common-12", "Failed to connect to the hive metastore."),
   VALIDATION_EXCEPTION("Common-13", "Failed to valid result after test."),
-  UNSUPPORTED_TRANSFORM_TYPE("Common-14", "Unsupported transform type.")
+  TRANSFORM_ERROR("Common-14", "Transform error occur.")
   ;
 
   private final String code;

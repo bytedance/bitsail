@@ -19,17 +19,25 @@ package com.bytedance.bitsail.core.flink.bridge.transform.delegate;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 
 import org.apache.flink.api.java.functions.KeySelector;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class RowKeySelector<INPUT extends Object, KEY extends Object> implements KeySelector<INPUT, KEY> {
 
-  private final int keyIndex;
+  private int keyIndex;
 
-  public static int DEFAULT_KEY_INDEX = 0;
-
-  public RowKeySelector(int keyIndex) {
-    this.keyIndex = keyIndex;
+  public RowKeySelector(RowTypeInfo rowTypeInfo, String keyColumn) {
+    List<String> fullColumns = Arrays.stream(rowTypeInfo.getFieldNames()).collect(Collectors.toList());
+    keyIndex = fullColumns.indexOf(keyColumn);
+    if (keyIndex == -1) {
+      throw BitSailException.asBitSailException(CommonErrorCode.TRANSFORM_ERROR,
+          String.format("partition_column_name %s not found in the columns of the source %s.", keyColumn, fullColumns));
+    }
   }
 
   @Override
