@@ -34,16 +34,13 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 
 import java.util.Locale;
 
-public class FlinkTransformerBuilder<T> extends FlinkDataTransformDAGBuilder<T>
+public class FlinkTransformBuilder<T> extends FlinkDataTransformDAGBuilder<T>
     implements ParallelismComputable {
 
   BitSailConfiguration jobConf;
 
-  DelegateFlinkPartitioner<T> partitioner;
-
-  public FlinkTransformerBuilder(BitSailConfiguration jobConf) {
+  public FlinkTransformBuilder(BitSailConfiguration jobConf) {
     this.jobConf = jobConf;
-    this.partitioner = new DelegateFlinkPartitioner<>(jobConf);
   }
 
   @Override

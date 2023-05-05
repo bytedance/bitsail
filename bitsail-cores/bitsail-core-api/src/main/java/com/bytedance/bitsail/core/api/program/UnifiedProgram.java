@@ -22,8 +22,10 @@ import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.Mode;
 import com.bytedance.bitsail.base.packages.PluginFinder;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.configuration.ConfigParser;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.core.api.command.CoreCommandArgs;
 import com.bytedance.bitsail.core.api.program.factory.ProgramDAGBuilderFactory;
@@ -112,6 +114,11 @@ public abstract class UnifiedProgram implements Program {
 
   @Override
   public void submit() throws Exception {
+    try {
+      validate();
+    } catch (Exception e) {
+      throw BitSailException.asBitSailException(CommonErrorCode.DAG_VALIDATION_EXCEPTION, e);
+    }
     execution.run(dataReaderDAGBuilders,
         dataTransformDAGBuilders,
         dataWriterDAGBuilders);
@@ -122,6 +129,11 @@ public abstract class UnifiedProgram implements Program {
   public boolean validate() throws Exception {
     for (DataReaderDAGBuilder readerDAG : dataReaderDAGBuilders) {
       if (!readerDAG.validate()) {
+        return false;
+      }
+    }
+    for (DataTransformDAGBuilder transformDAG : dataTransformDAGBuilders) {
+      if (!transformDAG.validate()) {
         return false;
       }
     }

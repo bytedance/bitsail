@@ -30,7 +30,7 @@ import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.core.api.program.factory.ProgramDAGBuilderFactory;
 import com.bytedance.bitsail.core.flink.bridge.reader.builder.FlinkSourceDAGBuilder;
-import com.bytedance.bitsail.core.flink.bridge.transform.builder.FlinkTransformerBuilder;
+import com.bytedance.bitsail.core.flink.bridge.transform.builder.FlinkTransformBuilder;
 import com.bytedance.bitsail.core.flink.bridge.writer.builder.FlinkWriterBuilder;
 import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatPlugin;
 import com.bytedance.bitsail.flink.core.legacy.connector.OutputFormatPlugin;
@@ -140,7 +140,7 @@ public class FlinkDAGBuilderFactory implements ProgramDAGBuilderFactory {
   public <T> DataTransformDAGBuilder getDataTransformDAGBuilder(Mode mode,
                                                                 BitSailConfiguration configuration,
                                                                 PluginFinder pluginFinder) {
-    return new FlinkTransformerBuilder<>(configuration);
+    return new FlinkTransformBuilder<>(configuration);
   }
 
   private static <T> T construct(String clazz,

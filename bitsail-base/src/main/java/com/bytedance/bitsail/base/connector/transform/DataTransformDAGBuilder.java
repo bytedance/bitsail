@@ -25,9 +25,26 @@ import java.io.Serializable;
  * Created 2022/4/22
  */
 public interface DataTransformDAGBuilder extends Serializable {
+
+  /**
+   * Initialize {@link DataTransformDAGBuilder} with configurations in execution environment.
+   *
+   * @param execution           Current execution environment.
+   * @param transformConfiguration Configuration for this transform.
+   */
   default void configure(ExecutionEnviron execution,
-                         BitSailConfiguration writerConfiguration) throws Exception {
+                         BitSailConfiguration transformConfiguration) throws Exception {
   }
 
+  /**
+   * Run the validation process before submitting the job.
+   */
+  default boolean validate() throws Exception {
+    return true;
+  }
+
+  /**
+   * @return The name of transform operator.
+   */
   String getTransformName();
 }

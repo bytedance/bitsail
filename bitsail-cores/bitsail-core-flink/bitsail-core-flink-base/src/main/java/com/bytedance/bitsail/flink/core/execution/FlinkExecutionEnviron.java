@@ -133,7 +133,7 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
 
     /* try to do schema alignment and configure each DAG builder */
     FlinkDAGBuilderInterceptor interceptor = new FlinkDAGBuilderInterceptor(this);
-    interceptor.intercept(readerBuilders, null, writerBuilders);
+    interceptor.intercept(readerBuilders, transformDAGBuilders, writerBuilders);
 
     /* get parallelism advice for each dag builder */
     parallelismAdvisor = new FlinkParallelismAdvisor(commonConfiguration, readerConfigurations, writerConfigurations);
