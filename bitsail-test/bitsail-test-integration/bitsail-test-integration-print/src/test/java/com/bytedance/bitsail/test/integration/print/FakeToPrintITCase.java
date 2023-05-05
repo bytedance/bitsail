@@ -14,10 +14,24 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.base.connector.transformer;
+package com.bytedance.bitsail.test.integration.print;
 
-/**
- * Created 2022/4/22
- */
-public class DataTransformDAGBuilder {
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
+
+import org.junit.Test;
+
+public class FakeToPrintITCase extends AbstractIntegrationTest {
+
+  public FakeToPrintITCase() {
+    super();
+    this.exitUponException = true;
+  }
+
+  @Test
+  public void testChainPartitioner() throws Exception {
+    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("transform_test.json");
+    submitJob(jobConf);
+  }
 }

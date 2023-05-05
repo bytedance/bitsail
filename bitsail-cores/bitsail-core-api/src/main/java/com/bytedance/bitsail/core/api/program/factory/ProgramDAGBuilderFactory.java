@@ -17,13 +17,14 @@
 package com.bytedance.bitsail.core.api.program.factory;
 
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
-import com.bytedance.bitsail.base.connector.transformer.DataTransformDAGBuilder;
+import com.bytedance.bitsail.base.connector.transform.DataTransformDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.execution.Mode;
 import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public interface ProgramDAGBuilderFactory extends Serializable {
@@ -46,8 +47,8 @@ public interface ProgramDAGBuilderFactory extends Serializable {
    * Get data transform builders from configuration.
    */
   default List<DataTransformDAGBuilder> getDataTransformDAGBuilders(Mode mode,
-                                                                    List<BitSailConfiguration> writerConfigurations,
+                                                                    List<BitSailConfiguration> configurations,
                                                                     PluginFinder pluginFinder) {
-    throw new UnsupportedOperationException();
+    return new ArrayList<>();
   }
 }

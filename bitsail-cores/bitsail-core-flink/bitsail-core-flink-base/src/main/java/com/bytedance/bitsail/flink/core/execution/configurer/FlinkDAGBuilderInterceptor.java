@@ -20,7 +20,7 @@ import com.bytedance.bitsail.base.catalog.TableCatalogFactory;
 import com.bytedance.bitsail.base.catalog.TableCatalogFactoryHelper;
 import com.bytedance.bitsail.base.connector.BuilderGroup;
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
-import com.bytedance.bitsail.base.connector.transformer.DataTransformDAGBuilder;
+import com.bytedance.bitsail.base.connector.transform.DataTransformDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.extension.TypeInfoConverterFactory;
 import com.bytedance.bitsail.common.catalog.TableCatalogManager;
@@ -55,7 +55,7 @@ public class FlinkDAGBuilderInterceptor {
 
     executionEnviron.refreshConfiguration();
 
-    configureDAGBuilders(readerBuilders, writerBuilders);
+    configureDAGBuilders(readerBuilders, transformDAGBuilders, writerBuilders);
   }
 
   private void alignTableCatalog(List<DataReaderDAGBuilder> readerBuilders,
@@ -116,13 +116,19 @@ public class FlinkDAGBuilderInterceptor {
    * configure each of reader/writer DAG builders
    */
   private <T> void configureDAGBuilders(List<DataReaderDAGBuilder> readerBuilders,
+                                        List<DataTransformDAGBuilder> transformBuilders,
                                         List<DataWriterDAGBuilder> writerBuilders) throws Exception {
     List<BitSailConfiguration> readerConfigurations = executionEnviron.getReaderConfigurations();
+    List<BitSailConfiguration> transformConfigurations = executionEnviron.getTransformConfigurations();
     List<BitSailConfiguration> writerConfigurations = executionEnviron.getWriterConfigurations();
     Preconditions.checkState(readerBuilders.size() == readerConfigurations.size());
+    Preconditions.checkState(transformBuilders.size() == transformConfigurations.size());
     Preconditions.checkState(writerBuilders.size() == writerConfigurations.size());
     for (int i = 0; i < readerBuilders.size(); ++i) {
       readerBuilders.get(i).configure(executionEnviron, readerConfigurations.get(i));
+    }
+    for (int i = 0; i < transformBuilders.size(); ++i) {
+      transformBuilders.get(i).configure(executionEnviron, transformConfigurations.get(i));
     }
     for (int i = 0; i < writerBuilders.size(); ++i) {
       writerBuilders.get(i).configure(executionEnviron, writerConfigurations.get(i));
