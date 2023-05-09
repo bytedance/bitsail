@@ -50,7 +50,6 @@ import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -143,7 +142,7 @@ public class MockConnectionsTest {
     while (maxPeriod <= 5) {
       if (reader.hasNext()) {
         Row row = reader.poll();
-        Arrays.stream(row.getFields()).forEach(o -> LOG.info(o.toString()));
+        LOG.info("row: {}.", row);
         maxPeriod++;
       }
       TimeUnit.SECONDS.sleep(1);
