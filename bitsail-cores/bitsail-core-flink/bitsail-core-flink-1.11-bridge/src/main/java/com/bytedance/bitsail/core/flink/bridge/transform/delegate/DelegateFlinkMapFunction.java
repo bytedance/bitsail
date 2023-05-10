@@ -25,7 +25,7 @@ import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.TransformOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
-import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConvertSerializer;
+import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConverter;
 import com.bytedance.bitsail.flink.core.typeutils.AutoDetectFlinkTypeInfoUtil;
 import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 
@@ -39,14 +39,14 @@ public class DelegateFlinkMapFunction<I, O extends org.apache.flink.types.Row> i
 
   private final BitSailMapFunction<com.bytedance.bitsail.common.row.Row, com.bytedance.bitsail.common.row.Row> realMapFunction;
 
-  private final FlinkRowConvertSerializer flinkRowConvertSerializer;
+  private final FlinkRowConverter rowConverter;
 
   private final RowTypeInfo inputType;
 
   public DelegateFlinkMapFunction(BitSailConfiguration jobConf, TypeInformation<?> flinkTypes) {
     this.inputType = AutoDetectFlinkTypeInfoUtil.bridgeRowTypeInfo((org.apache.flink.api.java.typeutils.RowTypeInfo) flinkTypes);
     this.realMapFunction = createMapFunction(jobConf, inputType);
-    this.flinkRowConvertSerializer = new FlinkRowConvertSerializer(
+    this.rowConverter = new FlinkRowConverter(
         this.inputType,
         jobConf);
   }
@@ -54,8 +54,8 @@ public class DelegateFlinkMapFunction<I, O extends org.apache.flink.types.Row> i
   @Override
   public O map(I value) throws Exception {
     org.apache.flink.types.Row outputRow;
-    Row bitsailRow = flinkRowConvertSerializer.deserialize((org.apache.flink.types.Row) value);
-    outputRow = flinkRowConvertSerializer.serialize(this.realMapFunction.map(bitsailRow));
+    Row bitsailRow = rowConverter.from((org.apache.flink.types.Row) value);
+    outputRow = rowConverter.to(this.realMapFunction.map(bitsailRow));
     return (O) outputRow;
   }
 
