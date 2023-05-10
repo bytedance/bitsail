@@ -17,7 +17,7 @@
 package com.bytedance.bitsail.base.execution;
 
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
-import com.bytedance.bitsail.base.connector.transformer.DataTransformDAGBuilder;
+import com.bytedance.bitsail.base.connector.transform.DataTransformDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;

@@ -1,0 +1,63 @@
+{
+  "job": {
+    "common": {
+      "job_id": 312,
+      "instance_id": 3124,
+      "job_name": "BitSail_fake_to_print_e2e_test",
+      "user_name": "test"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
+      "total_count": 300,
+      "rate": 10,
+      "null_percentage": 20,
+      "reader_parallelism_num": 2,
+      "columns": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "age",
+          "type": "int"
+        }
+      ]
+    },
+    "transform": [
+        {
+          "transform_type": "partition_by",
+          "partition_column_name": "name",
+          "partitioner_type": "hash"
+        },
+        {
+          "transform_type": "map",
+          "map_function_type": "APPEND_STRING",
+          "append_string_columns": ["name"],
+          "append_string_values": [" is working"]
+        },
+        {
+          "transform_type": "map",
+          "map_function_type": "APPEND_STRING",
+          "append_string_columns": ["name"],
+          "append_string_values": [" at home"]
+        }
+      ],
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
+      "content_type": "json",
+      "sample_write": true,
+      "sample_limit": 10,
+      "writer_parallelism_num": 2,
+      "columns": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "age",
+          "type": "int"
+        }
+      ]
+    }
+  }
+}

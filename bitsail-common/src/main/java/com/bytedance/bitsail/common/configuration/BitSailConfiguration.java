@@ -24,6 +24,7 @@ import com.bytedance.bitsail.common.util.FastJsonUtil;
 import com.bytedance.bitsail.common.util.StrUtil;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.io.IOUtils;
@@ -346,6 +347,11 @@ public class BitSailConfiguration implements Serializable {
 
   public List<?> getList(final String path) {
     return this.get(path, List.class);
+  }
+
+  public boolean isList(final String path) {
+    Object obj = this.get(path);
+    return obj instanceof JSONArray;
   }
 
   public <T> T getObject(final String path, TypeReference<T> reference) {

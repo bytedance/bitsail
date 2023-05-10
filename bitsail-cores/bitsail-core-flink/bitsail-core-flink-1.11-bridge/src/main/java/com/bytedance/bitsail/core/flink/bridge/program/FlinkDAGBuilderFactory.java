@@ -18,6 +18,7 @@ package com.bytedance.bitsail.core.flink.bridge.program;
 
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
 import com.bytedance.bitsail.base.connector.reader.v1.Source;
+import com.bytedance.bitsail.base.connector.transform.DataTransformDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.v1.Sink;
 import com.bytedance.bitsail.base.execution.Mode;
@@ -29,6 +30,7 @@ import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.core.api.program.factory.ProgramDAGBuilderFactory;
 import com.bytedance.bitsail.core.flink.bridge.reader.builder.FlinkSourceDAGBuilder;
+import com.bytedance.bitsail.core.flink.bridge.transform.builder.FlinkTransformBuilder;
 import com.bytedance.bitsail.core.flink.bridge.writer.builder.FlinkWriterBuilder;
 import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatPlugin;
 import com.bytedance.bitsail.flink.core.legacy.connector.OutputFormatPlugin;
@@ -39,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class FlinkDAGBuilderFactory implements ProgramDAGBuilderFactory {
@@ -114,6 +117,30 @@ public class FlinkDAGBuilderFactory implements ProgramDAGBuilderFactory {
     }
     throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
         String.format("Writer %s is not support.", writerClassName));
+  }
+
+  @Override
+  public List<DataTransformDAGBuilder> getDataTransformDAGBuilders(Mode mode,
+                                                                   List<BitSailConfiguration> configurations,
+                                                                   PluginFinder pluginFinder) {
+
+    return configurations.stream()
+        .map(transformConf -> {
+          try {
+            return getDataTransformDAGBuilder(mode, transformConf, pluginFinder);
+          } catch (Exception e) {
+            LOG.error("failed to create writer DAG builder");
+            throw new RuntimeException(e);
+          }
+        })
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+  }
+
+  public <T> DataTransformDAGBuilder getDataTransformDAGBuilder(Mode mode,
+                                                                BitSailConfiguration configuration,
+                                                                PluginFinder pluginFinder) {
+    return new FlinkTransformBuilder<>(configuration);
   }
 
   private static <T> T construct(String clazz,
