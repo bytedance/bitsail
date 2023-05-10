@@ -81,8 +81,8 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
   private final Sink<InputT, CommitT, WriterStateT> sink;
   private final BitSailConfiguration writerConfiguration;
   private final BitSailConfiguration commonConfiguration;
-  private final FlinkRowConverter flinkRowConverter;
   private final RowTypeInfo rowTypeInfo;
+  private transient FlinkRowConverter flinkRowConverter;
   private transient Writer<InputT, CommitT, WriterStateT> writer;
   private transient ListState<WriterStateT> writeState;
   private boolean endOfInput = false;
@@ -116,10 +116,6 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
       this.rowTypeInfo = TypeInfoUtils
           .getRowTypeInfo(sink.createTypeInfoConverter(), columnInfos);
     }
-
-    this.flinkRowConverter = new FlinkRowConverter(
-        this.rowTypeInfo,
-        this.commonConfiguration);
   }
 
   @Override
@@ -130,6 +126,9 @@ public class DelegateFlinkWriter<InputT, CommitT extends Serializable, WriterSta
     if (dirtyCollector instanceof RuntimeContextInjectable) {
       ((RuntimeContextInjectable) dirtyCollector).setRuntimeContext(getRuntimeContext());
     }
+    this.flinkRowConverter = new FlinkRowConverter(
+        this.rowTypeInfo,
+        this.commonConfiguration);
     messenger.open();
     ColumnCast.initColumnCast(commonConfiguration);
 

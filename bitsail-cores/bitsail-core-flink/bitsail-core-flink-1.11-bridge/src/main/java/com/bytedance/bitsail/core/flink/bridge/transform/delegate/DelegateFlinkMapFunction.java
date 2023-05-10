@@ -29,25 +29,33 @@ import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConverter;
 import com.bytedance.bitsail.flink.core.typeutils.AutoDetectFlinkTypeInfoUtil;
 import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.configuration.Configuration;
 
 import java.util.List;
 import java.util.Locale;
 
-public class DelegateFlinkMapFunction<I, O extends org.apache.flink.types.Row> implements MapFunction<I, O> {
+public class DelegateFlinkMapFunction<I, O extends org.apache.flink.types.Row> extends RichMapFunction<I, O> {
 
   private final BitSailMapFunction<com.bytedance.bitsail.common.row.Row, com.bytedance.bitsail.common.row.Row> realMapFunction;
 
-  private final FlinkRowConverter rowConverter;
+  private final RowTypeInfo rowTypeInfo;
 
-  private final RowTypeInfo inputType;
+  private final BitSailConfiguration jobConf;
 
-  public DelegateFlinkMapFunction(BitSailConfiguration jobConf, TypeInformation<?> flinkTypes) {
-    this.inputType = AutoDetectFlinkTypeInfoUtil.bridgeRowTypeInfo((org.apache.flink.api.java.typeutils.RowTypeInfo) flinkTypes);
-    this.realMapFunction = createMapFunction(jobConf, inputType);
+  private transient FlinkRowConverter rowConverter;
+
+  public DelegateFlinkMapFunction(BitSailConfiguration jobConf, TypeInformation<?> inputRowTypeInfo) {
+    this.jobConf = jobConf;
+    this.rowTypeInfo = AutoDetectFlinkTypeInfoUtil.bridgeRowTypeInfo((org.apache.flink.api.java.typeutils.RowTypeInfo) inputRowTypeInfo);
+    this.realMapFunction = createMapFunction(jobConf, rowTypeInfo);
+  }
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
     this.rowConverter = new FlinkRowConverter(
-        this.inputType,
+        rowTypeInfo,
         jobConf);
   }
 
