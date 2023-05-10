@@ -17,9 +17,9 @@
 package com.bytedance.bitsail.connector.doris.backend.model;
 
 import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.util.Preconditions;
 import com.bytedance.bitsail.connector.doris.error.DorisErrorCode;
 import com.bytedance.bitsail.connector.doris.rest.model.Schema;
-import com.bytedance.bitsail.connector.doris.thrift.TScanBatchResult;
 
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.BigIntVector;
@@ -36,7 +36,7 @@ import org.apache.arrow.vector.VarCharVector;
 import org.apache.arrow.vector.VectorSchemaRoot;
 import org.apache.arrow.vector.ipc.ArrowStreamReader;
 import org.apache.arrow.vector.types.Types;
-import org.apache.flink.util.Preconditions;
+import org.apache.doris.sdk.thrift.TScanBatchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -24,13 +24,13 @@ import com.bytedance.bitsail.connector.doris.config.DorisOptions;
 import com.bytedance.bitsail.connector.doris.rest.model.Field;
 import com.bytedance.bitsail.connector.doris.rest.model.PartitionDefinition;
 import com.bytedance.bitsail.connector.doris.rest.model.Schema;
-import com.bytedance.bitsail.connector.doris.thrift.TScanBatchResult;
-import com.bytedance.bitsail.connector.doris.thrift.TScanCloseParams;
-import com.bytedance.bitsail.connector.doris.thrift.TScanColumnDesc;
-import com.bytedance.bitsail.connector.doris.thrift.TScanNextBatchParams;
-import com.bytedance.bitsail.connector.doris.thrift.TScanOpenParams;
-import com.bytedance.bitsail.connector.doris.thrift.TScanOpenResult;
 
+import org.apache.doris.sdk.thrift.TScanBatchResult;
+import org.apache.doris.sdk.thrift.TScanCloseParams;
+import org.apache.doris.sdk.thrift.TScanColumnDesc;
+import org.apache.doris.sdk.thrift.TScanNextBatchParams;
+import org.apache.doris.sdk.thrift.TScanOpenParams;
+import org.apache.doris.sdk.thrift.TScanOpenResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

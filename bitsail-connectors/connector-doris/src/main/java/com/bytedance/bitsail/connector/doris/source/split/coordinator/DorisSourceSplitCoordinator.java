@@ -118,7 +118,7 @@ public class DorisSourceSplitCoordinator implements SourceSplitCoordinator<Doris
   }
 
   @Override
-  public EmptyState snapshotState() throws Exception {
+  public EmptyState snapshotState(long checkpoint) throws Exception {
     return new EmptyState();
   }
 

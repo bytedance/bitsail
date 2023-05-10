@@ -20,15 +20,16 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.connector.doris.backend.model.Routing;
 import com.bytedance.bitsail.connector.doris.config.DorisExecutionOptions;
 import com.bytedance.bitsail.connector.doris.error.DorisErrorCode;
-import com.bytedance.bitsail.connector.doris.thrift.TDorisExternalService;
-import com.bytedance.bitsail.connector.doris.thrift.TScanBatchResult;
-import com.bytedance.bitsail.connector.doris.thrift.TScanCloseParams;
-import com.bytedance.bitsail.connector.doris.thrift.TScanCloseResult;
-import com.bytedance.bitsail.connector.doris.thrift.TScanNextBatchParams;
-import com.bytedance.bitsail.connector.doris.thrift.TScanOpenParams;
-import com.bytedance.bitsail.connector.doris.thrift.TScanOpenResult;
-import com.bytedance.bitsail.connector.doris.thrift.TStatusCode;
 
+import org.apache.doris.sdk.thrift.TDorisExternalService;
+import org.apache.doris.sdk.thrift.TScanBatchResult;
+import org.apache.doris.sdk.thrift.TScanCloseParams;
+import org.apache.doris.sdk.thrift.TScanCloseResult;
+import org.apache.doris.sdk.thrift.TScanNextBatchParams;
+import org.apache.doris.sdk.thrift.TScanOpenParams;
+import org.apache.doris.sdk.thrift.TScanOpenResult;
+import org.apache.doris.sdk.thrift.TStatusCode;
+import org.apache.thrift.TConfiguration;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -66,15 +67,15 @@ public class BackendClient {
     TException ex = null;
     for (int attempt = 0; !isConnected && attempt < retries; ++attempt) {
       LOGGER.debug("Attempt {} to connect {}.", attempt, routing);
-      TBinaryProtocol.Factory factory = new TBinaryProtocol.Factory();
-      transport = new TSocket(routing.getHost(), routing.getPort(), socketTimeout, connectTimeout);
-      TProtocol protocol = factory.getProtocol(transport);
-      client = new TDorisExternalService.Client(protocol);
-      if (isConnected) {
-        LOGGER.info("Success connect to {}.", routing);
-        return;
-      }
       try {
+        TBinaryProtocol.Factory factory = new TBinaryProtocol.Factory();
+        transport = new TSocket(new TConfiguration(), routing.getHost(), routing.getPort(), socketTimeout, connectTimeout);
+        TProtocol protocol = factory.getProtocol(transport);
+        client = new TDorisExternalService.Client(protocol);
+        if (isConnected) {
+          LOGGER.info("Success connect to {}.", routing);
+          return;
+        }
         LOGGER.trace("Connect status before open transport to {} is '{}'.", routing, isConnected);
         if (!transport.isOpen()) {
           transport.open();

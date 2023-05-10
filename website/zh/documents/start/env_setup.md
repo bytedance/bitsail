@@ -15,34 +15,7 @@ order: 2
 - JDK1.8
 - maven 3.6+
 - [Docker desktop](https://www.docker.com/products/docker-desktop/)
-- thrift
-```bash
-安装 thrift
-  Windows:
-    1.下载：`http://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.exe`(下载目录自己指定)
-    2.修改thrift-0.13.0.exe 为 thrift
 
-  MacOS:
-    1. 下载：`brew install thrift@0.13.0`
-    2. 默认下载地址：/opt/homebrew/Cellar/thrift@0.13.0/0.13.0/bin/thrift
-
-    注：MacOS执行 `brew install thrift@0.13.0` 可能会报找不到版本的错误，解决方法如下，在终端执行：
-      1. `brew tap-new $USER/local-tap`
-      2. `brew extract --version='0.13.0' thrift $USER/local-tap`
-      3. `brew install thrift@0.13.0`
-      参考链接: `https://gist.github.com/tonydeng/02e571f273d6cce4230dc8d5f394493c`
-
-  Linux:
-    1.下载源码包：`wget https://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.tar.gz`
-    2.安装依赖：`yum install -y autoconf automake libtool cmake ncurses-devel openssl-devel lzo-devel zlib-devel gcc gcc-c++`
-    3.`tar zxvf thrift-0.13.0.tar.gz`
-    4.`cd thrift-0.13.0`
-    5.`./configure --without-tests`
-    6.`make`
-    7.`make install`
-    安装完成后查看版本：thrift --version
-    注：如果编译过Doris，则不需要安装thrift,可以直接使用 $DORIS_HOME/thirdparty/installed/bin/thrift
-```
 
 在安装上述必需组件后，您可以在本地的IDE上直接运行已有的集成测试。
 

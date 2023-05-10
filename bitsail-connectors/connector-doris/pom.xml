@@ -32,10 +32,16 @@
         <maven.compiler.target>8</maven.compiler.target>
         <mysql.version>5.1.49</mysql.version>
         <arrow.version>5.0.0</arrow.version>
-        <libthrift.version>0.13.0</libthrift.version>
+        <libthrift.version>0.16.0</libthrift.version>
+        <thrift-service.version>1.0.0</thrift-service.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.doris</groupId>
+            <artifactId>thrift-service</artifactId>
+            <version>${thrift-service.version}</version>
+        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -118,27 +124,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.thrift.tools</groupId>
-                <artifactId>maven-thrift-plugin</artifactId>
-                <version>0.1.11</version>
-                <configuration>
-                    <thriftExecutable>${thrift.binary}</thriftExecutable>
-                    <generator>java:fullcamel</generator>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>thrift-sources</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>

@@ -15,34 +15,6 @@ English | [简体中文](../../../zh/documents/start/env_setup.md)
 - JDK1.8
 - maven 3.6+
 - [Docker desktop](https://www.docker.com/products/docker-desktop/)
-- thrift
-```bash
-install thrift
-  Windows:
-    1. Download: `http://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.exe`
-    2. Modify thrift-0.13.0.exe to thrift 
- 
-  MacOS:
-    1. Download: `brew install thrift@0.13.0`
-    2. default address: /opt/homebrew/Cellar/thrift@0.13.0/0.13.0/bin/thrift
-
-    Note: Executing `brew install thrift@0.13.0` on MacOS may report an error that the version cannot be found. The solution is as follows, execute it in the terminal:
-      1. `brew tap-new $USER/local-tap`
-      2. `brew extract --version='0.13.0' thrift $USER/local-tap`
-      3. `brew install thrift@0.13.0`
-      Reference link: `https://gist.github.com/tonydeng/02e571f273d6cce4230dc8d5f394493c`
- 
-  Linux:
-    1.Download source package：`wget https://archive.apache.org/dist/thrift/0.13.0/thrift-0.13.0.tar.gz`
-    2.Install dependencies：`yum install -y autoconf automake libtool cmake ncurses-devel openssl-devel lzo-devel zlib-devel gcc gcc-c++`
-    3.`tar zxvf thrift-0.13.0.tar.gz`
-    4.`cd thrift-0.13.0`
-    5.`./configure --without-tests`
-    6.`make`
-    7.`make install`
-    Check the version after installation is complete：thrift --version
-    Note: If you have compiled Doris, you do not need to install thrift, you can directly use $DORIS_HOME/thirdparty/installed/bin/thrift
-```
 
 After correctly installing the above required components, we are able to run integration tests on your local IDE.
 

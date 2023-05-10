@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.doris.source;
+package com.bytedance.bitsail.test.integration.doris.source;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.doris.option.DorisReaderOptions;
-import com.bytedance.bitsail.test.connector.test.EmbeddedFlinkCluster;
-import com.bytedance.bitsail.test.connector.test.utils.JobConfUtils;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore
-public class DorisSourceITCase {
+public class DorisSourceITCase extends AbstractIntegrationTest {
 
   @Test
   public void test() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("doris_to_print.json");
     addDorisInfo(jobConf);
-    EmbeddedFlinkCluster.submitJob(jobConf);
+    submitJob(jobConf);
   }
 
   /**
@@ -46,8 +46,8 @@ public class DorisSourceITCase {
     jobConf.set(DorisReaderOptions.USER, "root");
     jobConf.set(DorisReaderOptions.PASSWORD, "");
     jobConf.set(DorisReaderOptions.DB_NAME, "test");
-    jobConf.set(DorisReaderOptions.TABLE_NAME, "doris_table");
-    jobConf.set(DorisReaderOptions.SQL_FILTER, "id=1");
+    jobConf.set(DorisReaderOptions.TABLE_NAME, "test_bitsail");
+//    jobConf.set(DorisReaderOptions.SQL_FILTER, "id=1");
   }
 
 }
