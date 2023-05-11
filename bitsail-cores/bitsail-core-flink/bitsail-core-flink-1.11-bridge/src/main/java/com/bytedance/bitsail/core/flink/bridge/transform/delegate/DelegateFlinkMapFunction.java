@@ -25,37 +25,45 @@ import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.TransformOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
-import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConvertSerializer;
+import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConverter;
 import com.bytedance.bitsail.flink.core.typeutils.AutoDetectFlinkTypeInfoUtil;
 import com.bytedance.bitsail.flink.core.typeutils.NativeFlinkTypeInfoUtil;
 
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.configuration.Configuration;
 
 import java.util.List;
 import java.util.Locale;
 
-public class DelegateFlinkMapFunction<I, O extends org.apache.flink.types.Row> implements MapFunction<I, O> {
+public class DelegateFlinkMapFunction<I, O extends org.apache.flink.types.Row> extends RichMapFunction<I, O> {
 
   private final BitSailMapFunction<com.bytedance.bitsail.common.row.Row, com.bytedance.bitsail.common.row.Row> realMapFunction;
 
-  private final FlinkRowConvertSerializer flinkRowConvertSerializer;
+  private final RowTypeInfo rowTypeInfo;
 
-  private final RowTypeInfo inputType;
+  private final BitSailConfiguration jobConf;
 
-  public DelegateFlinkMapFunction(BitSailConfiguration jobConf, TypeInformation<?> flinkTypes) {
-    this.inputType = AutoDetectFlinkTypeInfoUtil.bridgeRowTypeInfo((org.apache.flink.api.java.typeutils.RowTypeInfo) flinkTypes);
-    this.realMapFunction = createMapFunction(jobConf, inputType);
-    this.flinkRowConvertSerializer = new FlinkRowConvertSerializer(
-        this.inputType,
+  private transient FlinkRowConverter rowConverter;
+
+  public DelegateFlinkMapFunction(BitSailConfiguration jobConf, TypeInformation<?> inputRowTypeInfo) {
+    this.jobConf = jobConf;
+    this.rowTypeInfo = AutoDetectFlinkTypeInfoUtil.bridgeRowTypeInfo((org.apache.flink.api.java.typeutils.RowTypeInfo) inputRowTypeInfo);
+    this.realMapFunction = createMapFunction(jobConf, rowTypeInfo);
+  }
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+    this.rowConverter = new FlinkRowConverter(
+        rowTypeInfo,
         jobConf);
   }
 
   @Override
   public O map(I value) throws Exception {
     org.apache.flink.types.Row outputRow;
-    Row bitsailRow = flinkRowConvertSerializer.deserialize((org.apache.flink.types.Row) value);
-    outputRow = flinkRowConvertSerializer.serialize(this.realMapFunction.map(bitsailRow));
+    Row bitsailRow = rowConverter.from((org.apache.flink.types.Row) value);
+    outputRow = rowConverter.to(this.realMapFunction.map(bitsailRow));
     return (O) outputRow;
   }
 

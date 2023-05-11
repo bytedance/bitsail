@@ -27,19 +27,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.nio.charset.Charset;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,14 +43,10 @@ import static com.bytedance.bitsail.common.typeinfo.TypeInfos.STRING_TYPE_INFO;
 public class TypeInfoValueConverter implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(TypeInfoValueConverter.class);
 
-  private BitSailConfiguration commonConfiguration;
-  private DateTimeFormatter dateFormatter;
-  private DateTimeFormatter timeFormatter;
-  private DateTimeFormatter dateTimeFormatter;
-  private ZoneId timezone;
+  private TypeInfoCompatibles typeInfoCompatibles;
 
   public TypeInfoValueConverter(BitSailConfiguration commonConfiguration) {
-    this.commonConfiguration = commonConfiguration;
+    this.typeInfoCompatibles = new TypeInfoCompatibles(commonConfiguration);
   }
 
   /**
@@ -71,13 +58,15 @@ public class TypeInfoValueConverter implements Serializable {
     if (Objects.isNull(value)) {
       return null;
     }
+
     if (value instanceof Column) {
       return convertColumnObject((Column) value, typeInfo);
     }
+
     if (compareValueTypeInfo(value, typeInfo)) {
       return value;
     }
-    return convertNormalObject(value, typeInfo);
+    return convertJavaObject(value, typeInfo);
   }
 
   private Object convertColumnObject(Column value,
@@ -184,8 +173,8 @@ public class TypeInfoValueConverter implements Serializable {
   /**
    * Compare object's value type match with type info's definition or not.
    */
-  private boolean compareValueTypeInfo(Object value,
-                                       TypeInfo<?> typeInfo) {
+  private static boolean compareValueTypeInfo(Object value,
+                                              TypeInfo<?> typeInfo) {
     if (Objects.isNull(value)) {
       return true;
     }
@@ -229,7 +218,7 @@ public class TypeInfoValueConverter implements Serializable {
     return value.getClass().isAssignableFrom(typeInfo.getTypeClass());
   }
 
-  private Object convertNormalObject(Object value, TypeInfo<?> typeInfo) {
+  private Object convertJavaObject(Object value, TypeInfo<?> typeInfo) {
     if (Objects.isNull(value)) {
       return null;
     }
@@ -237,28 +226,28 @@ public class TypeInfoValueConverter implements Serializable {
     if (typeInfo instanceof MapTypeInfo) {
       if (!(value instanceof Map)) {
         throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-            "Object can't convert to map type.");
+            String.format("Type %s can't convert to map type.", value.getClass()));
       }
       MapTypeInfo<?, ?> mapTypeInfo = (MapTypeInfo<?, ?>) typeInfo;
-      Map<?, ?> raw = (Map<?, ?>) value;
-      Map<Object, Object> map = Maps.newHashMap();
-      for (Object key : raw.keySet()) {
-        map.put(convertNormalObject(key, mapTypeInfo.getKeyTypeInfo()),
-            convertNormalObject(raw.get(key), mapTypeInfo.getValueTypeInfo()));
+      Map<?, ?> origin = (Map<?, ?>) value;
+      Map<Object, Object> converted = Maps.newHashMap();
+      for (Object key : origin.keySet()) {
+        converted.put(convertJavaObject(key, mapTypeInfo.getKeyTypeInfo()),
+            convertJavaObject(origin.get(key), mapTypeInfo.getValueTypeInfo()));
       }
-      return map;
+      return converted;
     } else if (typeInfo instanceof ListTypeInfo) {
       if (!(value instanceof List)) {
         throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-            "Object can't convert to list type.");
+            String.format("Type %s can't convert to list type.", value.getClass()));
       }
       ListTypeInfo<?> listTypeInfo = (ListTypeInfo<?>) typeInfo;
-      List<?> raw = (List<?>) value;
-      List<Object> list = Lists.newArrayList();
-      for (Object key : raw) {
-        list.add(convertNormalObject(key, listTypeInfo.getElementTypeInfo()));
+      List<?> origin = (List<?>) value;
+      List<Object> converted = Lists.newArrayList();
+      for (Object key : origin) {
+        converted.add(convertJavaObject(key, listTypeInfo.getElementTypeInfo()));
       }
-      return list;
+      return converted;
 
     } else {
       return convertPrimitiveObject(value, typeInfo);
@@ -274,173 +263,14 @@ public class TypeInfoValueConverter implements Serializable {
       return null;
     }
 
-    Class<?> typeInfoTypeClass = typeInfo.getTypeClass();
-
-    if (STRING_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      if (value instanceof byte[]) {
-        return new String((byte[]) value, Charset.defaultCharset());
-      }
-      return String.valueOf(value);
+    TypeInfo<?> valueTypeInfo = TypeInfoBridge.bridgeTypeClass(value.getClass());
+    if (value.getClass() == typeInfo.getTypeClass()) {
+      return value;
     }
 
-    if (TypeInfos.SHORT_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      if (value instanceof Number) {
-        return ((Number) value).shortValue();
-      }
-      return NumberUtils.createNumber(value.toString()).shortValue();
+    if (!(valueTypeInfo instanceof BasicTypeInfo)) {
+      return valueTypeInfo.compatibleTo(typeInfo, value);
     }
-
-    if (TypeInfos.INT_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      if (value instanceof Number) {
-        return ((Number) value).intValue();
-      }
-      return NumberUtils.createNumber(value.toString()).intValue();
-    }
-
-    if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      if (value instanceof Number) {
-        return ((Number) value).longValue();
-      }
-      return NumberUtils.createNumber(value.toString()).longValue();
-    }
-
-    if (TypeInfos.FLOAT_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      if (value instanceof Number) {
-        return ((Number) value).floatValue();
-      }
-      return NumberUtils.createNumber(value.toString()).floatValue();
-    }
-
-    if (TypeInfos.DOUBLE_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      if (value instanceof Number) {
-        return ((Number) value).doubleValue();
-      }
-      return NumberUtils.createNumber(value.toString()).doubleValue();
-    }
-
-    if (TypeInfos.BIG_INTEGER_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      if (value instanceof Number) {
-        return ((Number) value).intValue();
-      }
-      return new BigInteger(value.toString());
-    }
-
-    if (TypeInfos.BIG_DECIMAL_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      return new BigDecimal(value.toString());
-    }
-
-    if (TypeInfos.BOOLEAN_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      String str = value.toString();
-      return Boolean.parseBoolean(str);
-    }
-
-    if (TypeInfos.LOCAL_DATE_TIME_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      return convertLocalDateTime(value, typeInfo);
-    }
-
-    if (TypeInfos.LOCAL_DATE_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      return convertLocalDate(value, typeInfo);
-    }
-
-    if (TypeInfos.LOCAL_TIME_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      return convertLocalTime(value, typeInfo);
-    }
-
-    if (TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      return convertSqlTimestamp(value, typeInfo);
-    }
-
-    if (TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      return convertSqlDate(value, typeInfo);
-    }
-
-    if (TypeInfos.SQL_TIME_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      return convertSqlTime(value, typeInfo);
-    }
-
-    if (BasicArrayTypeInfo.BINARY_TYPE_INFO.getTypeClass() == typeInfoTypeClass) {
-      if (value instanceof byte[]) {
-        return (byte[]) value;
-      }
-    }
-
-    throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-        String.format("Value %s can't convert into type info %s.", value, typeInfo));
+    return typeInfoCompatibles.compatibleTo(valueTypeInfo, typeInfo, value);
   }
-
-  private Object convertSqlTime(Object value, TypeInfo<?> typeInfo) {
-    return null;
-  }
-
-  private Object convertSqlDate(Object value, TypeInfo<?> typeInfo) {
-    return null;
-  }
-
-  private Object convertSqlTimestamp(Object value, TypeInfo<?> typeInfo) {
-    return null;
-  }
-
-  private Object convertLocalTime(Object value, TypeInfo<?> typeInfo) {
-    if (value instanceof LocalTime) {
-      return (LocalTime) value;
-    }
-    if (value instanceof LocalDateTime) {
-      return ((LocalDateTime) value).toLocalTime();
-    }
-    if (value instanceof String) {
-      //convert string to local date time.
-      try {
-        return LocalTime.parse(value.toString(), timeFormatter);
-      } catch (Exception e) {
-        LOG.debug("Value {} can't convert to local time.", value);
-        throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-            String.format("Value %s can't convert into type info %s.", value, typeInfo));
-      }
-    }
-    throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-        String.format("Value %s can't convert into type info %s.", value, typeInfo));
-  }
-
-  private Object convertLocalDate(Object value, TypeInfo<?> typeInfo) {
-    if (value instanceof LocalDateTime) {
-      return ((LocalDateTime) value).toLocalDate();
-    }
-    if (value instanceof LocalDate) {
-      return (LocalDate) value;
-    }
-    if (value instanceof String) {
-      //convert string to local date time.
-      try {
-        return LocalDate.parse(value.toString(), dateFormatter);
-      } catch (Exception e) {
-        LOG.debug("Value {} can't convert to local date time.", value);
-        throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-            String.format("Value %s can't convert into type info %s.", value, typeInfo));
-      }
-    }
-    throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-        String.format("Value %s can't convert into type info %s.", value, typeInfo));
-  }
-
-  private Object convertLocalDateTime(Object value, TypeInfo<?> typeInfo) {
-    if (value instanceof LocalDateTime) {
-      return (LocalDateTime) value;
-    }
-    if (value instanceof LocalDate) {
-      return ((LocalDate) value).atStartOfDay();
-    }
-    if (value instanceof String) {
-      //convert string to local date time.
-      try {
-        return LocalDateTime.parse(value.toString(), dateTimeFormatter);
-      } catch (Exception e) {
-        LOG.debug("Value {} can't convert to local date time.", value);
-        throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-            String.format("Value %s can't convert into type info %s.", value, typeInfo));
-      }
-    }
-    throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-        String.format("Value %s can't convert into type info %s.", value, typeInfo));
-  }
-
 }

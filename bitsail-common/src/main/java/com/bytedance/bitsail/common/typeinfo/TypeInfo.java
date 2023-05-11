@@ -16,6 +16,9 @@
 
 package com.bytedance.bitsail.common.typeinfo;
 
+import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -41,5 +44,10 @@ public abstract class TypeInfo<T> implements Serializable {
 
   public void setTypeProperties(List<TypeProperty> typeProperties) {
 
+  }
+
+  public Object compatibleTo(TypeInfo<?> target, Object value) {
+    throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
+        String.format("Type %s can't bridged to target type info %s.", this, target));
   }
 }
