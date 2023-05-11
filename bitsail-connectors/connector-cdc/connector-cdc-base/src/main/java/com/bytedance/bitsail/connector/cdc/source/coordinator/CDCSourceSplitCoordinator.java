@@ -60,6 +60,7 @@ public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BaseCDC
   @Override
   public void start() {
     // do nothing
+    LOG.info("CDCSourceSplitCoordinator start");
   }
 
   @Override
@@ -78,6 +79,7 @@ public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BaseCDC
   @Override
   public void addSplitsBack(List<BaseCDCSplit> splits, int subtaskId) {
     // do nothing
+    LOG.info("Add split back for split {} for subtask {}", splits, subtaskId);
   }
 
   @Override
@@ -105,11 +107,12 @@ public class CDCSourceSplitCoordinator implements SourceSplitCoordinator<BaseCDC
   @Override
   public void notifyCheckpointComplete(long checkpointId) throws Exception {
     // do nothing
+    LOG.info("Checkpoint {} completed", checkpointId);
   }
 
   @Override
   public void close() {
-    LOG.info("Closing MysqlSourceSplitCoordinator");
+    LOG.info("Closing CDCSourceSplitCoordinator");
   }
 
   private BinlogSplit createBinlogSplit(BitSailConfiguration jobConf) {

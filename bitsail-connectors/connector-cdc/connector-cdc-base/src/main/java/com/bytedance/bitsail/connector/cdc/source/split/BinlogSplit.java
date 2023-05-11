@@ -59,9 +59,11 @@ public class BinlogSplit extends BaseCDCSplit {
 
   @Override
   public String toString() {
-    return String.format("Mysql split ID: %s, begin offset: %s, end offset: %s",
+    StringBuilder sb = new StringBuilder();
+    this.schemas.forEach((k, v) -> sb.append(k).append(":").append(v).append(","));
+    return String.format("Binlog split ID: %s, begin offset: %s, end offset: %s, schema: %s",
         this.splitId,
         this.beginOffset.toString(),
-        this.endOffset.toString());
+        this.endOffset.toString(), sb);
   }
 }

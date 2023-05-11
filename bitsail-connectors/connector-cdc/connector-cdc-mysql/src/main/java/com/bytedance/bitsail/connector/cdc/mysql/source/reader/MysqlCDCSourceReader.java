@@ -26,18 +26,23 @@ import com.bytedance.bitsail.connector.cdc.source.reader.BinlogSplitReader;
 import com.bytedance.bitsail.connector.cdc.source.split.BaseCDCSplit;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class MysqlCDCSourceReader extends BaseCDCSourceReader {
+  private static final Logger LOG = LoggerFactory.getLogger(MysqlCDCSourceReader.class);
 
-  public MysqlCDCSourceReader(BitSailConfiguration jobConf, Context readerContext) {
-    super(jobConf, readerContext);
+  public MysqlCDCSourceReader(BitSailConfiguration readerConf, BitSailConfiguration commonConf, Context readerContext) {
+    super(readerConf, commonConf, readerContext);
   }
 
   @Override
   public List<BaseCDCSplit> snapshotState(long checkpointId) {
+    LOG.info("SnapshotState on MysqlCDCSourceReader with checkpoint ID: " + checkpointId);
     // store the latest offset
     Map<String, String> readerOffset = this.reader.getOffset();
     BinlogOffset offset = DebeziumHelper.convertDbzOffsetToBinlogOffset(readerOffset);
@@ -45,11 +50,12 @@ public class MysqlCDCSourceReader extends BaseCDCSourceReader {
     //TODO: Store the schema each checkpoint
     BinlogSplit split = new BinlogSplit("binlog-0", offset, BinlogOffset.boundless());
     splits.add(split);
+    LOG.info("Snapshot binlog split: " + split);
     return splits;
   }
 
   @Override
   public BinlogSplitReader<Row> getReader() {
-    return new MysqlBinlogSplitReader(jobConf, readerContext.getIndexOfSubtask());
+    return new MysqlBinlogSplitReader(readerConf, readerContext.getIndexOfSubtask());
   }
 }

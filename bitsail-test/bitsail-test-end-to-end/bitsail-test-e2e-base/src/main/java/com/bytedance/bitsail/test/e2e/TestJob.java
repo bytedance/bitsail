@@ -230,7 +230,7 @@ public class TestJob implements AutoCloseable {
       try {
         validation.accept(sink);
       } catch (Exception e) {
-        throw BitSailException.asBitSailException(CommonErrorCode.VALIDATION_EXCEPTION, e);
+        throw BitSailException.asBitSailException(CommonErrorCode.TEST_VALIDATION_EXCEPTION, e);
       }
       LOG.info("Pass validation!");
     }

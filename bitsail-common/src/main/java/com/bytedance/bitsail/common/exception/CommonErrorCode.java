@@ -31,7 +31,10 @@ public enum CommonErrorCode implements ErrorCode {
   UNSUPPORTED_COLUMN_TYPE("Common-10", "Unsupported column type."),
   HDFS_EXCEPTION("Common-11", "HDFS error."),
   HIVE_METASTORE_EXCEPTION("Common-12", "Failed to connect to the hive metastore."),
-  VALIDATION_EXCEPTION("Common-13", "Failed to valid result after test.")
+  TEST_VALIDATION_EXCEPTION("Common-13", "Failed to valid result after test."),
+  TRANSFORM_ERROR("Common-14", "Transform error occur."),
+
+  DAG_VALIDATION_EXCEPTION("Common-15", "DAG validation error.")
   ;
 
   private final String code;

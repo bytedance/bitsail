@@ -17,17 +17,18 @@
 package com.bytedance.bitsail.common.configuration;
 
 import com.bytedance.bitsail.common.BitSailException;
-import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.exception.FrameworkErrorCode;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.ReaderOptions;
+import com.bytedance.bitsail.common.option.TransformOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
 
+import com.alibaba.fastjson.TypeReference;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +72,10 @@ public class ConfigParser {
     return conf.getConfiguration(ReaderOptions.JOB_READER).clone();
   }
 
+  public static BitSailConfiguration getTransformConf(BitSailConfiguration conf) {
+    return conf.getConfiguration(TransformOptions.JOB_TRANSFORM).clone();
+  }
+
   public static BitSailConfiguration getOutputConf(BitSailConfiguration conf) {
     return conf.getConfiguration(WriterOptions.JOB_WRITER).clone();
   }
@@ -93,25 +98,37 @@ public class ConfigParser {
   }
 
   public static List<BitSailConfiguration> getInputConfList(BitSailConfiguration conf) {
-    if (conf.fieldExists(ReaderOptions.READER_CONFIG_LIST)) {
-      return getConfList(conf, ReaderOptions.READER_CONFIG_LIST);
+    if (conf.isList(ReaderOptions.JOB_READER)) {
+      return getConfList(conf, ReaderOptions.JOB_READER, ReaderOptions.READER_PREFIX);
     }
     return Arrays.asList(getInputConf(conf));
   }
 
+  public static List<BitSailConfiguration> getTransformConfList(BitSailConfiguration conf) {
+    if (conf.fieldExists(TransformOptions.JOB_TRANSFORM)) {
+      if (conf.isList(TransformOptions.JOB_TRANSFORM)) {
+        return getConfList(conf, TransformOptions.JOB_TRANSFORM, TransformOptions.TRANSFORM_PREFIX);
+      } else {
+        return Arrays.asList(getTransformConf(conf));
+      }
+    }
+    return new ArrayList<>();
+  }
+
   public static List<BitSailConfiguration> getOutputConfList(BitSailConfiguration conf) {
-    if (conf.fieldExists(WriterOptions.WRITER_CONFIG_LIST)) {
-      return getConfList(conf, WriterOptions.WRITER_CONFIG_LIST);
+    if (conf.isList(WriterOptions.JOB_WRITER)) {
+      return getConfList(conf, WriterOptions.JOB_WRITER, WriterOptions.WRITER_PREFIX);
     }
     return Arrays.asList(getOutputConf(conf));
   }
 
   private static List<BitSailConfiguration> getConfList(BitSailConfiguration conf,
-                                                        ConfigOption<List<Map<String, Object>>> option) {
-    List<Map<String, Object>> subConfMapList = conf.getNecessaryOption(option, CommonErrorCode.CONFIG_ERROR);
+                                                        String path,
+                                                        String prefix) {
+    List<Map<String, Object>> subConfMapList = conf.getObject(path, new TypeReference<List<Map<String, Object>>>() {});
     return subConfMapList.stream().map(subConfMap -> {
       BitSailConfiguration subConf = BitSailConfiguration.newDefault();
-      subConfMap.forEach(subConf::set);
+      subConfMap.forEach((k, v) -> subConf.set(prefix + k, v));
       return subConf;
     }).collect(Collectors.toList());
   }
