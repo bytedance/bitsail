@@ -108,12 +108,23 @@ public class TypeInfoCompatibles implements Serializable {
         (value) -> ((LocalDateTime) value).atZone(dateTimeZone)
             .toInstant().toEpochMilli()
     );
+
+    compatibles.put(TypeInfos.LOCAL_DATE_TIME_TYPE_INFO,
+        TypeInfos.SQL_TIMESTAMP_TYPE_INFO,
+        //TODO check time zone.
+        (value) -> Timestamp.valueOf((LocalDateTime) value)
+    );
   }
 
   private void addLocalTimeTypeInfoCompatibles() {
     compatibles.put(TypeInfos.LOCAL_TIME_TYPE_INFO,
         TypeInfos.STRING_TYPE_INFO,
         (value) -> ((LocalTime) value).format(timeFormatter)
+    );
+
+    compatibles.put(TypeInfos.LOCAL_TIME_TYPE_INFO,
+        TypeInfos.SQL_TIME_TYPE_INFO,
+        (value) -> Time.valueOf((LocalTime) value)
     );
   }
 
@@ -122,6 +133,11 @@ public class TypeInfoCompatibles implements Serializable {
         TypeInfos.STRING_TYPE_INFO,
         (value) -> ((LocalDate) value).format(dateFormatter)
     );
+
+    compatibles.put(TypeInfos.LOCAL_DATE_TYPE_INFO,
+        TypeInfos.SQL_DATE_TYPE_INFO,
+        (value) -> Date.valueOf((LocalDate) value)
+    );
   }
 
   private void addSqlTimestampTypeInfoCompatibles() {
@@ -129,6 +145,28 @@ public class TypeInfoCompatibles implements Serializable {
     compatibles.put(TypeInfos.SQL_TIMESTAMP_TYPE_INFO,
         TypeInfos.LOCAL_DATE_TIME_TYPE_INFO,
         (value) -> ((Timestamp) value).toLocalDateTime()
+    );
+
+    compatibles.put(TypeInfos.SQL_TIMESTAMP_TYPE_INFO,
+        TypeInfos.LOCAL_DATE_TYPE_INFO,
+        new Function<Object, Object>() {
+          @Override
+          public Object apply(Object value) {
+            return ((LocalDateTime) compatibles.get(TypeInfos.SQL_TIMESTAMP_TYPE_INFO, TypeInfos.LOCAL_DATE_TIME_TYPE_INFO)
+                .apply(value)).toLocalDate();
+          }
+        }
+    );
+
+    compatibles.put(TypeInfos.SQL_TIMESTAMP_TYPE_INFO,
+        TypeInfos.LOCAL_TIME_TYPE_INFO,
+        new Function<Object, Object>() {
+          @Override
+          public Object apply(Object value) {
+            return ((LocalDateTime) compatibles.get(TypeInfos.SQL_TIMESTAMP_TYPE_INFO, TypeInfos.LOCAL_DATE_TIME_TYPE_INFO)
+                .apply(value)).toLocalTime();
+          }
+        }
     );
 
     compatibles.put(TypeInfos.SQL_TIMESTAMP_TYPE_INFO,
@@ -154,6 +192,10 @@ public class TypeInfoCompatibles implements Serializable {
         new Function<Object, Object>() {
           @Override
           public Object apply(Object value) {
+            if (value instanceof java.sql.Time) {
+              return ((java.sql.Time) value).toLocalTime();
+            }
+            //todo check
             java.util.Date date = (java.util.Date) value;
             return Instant.ofEpochMilli(date.getTime())
                 .atZone(dateTimeZone)
@@ -185,6 +227,10 @@ public class TypeInfoCompatibles implements Serializable {
         new Function<Object, Object>() {
           @Override
           public Object apply(Object value) {
+            if (value instanceof java.sql.Date) {
+              return ((java.sql.Date) value).toLocalDate();
+            }
+            //todo check
             java.util.Date date = (java.util.Date) value;
             return Instant.ofEpochMilli(date.getTime())
                 .atZone(dateTimeZone)
@@ -453,6 +499,16 @@ public class TypeInfoCompatibles implements Serializable {
         (value) -> ((BigDecimal) value).toString()
     );
 
+    compatibles.put(TypeInfos.BIG_DECIMAL_TYPE_INFO,
+        TypeInfos.DOUBLE_TYPE_INFO,
+        (value) -> ((BigDecimal) value).doubleValue()
+    );
+
+    compatibles.put(TypeInfos.BIG_DECIMAL_TYPE_INFO,
+        TypeInfos.FLOAT_TYPE_INFO,
+        (value) -> ((BigDecimal) value).floatValue()
+    );
+
     compatibles.put(TypeInfos.BIG_INTEGER_TYPE_INFO,
         TypeInfos.STRING_TYPE_INFO,
         (value) -> ((BigInteger) value).toString()
@@ -463,27 +519,26 @@ public class TypeInfoCompatibles implements Serializable {
         (value) -> ((Float) value).toString()
     );
 
-    //TODO in future, will be removed. float -> big decimal
     compatibles.put(TypeInfos.FLOAT_TYPE_INFO,
         TypeInfos.BIG_DECIMAL_TYPE_INFO,
         new Function<Object, Object>() {
           @Override
           public Object apply(Object value) {
-
-            try {
-              return BigDecimal.valueOf(((Float) value).doubleValue());
-            } catch (NumberFormatException e) {
-              throw BitSailException.asBitSailException(
-                  CommonErrorCode.CONVERT_NOT_SUPPORT,
-                  String.format("float [%s] can't convert to big decimal.", value));
-            }
+            return new BigDecimal((String) compatibles.get(TypeInfos.FLOAT_TYPE_INFO, TypeInfos.STRING_TYPE_INFO)
+                .apply(value));
           }
         }
     );
 
     compatibles.put(TypeInfos.FLOAT_TYPE_INFO,
         TypeInfos.DOUBLE_TYPE_INFO,
-        (value) -> ((Float) value).doubleValue()
+        new Function<Object, Object>() {
+          @Override
+          public Object apply(Object value) {
+            return Double.valueOf((String) compatibles.get(TypeInfos.FLOAT_TYPE_INFO, TypeInfos.STRING_TYPE_INFO)
+                .apply(value));
+          }
+        }
     );
 
     //TODO in future, will be removed. float -> long
@@ -494,7 +549,7 @@ public class TypeInfoCompatibles implements Serializable {
 
     compatibles.put(TypeInfos.DOUBLE_TYPE_INFO,
         TypeInfos.STRING_TYPE_INFO,
-        (value) -> ((Float) value).toString()
+        (value) -> ((Double) value).toString()
     );
 
     compatibles.put(TypeInfos.DOUBLE_TYPE_INFO,

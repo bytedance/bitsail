@@ -20,6 +20,7 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Primitives;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -96,6 +97,9 @@ public class TypeInfoBridge {
   public static TypeInfo<?> bridgeTypeClass(Class<?> clazz) {
     if (Objects.isNull(clazz)) {
       return TypeInfos.VOID_TYPE_INFO;
+    }
+    if (clazz.isPrimitive()) {
+      clazz = Primitives.wrap(clazz);
     }
     TypeInfo<?> typeInfo = TYPE_INFO_CLASS_MAPPING.get(clazz);
     if (Objects.nonNull(typeInfo)) {
