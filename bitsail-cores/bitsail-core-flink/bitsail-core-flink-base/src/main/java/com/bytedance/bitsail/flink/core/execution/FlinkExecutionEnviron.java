@@ -261,7 +261,7 @@ public class FlinkExecutionEnviron extends ExecutionEnviron {
     DataStream<T> transformStream = unionStream;
     for (int i = 0; i < transformDAGBuilders.size(); ++i) {
       FlinkDataTransformDAGBuilder<T> flinkDataTransformDAGBuilder = (FlinkDataTransformDAGBuilder<T>) transformDAGBuilders.get(i);
-      transformStream = flinkDataTransformDAGBuilder.addTransformer(transformStream);
+      transformStream = flinkDataTransformDAGBuilder.addTransformer(transformStream, transformStream.getParallelism());
     }
 
     for (int i = 0; i < writerBuilders.size(); ++i) {

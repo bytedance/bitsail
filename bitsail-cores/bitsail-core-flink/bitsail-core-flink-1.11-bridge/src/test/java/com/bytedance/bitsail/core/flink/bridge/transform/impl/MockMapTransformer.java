@@ -14,20 +14,31 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.base.connector.transform.v1;
+package com.bytedance.bitsail.core.flink.bridge.transform.impl;
 
+import com.bytedance.bitsail.base.connector.transform.v1.MapTransformer;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 
-import java.io.Serializable;
+public class MockMapTransformer implements MapTransformer<Row> {
+  @Override
+  public Row map(Row element) {
+    return element;
+  }
 
-/**
- * Interface of BitSail map function.
- * @param <I>
- * @param <O>
- */
-public interface BitSailMapFunction<I, O> extends Serializable {
+  @Override
+  public void configure(BitSailConfiguration commonConfiguration, BitSailConfiguration transformConfiguration) {
 
-  O map(I input) throws Exception;
+  }
 
-  RowTypeInfo getOutputType();
+  @Override
+  public void setTypeInfo(RowTypeInfo rowTypeInfo) {
+
+  }
+
+  @Override
+  public String getComponentName() {
+    return "MockMapTransformer";
+  }
 }

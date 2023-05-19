@@ -22,6 +22,6 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 
 public abstract class FlinkDataTransformDAGBuilder<T> implements DataTransformDAGBuilder {
 
-  public abstract DataStream<T> addTransformer(DataStream<T> source);
+  public abstract DataStream<T> addTransformer(DataStream<T> source, int adviceParallelism);
 
 }

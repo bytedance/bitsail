@@ -21,6 +21,7 @@ import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.exception.ErrorCode;
 import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.util.FastJsonUtil;
+import com.bytedance.bitsail.common.util.JsonSerializer;
 import com.bytedance.bitsail.common.util.StrUtil;
 
 import com.alibaba.fastjson.JSON;
@@ -217,6 +218,14 @@ public class BitSailConfiguration implements Serializable {
     subConf.setObject(path, extractConfiguration(result));
 
     return subConf;
+  }
+
+  public BitSailConfiguration getSubConfiguration(final String path) {
+    checkPath(path);
+
+    Object result = this.get(path);
+
+    return BitSailConfiguration.from(JsonSerializer.serialize(extractConfiguration(result)));
   }
 
   public String getString(final String path) {

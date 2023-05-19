@@ -14,21 +14,16 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.base.connector.transform.v1;
+package com.bytedance.bitsail.transforms.partition.field;
 
-import java.io.Serializable;
+import com.bytedance.bitsail.common.option.ConfigOption;
+import com.bytedance.bitsail.common.option.TransformOptions;
 
-/**
- * Interface of BitSail partitioner.
- * @param <K>
- */
-public interface BitSailPartitioner<K> extends Serializable {
-  /**
-   * Computes the partition for the given key.
-   *
-   * @param key The key.
-   * @param totalPartitions The total number of downstream partition.
-   * @return The partition of this key.
-   */
-  int partition(K key, int totalPartitions);
+import static com.bytedance.bitsail.common.option.ConfigOptions.key;
+
+public interface FieldBaseOptions extends TransformOptions {
+
+  ConfigOption<String> FIELD_NAME =
+      key("field_name")
+          .noDefaultValue(String.class);
 }

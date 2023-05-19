@@ -14,22 +14,23 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.core.flink.bridge.transform.delegate;
+package com.bytedance.bitsail.base.connector.transform.v1;
 
-import com.bytedance.bitsail.base.connector.transform.v1.PartitionTransformer;
+import com.bytedance.bitsail.base.extension.Component;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 
-import org.apache.flink.api.common.functions.Partitioner;
+import java.io.Serializable;
 
-public class DelegateFlinkPartitioner<K> implements Partitioner<K> {
-  private final PartitionTransformer<?, K> partitionTransformer;
+public interface Transformer extends Serializable, Component {
 
-  public DelegateFlinkPartitioner(PartitionTransformer<?, K> partitionTransformer) {
-    this.partitionTransformer = partitionTransformer;
+  void configure(BitSailConfiguration commonConfiguration,
+                 BitSailConfiguration transformConfiguration);
+
+
+  default void open() {
 
   }
 
-  @Override
-  public int partition(K key, int numPartitions) {
-    return partitionTransformer.partition(key, numPartitions);
-  }
+  void setTypeInfo(RowTypeInfo rowTypeInfo);
 }

@@ -16,20 +16,9 @@
 
 package com.bytedance.bitsail.base.connector.transform.v1;
 
-import static java.lang.Math.abs;
+import com.bytedance.bitsail.common.row.Row;
 
-/**
- * Partitioner that call toString then hashCode method to calculate the partition of a given key.
- * @param <K>
- */
-public class SimpleHashCodePartitioner<K> implements BitSailPartitioner<K> {
-  private static final long serialVersionUID = 1L;
-  public SimpleHashCodePartitioner() {
+public interface MapTransformer<T extends Row> extends Transformer {
 
-  }
-
-  @Override
-  public int partition(K key, int totalPartitions) {
-    return abs(key.toString().hashCode()) % totalPartitions;
-  }
+  T map(T element);
 }
