@@ -25,21 +25,21 @@ import java.io.Serializable;
 @Builder
 public class CatalogTable implements Serializable {
 
-  private CatalogTableDefinition catalogTableDefinition;
+  private TableId tableId;
 
   private final CatalogTableSchema catalogTableSchema;
 
   private final String comment;
 
-  public CatalogTable(CatalogTableDefinition catalogTableDefinition,
+  public CatalogTable(TableId tableId,
                       CatalogTableSchema catalogTableSchema) {
-    this(catalogTableDefinition, catalogTableSchema, null);
+    this(tableId, catalogTableSchema, null);
   }
 
-  public CatalogTable(CatalogTableDefinition catalogTableDefinition,
+  public CatalogTable(TableId tableId,
                       CatalogTableSchema catalogTableSchema,
                       String comment) {
-    this.catalogTableDefinition = catalogTableDefinition;
+    this.tableId = tableId;
     this.catalogTableSchema = catalogTableSchema;
     this.comment = comment;
   }
@@ -47,7 +47,7 @@ public class CatalogTable implements Serializable {
   @Override
   public String toString() {
     return "CatalogTable{" +
-        "catalogTableDefinition=" + catalogTableDefinition +
+        "catalogTableDefinition=" + tableId +
         ", catalogTableSchema=" + catalogTableSchema +
         ", comment='" + comment + '\'' +
         '}';

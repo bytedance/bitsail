@@ -16,7 +16,10 @@
 
 package com.bytedance.bitsail.test.integration.cdc.mysql;
 
+import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.component.format.debezium.DebeziumDeserializationSchema;
+import com.bytedance.bitsail.component.format.debezium.DebeziumJsonDeserializationSchema;
 import com.bytedance.bitsail.connector.cdc.model.ClusterInfo;
 import com.bytedance.bitsail.connector.cdc.model.ConnectionInfo;
 import com.bytedance.bitsail.connector.cdc.mysql.source.debezium.MysqlBinlogSplitReader;
@@ -25,6 +28,7 @@ import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 import com.bytedance.bitsail.test.integration.cdc.mysql.container.MySQLContainerMariadbAdapter;
 import com.bytedance.bitsail.test.integration.cdc.mysql.container.util.TestDatabase;
+import com.bytedance.bitsail.test.integration.cdc.mysql.context.SourceMockContext;
 
 import com.google.common.collect.Lists;
 import org.junit.After;
@@ -50,6 +54,8 @@ public class MysqlBinlogSplitReaderContainerITCase {
   private static final String TEST_DATABASE = "test";
 
   private MySQLContainer<?> container;
+  private DebeziumDeserializationSchema deserializationSchema;
+  private SourceReader.Context context;
 
   @Before
   public void before() {
@@ -63,6 +69,8 @@ public class MysqlBinlogSplitReaderContainerITCase {
         .withLogConsumer(new Slf4jLogConsumer(LOG));
     //container.addParameter("MY_CNF", "container/my.cnf");
 
+    deserializationSchema = new DebeziumJsonDeserializationSchema(BitSailConfiguration.newDefault());
+    context = new SourceMockContext(0, deserializationSchema.getProducedType());
     Startables.deepStart(Stream.of(container)).join();
   }
 
@@ -101,7 +109,7 @@ public class MysqlBinlogSplitReaderContainerITCase {
     jobConf.set("job.reader.debezium.schema.history.internal", "io.debezium.relational.history.MemorySchemaHistory");
     jobConf.set("job.reader.debezium.database.history", "io.debezium.relational.history.MemoryDatabaseHistory");
 
-    MysqlBinlogSplitReader reader = new MysqlBinlogSplitReader(jobConf, 0);
+    MysqlBinlogSplitReader reader = new MysqlBinlogSplitReader(jobConf, context, deserializationSchema);
     BinlogSplit split = new BinlogSplit("split-1", BinlogOffset.earliest(), BinlogOffset.boundless());
     reader.readSplit(split);
     int maxPeriod = 0;

@@ -64,6 +64,12 @@
                     <artifactId>bitsail-core-flink-1.11-bridge</artifactId>
                     <version>${revision}</version>
                     <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>com.bytedance.bitsail</groupId>
+                            <artifactId>bitsail-core-common</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
             </dependencies>
         </profile>

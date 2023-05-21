@@ -16,9 +16,9 @@
 
 package com.bytedance.bitsail.common.catalog;
 
-import com.bytedance.bitsail.common.catalog.fake.FakeTableCatalog;
+import com.bytedance.bitsail.common.catalog.fake.FakeCatalog;
 import com.bytedance.bitsail.common.catalog.table.CatalogTableColumn;
-import com.bytedance.bitsail.common.catalog.table.CatalogTableDefinition;
+import com.bytedance.bitsail.common.catalog.table.TableId;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.ReaderOptions;
@@ -32,7 +32,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class TableCatalogManagerTest {
+public class CatalogManagerTest {
 
   private BitSailConfiguration commonConfiguration;
   private BitSailConfiguration readerConfiguration;
@@ -68,16 +68,16 @@ public class TableCatalogManagerTest {
     commonConfiguration.set(TableCatalogOptions.COLUMN_ALIGN_STRATEGY,
         TableCatalogStrategy.INTERSECT.name());
     commonConfiguration.set(TableCatalogOptions.SYNC_DDL, true);
-    FakeTableCatalog readerFakeTableCatalog = new FakeTableCatalog(readerColumns, CatalogTableDefinition.builder()
+    FakeCatalog readerFakeTableCatalog = new FakeCatalog(readerColumns, TableId.builder()
         .database("a")
         .table("b").build());
-    FakeTableCatalog writerFakeTableCatalog = new FakeTableCatalog(writerColumns, CatalogTableDefinition.builder()
+    FakeCatalog writerFakeTableCatalog = new FakeCatalog(writerColumns, TableId.builder()
         .database("a")
         .table("c").build());
 
     TableCatalogManager tableCatalogManager = TableCatalogManager.builder()
-        .readerTableCatalog(readerFakeTableCatalog)
-        .writerTableCatalog(writerFakeTableCatalog)
+        .readerCatalog(readerFakeTableCatalog)
+        .writerCatalog(writerFakeTableCatalog)
         .writerTypeInfoConverter(new BitSailTypeInfoConverter())
         .readerTypeInfoConverter(new BitSailTypeInfoConverter())
         .commonConfiguration(commonConfiguration)
@@ -117,16 +117,16 @@ public class TableCatalogManagerTest {
         TableCatalogStrategy.SOURCE_ONLY.name());
     commonConfiguration.set(TableCatalogOptions.SYNC_DDL, true);
 
-    FakeTableCatalog readerFakeTableCatalog = new FakeTableCatalog(readerColumns, CatalogTableDefinition.builder()
+    FakeCatalog readerFakeTableCatalog = new FakeCatalog(readerColumns, TableId.builder()
         .database("a")
         .table("b").build());
-    FakeTableCatalog writerFakeTableCatalog = new FakeTableCatalog(writerColumns, CatalogTableDefinition.builder()
+    FakeCatalog writerFakeTableCatalog = new FakeCatalog(writerColumns, TableId.builder()
         .database("a")
         .table("c").build());
 
     TableCatalogManager tableCatalogManager = TableCatalogManager.builder()
-        .readerTableCatalog(readerFakeTableCatalog)
-        .writerTableCatalog(writerFakeTableCatalog)
+        .readerCatalog(readerFakeTableCatalog)
+        .writerCatalog(writerFakeTableCatalog)
         .writerTypeInfoConverter(new BitSailTypeInfoConverter())
         .readerTypeInfoConverter(new BitSailTypeInfoConverter())
         .commonConfiguration(commonConfiguration)
@@ -167,16 +167,16 @@ public class TableCatalogManagerTest {
     commonConfiguration.set(TableCatalogOptions.COLUMN_ALIGN_STRATEGY, TableCatalogStrategy.SOURCE_ONLY.name());
     commonConfiguration.set(TableCatalogOptions.SYNC_DDL, true);
 
-    FakeTableCatalog readerFakeTableCatalog = new FakeTableCatalog(readerColumns, CatalogTableDefinition.builder()
+    FakeCatalog readerFakeTableCatalog = new FakeCatalog(readerColumns, TableId.builder()
         .database("a")
         .table("b").build());
-    FakeTableCatalog writerFakeTableCatalog = new FakeTableCatalog(writerColumns, CatalogTableDefinition.builder()
+    FakeCatalog writerFakeTableCatalog = new FakeCatalog(writerColumns, TableId.builder()
         .database("a")
         .table("c").build());
 
     TableCatalogManager tableCatalogManager = TableCatalogManager.builder()
-        .readerTableCatalog(readerFakeTableCatalog)
-        .writerTableCatalog(writerFakeTableCatalog)
+        .readerCatalog(readerFakeTableCatalog)
+        .writerCatalog(writerFakeTableCatalog)
         .writerTypeInfoConverter(new BitSailTypeInfoConverter())
         .readerTypeInfoConverter(new BitSailTypeInfoConverter())
         .commonConfiguration(commonConfiguration)

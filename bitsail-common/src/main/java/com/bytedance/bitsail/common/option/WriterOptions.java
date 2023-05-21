@@ -108,5 +108,13 @@ public interface WriterOptions {
     ConfigOption<String> WRITE_MODE =
         key(WRITER_PREFIX + "write_mode")
             .defaultValue("overwrite");
+
+    ConfigOption<Boolean> MULTIPLE_TABLE_ENABLED =
+        key(WRITER_PREFIX + "multiple_table_enabled")
+            .defaultValue(false);
+
+    ConfigOption<String> TABLE_PATTERN =
+        key(WRITER_PREFIX + "table_pattern")
+            .defaultValue(".*");
   }
 }

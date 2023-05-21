@@ -59,6 +59,9 @@ engine.type.to.bitsail.type.converter:
   - source.type: date
     target.type: date.date
 
+  - source.type: bit
+    target.type: byte
+
   - source.type: datetime
     target.type: date.datetime
 

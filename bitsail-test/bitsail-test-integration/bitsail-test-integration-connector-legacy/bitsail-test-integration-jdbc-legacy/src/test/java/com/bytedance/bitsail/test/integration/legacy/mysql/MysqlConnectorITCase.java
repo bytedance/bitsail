@@ -17,9 +17,9 @@
 package com.bytedance.bitsail.test.integration.legacy.mysql;
 
 import com.bytedance.bitsail.common.catalog.table.CatalogTable;
-import com.bytedance.bitsail.common.catalog.table.CatalogTableDefinition;
+import com.bytedance.bitsail.common.catalog.table.TableId;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.connector.legacy.jdbc.catalog.MySQLTableCatalog;
+import com.bytedance.bitsail.connector.legacy.jdbc.catalog.MySQLCatalog;
 import com.bytedance.bitsail.connector.legacy.jdbc.converter.JdbcTypeInfoConverter;
 import com.bytedance.bitsail.connector.legacy.jdbc.model.ClusterInfo;
 import com.bytedance.bitsail.connector.legacy.jdbc.model.ConnectionInfo;
@@ -110,7 +110,7 @@ public class MysqlConnectorITCase extends AbstractIntegrationTest {
 
   @Test
   public void testGetCatalogTable() {
-    MySQLTableCatalog catalog = MySQLTableCatalog
+    MySQLCatalog catalog = MySQLCatalog
         .builder()
         .url(mySQLContainer.getJdbcUrl())
         .table(TABLE)
@@ -121,7 +121,7 @@ public class MysqlConnectorITCase extends AbstractIntegrationTest {
 
     catalog.open(new JdbcTypeInfoConverter("mysql"));
 
-    CatalogTableDefinition catalogTableDefinition = catalog.createCatalogTableDefinition();
+    TableId catalogTableDefinition = catalog.createCatalogTableDefinition();
     CatalogTable catalogTable = catalog.getCatalogTable(catalogTableDefinition);
 
     Assert.assertNotNull(catalogTable.getCatalogTableSchema());

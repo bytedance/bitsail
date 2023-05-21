@@ -33,10 +33,11 @@ import org.slf4j.LoggerFactory;
 public class MysqlCDCSource extends BaseCDCSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(MysqlCDCSource.class);
+
   @Override
   public SourceReader<Row, BaseCDCSplit> createReader(SourceReader.Context readerContext) {
     LOG.info("Create Mysql CDC Source");
-    return new MysqlCDCSourceReader(readerConf, commonConf, readerContext);
+    return new MysqlCDCSourceReader(readerConf, commonConf, readerContext, deserializationSchema);
   }
 
   @Override
@@ -48,4 +49,5 @@ public class MysqlCDCSource extends BaseCDCSource {
   public String getReaderName() {
     return "mysql_cdc";
   }
+
 }
