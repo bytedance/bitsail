@@ -35,6 +35,11 @@ import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 /**
@@ -99,6 +104,33 @@ public abstract class AbstractIntegrationTest {
               throwableList.size(),
               throwableList.stream().map(p -> p.getFirst().name()).collect(Collectors.joining(", ")))
       );
+    }
+  }
+
+  /**
+   * Submit the job with execution timeout. For testing streaming job.
+   * @param jobConf
+   * @param execTimeout
+   * @throws Exception
+   */
+  public void submitJob(BitSailConfiguration jobConf, int execTimeout) throws Exception {
+    int exitCode;
+    ExecutorService service = Executors.newSingleThreadExecutor();
+    try {
+      Future<?> future = service.submit(
+          () -> {
+            try {
+                submitJob(jobConf);
+            } catch (Exception e) {
+              throw new RuntimeException(e);
+            }
+          });
+      future.get(execTimeout, TimeUnit.SECONDS);
+    } catch (TimeoutException te) {
+      LOG.info("Execute more than {} seconds, will terminate it.", execTimeout);
+    } catch (Exception e) {
+      LOG.error("Failed to execute job.", e);
+      throw e;
     }
   }
 
