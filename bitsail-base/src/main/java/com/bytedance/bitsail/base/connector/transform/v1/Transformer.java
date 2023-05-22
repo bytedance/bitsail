@@ -27,7 +27,6 @@ public interface Transformer extends Serializable, Component {
   void configure(BitSailConfiguration commonConfiguration,
                  BitSailConfiguration transformConfiguration);
 
-
   default void open() {
 
   }
