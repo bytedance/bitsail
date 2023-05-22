@@ -24,24 +24,11 @@
       ]
     },
     "transform": [
-        {
-          "transform_type": "partition_by",
-          "partition_column_name": "name",
-          "partitioner_type": "hash"
-        },
-        {
-          "transform_type": "map",
-          "map_function_type": "APPEND_STRING",
-          "append_string_columns": ["name"],
-          "append_string_values": [" is working"]
-        },
-        {
-          "transform_type": "map",
-          "map_function_type": "APPEND_STRING",
-          "append_string_columns": ["name"],
-          "append_string_values": [" at home"]
-        }
-      ],
+      {
+        "transform_name": "FieldBase",
+        "field_ame": "name"
+      }
+    ],
     "writer": {
       "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
       "content_type": "json",
