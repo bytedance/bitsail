@@ -35,9 +35,9 @@ import io.debezium.connector.mysql.MysqlTextProtocolFieldReader;
 import io.debezium.relational.Table;
 import io.debezium.relational.TableId;
 import io.debezium.relational.history.TableChanges;
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,10 +63,10 @@ public class MockConnectionsTest {
 
   private static final String TEST_USERNAME = "user1";
   private static final String TEST_PASSWORD = "password1";
-  private MySQLContainer<?> container;
+  private static MySQLContainer<?> container;
 
-  @Before
-  public void before() {
+  @BeforeClass
+  public static void before() {
     container = new MySQLContainerMariadbAdapter<>(DockerImageName.parse(MYSQL_DOCKER_IMAGER))
         .withUrlParam("permitMysqlScheme", null)
         .withInitScript("scripts/insert_test.sql")
@@ -77,8 +77,8 @@ public class MockConnectionsTest {
     Startables.deepStart(Stream.of(container)).join();
   }
 
-  @After
-  public void after() {
+  @AfterClass
+  public static void after() {
     container.close();
   }
 

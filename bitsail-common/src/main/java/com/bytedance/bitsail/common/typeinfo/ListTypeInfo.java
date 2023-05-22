@@ -16,6 +16,7 @@
 
 package com.bytedance.bitsail.common.typeinfo;
 
+import com.bytedance.bitsail.common.util.JsonSerializer;
 import com.bytedance.bitsail.common.util.Preconditions;
 
 import java.util.List;
@@ -50,6 +51,14 @@ public class ListTypeInfo<T> extends TypeInfo<List<T>> {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public Object compatibleTo(TypeInfo<?> target, Object value) {
+    if (TypeInfos.STRING_TYPE_INFO.getTypeClass() == target.getTypeClass()) {
+      return JsonSerializer.serialize(value);
+    }
+    return super.compatibleTo(target, value);
   }
 
   public TypeInfo<T> getElementTypeInfo() {

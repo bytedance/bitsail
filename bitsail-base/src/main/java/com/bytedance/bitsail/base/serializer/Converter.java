@@ -16,11 +16,15 @@
 
 package com.bytedance.bitsail.base.serializer;
 
-import com.bytedance.bitsail.common.row.Row;
+import java.io.IOException;
+import java.io.Serializable;
 
 /**
- * Created 2022/6/21
+ * Created 2022/6/14
  */
-public interface RowSerializer<Output> extends Serializer<Row, Output> {
+public interface Converter<SerializeT, DeserializeT> extends Serializable {
 
+  DeserializeT from(SerializeT obj) throws IOException;
+
+  SerializeT to(DeserializeT serialized) throws IOException;
 }

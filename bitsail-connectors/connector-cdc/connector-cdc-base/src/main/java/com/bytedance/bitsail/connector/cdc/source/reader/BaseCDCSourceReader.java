@@ -37,7 +37,9 @@ public abstract class BaseCDCSourceReader implements SourceReader<Row, BaseCDCSp
 
   private static final Logger LOG = LoggerFactory.getLogger(BaseCDCSourceReader.class);
 
-  protected BitSailConfiguration jobConf;
+  protected BitSailConfiguration readerConf;
+
+  protected BitSailConfiguration commonConf;
 
   protected Context readerContext;
 
@@ -49,13 +51,17 @@ public abstract class BaseCDCSourceReader implements SourceReader<Row, BaseCDCSp
 
   private boolean isStreaming;
 
-  public BaseCDCSourceReader(BitSailConfiguration jobConf, SourceReader.Context readerContext) {
-    this.jobConf = jobConf;
+  public BaseCDCSourceReader(BitSailConfiguration readerConf,
+                             BitSailConfiguration commonConf,
+                             SourceReader.Context readerContext) {
+    this.readerConf = readerConf;
+    this.commonConf = commonConf;
     this.readerContext = readerContext;
     this.remainSplits = new ArrayDeque<>();
     this.reader = getReader();
     this.splitSubmitted = false;
-    this.isStreaming = jobConf.get(CommonOptions.JOB_TYPE).equalsIgnoreCase("streaming");
+    this.isStreaming = commonConf.get(CommonOptions.JOB_TYPE).equalsIgnoreCase("streaming");
+    LOG.info("Is streaming task: " + isStreaming);
   }
 
   public abstract BinlogSplitReader<Row> getReader();

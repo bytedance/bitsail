@@ -20,8 +20,10 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Primitives;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -34,6 +36,9 @@ public class TypeInfoBridge {
       Maps.newHashMap();
 
   public static final Map<Class<?>, Types> TYPE_INFO_TYPES_MAPPING =
+      Maps.newHashMap();
+
+  public static final Map<Class<?>, TypeInfo<?>> TYPE_INFO_CLASS_MAPPING =
       Maps.newHashMap();
 
   static {
@@ -65,7 +70,11 @@ public class TypeInfoBridge {
             TYPE_INFO_MAPPING.get(type));
       }
       TYPE_INFO_TYPES_MAPPING.put(TYPE_INFO_MAPPING.get(type).getTypeClass(), type);
+      TYPE_INFO_CLASS_MAPPING.put(TYPE_INFO_MAPPING.get(type).getTypeClass(), TYPE_INFO_MAPPING.get(type));
     }
+
+    //Add extra java.util.date.
+    TYPE_INFO_CLASS_MAPPING.put(java.util.Date.class, TypeInfos.SQL_TIMESTAMP_TYPE_INFO);
   }
 
   public static TypeInfo<?> bridgeTypeInfo(String typeString) {
@@ -83,6 +92,27 @@ public class TypeInfoBridge {
     }
     throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,
         String.format("Not support bridge complex type info %s.", typeInfo));
+  }
+
+  public static TypeInfo<?> bridgeTypeClass(Class<?> clazz) {
+    if (Objects.isNull(clazz)) {
+      return TypeInfos.VOID_TYPE_INFO;
+    }
+    if (clazz.isPrimitive()) {
+      clazz = Primitives.wrap(clazz);
+    }
+    TypeInfo<?> typeInfo = TYPE_INFO_CLASS_MAPPING.get(clazz);
+    if (Objects.nonNull(typeInfo)) {
+      return typeInfo;
+    }
+    if (Map.class.isAssignableFrom(clazz)) {
+      return new MapTypeInfo<>(new GenericTypeInfo<>(Object.class), new GenericTypeInfo<>(Object.class));
+    }
+    if (List.class.isAssignableFrom(clazz)) {
+      return new ListTypeInfo<>(new GenericTypeInfo<>(Object.class));
+    }
+    throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,
+        String.format("Not support bridge type info from class %s", clazz));
   }
 
 }

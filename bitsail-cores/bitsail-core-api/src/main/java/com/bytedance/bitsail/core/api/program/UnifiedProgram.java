@@ -17,13 +17,15 @@
 package com.bytedance.bitsail.core.api.program;
 
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
-import com.bytedance.bitsail.base.connector.transformer.DataTransformDAGBuilder;
+import com.bytedance.bitsail.base.connector.transform.DataTransformDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.Mode;
 import com.bytedance.bitsail.base.packages.PluginFinder;
+import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.configuration.ConfigParser;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.core.api.command.CoreCommandArgs;
 import com.bytedance.bitsail.core.api.program.factory.ProgramDAGBuilderFactory;
@@ -39,6 +41,7 @@ public abstract class UnifiedProgram implements Program {
 
   private BitSailConfiguration globalConfiguration;
   private List<BitSailConfiguration> readerConfigurations;
+  private List<BitSailConfiguration> transformConfigurations;
   private List<BitSailConfiguration> writerConfigurations;
 
   private ExecutionEnviron execution;
@@ -50,9 +53,8 @@ public abstract class UnifiedProgram implements Program {
   private String jobName;
 
   private List<DataReaderDAGBuilder> dataReaderDAGBuilders = Lists.newArrayList();
-  private List<DataWriterDAGBuilder> dataWriterDAGBuilders = Lists.newArrayList();
   private List<DataTransformDAGBuilder> dataTransformDAGBuilders = Lists.newArrayList();
-
+  private List<DataWriterDAGBuilder> dataWriterDAGBuilders = Lists.newArrayList();
   @Override
   public void configure(PluginFinder pluginFinder,
                         BitSailConfiguration globalConfiguration,
@@ -80,6 +82,7 @@ public abstract class UnifiedProgram implements Program {
 
     this.globalConfiguration = globalConfiguration;
     this.readerConfigurations = execution.getReaderConfigurations();
+    this.transformConfigurations = execution.getTransformConfigurations();
     this.writerConfigurations = execution.getWriterConfigurations();
 
     prepare();
@@ -91,6 +94,11 @@ public abstract class UnifiedProgram implements Program {
     dataReaderDAGBuilders = programBuilderFactory
         .getDataReaderDAGBuilders(mode,
             readerConfigurations,
+            pluginFinder);
+
+    dataTransformDAGBuilders = programBuilderFactory
+        .getDataTransformDAGBuilders(mode,
+            transformConfigurations,
             pluginFinder);
 
     dataWriterDAGBuilders = programBuilderFactory
@@ -106,6 +114,11 @@ public abstract class UnifiedProgram implements Program {
 
   @Override
   public void submit() throws Exception {
+    try {
+      validate();
+    } catch (Exception e) {
+      throw BitSailException.asBitSailException(CommonErrorCode.DAG_VALIDATION_EXCEPTION, e);
+    }
     execution.run(dataReaderDAGBuilders,
         dataTransformDAGBuilders,
         dataWriterDAGBuilders);
@@ -116,6 +129,11 @@ public abstract class UnifiedProgram implements Program {
   public boolean validate() throws Exception {
     for (DataReaderDAGBuilder readerDAG : dataReaderDAGBuilders) {
       if (!readerDAG.validate()) {
+        return false;
+      }
+    }
+    for (DataTransformDAGBuilder transformDAG : dataTransformDAGBuilders) {
+      if (!transformDAG.validate()) {
         return false;
       }
     }

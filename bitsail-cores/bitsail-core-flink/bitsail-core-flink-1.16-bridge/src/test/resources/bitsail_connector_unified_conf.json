@@ -47,7 +47,37 @@
     },
     "writer": {
       "class": "com.bytedance.bitsail.connector.print.sink.PrintSink",
-      "writer_parallelism_num": 2
+      "writer_parallelism_num": 2,
+      "columns": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "local_date_value",
+          "type": "date"
+        },
+        {
+          "name": "list_value",
+          "type": "list<string>"
+        },
+        {
+          "name": "map_value",
+          "type": "map<string,string>"
+        },
+        {
+          "name": "localdatetime_value",
+          "type": "timestamp"
+        },
+        {
+          "name": "date_value",
+          "type": "date.date"
+        },
+        {
+          "name": "datetime_value",
+          "type": "date.datetime"
+        }
+      ]
     }
   }
 }

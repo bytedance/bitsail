@@ -24,14 +24,19 @@ import com.bytedance.bitsail.connector.cdc.source.BaseCDCSource;
 import com.bytedance.bitsail.connector.cdc.source.split.BaseCDCSplit;
 import com.bytedance.bitsail.connector.cdc.source.split.BaseSplitSerializer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Source to read mysql binlog.
  */
 public class MysqlCDCSource extends BaseCDCSource {
 
+  private static final Logger LOG = LoggerFactory.getLogger(MysqlCDCSource.class);
   @Override
   public SourceReader<Row, BaseCDCSplit> createReader(SourceReader.Context readerContext) {
-    return new MysqlCDCSourceReader(jobConf, readerContext);
+    LOG.info("Create Mysql CDC Source");
+    return new MysqlCDCSourceReader(readerConf, commonConf, readerContext);
   }
 
   @Override

@@ -27,7 +27,7 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConvertSerializer;
+import com.bytedance.bitsail.flink.core.delagate.converter.FlinkRowConverter;
 import com.bytedance.bitsail.flink.core.util.RowUtil;
 
 import org.apache.flink.api.connector.source.ReaderOutput;
@@ -44,7 +44,7 @@ public class DelegateSourcePipeline<T> implements SourcePipeline<T> {
   private final ReaderOutput<T> readerOutput;
 
   //todo flink row converter and watermark.
-  private final FlinkRowConvertSerializer flinkRowConvertSerializer;
+  private final FlinkRowConverter flinkRowConvertSerializer;
 
   private final AbstractDirtyCollector dirtyCollector;
 
@@ -57,7 +57,7 @@ public class DelegateSourcePipeline<T> implements SourcePipeline<T> {
   private Channel trafficLimiter;
 
   public DelegateSourcePipeline(ReaderOutput<T> readerOutput,
-                                FlinkRowConvertSerializer flinkRowConvertSerializer,
+                                FlinkRowConverter flinkRowConvertSerializer,
                                 MetricManager metricManager,
                                 Messenger messenger,
                                 AbstractDirtyCollector dirtyCollectorFactory,
@@ -81,7 +81,7 @@ public class DelegateSourcePipeline<T> implements SourcePipeline<T> {
   public void output(T record) throws IOException {
     org.apache.flink.types.Row serialize;
     try {
-      serialize = flinkRowConvertSerializer.serialize((Row) record);
+      serialize = flinkRowConvertSerializer.to((Row) record);
       long rowBytesSize = RowUtil.getRowBytesSize(serialize);
       messenger.addSuccessRecord(rowBytesSize);
       metricManager.reportRecord(rowBytesSize, MessageType.SUCCESS);

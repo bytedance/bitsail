@@ -18,6 +18,7 @@ package com.bytedance.bitsail.common.typeinfo;
 
 import com.bytedance.bitsail.common.util.Preconditions;
 
+import java.nio.charset.Charset;
 import java.util.Objects;
 
 public class BasicArrayTypeInfo<T> extends TypeInfo<T> {
@@ -50,6 +51,14 @@ public class BasicArrayTypeInfo<T> extends TypeInfo<T> {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public Object compatibleTo(TypeInfo<?> target, Object value) {
+    if (TypeInfos.STRING_TYPE_INFO.getTypeClass() == target.getTypeClass()) {
+      return new String((byte[]) value, Charset.defaultCharset());
+    }
+    return super.compatibleTo(target, value);
   }
 
   @Override

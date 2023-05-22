@@ -46,6 +46,7 @@
         <module>bitsail-test-integration-selectdb</module>
         <module>bitsail-test-integration-connector-legacy</module>
         <module>bitsail-test-integration-hbase</module>
+        <module>bitsail-test-integration-print</module>
     </modules>
 
     <properties>

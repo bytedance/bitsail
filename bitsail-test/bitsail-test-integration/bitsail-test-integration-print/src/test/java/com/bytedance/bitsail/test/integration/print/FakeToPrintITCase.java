@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.base.serializer;
+package com.bytedance.bitsail.test.integration.print;
 
-import java.io.IOException;
-import java.io.Serializable;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
+import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
-/**
- * Created 2022/6/14
- */
-public interface Serializer<SerializeT, DeserializeT> extends Serializable {
+import org.junit.Test;
 
-  DeserializeT serialize(SerializeT obj) throws IOException;
+public class FakeToPrintITCase extends AbstractIntegrationTest {
 
-  SerializeT deserialize(DeserializeT serialized) throws IOException;
+  public FakeToPrintITCase() {
+    super();
+    this.exitUponException = true;
+  }
+
+  @Test
+  public void testChainPartitioner() throws Exception {
+    BitSailConfiguration jobConf = JobConfUtils.fromClasspath("transform_test.json");
+    submitJob(jobConf);
+  }
 }

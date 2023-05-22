@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.base.connector.transformer;
+package com.bytedance.bitsail.base.serializer;
+
+import com.bytedance.bitsail.common.row.Row;
 
 /**
- * Created 2022/4/22
+ * Created 2022/6/21
  */
-public class DataTransformDAGBuilder {
+public interface RowConverter<Input> extends Converter<Input, Row> {
+
 }

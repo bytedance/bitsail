@@ -44,7 +44,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 public class FlinkRowConvertSerializerTest {
-  private FlinkRowConvertSerializer flinkRowConvertSerializer;
+  private FlinkRowConverter flinkRowConvertSerializer;
 
   @Before
   public void init() {
@@ -58,14 +58,14 @@ public class FlinkRowConvertSerializerTest {
     TypeInfoConverter converter = new BitSailTypeInfoConverter();
     BitSailConfiguration conf = BitSailConfiguration.newDefault();
     RowTypeInfo rowTypeInfo = TypeInfoUtils.getRowTypeInfo(converter, columns);
-    flinkRowConvertSerializer = new FlinkRowConvertSerializer(rowTypeInfo, conf);
+    flinkRowConvertSerializer = new FlinkRowConverter(rowTypeInfo, conf);
   }
 
   @Test
   public void serializeTest() throws IOException {
     com.bytedance.bitsail.common.row.Row row = new com.bytedance.bitsail.common.row.Row(new Object[] {"test"});
-    Row serialize = flinkRowConvertSerializer.serialize(row);
-    com.bytedance.bitsail.common.row.Row deserialize = flinkRowConvertSerializer.deserialize(serialize);
+    Row serialize = flinkRowConvertSerializer.to(row);
+    com.bytedance.bitsail.common.row.Row deserialize = flinkRowConvertSerializer.from(serialize);
     Assert.assertEquals(row.getField(0), deserialize.getField(0));
   }
 
@@ -83,7 +83,7 @@ public class FlinkRowConvertSerializerTest {
         listValue,
         mapValue
     );
-    com.bytedance.bitsail.common.row.Row bitSailRow = flinkRowConvertSerializer.deserialize(row);
+    com.bytedance.bitsail.common.row.Row bitSailRow = flinkRowConvertSerializer.from(row);
     assertEquals(bitSailRow.getFields().length, 5);
     assertEquals(bitSailRow.getField(0), stringValue);
     assertEquals(bitSailRow.getField(1), intValue);
@@ -109,7 +109,7 @@ public class FlinkRowConvertSerializerTest {
         new ListColumn<>(listValue, StringColumn.class),
         new MapColumn<>(mapValue, StringColumn.class, LongColumn.class)
     );
-    com.bytedance.bitsail.common.row.Row bitSailRow = flinkRowConvertSerializer.deserialize(row);
+    com.bytedance.bitsail.common.row.Row bitSailRow = flinkRowConvertSerializer.from(row);
     assertEquals(bitSailRow.getFields().length, 5);
     assertEquals(bitSailRow.getField(0), stringValue);
     assertEquals(bitSailRow.getField(1), intValue);
