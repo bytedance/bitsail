@@ -26,7 +26,7 @@
     "transform": [
       {
         "transform_name": "FieldBase",
-        "field_ame": "name"
+        "field_name": "name"
       }
     ],
     "writer": {
