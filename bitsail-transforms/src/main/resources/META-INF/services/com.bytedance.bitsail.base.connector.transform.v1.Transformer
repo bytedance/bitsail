@@ -15,3 +15,4 @@
 #
 
 com.bytedance.bitsail.transforms.partition.field.FieldBasePartitionTransformer
+com.bytedance.bitsail.transforms.map.encrypt.EncryptFieldMapTransformer

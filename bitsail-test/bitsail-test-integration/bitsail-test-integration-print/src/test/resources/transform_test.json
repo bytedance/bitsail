@@ -27,6 +27,10 @@
       {
         "transform_name": "FieldBase",
         "field_name": "name"
+      },
+      {
+        "transform_name": "EncryptField",
+        "field_name": "name"
       }
     ],
     "writer": {

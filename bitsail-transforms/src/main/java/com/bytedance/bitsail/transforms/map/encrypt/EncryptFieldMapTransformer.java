@@ -14,38 +14,44 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.transforms.map.normalization;
+package com.bytedance.bitsail.transforms.map.encrypt;
 
 import com.bytedance.bitsail.base.connector.transform.v1.MapTransformer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 
-import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
-public class NormalizationFieldMapTransformer implements MapTransformer<Row> {
+public class EncryptFieldMapTransformer implements MapTransformer<Row> {
   private BitSailConfiguration transformConfiguration;
-  private List<String> appendStringColumns;
-  private List<String> appendStringValues;
   private RowTypeInfo rowTypeInfo;
+  private int fieldIndex;
+  private String fieldName;
+  private Encrypts encrypts;
 
   @Override
   public void configure(BitSailConfiguration commonConfiguration, BitSailConfiguration transformConfiguration) {
     this.transformConfiguration = transformConfiguration;
+    this.fieldName = transformConfiguration.get(EncryptOptions.FIELD_NAME);
+    this.encrypts = Encrypts.valueOf(StringUtils.upperCase(transformConfiguration.get(EncryptOptions.ENCRYPT_NAME)));
   }
 
   @Override
   public void setTypeInfo(RowTypeInfo rowTypeInfo) {
     this.rowTypeInfo = rowTypeInfo;
+    this.fieldIndex = rowTypeInfo.indexOf(fieldName);
   }
 
   @Override
   public Row map(Row element) {
+    Object field = element.getField(fieldIndex);
+    element.setField(fieldIndex, encrypts.encrypt(field == null ? null : field.toString()));
     return element;
   }
 
   @Override
   public String getComponentName() {
-    return "Normalization";
+    return "EncryptField";
   }
 }

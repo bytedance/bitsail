@@ -14,26 +14,20 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.transforms.map.normalization;
+package com.bytedance.bitsail.transforms.map.encrypt;
 
 import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.TransformOptions;
 
-import com.alibaba.fastjson.TypeReference;
-
-import java.util.List;
-
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 
-public interface NormalizationOptions extends TransformOptions {
+public interface EncryptOptions extends TransformOptions {
 
-  ConfigOption<List<String>> APPEND_STRING_COLUMNS =
-      key("append_string_columns")
-          .onlyReference(new TypeReference<List<String>>() {
-          });
+  ConfigOption<String> FIELD_NAME =
+      key("field_name")
+          .noDefaultValue(String.class);
 
-  ConfigOption<List<String>> APPEND_STRING_VALUES =
-      key("append_string_values")
-          .onlyReference(new TypeReference<List<String>>() {
-          });
+  ConfigOption<String> ENCRYPT_NAME =
+      key("encrypt_name")
+          .defaultValue(Encrypts.MD5.name());
 }
