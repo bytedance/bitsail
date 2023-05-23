@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.core.flink.bridge.transform.delegate;
+package com.bytedance.bitsail.flink.core.transform.delegate;
 
 import com.bytedance.bitsail.base.connector.transform.v1.PartitionTransformer;
 import com.bytedance.bitsail.common.BitSailException;

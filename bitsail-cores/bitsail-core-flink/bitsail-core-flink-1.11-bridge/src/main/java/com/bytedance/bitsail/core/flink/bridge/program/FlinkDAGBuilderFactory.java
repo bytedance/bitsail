@@ -35,12 +35,12 @@ import com.bytedance.bitsail.common.option.TransformOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.core.api.program.factory.ProgramDAGBuilderFactory;
 import com.bytedance.bitsail.core.flink.bridge.reader.builder.FlinkSourceDAGBuilder;
-import com.bytedance.bitsail.core.flink.bridge.transform.builder.FlinkMapTransformerBuilder;
-import com.bytedance.bitsail.core.flink.bridge.transform.builder.FlinkPartitionTransformerBuilder;
 import com.bytedance.bitsail.core.flink.bridge.writer.builder.FlinkWriterBuilder;
 import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatPlugin;
 import com.bytedance.bitsail.flink.core.legacy.connector.OutputFormatPlugin;
 import com.bytedance.bitsail.flink.core.reader.PluginableInputFormatDAGBuilder;
+import com.bytedance.bitsail.flink.core.transform.builder.FlinkMapTransformerBuilder;
+import com.bytedance.bitsail.flink.core.transform.builder.FlinkPartitionTransformerBuilder;
 import com.bytedance.bitsail.flink.core.writer.PluginableOutputFormatDAGBuilder;
 
 import org.slf4j.Logger;

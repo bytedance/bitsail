@@ -50,7 +50,7 @@
         "transform_name": "MockMapTransformer"
       },
       {
-        "transform_name": "FieldBase",
+        "transform_name": "FieldBasePartitioner",
         "field_name": "id"
       }
     ],

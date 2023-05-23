@@ -14,12 +14,12 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.core.flink.bridge.transform.builder;
+package com.bytedance.bitsail.flink.core.transform.builder;
 
 import com.bytedance.bitsail.base.connector.transform.v1.PartitionTransformer;
 import com.bytedance.bitsail.base.connector.transform.v1.Transformer;
-import com.bytedance.bitsail.core.flink.bridge.transform.delegate.DelegateFlinkKeySelector;
-import com.bytedance.bitsail.core.flink.bridge.transform.delegate.DelegateFlinkPartitioner;
+import com.bytedance.bitsail.flink.core.transform.delegate.DelegateFlinkKeySelector;
+import com.bytedance.bitsail.flink.core.transform.delegate.DelegateFlinkPartitioner;
 import com.bytedance.bitsail.flink.core.typeutils.AutoDetectFlinkTypeInfoUtil;
 
 import org.apache.flink.api.java.typeutils.RowTypeInfo;

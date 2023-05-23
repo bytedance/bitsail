@@ -56,6 +56,6 @@ public class FieldBasePartitionTransformer implements PartitionTransformer<Row, 
 
   @Override
   public String getComponentName() {
-    return "FieldBase";
+    return "FieldBasePartitioner";
   }
 }

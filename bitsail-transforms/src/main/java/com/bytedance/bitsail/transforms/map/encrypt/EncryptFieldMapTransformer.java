@@ -52,6 +52,6 @@ public class EncryptFieldMapTransformer implements MapTransformer<Row> {
 
   @Override
   public String getComponentName() {
-    return "EncryptField";
+    return "EncryptFieldMapTransformer";
   }
 }

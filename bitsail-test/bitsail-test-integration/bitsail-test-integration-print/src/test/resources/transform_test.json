@@ -25,11 +25,11 @@
     },
     "transform": [
       {
-        "transform_name": "FieldBase",
+        "transform_name": "FieldBasePartitioner",
         "field_name": "name"
       },
       {
-        "transform_name": "EncryptField",
+        "transform_name": "EncryptFieldMapTransformer",
         "field_name": "name"
       }
     ],

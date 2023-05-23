@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.core.flink.bridge.transform.builder;
+package com.bytedance.bitsail.flink.core.transform.builder;
 
 import com.bytedance.bitsail.base.connector.transform.v1.Transformer;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
