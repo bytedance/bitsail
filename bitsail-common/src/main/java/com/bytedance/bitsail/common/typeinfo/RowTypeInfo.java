@@ -58,6 +58,15 @@ public class RowTypeInfo extends TypeInfo<Row> {
     return Arrays.equals(fieldNames, that.fieldNames) && Arrays.equals(typeInfos, that.typeInfos);
   }
 
+  public int indexOf(String fieldName) {
+    for (int index = 0; index < fieldNames.length; index++) {
+      if (fieldNames[index].equals(fieldName)) {
+        return index;
+      }
+    }
+    return -1;
+  }
+
   @Override
   public int hashCode() {
     int result = Arrays.hashCode(fieldNames);

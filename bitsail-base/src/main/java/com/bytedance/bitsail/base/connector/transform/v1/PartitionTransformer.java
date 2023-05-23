@@ -14,9 +14,13 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.base.connector.transform;
+package com.bytedance.bitsail.base.connector.transform.v1;
 
-public enum MapFunctionType {
-  APPEND_STRING,
-  ENCRYPT_MD5
+import com.bytedance.bitsail.common.row.Row;
+
+public interface PartitionTransformer<I extends Row, K> extends Transformer {
+
+  K selectKey(I element);
+
+  int partition(K key, int totalPartitions);
 }

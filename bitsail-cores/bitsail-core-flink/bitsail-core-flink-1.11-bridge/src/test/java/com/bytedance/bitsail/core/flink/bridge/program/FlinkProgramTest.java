@@ -52,6 +52,19 @@ public class FlinkProgramTest {
     unifiedProgram.submit();
   }
 
+  @Test
+  public void testSubmitTransform() throws Exception {
+    BitSailConfiguration globalConfiguration = loadConf("bitsail_transform_conf.json");
+    LOG.info("Final Configuration: {}.\n", globalConfiguration.desensitizedBeautify());
+    CoreCommandArgs coreCommandArgs = new CoreCommandArgs();
+    coreCommandArgs.setEngineName("flink");
+    UnifiedProgram unifiedProgram = new FlinkProgram();
+    PluginFinder pluginFinder = PluginFinderFactory.getPluginFinder(globalConfiguration.get(CommonOptions.PLUGIN_FINDER_NAME));
+    pluginFinder.configure(globalConfiguration);
+    unifiedProgram.configure(pluginFinder, globalConfiguration, coreCommandArgs);
+    unifiedProgram.submit();
+  }
+
   private static BitSailConfiguration loadConf(String path) throws URISyntaxException, IOException {
     ClassLoader classLoader = FlinkProgram.class.getClassLoader();
     URL resource = classLoader.getResource(path);

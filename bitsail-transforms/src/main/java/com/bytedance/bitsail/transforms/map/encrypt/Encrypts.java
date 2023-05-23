@@ -14,20 +14,25 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.base.connector.transform.v1;
+package com.bytedance.bitsail.transforms.map.encrypt;
 
-import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
+import com.google.common.base.Charsets;
+import com.google.common.hash.Hashing;
 
-import java.io.Serializable;
+public enum Encrypts {
 
-/**
- * Interface of BitSail map function.
- * @param <I>
- * @param <O>
- */
-public interface BitSailMapFunction<I, O> extends Serializable {
+  MD5 {
+    @Override
+    public String encrypt(String value) {
+      return Hashing.md5().newHasher()
+          .putString(value, Charsets.UTF_8)
+          .hash()
+          .toString();
+    }
+  };
 
-  O map(I input) throws Exception;
+  public String encrypt(String value) {
+    throw new UnsupportedOperationException();
+  }
 
-  RowTypeInfo getOutputType();
 }

@@ -16,9 +16,13 @@
 
 package com.bytedance.bitsail.core.flink.bridge.program;
 
+import com.bytedance.bitsail.base.component.DefaultComponentBuilderLoader;
 import com.bytedance.bitsail.base.connector.reader.DataReaderDAGBuilder;
 import com.bytedance.bitsail.base.connector.reader.v1.Source;
 import com.bytedance.bitsail.base.connector.transform.DataTransformDAGBuilder;
+import com.bytedance.bitsail.base.connector.transform.v1.MapTransformer;
+import com.bytedance.bitsail.base.connector.transform.v1.PartitionTransformer;
+import com.bytedance.bitsail.base.connector.transform.v1.Transformer;
 import com.bytedance.bitsail.base.connector.writer.DataWriterDAGBuilder;
 import com.bytedance.bitsail.base.connector.writer.v1.Sink;
 import com.bytedance.bitsail.base.execution.Mode;
@@ -27,14 +31,16 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.ReaderOptions;
+import com.bytedance.bitsail.common.option.TransformOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.core.api.program.factory.ProgramDAGBuilderFactory;
 import com.bytedance.bitsail.core.flink.bridge.reader.builder.FlinkSourceDAGBuilder;
-import com.bytedance.bitsail.core.flink.bridge.transform.builder.FlinkTransformBuilder;
 import com.bytedance.bitsail.core.flink.bridge.writer.builder.FlinkWriterBuilder;
 import com.bytedance.bitsail.flink.core.legacy.connector.InputFormatPlugin;
 import com.bytedance.bitsail.flink.core.legacy.connector.OutputFormatPlugin;
 import com.bytedance.bitsail.flink.core.reader.PluginableInputFormatDAGBuilder;
+import com.bytedance.bitsail.flink.core.transform.builder.FlinkMapTransformerBuilder;
+import com.bytedance.bitsail.flink.core.transform.builder.FlinkPartitionTransformerBuilder;
 import com.bytedance.bitsail.flink.core.writer.PluginableOutputFormatDAGBuilder;
 
 import org.slf4j.Logger;
@@ -123,13 +129,15 @@ public class FlinkDAGBuilderFactory implements ProgramDAGBuilderFactory {
   public List<DataTransformDAGBuilder> getDataTransformDAGBuilders(Mode mode,
                                                                    List<BitSailConfiguration> configurations,
                                                                    PluginFinder pluginFinder) {
+    DefaultComponentBuilderLoader<Transformer> transformerPluginFinder =
+        new DefaultComponentBuilderLoader<>(Transformer.class, pluginFinder.getClassloader());
 
     return configurations.stream()
         .map(transformConf -> {
           try {
-            return getDataTransformDAGBuilder(mode, transformConf, pluginFinder);
+            return getDataTransformDAGBuilder(mode, transformConf, transformerPluginFinder);
           } catch (Exception e) {
-            LOG.error("failed to create writer DAG builder");
+            LOG.error("failed to create transform DAG builder");
             throw new RuntimeException(e);
           }
         })
@@ -138,9 +146,19 @@ public class FlinkDAGBuilderFactory implements ProgramDAGBuilderFactory {
   }
 
   public <T> DataTransformDAGBuilder getDataTransformDAGBuilder(Mode mode,
-                                                                BitSailConfiguration configuration,
-                                                                PluginFinder pluginFinder) {
-    return new FlinkTransformBuilder<>(configuration);
+                                                                BitSailConfiguration transformConfiguration,
+                                                                DefaultComponentBuilderLoader<Transformer> transformerPluginFinder) {
+    String name = transformConfiguration.get(TransformOptions.BaseTransformOptions
+        .TRANSFORM_NAME);
+    LOG.info("Transform's name {}.", name);
+    Transformer transformer = transformerPluginFinder.loadComponent(name);
+    if (transformer instanceof MapTransformer) {
+      return new FlinkMapTransformerBuilder<>(transformer);
+    } else if (transformer instanceof PartitionTransformer) {
+      return new FlinkPartitionTransformerBuilder<>(transformer);
+    }
+    throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
+        String.format("Transformer %s is not support.", name));
   }
 
   private static <T> T construct(String clazz,

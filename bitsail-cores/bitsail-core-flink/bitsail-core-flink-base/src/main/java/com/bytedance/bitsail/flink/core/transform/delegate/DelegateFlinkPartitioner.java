@@ -14,14 +14,22 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.flink.core.transform;
+package com.bytedance.bitsail.flink.core.transform.delegate;
 
-import com.bytedance.bitsail.base.connector.transform.DataTransformDAGBuilder;
+import com.bytedance.bitsail.base.connector.transform.v1.PartitionTransformer;
 
-import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.api.common.functions.Partitioner;
 
-public abstract class FlinkDataTransformDAGBuilder<T> implements DataTransformDAGBuilder {
+public class DelegateFlinkPartitioner<K> implements Partitioner<K> {
+  private final PartitionTransformer<?, K> partitionTransformer;
 
-  public abstract DataStream<T> addTransformer(DataStream<T> source, int adviceParallelism);
+  public DelegateFlinkPartitioner(PartitionTransformer<?, K> partitionTransformer) {
+    this.partitionTransformer = partitionTransformer;
 
+  }
+
+  @Override
+  public int partition(K key, int numPartitions) {
+    return partitionTransformer.partition(key, numPartitions);
+  }
 }

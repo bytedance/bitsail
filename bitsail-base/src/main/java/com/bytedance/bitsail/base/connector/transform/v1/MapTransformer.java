@@ -16,13 +16,9 @@
 
 package com.bytedance.bitsail.base.connector.transform.v1;
 
-import java.io.Serializable;
+import com.bytedance.bitsail.common.row.Row;
 
-/**
- * Interface for BitSail flatmap function.
- * @param <I>
- * @param <O>
- */
-public interface BitSailFlatMapFunction <I, O> extends Serializable {
-  //TODO: design interface for flatmap
+public interface MapTransformer<T extends Row> extends Transformer {
+
+  T map(T element);
 }

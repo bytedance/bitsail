@@ -14,10 +14,22 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.base.connector.transform;
+package com.bytedance.bitsail.base.connector.transform.v1;
 
-public enum PartitionerType {
-  HASH,
-  RANGE,
-  ROUND_ROBIN
+import com.bytedance.bitsail.base.extension.Component;
+import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
+
+import java.io.Serializable;
+
+public interface Transformer extends Serializable, Component {
+
+  void configure(BitSailConfiguration commonConfiguration,
+                 BitSailConfiguration transformConfiguration);
+
+  default void open() {
+
+  }
+
+  void setTypeInfo(RowTypeInfo rowTypeInfo);
 }

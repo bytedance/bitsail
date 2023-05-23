@@ -14,22 +14,8 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.base.connector.transform.v1;
+package com.bytedance.bitsail.core.flink.bridge.transform.builder;
 
-import static java.lang.Math.abs;
+public class FlinkBaseTransformerBuilderTest {
 
-/**
- * Partitioner that call toString then hashCode method to calculate the partition of a given key.
- * @param <K>
- */
-public class SimpleHashCodePartitioner<K> implements BitSailPartitioner<K> {
-  private static final long serialVersionUID = 1L;
-  public SimpleHashCodePartitioner() {
-
-  }
-
-  @Override
-  public int partition(K key, int totalPartitions) {
-    return abs(key.toString().hashCode()) % totalPartitions;
-  }
 }

@@ -14,11 +14,20 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.base.connector.transform;
+package com.bytedance.bitsail.transforms.map.encrypt;
 
-public enum TransformType {
-  PARTITION_BY,
-  MAP,
-  FLATMAP,
-  FILTER
+import com.bytedance.bitsail.common.option.ConfigOption;
+import com.bytedance.bitsail.common.option.TransformOptions;
+
+import static com.bytedance.bitsail.common.option.ConfigOptions.key;
+
+public interface EncryptOptions extends TransformOptions {
+
+  ConfigOption<String> FIELD_NAME =
+      key("field_name")
+          .noDefaultValue(String.class);
+
+  ConfigOption<String> ENCRYPT_NAME =
+      key("encrypt_name")
+          .defaultValue(Encrypts.MD5.name());
 }
