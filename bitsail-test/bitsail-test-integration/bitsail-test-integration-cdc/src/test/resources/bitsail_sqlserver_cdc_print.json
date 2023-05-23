@@ -14,7 +14,7 @@
     },
     "reader": {
       "class": "com.bytedance.bitsail.connector.cdc.sqlserver.source.SqlServerCDCSource",
-      "database": "bitsail_test",
+      "db_name": "bitsail_test",
       "connections": [
       ],
       "user_name": "SA",

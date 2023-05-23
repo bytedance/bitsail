@@ -103,9 +103,9 @@ public class SqlServerBinlogSplitReader implements BinlogSplitReader<Row> {
 
   private final BitSailConfiguration jobConf;
 
-  public SqlServerBinlogSplitReader(BitSailConfiguration jobConf, int subtaskId) {
+  public SqlServerBinlogSplitReader(BitSailConfiguration jobConf, int subtaskId, long instantId) {
     this.jobConf = jobConf;
-    this.sqlserverConfig = SqlServerConfig.fromBitSailConf(jobConf);
+    this.sqlserverConfig = SqlServerConfig.fromBitSailConf(jobConf, instantId);
     this.schemaNameAdjuster = SchemaNameAdjuster.create();
     this.connectorConfig = sqlserverConfig.getDbzSqlServerConnectorConfig();
     this.subtaskId = subtaskId;

@@ -50,6 +50,7 @@ public class SqlServerConfig implements Serializable {
   private final String username;
   private final String password;
   private final String database;
+  private final long instantId;
 
   // debezium configuration
   private final Properties dbzProperties;
@@ -57,7 +58,7 @@ public class SqlServerConfig implements Serializable {
   private final SqlServerConnectorConfig dbzSqlServerConnectorConfig;
 
   @SuppressWarnings("checkstyle:MagicNumber")
-  public static SqlServerConfig fromBitSailConf(BitSailConfiguration jobConf) {
+  public static SqlServerConfig fromBitSailConf(BitSailConfiguration jobConf, long instantId) {
     List<ClusterInfo> clusterInfo = jobConf.getNecessaryOption(BinlogReaderOptions.CONNECTIONS, BinlogReaderErrorCode.REQUIRED_VALUE);
     //Only support one DB
     assert (clusterInfo.size() == 1);
@@ -69,8 +70,8 @@ public class SqlServerConfig implements Serializable {
 
     String username = jobConf.getNecessaryOption(BinlogReaderOptions.USER_NAME, BinlogReaderErrorCode.REQUIRED_VALUE);
     String password = jobConf.getNecessaryOption(BinlogReaderOptions.PASSWORD, BinlogReaderErrorCode.REQUIRED_VALUE);
-    String database = jobConf.getNecessaryOption(BinlogReaderOptions.DATABASE, BinlogReaderErrorCode.REQUIRED_VALUE);
-    fillConnectionInfo(props, connectionInfo, username, password, database);
+    String database = jobConf.getNecessaryOption(BinlogReaderOptions.DB_NAME, BinlogReaderErrorCode.REQUIRED_VALUE);
+    fillConnectionInfo(props, connectionInfo, username, password, database, instantId);
 
     Configuration config = Configuration.from(props);
 
@@ -87,6 +88,7 @@ public class SqlServerConfig implements Serializable {
         .username(username)
         .password(password)
         .database(database)
+        .instantId(instantId)
         .dbzProperties(props)
         .dbzConfiguration(config)
         .dbzSqlServerConnectorConfig(new SqlServerConnectorConfig(config))
@@ -102,6 +104,8 @@ public class SqlServerConfig implements Serializable {
         .port(0)
         .username("username")
         .password("password")
+        .database("db")
+        .instantId(1L)
         .dbzProperties(props)
         .dbzConfiguration(config)
         .dbzSqlServerConnectorConfig(new SqlServerConnectorConfig(config))
@@ -125,14 +129,14 @@ public class SqlServerConfig implements Serializable {
   /**
    * Set connection information to debezium properties.
    */
-  public static void fillConnectionInfo(Properties props, ConnectionInfo connectionInfo, String username, String password, String database) {
+  public static void fillConnectionInfo(Properties props, ConnectionInfo connectionInfo, String username, String password, String database, long instantId) {
     props.put("database.hostname", connectionInfo.getHost());
     props.put("database.port", String.valueOf(connectionInfo.getPort()));
     props.put("database.user", username);
     props.put("database.password", password);
     props.put("database.dbname", database);
-    props.put("database.server.name", connectionInfo.getHost());
-    props.put("database.server.id", String.valueOf(connectionInfo.getPort()));
+    props.put("database.server.name", String.valueOf(instantId));
+    props.put("database.server.id", String.valueOf(instantId));
   }
 
   /**
@@ -145,7 +149,5 @@ public class SqlServerConfig implements Serializable {
     props.putIfAbsent("database.history", "io.debezium.relational.history.MemoryDatabaseHistory");
     props.putIfAbsent("database.history.instance.name", "default_database_history");
     props.putIfAbsent("include.schema.changes", "false");
-    props.putIfAbsent("database.useSSL", "false");
-    props.putIfAbsent("database.allowPublicKeyRetrieval", "true");
   }
 }

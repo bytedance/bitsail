@@ -119,9 +119,9 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
 
   private final BitSailConfiguration jobConf;
 
-  public MysqlBinlogSplitReader(BitSailConfiguration jobConf, int subtaskId) {
+  public MysqlBinlogSplitReader(BitSailConfiguration jobConf, int subtaskId, long instantId) {
     this.jobConf = jobConf;
-    this.mysqlConfig = MysqlConfig.fromBitSailConf(jobConf);
+    this.mysqlConfig = MysqlConfig.fromBitSailConf(jobConf, instantId);
     this.schemaNameAdjuster = SchemaNameAdjuster.create();
     // handle configuration
     this.connectorConfig = mysqlConfig.getDbzMySqlConnectorConfig();

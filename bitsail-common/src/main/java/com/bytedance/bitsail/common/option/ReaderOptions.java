@@ -104,10 +104,6 @@ public interface ReaderOptions {
         key(READER_PREFIX + "password")
             .noDefaultValue(String.class);
 
-    ConfigOption<String> DATABASE =
-        key(READER_PREFIX + "database")
-            .noDefaultValue(String.class);
-
     ConfigOption<String> CONTENT_TYPE =
         key(READER_PREFIX + "content_type")
             .noDefaultValue(String.class);

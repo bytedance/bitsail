@@ -17,6 +17,7 @@
 package com.bytedance.bitsail.connector.cdc.sqlserver.source.reader;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
 import com.bytedance.bitsail.connector.cdc.source.reader.BaseCDCSourceReader;
@@ -56,6 +57,6 @@ public class SqlServerCDCSourceReader extends BaseCDCSourceReader {
 
   @Override
   public BinlogSplitReader<Row> getReader() {
-    return new SqlServerBinlogSplitReader(readerConf, readerContext.getIndexOfSubtask());
+    return new SqlServerBinlogSplitReader(readerConf, readerContext.getIndexOfSubtask(), commonConf.get(CommonOptions.INSTANCE_ID));
   }
 }

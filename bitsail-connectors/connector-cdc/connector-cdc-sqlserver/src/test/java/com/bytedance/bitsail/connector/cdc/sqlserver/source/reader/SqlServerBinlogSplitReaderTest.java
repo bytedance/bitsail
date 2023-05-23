@@ -120,10 +120,10 @@ public class SqlServerBinlogSplitReaderTest {
     jobConf.set(BinlogReaderOptions.USER_NAME, USERNAME);
     jobConf.set(BinlogReaderOptions.PASSWORD, PASSWORD);
     jobConf.set(BinlogReaderOptions.INITIAL_OFFSET_TYPE, "earliest");
-    jobConf.set(BinlogReaderOptions.DATABASE, DATABASE);
+    jobConf.set(BinlogReaderOptions.DB_NAME, DATABASE);
     //jobConf.set("job.reader.debezium.table.whitelist", "dbo.ExampleTable");
 
-    SqlServerBinlogSplitReader reader = new SqlServerBinlogSplitReader(jobConf, 0);
+    SqlServerBinlogSplitReader reader = new SqlServerBinlogSplitReader(jobConf, 0, 1L);
     BinlogSplit split = new BinlogSplit("split-1", BinlogOffset.earliest(), BinlogOffset.boundless());
     reader.readSplit(split);
     int maxPeriod = 0;
