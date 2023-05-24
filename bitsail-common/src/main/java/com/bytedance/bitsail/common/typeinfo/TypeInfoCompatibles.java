@@ -288,8 +288,9 @@ public class TypeInfoCompatibles implements Serializable {
 
     compatibles.put(TypeInfos.SHORT_TYPE_INFO,
         TypeInfos.BOOLEAN_TYPE_INFO,
-        (value) -> ((Short) value) == 1
+        (value) -> ((Short) value) != 0
     );
+
     compatibles.put(TypeInfos.SHORT_TYPE_INFO,
         TypeInfos.INT_TYPE_INFO,
         (value) -> ((Short) value).intValue()
@@ -384,7 +385,7 @@ public class TypeInfoCompatibles implements Serializable {
 
     compatibles.put(TypeInfos.INT_TYPE_INFO,
         TypeInfos.BOOLEAN_TYPE_INFO,
-        (value) -> ((Integer) value) == 1
+        (value) -> ((Integer) value) != 0
     );
 
     //TODO in future, will be removed. int -> big integer
@@ -412,7 +413,7 @@ public class TypeInfoCompatibles implements Serializable {
 
     compatibles.put(TypeInfos.LONG_TYPE_INFO,
         TypeInfos.BOOLEAN_TYPE_INFO,
-        (value) -> ((Long) value) == 1L
+        (value) -> ((Long) value) != 0L
     );
 
     compatibles.put(TypeInfos.LONG_TYPE_INFO,
@@ -483,16 +484,15 @@ public class TypeInfoCompatibles implements Serializable {
         }
     );
 
-    //compatibles.put(TypeInfos.LONG_TYPE_INFO,
-    //    TypeInfos.BIG_INTEGER_TYPE_INFO,
-    //    null
-    //);
+    compatibles.put(TypeInfos.LONG_TYPE_INFO,
+        TypeInfos.BIG_INTEGER_TYPE_INFO,
+        value -> BigInteger.valueOf((Long) value)
+    );
 
-    //compatibles.put(TypeInfos.LONG_TYPE_INFO,
-    //    TypeInfos.BIG_DECIMAL_TYPE_INFO,
-    //    null
-    //);
-    //
+    compatibles.put(TypeInfos.LONG_TYPE_INFO,
+        TypeInfos.BIG_DECIMAL_TYPE_INFO,
+        value -> BigDecimal.valueOf((Long) value)
+    );
 
     compatibles.put(TypeInfos.BIG_DECIMAL_TYPE_INFO,
         TypeInfos.STRING_TYPE_INFO,
@@ -504,14 +504,51 @@ public class TypeInfoCompatibles implements Serializable {
         (value) -> ((BigDecimal) value).doubleValue()
     );
 
+    //TODO in future we maybe discard this converted
     compatibles.put(TypeInfos.BIG_DECIMAL_TYPE_INFO,
         TypeInfos.FLOAT_TYPE_INFO,
         (value) -> ((BigDecimal) value).floatValue()
     );
 
+    compatibles.put(TypeInfos.BIG_DECIMAL_TYPE_INFO,
+        TypeInfos.LONG_TYPE_INFO,
+        (value) -> ((BigDecimal) value).
+            //TODO in future we maybe change to method `longValueExact` to avoid lose precisions
+                longValue()
+    );
+
+    compatibles.put(TypeInfos.BIG_DECIMAL_TYPE_INFO,
+        TypeInfos.BIG_INTEGER_TYPE_INFO,
+        (value) -> ((BigDecimal) value).
+            //TODO in future we maybe change to method `toBigIntegerExact` to avoid lose precisions
+                toBigInteger()
+    );
+
     compatibles.put(TypeInfos.BIG_INTEGER_TYPE_INFO,
         TypeInfos.STRING_TYPE_INFO,
         (value) -> ((BigInteger) value).toString()
+    );
+
+    compatibles.put(TypeInfos.BIG_INTEGER_TYPE_INFO,
+        TypeInfos.LONG_TYPE_INFO,
+        (value) -> ((BigInteger) value).
+            longValueExact()
+    );
+
+    compatibles.put(TypeInfos.BIG_INTEGER_TYPE_INFO,
+        TypeInfos.BOOLEAN_TYPE_INFO,
+        new Function<Object, Object>() {
+          @Override
+          public Object apply(Object value) {
+            try {
+              return ((BigInteger) value).compareTo(BigInteger.ZERO) != 0;
+            } catch (Exception e) {
+              throw BitSailException.asBitSailException(
+                  CommonErrorCode.CONVERT_NOT_SUPPORT,
+                  String.format("biginteger [%s] can't convert to boolean", value));
+            }
+          }
+        }
     );
 
     compatibles.put(TypeInfos.FLOAT_TYPE_INFO,
@@ -521,24 +558,21 @@ public class TypeInfoCompatibles implements Serializable {
 
     compatibles.put(TypeInfos.FLOAT_TYPE_INFO,
         TypeInfos.BIG_DECIMAL_TYPE_INFO,
-        new Function<Object, Object>() {
-          @Override
-          public Object apply(Object value) {
-            return new BigDecimal((String) compatibles.get(TypeInfos.FLOAT_TYPE_INFO, TypeInfos.STRING_TYPE_INFO)
-                .apply(value));
-          }
-        }
+        value -> new BigDecimal((String) compatibles.get(TypeInfos.FLOAT_TYPE_INFO, TypeInfos.STRING_TYPE_INFO)
+            .apply(value))
+    );
+
+    //TODO in future, will be removed. float -> biginteger
+    compatibles.put(TypeInfos.FLOAT_TYPE_INFO,
+        TypeInfos.BIG_INTEGER_TYPE_INFO,
+        value -> ((BigDecimal) compatibles.get(TypeInfos.FLOAT_TYPE_INFO, TypeInfos.BIG_DECIMAL_TYPE_INFO)
+            .apply(value)).toBigInteger()
     );
 
     compatibles.put(TypeInfos.FLOAT_TYPE_INFO,
         TypeInfos.DOUBLE_TYPE_INFO,
-        new Function<Object, Object>() {
-          @Override
-          public Object apply(Object value) {
-            return Double.valueOf((String) compatibles.get(TypeInfos.FLOAT_TYPE_INFO, TypeInfos.STRING_TYPE_INFO)
-                .apply(value));
-          }
-        }
+        value -> Double.valueOf((String) compatibles.get(TypeInfos.FLOAT_TYPE_INFO, TypeInfos.STRING_TYPE_INFO)
+            .apply(value))
     );
 
     //TODO in future, will be removed. float -> long
@@ -554,47 +588,48 @@ public class TypeInfoCompatibles implements Serializable {
 
     compatibles.put(TypeInfos.DOUBLE_TYPE_INFO,
         TypeInfos.BIG_DECIMAL_TYPE_INFO,
-        new Function<Object, Object>() {
-          @Override
-          public Object apply(Object value) {
-
-            try {
-              return BigDecimal.valueOf(((Double) value));
-            } catch (NumberFormatException e) {
-              throw BitSailException.asBitSailException(
-                  CommonErrorCode.CONVERT_NOT_SUPPORT,
-                  String.format("double [%s] can't convert to big decimal.", value));
-            }
-          }
-        }
+        value -> new BigDecimal((String) compatibles.get(TypeInfos.DOUBLE_TYPE_INFO, TypeInfos.STRING_TYPE_INFO)
+            .apply(value))
     );
 
-    //TODO in future, will be removed. double -> big integer
+    //TODO in future, will be removed. double -> big integer now it will lose precisions
     compatibles.put(TypeInfos.DOUBLE_TYPE_INFO,
         TypeInfos.BIG_INTEGER_TYPE_INFO,
-        new Function<Object, Object>() {
-          @Override
-          public Object apply(Object value) {
-
-            try {
-              return BigDecimal.valueOf(((Double) value)).toBigInteger();
-            } catch (NumberFormatException e) {
-              throw BitSailException.asBitSailException(
-                  CommonErrorCode.CONVERT_NOT_SUPPORT,
-                  String.format("double [%s] can't convert to big integer.", value));
-            }
-          }
-        }
+        value -> ((BigDecimal) compatibles.get(TypeInfos.DOUBLE_TYPE_INFO, TypeInfos.BIG_DECIMAL_TYPE_INFO)
+            .apply(value)).toBigInteger()
     );
 
     //TODO in future, will be removed. double -> long
     compatibles.put(TypeInfos.DOUBLE_TYPE_INFO,
         TypeInfos.LONG_TYPE_INFO,
-        (value) -> ((Double) value).longValue()
+        (value) -> ((Double) value).
+            longValue()
+    );
+
+    compatibles.put(TypeInfos.DOUBLE_TYPE_INFO,
+        TypeInfos.FLOAT_TYPE_INFO,
+        value -> ((Double) value).floatValue()
     );
   }
 
   private void addStringTypeInfoCompatibles() {
+    compatibles.put(TypeInfos.STRING_TYPE_INFO,
+        TypeInfos.BOOLEAN_TYPE_INFO,
+        new Function<Object, Object>() {
+          @Override
+          public Object apply(Object value) {
+
+            try {
+              return Boolean.parseBoolean(value.toString());
+            } catch (NumberFormatException e) {
+              throw BitSailException.asBitSailException(
+                  CommonErrorCode.CONVERT_NOT_SUPPORT,
+                  String.format("string [%s] can't convert to boolean.", value));
+            }
+          }
+        }
+    );
+
     compatibles.put(TypeInfos.STRING_TYPE_INFO,
         TypeInfos.SHORT_TYPE_INFO,
         new Function<Object, Object>() {
@@ -611,6 +646,7 @@ public class TypeInfoCompatibles implements Serializable {
           }
         }
     );
+
     compatibles.put(TypeInfos.STRING_TYPE_INFO,
         TypeInfos.INT_TYPE_INFO,
         new Function<Object, Object>() {
@@ -671,6 +707,40 @@ public class TypeInfoCompatibles implements Serializable {
               throw BitSailException.asBitSailException(
                   CommonErrorCode.CONVERT_NOT_SUPPORT,
                   String.format("string [%s] can't convert to double.", value));
+            }
+          }
+        }
+    );
+
+    compatibles.put(TypeInfos.STRING_TYPE_INFO,
+        TypeInfos.BIG_DECIMAL_TYPE_INFO,
+        new Function<Object, Object>() {
+          @Override
+          public Object apply(Object value) {
+
+            try {
+              return new BigDecimal((String) value);
+            } catch (NumberFormatException e) {
+              throw BitSailException.asBitSailException(
+                  CommonErrorCode.CONVERT_NOT_SUPPORT,
+                  String.format("String[%s] can't convert to big decimal.", value));
+            }
+          }
+        }
+    );
+
+    compatibles.put(TypeInfos.STRING_TYPE_INFO,
+        TypeInfos.BIG_INTEGER_TYPE_INFO,
+        new Function<Object, Object>() {
+          @Override
+          public Object apply(Object value) {
+            try {
+              return ((BigDecimal) compatibles.get(TypeInfos.STRING_TYPE_INFO, TypeInfos.BIG_DECIMAL_TYPE_INFO)
+                  .apply(value)).toBigInteger();
+            } catch (NumberFormatException e) {
+              throw BitSailException.asBitSailException(
+                  CommonErrorCode.CONVERT_NOT_SUPPORT,
+                  String.format("String[%s] can't convert to big integer.", value));
             }
           }
         }
@@ -775,40 +845,6 @@ public class TypeInfoCompatibles implements Serializable {
             } catch (Exception e) {
               return ((LocalDateTime) compatibles.get(TypeInfos.STRING_TYPE_INFO, TypeInfos.LOCAL_DATE_TIME_TYPE_INFO)
                   .apply(value)).toLocalTime();
-            }
-          }
-        }
-    );
-
-    compatibles.put(TypeInfos.STRING_TYPE_INFO,
-        TypeInfos.BIG_DECIMAL_TYPE_INFO,
-        new Function<Object, Object>() {
-          @Override
-          public Object apply(Object value) {
-
-            try {
-              return new BigDecimal((String) value);
-            } catch (NumberFormatException e) {
-              throw BitSailException.asBitSailException(
-                  CommonErrorCode.CONVERT_NOT_SUPPORT,
-                  String.format("String[%s] can't convert to big decimal.", value));
-            }
-          }
-        }
-    );
-
-    compatibles.put(TypeInfos.STRING_TYPE_INFO,
-        TypeInfos.BIG_INTEGER_TYPE_INFO,
-        new Function<Object, Object>() {
-          @Override
-          public Object apply(Object value) {
-            try {
-              return ((BigDecimal) compatibles.get(TypeInfos.STRING_TYPE_INFO, TypeInfos.BIG_DECIMAL_TYPE_INFO)
-                  .apply(value)).toBigInteger();
-            } catch (NumberFormatException e) {
-              throw BitSailException.asBitSailException(
-                  CommonErrorCode.CONVERT_NOT_SUPPORT,
-                  String.format("String[%s] can't convert to big integer.", value));
             }
           }
         }
