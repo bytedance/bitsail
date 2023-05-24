@@ -23,6 +23,7 @@ import com.bytedance.bitsail.common.option.CommonOptions;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Maps;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -38,6 +39,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -58,6 +60,7 @@ public class TypeInfoCompatibles implements Serializable {
   private final transient DateTimeFormatter timeFormatter;
   private final transient DateTimeFormatter dateTimeFormatter;
   private final transient ZoneId dateTimeZone;
+  private final transient Map<Integer, DateTimeFormatter> defaultDateTimeFormatterMap;
 
   private final transient HashBasedTable<TypeInfo<?>, TypeInfo<?>, Function<Object, Object>> compatibles;
 
@@ -76,6 +79,8 @@ public class TypeInfoCompatibles implements Serializable {
         ZoneId.of(commonConfiguration.get(CommonOptions.DateFormatOptions.TIME_ZONE)) :
         ZoneId.systemDefault();
 
+    this.defaultDateTimeFormatterMap = prepareFormatterMap();
+
     addByteArrayTypeInfoCompatibles();
     addBooleanTypeInfoCompatibles();
     addStringTypeInfoCompatibles();
@@ -86,6 +91,36 @@ public class TypeInfoCompatibles implements Serializable {
     addLocalDateTypeInfoCompatibles();
     addLocalTimeTypeInfoCompatibles();
     addLocalDateTimeTypeInfoCompatibles();
+  }
+
+  private static Map<Integer, DateTimeFormatter> prepareFormatterMap() {
+    Map<Integer, DateTimeFormatter> dateTimeFormatterMap = Maps.newHashMap();
+    dateTimeFormatterMap.put(
+        "yyyyMMdd HH:mm:ss".length(),
+        DateTimeFormatter.ofPattern("yyyyMMdd HH:mm:ss"));
+    dateTimeFormatterMap.put(
+        "yyyy-MM-dd HH:mm:ss".length(),
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    dateTimeFormatterMap.put(
+        "yyyy-MM-dd HH:mm:ss.S".length(),
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S"));
+    dateTimeFormatterMap.put(
+        "yyyy-MM-dd HH:mm:ss.SS".length(),
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SS"));
+    dateTimeFormatterMap.put(
+        "yyyy-MM-dd HH:mm:ss.SSS".length(),
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+    dateTimeFormatterMap.put(
+        "yyyy-MM-dd HH:mm:ss.SSSS".length(),
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSS"));
+    dateTimeFormatterMap.put(
+        "yyyy-MM-dd HH:mm:ss.SSSSS".length(),
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSS"));
+    dateTimeFormatterMap.put(
+        "yyyy-MM-dd HH:mm:ss.SSSSSS".length(),
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"));
+
+    return dateTimeFormatterMap;
   }
 
   private void addByteArrayTypeInfoCompatibles() {
@@ -173,8 +208,9 @@ public class TypeInfoCompatibles implements Serializable {
         new Function<Object, Object>() {
           @Override
           public Object apply(Object value) {
-            return dateTimeFormatter.format(((LocalDateTime) compatibles.get(TypeInfos.SQL_TIMESTAMP_TYPE_INFO, TypeInfos.LOCAL_DATE_TIME_TYPE_INFO)
-                .apply(value)));
+            return compatibles.get(TypeInfos.LOCAL_DATE_TIME_TYPE_INFO, TypeInfos.STRING_TYPE_INFO)
+                .apply((compatibles.get(TypeInfos.SQL_TIMESTAMP_TYPE_INFO, TypeInfos.LOCAL_DATE_TIME_TYPE_INFO)
+                    .apply(value)));
           }
         }
     );
@@ -208,8 +244,9 @@ public class TypeInfoCompatibles implements Serializable {
         new Function<Object, Object>() {
           @Override
           public Object apply(Object value) {
-            return timeFormatter.format(((LocalTime) compatibles.get(TypeInfos.SQL_TIME_TYPE_INFO, TypeInfos.LOCAL_TIME_TYPE_INFO)
-                .apply(value)));
+            return compatibles.get(TypeInfos.LOCAL_TIME_TYPE_INFO, TypeInfos.STRING_TYPE_INFO)
+                .apply((compatibles.get(TypeInfos.SQL_TIME_TYPE_INFO, TypeInfos.LOCAL_TIME_TYPE_INFO)
+                    .apply(value)));
           }
         }
     );
@@ -243,8 +280,9 @@ public class TypeInfoCompatibles implements Serializable {
         new Function<Object, Object>() {
           @Override
           public Object apply(Object value) {
-            return dateFormatter.format(((LocalDate) compatibles.get(TypeInfos.SQL_DATE_TYPE_INFO, TypeInfos.LOCAL_DATE_TYPE_INFO)
-                .apply(value)));
+            return compatibles.get(TypeInfos.LOCAL_DATE_TYPE_INFO, TypeInfos.STRING_TYPE_INFO)
+                .apply((compatibles.get(TypeInfos.SQL_DATE_TYPE_INFO, TypeInfos.LOCAL_DATE_TYPE_INFO)
+                    .apply(value)));
           }
         }
     );
@@ -812,7 +850,17 @@ public class TypeInfoCompatibles implements Serializable {
         new Function<Object, Object>() {
           @Override
           public Object apply(Object value) {
-            return LocalDateTime.parse((String) value, dateTimeFormatter);
+            String str = (String) value;
+            try {
+              return LocalDateTime.parse(str, dateTimeFormatter);
+            } catch (Exception e) {
+              str = str.replace("T", " ");
+              DateTimeFormatter formatter = defaultDateTimeFormatterMap.get(str.length());
+              if (Objects.isNull(formatter)) {
+                throw e;
+              }
+              return LocalDateTime.parse(str, formatter);
+            }
           }
         }
     );

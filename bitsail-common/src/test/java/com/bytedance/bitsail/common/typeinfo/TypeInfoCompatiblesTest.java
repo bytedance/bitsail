@@ -164,6 +164,26 @@ public class TypeInfoCompatiblesTest {
     result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
     assertTypeInfo(result, target);
 
+    timestampStr = "2021-01-01 10:01:23.1";
+    result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
+    assertTypeInfo(result, target);
+
+    timestampStr = "2021-01-01 10:01:23.11";
+    result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
+    assertTypeInfo(result, target);
+
+    timestampStr = "2021-01-01 10:01:23.111";
+    result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
+    assertTypeInfo(result, target);
+
+    timestampStr = "2021-01-01 10:01:23.1111";
+    result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
+    assertTypeInfo(result, target);
+
+    timestampStr = "2021-01-01 10:01:23.111111";
+    result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
+    assertTypeInfo(result, target);
+
     target = TypeInfos.SQL_DATE_TYPE_INFO;
     result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
     assertTypeInfo(result, target);
