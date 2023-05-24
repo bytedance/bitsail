@@ -19,10 +19,13 @@ package com.bytedance.bitsail.common.typeinfo;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.collections.MapUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -33,9 +36,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 public class TypeInfoCompatiblesTest {
+  private static final Logger LOG = LoggerFactory.getLogger(TypeInfoCompatiblesTest.class);
 
   private TypeInfoCompatibles typeInfoCompatibles;
 
@@ -48,7 +53,7 @@ public class TypeInfoCompatiblesTest {
   public void testIntTypeInfoCompatibles() {
     int value = 100;
     TypeInfo<Integer> source = TypeInfos.INT_TYPE_INFO;
-    assertTypeInfo(source, value);
+    Assert.assertEquals(assertTypeInfo(source, value), 8);
   }
 
   @Test
@@ -64,7 +69,7 @@ public class TypeInfoCompatiblesTest {
   public void testLongTypeInfoCompatibles() {
     long value = 1000L;
     TypeInfo<?> source = TypeInfos.LONG_TYPE_INFO;
-    assertTypeInfo(source, value);
+    Assert.assertEquals(assertTypeInfo(source, value), 9);
   }
 
   @Test
@@ -82,13 +87,15 @@ public class TypeInfoCompatiblesTest {
   public void testBigDecimalTypeInfoCompatibles() {
     BigDecimal value = new BigDecimal("87496.4557384283");
     TypeInfo<?> source = TypeInfos.BIG_DECIMAL_TYPE_INFO;
-    assertTypeInfo(source, value);
+    Assert.assertEquals(assertTypeInfo(source, value), 5);
   }
 
   @Test
   public void testDoubleTypeInfoCompatibles() {
     double value = 1.231d;
     TypeInfo<?> source = TypeInfos.DOUBLE_TYPE_INFO;
+
+    Assert.assertEquals(assertTypeInfo(source, value), 5);
 
     Object result;
     TypeInfo<?> target;
@@ -103,12 +110,19 @@ public class TypeInfoCompatiblesTest {
     target = TypeInfos.BIG_INTEGER_TYPE_INFO;
     result = typeInfoCompatibles.compatibleTo(source, target, value);
     assertTypeInfo(result, target);
+
+    value = Double.parseDouble(String.valueOf(Float.MAX_VALUE)) * 10d;
+    target = TypeInfos.FLOAT_TYPE_INFO;
+    result = typeInfoCompatibles.compatibleTo(source, target, value);
+    assertTypeInfo(result, target);
   }
 
   @Test
   public void testFloatTypeInfoCompatibles() {
     float value = 1.231f;
     TypeInfo<?> source = TypeInfos.FLOAT_TYPE_INFO;
+
+    Assert.assertEquals(assertTypeInfo(source, value), 5);
 
     Object result;
     TypeInfo<?> target;
@@ -130,34 +144,43 @@ public class TypeInfoCompatiblesTest {
     String numberStr = "2012";
     TypeInfo<?> source = TypeInfos.STRING_TYPE_INFO;
 
+    Assert.assertEquals(assertTypeInfo(source, numberStr, Sets.newHashSet(TypeInfos.LOCAL_DATE_TIME_TYPE_INFO,
+        TypeInfos.LOCAL_DATE_TYPE_INFO,
+        TypeInfos.LOCAL_TIME_TYPE_INFO,
+        TypeInfos.SQL_DATE_TYPE_INFO,
+        TypeInfos.SQL_TIME_TYPE_INFO,
+        TypeInfos.SQL_TIMESTAMP_TYPE_INFO)), 15);
+
     Object result;
     TypeInfo<?> target;
-    target = TypeInfos.SHORT_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, numberStr);
-    assertTypeInfo(result, target);
 
-    target = TypeInfos.INT_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, numberStr);
-    assertTypeInfo(result, target);
-
-    target = TypeInfos.LONG_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, numberStr);
-    assertTypeInfo(result, target);
-
-    target = BasicArrayTypeInfo.BINARY_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, numberStr);
-    assertTypeInfo(result, target);
-
-    target = TypeInfos.BIG_INTEGER_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, numberStr);
-    assertTypeInfo(result, target);
-
-    target = TypeInfos.BIG_DECIMAL_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, numberStr);
+    String booleanStr = "true";
+    target = TypeInfos.BOOLEAN_TYPE_INFO;
+    result = typeInfoCompatibles.compatibleTo(source, target, booleanStr);
     assertTypeInfo(result, target);
 
     String timestampStr = "2021-01-01 10:01:23";
     target = TypeInfos.SQL_TIMESTAMP_TYPE_INFO;
+    result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
+    assertTypeInfo(result, target);
+
+    timestampStr = "2021-01-01 10:01:23.1";
+    result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
+    assertTypeInfo(result, target);
+
+    timestampStr = "2021-01-01 10:01:23.11";
+    result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
+    assertTypeInfo(result, target);
+
+    timestampStr = "2021-01-01 10:01:23.111";
+    result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
+    assertTypeInfo(result, target);
+
+    timestampStr = "2021-01-01 10:01:23.1111";
+    result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
+    assertTypeInfo(result, target);
+
+    timestampStr = "2021-01-01 10:01:23.111111";
     result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
     assertTypeInfo(result, target);
 
@@ -168,6 +191,18 @@ public class TypeInfoCompatiblesTest {
     target = TypeInfos.SQL_TIME_TYPE_INFO;
     result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
     assertTypeInfo(result, target);
+
+    target = TypeInfos.LOCAL_DATE_TIME_TYPE_INFO;
+    result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
+    assertTypeInfo(result, target);
+
+    target = TypeInfos.LOCAL_DATE_TYPE_INFO;
+    result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
+    assertTypeInfo(result, target);
+
+    target = TypeInfos.LOCAL_TIME_TYPE_INFO;
+    result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
+    assertTypeInfo(result, target);
   }
 
   @Test
@@ -175,15 +210,7 @@ public class TypeInfoCompatiblesTest {
     Date date = new Date(System.currentTimeMillis());
     TypeInfo<?> source = TypeInfos.SQL_DATE_TYPE_INFO;
 
-    Object result;
-    TypeInfo<?> target;
-    target = TypeInfos.STRING_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, date);
-    assertTypeInfo(result, target);
-
-    target = TypeInfos.LOCAL_DATE_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, date);
-    assertTypeInfo(result, target);
+    Assert.assertEquals(assertTypeInfo(source, date), 4);
   }
 
   @Test
@@ -191,21 +218,15 @@ public class TypeInfoCompatiblesTest {
     Time time = new Time(System.currentTimeMillis());
     TypeInfo<?> source = TypeInfos.SQL_TIME_TYPE_INFO;
 
-    Object result;
-    TypeInfo<?> target;
-    target = TypeInfos.STRING_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, time);
-    assertTypeInfo(result, target);
-
-    target = TypeInfos.LOCAL_TIME_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, time);
-    assertTypeInfo(result, target);
+    Assert.assertEquals(assertTypeInfo(source, time), 3);
   }
 
   @Test
   public void testSqlTimestampTypeInfoCompatibles() {
     long timestamp = System.currentTimeMillis();
     TypeInfo<?> source = TypeInfos.SQL_TIMESTAMP_TYPE_INFO;
+
+    Assert.assertEquals(assertTypeInfo(source, new Timestamp(timestamp)), 5);
 
     Object result;
     TypeInfo<?> target;
@@ -229,15 +250,7 @@ public class TypeInfoCompatiblesTest {
     LocalDateTime localDateTime = LocalDateTime.now();
     TypeInfo<?> source = TypeInfos.LOCAL_DATE_TIME_TYPE_INFO;
 
-    Object result;
-    TypeInfo<?> target;
-    target = TypeInfos.STRING_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, localDateTime);
-    assertTypeInfo(result, target);
-
-    target = TypeInfos.LONG_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, localDateTime);
-    assertTypeInfo(result, target);
+    Assert.assertEquals(assertTypeInfo(source, localDateTime), 3);
   }
 
   @Test
@@ -245,15 +258,7 @@ public class TypeInfoCompatiblesTest {
     LocalTime localTime = LocalTime.now();
     TypeInfo<?> source = TypeInfos.LOCAL_TIME_TYPE_INFO;
 
-    Object result;
-    TypeInfo<?> target;
-    target = TypeInfos.STRING_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, localTime);
-    assertTypeInfo(result, target);
-
-    target = TypeInfos.SQL_TIME_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, localTime);
-    assertTypeInfo(result, target);
+    Assert.assertEquals(assertTypeInfo(source, localTime), 2);
   }
 
   @Test
@@ -261,15 +266,7 @@ public class TypeInfoCompatiblesTest {
     LocalDate localDate = LocalDate.now();
     TypeInfo<?> source = TypeInfos.LOCAL_DATE_TYPE_INFO;
 
-    Object result;
-    TypeInfo<?> target;
-    target = TypeInfos.STRING_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, localDate);
-    assertTypeInfo(result, target);
-
-    target = TypeInfos.SQL_DATE_TYPE_INFO;
-    result = typeInfoCompatibles.compatibleTo(source, target, localDate);
-    assertTypeInfo(result, target);
+    Assert.assertEquals(assertTypeInfo(source, localDate), 2);
   }
 
   @Test
@@ -289,18 +286,27 @@ public class TypeInfoCompatiblesTest {
     Assert.assertEquals(str, result);
   }
 
-  private void assertTypeInfo(TypeInfo<?> source, Object value) {
+  private int assertTypeInfo(TypeInfo<?> source, Object value) {
+    return assertTypeInfo(source, value, Sets.newHashSet());
+  }
+
+  private int assertTypeInfo(TypeInfo<?> source, Object value, Set<TypeInfo<?>> excluded) {
     Map<TypeInfo<?>, Function<Object, Object>> targets = typeInfoCompatibles.getCompatibles()
         .row(source);
 
     if (MapUtils.isEmpty(targets)) {
-      return;
+      return 0;
     }
 
     for (Map.Entry<TypeInfo<?>, Function<Object, Object>> entry : targets.entrySet()) {
+      if (excluded.contains(entry.getKey())) {
+        continue;
+      }
       Object result = typeInfoCompatibles.compatibleTo(source, entry.getKey(), value);
+      LOG.info("Converted type info from {} to {} for value {}, result {}.", source, entry.getKey(), value, result);
       assertTypeInfo(result, entry.getKey());
     }
+    return targets.keySet().size();
   }
 
   private static void assertTypeInfo(Object value, TypeInfo<?> typeInfo) {
