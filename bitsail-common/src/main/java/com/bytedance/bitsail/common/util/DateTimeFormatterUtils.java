@@ -55,7 +55,6 @@ public class DateTimeFormatterUtils {
   }
 
   public static DateTimeFormatter getFormatter(String str) {
-    str = StringUtils.replace(str, "T", " ");
     return DEFAULT_DATETIME_FORMATTER_MAP.get(StringUtils.length(str));
   }
 

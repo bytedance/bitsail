@@ -24,6 +24,7 @@ import com.bytedance.bitsail.common.util.DateTimeFormatterUtils;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashBasedTable;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -820,6 +821,7 @@ public class TypeInfoCompatibles implements Serializable {
             try {
               return LocalDateTime.parse(str, dateTimeFormatter);
             } catch (Exception e) {
+              str = StringUtils.replace(str, "T", " ");
               DateTimeFormatter formatter = DateTimeFormatterUtils.getFormatter(str);
               if (Objects.isNull(formatter)) {
                 throw e;
