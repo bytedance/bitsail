@@ -111,7 +111,6 @@ public class TypeInfoCompatiblesColumnCompareTest {
     Assert.assertEquals(doubleColumn.asDouble(),
         typeInfoCompatibles.compatibleTo(source, TypeInfos.DOUBLE_TYPE_INFO, valueLong));
 
-
     Integer valueInteger = Integer.MAX_VALUE;
     doubleColumn = new DoubleColumn(valueInteger);
     source = TypeInfos.INT_TYPE_INFO;
