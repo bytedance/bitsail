@@ -53,7 +53,7 @@ public class TypeInfoCompatiblesTest {
   public void testIntTypeInfoCompatibles() {
     int value = 100;
     TypeInfo<Integer> source = TypeInfos.INT_TYPE_INFO;
-    assertTypeInfo(source, value);
+    Assert.assertEquals(assertTypeInfo(source, value), 8);
   }
 
   @Test
@@ -69,7 +69,7 @@ public class TypeInfoCompatiblesTest {
   public void testLongTypeInfoCompatibles() {
     long value = 1000L;
     TypeInfo<?> source = TypeInfos.LONG_TYPE_INFO;
-    assertTypeInfo(source, value);
+    Assert.assertEquals(assertTypeInfo(source, value), 9);
   }
 
   @Test
@@ -87,7 +87,7 @@ public class TypeInfoCompatiblesTest {
   public void testBigDecimalTypeInfoCompatibles() {
     BigDecimal value = new BigDecimal("87496.4557384283");
     TypeInfo<?> source = TypeInfos.BIG_DECIMAL_TYPE_INFO;
-    assertTypeInfo(source, value);
+    Assert.assertEquals(assertTypeInfo(source, value), 5);
   }
 
   @Test
@@ -95,7 +95,7 @@ public class TypeInfoCompatiblesTest {
     double value = 1.231d;
     TypeInfo<?> source = TypeInfos.DOUBLE_TYPE_INFO;
 
-    assertTypeInfo(source, value);
+    Assert.assertEquals(assertTypeInfo(source, value), 5);
 
     Object result;
     TypeInfo<?> target;
@@ -122,7 +122,7 @@ public class TypeInfoCompatiblesTest {
     float value = 1.231f;
     TypeInfo<?> source = TypeInfos.FLOAT_TYPE_INFO;
 
-    assertTypeInfo(source, value);
+    Assert.assertEquals(assertTypeInfo(source, value), 5);
 
     Object result;
     TypeInfo<?> target;
@@ -144,12 +144,12 @@ public class TypeInfoCompatiblesTest {
     String numberStr = "2012";
     TypeInfo<?> source = TypeInfos.STRING_TYPE_INFO;
 
-    assertTypeInfo(source, numberStr, Sets.newHashSet(TypeInfos.LOCAL_DATE_TIME_TYPE_INFO,
+    Assert.assertEquals(assertTypeInfo(source, numberStr, Sets.newHashSet(TypeInfos.LOCAL_DATE_TIME_TYPE_INFO,
         TypeInfos.LOCAL_DATE_TYPE_INFO,
         TypeInfos.LOCAL_TIME_TYPE_INFO,
         TypeInfos.SQL_DATE_TYPE_INFO,
         TypeInfos.SQL_TIME_TYPE_INFO,
-        TypeInfos.SQL_TIMESTAMP_TYPE_INFO));
+        TypeInfos.SQL_TIMESTAMP_TYPE_INFO)), 15);
 
     Object result;
     TypeInfo<?> target;
@@ -190,7 +190,7 @@ public class TypeInfoCompatiblesTest {
     Date date = new Date(System.currentTimeMillis());
     TypeInfo<?> source = TypeInfos.SQL_DATE_TYPE_INFO;
 
-    assertTypeInfo(source, date);
+    Assert.assertEquals(assertTypeInfo(source, date), 4);
   }
 
   @Test
@@ -198,8 +198,7 @@ public class TypeInfoCompatiblesTest {
     Time time = new Time(System.currentTimeMillis());
     TypeInfo<?> source = TypeInfos.SQL_TIME_TYPE_INFO;
 
-    assertTypeInfo(source, time);
-
+    Assert.assertEquals(assertTypeInfo(source, time), 3);
   }
 
   @Test
@@ -207,7 +206,7 @@ public class TypeInfoCompatiblesTest {
     long timestamp = System.currentTimeMillis();
     TypeInfo<?> source = TypeInfos.SQL_TIMESTAMP_TYPE_INFO;
 
-    assertTypeInfo(source, new Timestamp(timestamp));
+    Assert.assertEquals(assertTypeInfo(source, new Timestamp(timestamp)), 5);
 
     Object result;
     TypeInfo<?> target;
@@ -231,7 +230,7 @@ public class TypeInfoCompatiblesTest {
     LocalDateTime localDateTime = LocalDateTime.now();
     TypeInfo<?> source = TypeInfos.LOCAL_DATE_TIME_TYPE_INFO;
 
-    assertTypeInfo(source, localDateTime);
+    Assert.assertEquals(assertTypeInfo(source, localDateTime), 3);
   }
 
   @Test
@@ -239,7 +238,7 @@ public class TypeInfoCompatiblesTest {
     LocalTime localTime = LocalTime.now();
     TypeInfo<?> source = TypeInfos.LOCAL_TIME_TYPE_INFO;
 
-    assertTypeInfo(source, localTime);
+    Assert.assertEquals(assertTypeInfo(source, localTime), 2);
   }
 
   @Test
@@ -247,7 +246,7 @@ public class TypeInfoCompatiblesTest {
     LocalDate localDate = LocalDate.now();
     TypeInfo<?> source = TypeInfos.LOCAL_DATE_TYPE_INFO;
 
-    assertTypeInfo(source, localDate);
+    Assert.assertEquals(assertTypeInfo(source, localDate), 2);
   }
 
   @Test
@@ -267,16 +266,16 @@ public class TypeInfoCompatiblesTest {
     Assert.assertEquals(str, result);
   }
 
-  private void assertTypeInfo(TypeInfo<?> source, Object value) {
-    assertTypeInfo(source, value, Sets.newHashSet());
+  private int assertTypeInfo(TypeInfo<?> source, Object value) {
+    return assertTypeInfo(source, value, Sets.newHashSet());
   }
 
-  private void assertTypeInfo(TypeInfo<?> source, Object value, Set<TypeInfo<?>> excluded) {
+  private int assertTypeInfo(TypeInfo<?> source, Object value, Set<TypeInfo<?>> excluded) {
     Map<TypeInfo<?>, Function<Object, Object>> targets = typeInfoCompatibles.getCompatibles()
         .row(source);
 
     if (MapUtils.isEmpty(targets)) {
-      return;
+      return 0;
     }
 
     for (Map.Entry<TypeInfo<?>, Function<Object, Object>> entry : targets.entrySet()) {
@@ -287,6 +286,7 @@ public class TypeInfoCompatiblesTest {
       LOG.info("Converted type info from {} to {} for value {}, result {}.", source, entry.getKey(), value, result);
       assertTypeInfo(result, entry.getKey());
     }
+    return targets.keySet().size();
   }
 
   private static void assertTypeInfo(Object value, TypeInfo<?> typeInfo) {
