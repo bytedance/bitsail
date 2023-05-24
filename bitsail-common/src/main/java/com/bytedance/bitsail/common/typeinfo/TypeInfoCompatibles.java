@@ -510,18 +510,16 @@ public class TypeInfoCompatibles implements Serializable {
         (value) -> ((BigDecimal) value).floatValue()
     );
 
+    //TODO in future we maybe change to method `longValueExact` to avoid lose precisions
     compatibles.put(TypeInfos.BIG_DECIMAL_TYPE_INFO,
         TypeInfos.LONG_TYPE_INFO,
-        (value) -> ((BigDecimal) value).
-            //TODO in future we maybe change to method `longValueExact` to avoid lose precisions
-                longValue()
+        (value) -> ((BigDecimal) value).longValue()
     );
 
+    //TODO in future we maybe change to method `toBigIntegerExact` to avoid lose precisions
     compatibles.put(TypeInfos.BIG_DECIMAL_TYPE_INFO,
         TypeInfos.BIG_INTEGER_TYPE_INFO,
-        (value) -> ((BigDecimal) value).
-            //TODO in future we maybe change to method `toBigIntegerExact` to avoid lose precisions
-                toBigInteger()
+        (value) -> ((BigDecimal) value).toBigInteger()
     );
 
     compatibles.put(TypeInfos.BIG_INTEGER_TYPE_INFO,
@@ -531,8 +529,7 @@ public class TypeInfoCompatibles implements Serializable {
 
     compatibles.put(TypeInfos.BIG_INTEGER_TYPE_INFO,
         TypeInfos.LONG_TYPE_INFO,
-        (value) -> ((BigInteger) value).
-            longValueExact()
+        (value) -> ((BigInteger) value).longValueExact()
     );
 
     compatibles.put(TypeInfos.BIG_INTEGER_TYPE_INFO,
@@ -602,8 +599,7 @@ public class TypeInfoCompatibles implements Serializable {
     //TODO in future, will be removed. double -> long
     compatibles.put(TypeInfos.DOUBLE_TYPE_INFO,
         TypeInfos.LONG_TYPE_INFO,
-        (value) -> ((Double) value).
-            longValue()
+        (value) -> ((Double) value).longValue()
     );
 
     compatibles.put(TypeInfos.DOUBLE_TYPE_INFO,
@@ -679,6 +675,7 @@ public class TypeInfoCompatibles implements Serializable {
           }
         }
     );
+
     compatibles.put(TypeInfos.STRING_TYPE_INFO,
         TypeInfos.FLOAT_TYPE_INFO,
         new Function<Object, Object>() {
