@@ -23,7 +23,6 @@ import com.bytedance.bitsail.common.option.CommonOptions;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashBasedTable;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -533,6 +532,11 @@ public class TypeInfoCompatibles implements Serializable {
     );
 
     compatibles.put(TypeInfos.BIG_INTEGER_TYPE_INFO,
+        TypeInfos.BIG_DECIMAL_TYPE_INFO,
+        (value) -> new BigDecimal((BigInteger) value)
+    );
+
+    compatibles.put(TypeInfos.BIG_INTEGER_TYPE_INFO,
         TypeInfos.BOOLEAN_TYPE_INFO,
         new Function<Object, Object>() {
           @Override
@@ -626,6 +630,7 @@ public class TypeInfoCompatibles implements Serializable {
         }
     );
 
+    //TODO in future maybe add parameter to allow converter when we want to transform 1.2 to short
     compatibles.put(TypeInfos.STRING_TYPE_INFO,
         TypeInfos.SHORT_TYPE_INFO,
         new Function<Object, Object>() {
@@ -633,7 +638,7 @@ public class TypeInfoCompatibles implements Serializable {
           public Object apply(Object value) {
 
             try {
-              return NumberUtils.toShort(value.toString());
+              return Short.parseShort(value.toString());
             } catch (NumberFormatException e) {
               throw BitSailException.asBitSailException(
                   CommonErrorCode.CONVERT_NOT_SUPPORT,
@@ -643,6 +648,7 @@ public class TypeInfoCompatibles implements Serializable {
         }
     );
 
+    //TODO in future maybe add parameter to allow converter when we want to transform 1.2 to int
     compatibles.put(TypeInfos.STRING_TYPE_INFO,
         TypeInfos.INT_TYPE_INFO,
         new Function<Object, Object>() {
@@ -650,7 +656,7 @@ public class TypeInfoCompatibles implements Serializable {
           public Object apply(Object value) {
 
             try {
-              return NumberUtils.toInt(value.toString());
+              return Integer.parseInt(value.toString());
             } catch (NumberFormatException e) {
               throw BitSailException.asBitSailException(
                   CommonErrorCode.CONVERT_NOT_SUPPORT,
@@ -659,6 +665,8 @@ public class TypeInfoCompatibles implements Serializable {
           }
         }
     );
+
+    //TODO in future maybe add parameter to allow converter when we want to transform 1.2 to long
     compatibles.put(TypeInfos.STRING_TYPE_INFO,
         TypeInfos.LONG_TYPE_INFO,
         new Function<Object, Object>() {
@@ -666,7 +674,7 @@ public class TypeInfoCompatibles implements Serializable {
           public Object apply(Object value) {
 
             try {
-              return NumberUtils.toLong(value.toString());
+              return Long.parseLong(value.toString());
             } catch (NumberFormatException e) {
               throw BitSailException.asBitSailException(
                   CommonErrorCode.CONVERT_NOT_SUPPORT,
@@ -683,7 +691,7 @@ public class TypeInfoCompatibles implements Serializable {
           public Object apply(Object value) {
 
             try {
-              return NumberUtils.toFloat(value.toString());
+              return Float.parseFloat(value.toString());
             } catch (NumberFormatException e) {
               throw BitSailException.asBitSailException(
                   CommonErrorCode.CONVERT_NOT_SUPPORT,
@@ -699,7 +707,7 @@ public class TypeInfoCompatibles implements Serializable {
           public Object apply(Object value) {
 
             try {
-              return NumberUtils.toDouble(value.toString());
+              return Double.parseDouble(value.toString());
             } catch (NumberFormatException e) {
               throw BitSailException.asBitSailException(
                   CommonErrorCode.CONVERT_NOT_SUPPORT,
@@ -726,14 +734,14 @@ public class TypeInfoCompatibles implements Serializable {
         }
     );
 
+    //TODO in future maybe add parameter to allow converter when we want to transform 1.2 to big integer
     compatibles.put(TypeInfos.STRING_TYPE_INFO,
         TypeInfos.BIG_INTEGER_TYPE_INFO,
         new Function<Object, Object>() {
           @Override
           public Object apply(Object value) {
             try {
-              return ((BigDecimal) compatibles.get(TypeInfos.STRING_TYPE_INFO, TypeInfos.BIG_DECIMAL_TYPE_INFO)
-                  .apply(value)).toBigInteger();
+              return new BigInteger((String) value);
             } catch (NumberFormatException e) {
               throw BitSailException.asBitSailException(
                   CommonErrorCode.CONVERT_NOT_SUPPORT,
@@ -749,20 +757,14 @@ public class TypeInfoCompatibles implements Serializable {
           @Override
           public Object apply(Object value) {
             try {
-              LocalDate localDate = (LocalDate) (compatibles.get(TypeInfos.STRING_TYPE_INFO, TypeInfos.LOCAL_TIME_TYPE_INFO).apply(value));
-              long timestamp = localDate.atStartOfDay()
-                  .atZone(dateTimeZone)
-                  .toInstant()
-                  .toEpochMilli();
-              return new Date(timestamp);
+              LocalDate localDate = (LocalDate) (compatibles.get(TypeInfos.STRING_TYPE_INFO,
+                  TypeInfos.LOCAL_DATE_TYPE_INFO).apply(value));
+              return java.sql.Date.valueOf(localDate);
             } catch (Exception e) {
               try {
-                LocalDateTime localDateTime = (LocalDateTime) (compatibles.get(TypeInfos.STRING_TYPE_INFO, TypeInfos.LOCAL_DATE_TIME_TYPE_INFO).apply(value));
-                long timestamp = localDateTime
-                    .atZone(dateTimeZone)
-                    .toInstant()
-                    .toEpochMilli();
-                return new Date(timestamp);
+                LocalDateTime localDateTime = (LocalDateTime) (compatibles.get(TypeInfos.STRING_TYPE_INFO,
+                    TypeInfos.LOCAL_DATE_TIME_TYPE_INFO).apply(value));
+                return java.sql.Date.valueOf(localDateTime.toLocalDate());
               } catch (Exception e1) {
                 throw BitSailException.asBitSailException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
@@ -779,11 +781,11 @@ public class TypeInfoCompatibles implements Serializable {
           public Object apply(Object value) {
             try {
               LocalTime localTime = (LocalTime) (compatibles.get(TypeInfos.STRING_TYPE_INFO, TypeInfos.LOCAL_TIME_TYPE_INFO).apply(value));
-              return new Time(localTime.getHour(), localTime.getMinute(), localTime.getSecond());
+              return Time.valueOf(localTime);
             } catch (Exception e) {
               try {
                 LocalDateTime localDateTime = (LocalDateTime) (compatibles.get(TypeInfos.STRING_TYPE_INFO, TypeInfos.LOCAL_DATE_TIME_TYPE_INFO).apply(value));
-                return new Time(localDateTime.getHour(), localDateTime.getMinute(), localDateTime.getSecond());
+                return Time.valueOf(localDateTime.toLocalTime());
               } catch (Exception e1) {
                 throw BitSailException.asBitSailException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
@@ -800,9 +802,7 @@ public class TypeInfoCompatibles implements Serializable {
           @Override
           public Object apply(Object value) {
             LocalDateTime localDateTime = (LocalDateTime) (compatibles.get(TypeInfos.STRING_TYPE_INFO, TypeInfos.LOCAL_DATE_TIME_TYPE_INFO).apply(value));
-            return new Timestamp(localDateTime.atZone(dateTimeZone)
-                .toInstant()
-                .toEpochMilli());
+            return Timestamp.valueOf(localDateTime);
           }
         }
     );
@@ -907,6 +907,11 @@ public class TypeInfoCompatibles implements Serializable {
   public Object compatibleTo(TypeInfo<?> from,
                              TypeInfo<?> to,
                              Object value) {
+    Class<?> fromTypeClass = from.getTypeClass();
+    Class<?> toTypeClass = to.getTypeClass();
+    if (fromTypeClass == toTypeClass) {
+      return value;
+    }
     Function<Object, Object> function = compatibles.get(from, to);
     if (Objects.isNull(function)) {
       throw BitSailException.asBitSailException(CommonErrorCode.CONVERT_NOT_SUPPORT,
