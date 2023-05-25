@@ -159,8 +159,17 @@ public class TypeInfoCompatiblesTest {
     result = typeInfoCompatibles.compatibleTo(source, target, booleanStr);
     assertTypeInfo(result, target);
 
-    String timestampStr = "2021-01-01 10:01:23";
+    String timestampStr = "2021-01-01";
+    target = TypeInfos.LOCAL_DATE_TIME_TYPE_INFO;
+    result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
+    assertTypeInfo(result, target);
+
+    timestampStr = "2021-01-01";
     target = TypeInfos.SQL_TIMESTAMP_TYPE_INFO;
+    result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
+    assertTypeInfo(result, target);
+
+    timestampStr = "2021-01-01 10:01:23";
     result = typeInfoCompatibles.compatibleTo(source, target, timestampStr);
     assertTypeInfo(result, target);
 
@@ -226,7 +235,7 @@ public class TypeInfoCompatiblesTest {
     long timestamp = System.currentTimeMillis();
     TypeInfo<?> source = TypeInfos.SQL_TIMESTAMP_TYPE_INFO;
 
-    Assert.assertEquals(assertTypeInfo(source, new Timestamp(timestamp)), 5);
+    Assert.assertEquals(assertTypeInfo(source, new Timestamp(timestamp)), 7);
 
     Object result;
     TypeInfo<?> target;
@@ -250,7 +259,7 @@ public class TypeInfoCompatiblesTest {
     LocalDateTime localDateTime = LocalDateTime.now();
     TypeInfo<?> source = TypeInfos.LOCAL_DATE_TIME_TYPE_INFO;
 
-    Assert.assertEquals(assertTypeInfo(source, localDateTime), 3);
+    Assert.assertEquals(assertTypeInfo(source, localDateTime), 7);
   }
 
   @Test

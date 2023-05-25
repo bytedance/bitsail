@@ -26,6 +26,13 @@ public class DateTimeFormatterUtils {
 
   private static final Map<Integer, DateTimeFormatter> DEFAULT_DATETIME_FORMATTER_MAP;
 
+  private static String YYYYMMDD_FORMAT = "yyyyMMdd";
+  private static String YYYY_MM_DD_FORMAT = "yyyy-MM-dd";
+  private static String DEFAULT_HH_MM_SS = " 00:00:00";
+
+  private static int YYYYMMDD_FORMAT_LENGTH = YYYYMMDD_FORMAT.length();
+  private static int YYYY_MM_DD_FORMAT_LENGTH = YYYY_MM_DD_FORMAT.length();
+
   static {
     DEFAULT_DATETIME_FORMATTER_MAP = Maps.newHashMap();
     DEFAULT_DATETIME_FORMATTER_MAP.put(
@@ -56,6 +63,16 @@ public class DateTimeFormatterUtils {
 
   public static DateTimeFormatter getFormatter(String str) {
     return DEFAULT_DATETIME_FORMATTER_MAP.get(StringUtils.length(str));
+  }
+
+  public static String addSuffixNecessary(String str) {
+    str = StringUtils.replace(str, "T", " ");
+    int length = str.length();
+    if (YYYYMMDD_FORMAT_LENGTH == length ||
+        YYYY_MM_DD_FORMAT_LENGTH == length) {
+      str = str + DEFAULT_HH_MM_SS;
+    }
+    return str;
   }
 
 }
