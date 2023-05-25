@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -138,6 +139,11 @@ public class TypeInfoCompatiblesColumnCompareTest {
         typeInfoCompatibles.compatibleTo(source, TypeInfos.STRING_TYPE_INFO, valueBigDecimal));
     Assert.assertEquals(doubleColumn.asDouble(),
         typeInfoCompatibles.compatibleTo(source, TypeInfos.DOUBLE_TYPE_INFO, valueBigDecimal));
+
+    valueBigDecimal = new BigDecimal("23232323211.11111111111", MathContext.DECIMAL32);
+    doubleColumn = new DoubleColumn(valueBigDecimal);
+    Assert.assertEquals(doubleColumn.asString(),
+        typeInfoCompatibles.compatibleTo(source, TypeInfos.STRING_TYPE_INFO, valueBigDecimal));
 
     BigInteger valueBigInteger = BigInteger.valueOf(Long.MAX_VALUE);
     doubleColumn = new DoubleColumn(valueBigInteger);

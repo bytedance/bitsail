@@ -536,9 +536,10 @@ public class TypeInfoCompatibles implements Serializable {
         value -> BigDecimal.valueOf((Long) value)
     );
 
+    //use plain string will not parse big decimal as sci
     compatibles.put(TypeInfos.BIG_DECIMAL_TYPE_INFO,
         TypeInfos.STRING_TYPE_INFO,
-        (value) -> ((BigDecimal) value).toString()
+        (value) -> ((BigDecimal) value).toPlainString()
     );
 
     compatibles.put(TypeInfos.BIG_DECIMAL_TYPE_INFO,

@@ -21,6 +21,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 
 import com.google.common.collect.Sets;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -88,6 +90,13 @@ public class TypeInfoCompatiblesTest {
     BigDecimal value = new BigDecimal("87496.4557384283");
     TypeInfo<?> source = TypeInfos.BIG_DECIMAL_TYPE_INFO;
     Assert.assertEquals(assertTypeInfo(source, value), 5);
+
+    value = new BigDecimal("23232323211.11111111111", MathContext.DECIMAL32);
+    Object result;
+    TypeInfo<?> target;
+    target = TypeInfos.STRING_TYPE_INFO;
+    result = typeInfoCompatibles.compatibleTo(source, target, value);
+    Assert.assertTrue(StringUtils.containsNone((String) result, "E"));
   }
 
   @Test
