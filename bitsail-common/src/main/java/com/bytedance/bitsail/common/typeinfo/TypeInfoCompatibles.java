@@ -24,7 +24,6 @@ import com.bytedance.bitsail.common.util.DateTimeFormatterUtils;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashBasedTable;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -105,15 +104,33 @@ public class TypeInfoCompatibles implements Serializable {
 
     compatibles.put(TypeInfos.LOCAL_DATE_TIME_TYPE_INFO,
         TypeInfos.LONG_TYPE_INFO,
-        //TODO check time zone.
         (value) -> ((LocalDateTime) value).atZone(dateTimeZone)
             .toInstant().toEpochMilli()
     );
 
     compatibles.put(TypeInfos.LOCAL_DATE_TIME_TYPE_INFO,
         TypeInfos.SQL_TIMESTAMP_TYPE_INFO,
-        //TODO check time zone.
         (value) -> Timestamp.valueOf((LocalDateTime) value)
+    );
+
+    compatibles.put(TypeInfos.LOCAL_DATE_TIME_TYPE_INFO,
+        TypeInfos.LOCAL_DATE_TYPE_INFO,
+        (value) -> ((LocalDateTime) value).toLocalDate()
+    );
+
+    compatibles.put(TypeInfos.LOCAL_DATE_TIME_TYPE_INFO,
+        TypeInfos.LOCAL_TIME_TYPE_INFO,
+        (value) -> ((LocalDateTime) value).toLocalTime()
+    );
+
+    compatibles.put(TypeInfos.LOCAL_DATE_TIME_TYPE_INFO,
+        TypeInfos.SQL_DATE_TYPE_INFO,
+        (value) -> java.sql.Date.valueOf(((LocalDateTime) value).toLocalDate())
+    );
+
+    compatibles.put(TypeInfos.LOCAL_DATE_TIME_TYPE_INFO,
+        TypeInfos.SQL_TIME_TYPE_INFO,
+        (value) -> java.sql.Time.valueOf(((LocalDateTime) value).toLocalTime())
     );
   }
 
@@ -181,9 +198,30 @@ public class TypeInfoCompatibles implements Serializable {
           }
         }
     );
+
     compatibles.put(TypeInfos.SQL_TIMESTAMP_TYPE_INFO,
         TypeInfos.LONG_TYPE_INFO,
         (value) -> ((Timestamp) value).getTime()
+    );
+
+    compatibles.put(TypeInfos.SQL_TIMESTAMP_TYPE_INFO,
+        TypeInfos.SQL_DATE_TYPE_INFO,
+        new Function<Object, Object>() {
+          @Override
+          public Object apply(Object value) {
+            return new java.sql.Date(((Timestamp) value).getTime());
+          }
+        }
+    );
+
+    compatibles.put(TypeInfos.SQL_TIMESTAMP_TYPE_INFO,
+        TypeInfos.SQL_TIME_TYPE_INFO,
+        new Function<Object, Object>() {
+          @Override
+          public Object apply(Object value) {
+            return new java.sql.Time(((Timestamp) value).getTime());
+          }
+        }
     );
 
   }
@@ -821,7 +859,7 @@ public class TypeInfoCompatibles implements Serializable {
             try {
               return LocalDateTime.parse(str, dateTimeFormatter);
             } catch (Exception e) {
-              str = StringUtils.replace(str, "T", " ");
+              str = DateTimeFormatterUtils.addSuffixNecessary(str);
               DateTimeFormatter formatter = DateTimeFormatterUtils.getFormatter(str);
               if (Objects.isNull(formatter)) {
                 throw e;

@@ -196,7 +196,7 @@ public class TypeInfoCompatiblesColumnCompareTest {
     Assert.assertEquals(stringColumn.asDouble(),
         typeInfoCompatibles.compatibleTo(source, TypeInfos.DOUBLE_TYPE_INFO, value));
 
-    value = "NaN";
+    value = "Infinity";
     stringColumn = new StringColumn(value);
     Assert.assertEquals(stringColumn.asDouble(),
         typeInfoCompatibles.compatibleTo(source, TypeInfos.DOUBLE_TYPE_INFO, value));
