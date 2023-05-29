@@ -101,6 +101,7 @@
         <avro.version>1.10.0</avro.version>
         <mertric.core.version>4.0.1</mertric.core.version>
         <common.logging.version>1.2</common.logging.version>
+        <testcontainer.version>1.17.5</testcontainer.version>
         <!--   connector dependency package version     -->
         <snappy.version>1.1.2.6</snappy.version>
         <parquet.hadoop.version>1.8.3</parquet.hadoop.version>

@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.cdc.mysql.source.config;
+package com.bytedance.bitsail.connector.cdc.sqlserver.source.config;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.cdc.error.BinlogReaderErrorCode;
@@ -24,7 +24,7 @@ import com.bytedance.bitsail.connector.cdc.option.BinlogReaderOptions;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.debezium.config.Configuration;
-import io.debezium.connector.mysql.MySqlConnectorConfig;
+import io.debezium.connector.sqlserver.SqlServerConnectorConfig;
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
@@ -37,24 +37,28 @@ import java.util.stream.Collectors;
 
 @Getter
 @Builder
-public class MysqlConfig implements Serializable {
-
+public class SqlServerConfig implements Serializable {
   private static final long serialVersionUID = 1L;
 
   public static final String DEBEZIUM_PREFIX = "job.reader.debezium.";
+  public static final String CHANGE_LSN = "change_lsn";
+  public static final String COMMIT_LSN = "commit_lsn";
+  public static final String EVENT_SERIAL_NO = "event_serial_no";
 
   private final String hostname;
   private final int port;
   private final String username;
   private final String password;
+  private final String database;
   private final long instantId;
 
   // debezium configuration
   private final Properties dbzProperties;
   private final Configuration dbzConfiguration;
-  private final MySqlConnectorConfig dbzMySqlConnectorConfig;
+  private final SqlServerConnectorConfig dbzSqlServerConnectorConfig;
 
-  public static MysqlConfig fromBitSailConf(BitSailConfiguration jobConf, long instantId) {
+  @SuppressWarnings("checkstyle:MagicNumber")
+  public static SqlServerConfig fromBitSailConf(BitSailConfiguration jobConf, long instantId) {
     List<ClusterInfo> clusterInfo = jobConf.getNecessaryOption(BinlogReaderOptions.CONNECTIONS, BinlogReaderErrorCode.REQUIRED_VALUE);
     //Only support one DB
     assert (clusterInfo.size() == 1);
@@ -66,34 +70,45 @@ public class MysqlConfig implements Serializable {
 
     String username = jobConf.getNecessaryOption(BinlogReaderOptions.USER_NAME, BinlogReaderErrorCode.REQUIRED_VALUE);
     String password = jobConf.getNecessaryOption(BinlogReaderOptions.PASSWORD, BinlogReaderErrorCode.REQUIRED_VALUE);
-    fillConnectionInfo(props, connectionInfo, username, password, instantId);
+    String database = jobConf.getNecessaryOption(BinlogReaderOptions.DB_NAME, BinlogReaderErrorCode.REQUIRED_VALUE);
+    fillConnectionInfo(props, connectionInfo, username, password, database, instantId);
 
     Configuration config = Configuration.from(props);
-    return MysqlConfig.builder()
+
+    // be the same with debezium sqlserver connector
+    // By default do not load whole result sets into memory
+    config = config.edit()
+        .withDefault("database.responseBuffering", "adaptive")
+        .withDefault("database.fetchSize", 10_000)
+        .build();
+
+    return SqlServerConfig.builder()
         .hostname(connectionInfo.getHost())
         .port(connectionInfo.getPort())
         .username(username)
         .password(password)
+        .database(database)
         .instantId(instantId)
         .dbzProperties(props)
         .dbzConfiguration(config)
-        .dbzMySqlConnectorConfig(new MySqlConnectorConfig(config))
+        .dbzSqlServerConnectorConfig(new SqlServerConnectorConfig(config))
         .build();
   }
 
   @VisibleForTesting
-  public static MysqlConfig newDefault() {
+  public static SqlServerConfig newDefault() {
     Properties props = new Properties();
     Configuration config = Configuration.from(props);
-    return MysqlConfig.builder()
+    return SqlServerConfig.builder()
         .hostname("")
         .port(0)
         .username("username")
         .password("password")
+        .database("db")
         .instantId(1L)
         .dbzProperties(props)
         .dbzConfiguration(config)
-        .dbzMySqlConnectorConfig(new MySqlConnectorConfig(config))
+        .dbzSqlServerConnectorConfig(new SqlServerConnectorConfig(config))
         .build();
   }
 
@@ -114,11 +129,12 @@ public class MysqlConfig implements Serializable {
   /**
    * Set connection information to debezium properties.
    */
-  public static void fillConnectionInfo(Properties props, ConnectionInfo connectionInfo, String username, String password, long instantId) {
+  public static void fillConnectionInfo(Properties props, ConnectionInfo connectionInfo, String username, String password, String database, long instantId) {
     props.put("database.hostname", connectionInfo.getHost());
     props.put("database.port", String.valueOf(connectionInfo.getPort()));
     props.put("database.user", username);
     props.put("database.password", password);
+    props.put("database.dbname", database);
     props.put("database.server.name", String.valueOf(instantId));
     props.put("database.server.id", String.valueOf(instantId));
   }
@@ -129,10 +145,9 @@ public class MysqlConfig implements Serializable {
    */
   public static void fillDefaultProps(Properties props) {
     props.putIfAbsent("database.serverTimezone", ZoneId.of("UTC").toString());
-    props.putIfAbsent("database.history", "com.bytedance.bitsail.connector.cdc.mysql.source.debezium.InMemoryDatabaseHistory");
+    //TODO: standardize schema history for mysql and sqlserver
+    props.putIfAbsent("database.history", "io.debezium.relational.history.MemoryDatabaseHistory");
     props.putIfAbsent("database.history.instance.name", "default_database_history");
     props.putIfAbsent("include.schema.changes", "false");
-    props.putIfAbsent("database.useSSL", "false");
-    props.putIfAbsent("database.allowPublicKeyRetrieval", "true");
   }
 }

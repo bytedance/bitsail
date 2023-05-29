@@ -14,18 +14,17 @@
  *  limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.cdc.mysql.source.reader;
+package com.bytedance.bitsail.connector.cdc.sqlserver.source.reader;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.connector.cdc.mysql.source.debezium.DebeziumHelper;
-import com.bytedance.bitsail.connector.cdc.mysql.source.debezium.MysqlBinlogSplitReader;
 import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
 import com.bytedance.bitsail.connector.cdc.source.reader.BaseCDCSourceReader;
 import com.bytedance.bitsail.connector.cdc.source.reader.BinlogSplitReader;
 import com.bytedance.bitsail.connector.cdc.source.split.BaseCDCSplit;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
+import com.bytedance.bitsail.connector.cdc.sqlserver.source.util.DebeziumUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,22 +33,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MysqlCDCSourceReader extends BaseCDCSourceReader {
-  private static final Logger LOG = LoggerFactory.getLogger(MysqlCDCSourceReader.class);
+public class SqlServerCDCSourceReader extends BaseCDCSourceReader {
+  private static final Logger LOG = LoggerFactory.getLogger(SqlServerCDCSourceReader.class);
 
-  public MysqlCDCSourceReader(BitSailConfiguration readerConf, BitSailConfiguration commonConf, Context readerContext) {
+  public SqlServerCDCSourceReader(BitSailConfiguration readerConf,
+                                  BitSailConfiguration commonConf, Context readerContext) {
     super(readerConf, commonConf, readerContext);
   }
 
   @Override
   public List<BaseCDCSplit> snapshotState(long checkpointId) {
-    LOG.info("SnapshotState on MysqlCDCSourceReader with checkpoint ID: " + checkpointId);
+    LOG.info("SnapshotState on SqlServerCDCSourceReader with checkpoint ID: " + checkpointId);
     // store the latest offset
     Map<String, String> readerOffset = this.reader.getOffset();
-    BinlogOffset offset = DebeziumHelper.convertDbzOffsetToBinlogOffset(readerOffset);
+    BinlogOffset offset = DebeziumUtils.convertDbzOffsetToBinlogOffset(readerOffset);
     List<BaseCDCSplit> splits = new ArrayList<>();
     //TODO: Store the schema each checkpoint
-    BinlogSplit split = new BinlogSplit("binlog-0", offset, BinlogOffset.boundless());
+    BinlogSplit split = new BinlogSplit("sqlserver-binlog-0", offset, BinlogOffset.boundless());
     splits.add(split);
     LOG.info("Snapshot binlog split: " + split);
     return splits;
@@ -57,6 +57,6 @@ public class MysqlCDCSourceReader extends BaseCDCSourceReader {
 
   @Override
   public BinlogSplitReader<Row> getReader() {
-    return new MysqlBinlogSplitReader(readerConf, readerContext.getIndexOfSubtask(), commonConf.get(CommonOptions.INSTANCE_ID));
+    return new SqlServerBinlogSplitReader(readerConf, readerContext.getIndexOfSubtask(), commonConf.get(CommonOptions.INSTANCE_ID));
   }
 }

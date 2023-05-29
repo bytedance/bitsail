@@ -1,0 +1,58 @@
+{
+  "job": {
+    "common": {
+      "job_type": "STREAMING",
+      "job_plugin_lib_dir": "plugin",
+      "job_plugin_conf_dir": "plugin_conf",
+      "enable_dynamic_loader": true,
+      "instance_id": "1",
+      "internal_instance_id": "1",
+      "extra_properties": {
+        "update-mode": "append"
+      },
+      "job_name": "bitsail_test_integration_cdc_to_print"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.cdc.sqlserver.source.SqlServerCDCSource",
+      "db_name": "bitsail_test",
+      "connections": [
+      ],
+      "user_name": "SA",
+      "password": "Password!",
+      "initial_offset_type": "latest",
+      "columns": [
+        {
+          "name": "db",
+          "type": "string"
+        },
+        {
+          "name": "table",
+          "type": "string"
+        },
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "timestamp",
+          "type": "string"
+        },
+        {
+          "name": "ddl",
+          "type": "boolean"
+        },
+        {
+          "name": "version",
+          "type": "int"
+        },
+        {
+          "name": "value",
+          "type": "binary"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.print.sink.PrintSink"
+    }
+  }
+}

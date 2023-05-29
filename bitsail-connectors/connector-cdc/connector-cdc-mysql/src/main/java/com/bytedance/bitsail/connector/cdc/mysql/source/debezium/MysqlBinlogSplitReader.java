@@ -119,9 +119,9 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
 
   private final BitSailConfiguration jobConf;
 
-  public MysqlBinlogSplitReader(BitSailConfiguration jobConf, int subtaskId) {
+  public MysqlBinlogSplitReader(BitSailConfiguration jobConf, int subtaskId, long instantId) {
     this.jobConf = jobConf;
-    this.mysqlConfig = MysqlConfig.fromBitSailConf(jobConf);
+    this.mysqlConfig = MysqlConfig.fromBitSailConf(jobConf, instantId);
     this.schemaNameAdjuster = SchemaNameAdjuster.create();
     // handle configuration
     this.connectorConfig = mysqlConfig.getDbzMySqlConnectorConfig();
@@ -137,17 +137,6 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
     this.topicSelector = MySqlTopicSelector.defaultSelector(connectorConfig);
 
     final MySqlValueConverters valueConverters = DebeziumHelper.getValueConverters(connectorConfig);
-
-    this.queue = new ChangeEventQueue.Builder<DataChangeEvent>()
-        .pollInterval(Duration.ofMillis(jobConf.get(BinlogReaderOptions.POLL_INTERVAL_MS)))
-        .maxBatchSize(jobConf.get(BinlogReaderOptions.MAX_BATCH_SIZE))
-        .maxQueueSize(jobConf.get(BinlogReaderOptions.MAX_QUEUE_SIZE))
-        .loggingContextSupplier(() -> taskContext.configureLoggingContext("mysql-connector-task"))
-        .buffering()
-        .build();
-    this.batch = new ArrayList<>();
-    this.recordIterator = this.batch.iterator();
-    this.errorHandler = new MySqlErrorHandler(connectorConfig.getLogicalName(), queue);
 
     final MySqlEventMetadataProvider metadataProvider = new MySqlEventMetadataProvider();
 
@@ -193,8 +182,17 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
       LOG.debug("Schema for TableId " + tableId.toString() + ":" + schema.schemaFor(tableId).toString());
     }
     this.taskContext = new MySqlTaskContext(connectorConfig, schema);
-
     this.binaryLogClient = this.taskContext.getBinaryLogClient();
+    this.queue = new ChangeEventQueue.Builder<DataChangeEvent>()
+        .pollInterval(Duration.ofMillis(jobConf.get(BinlogReaderOptions.POLL_INTERVAL_MS)))
+        .maxBatchSize(jobConf.get(BinlogReaderOptions.MAX_BATCH_SIZE))
+        .maxQueueSize(jobConf.get(BinlogReaderOptions.MAX_QUEUE_SIZE))
+        .loggingContextSupplier(() -> taskContext.configureLoggingContext("mysql-connector-task"))
+        .buffering()
+        .build();
+    this.batch = new ArrayList<>();
+    this.recordIterator = this.batch.iterator();
+    this.errorHandler = new MySqlErrorHandler(connectorConfig.getLogicalName(), queue);
 
     this.dispatcher = new EventDispatcher<>(
         connectorConfig,
@@ -250,14 +248,14 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
   public void close() {
     LOG.info("Received close signal on MysqlBinlogSplitReader");
     try {
+      if (executorService != null) {
+        executorService.shutdown();
+      }
       if (this.connection != null) {
         this.connection.close();
       }
       if (this.binaryLogClient != null) {
         this.binaryLogClient.disconnect();
-      }
-      if (executorService != null) {
-        executorService.shutdown();
       }
       isRunning = false;
     } catch (Exception e) {

@@ -34,6 +34,7 @@ header:
     - '**/*.csv'
     - '**/_SUCCESS'
     - '**/*.cnf'
+    - '**/*.txt'
     - 'build.sh'
     - 'bitsail-connectors/bitsail-connectors-legacy/bitsail-connector-hudi/src/test/resources/'
     - 'bitsail-connectors/bitsail-connectors-legacy/bitsail-connector-ftp/src/test/resources/'
