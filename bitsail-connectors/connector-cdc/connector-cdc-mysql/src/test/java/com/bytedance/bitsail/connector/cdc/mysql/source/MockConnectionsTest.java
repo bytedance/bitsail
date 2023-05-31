@@ -129,7 +129,7 @@ public class MockConnectionsTest {
     jobConf.set(BinlogReaderOptions.PASSWORD, TEST_PASSWORD);
     jobConf.set(BinlogReaderOptions.INITIAL_OFFSET_TYPE, "latest");
 
-    MysqlBinlogSplitReader reader = new MysqlBinlogSplitReader(jobConf, 0);
+    MysqlBinlogSplitReader reader = new MysqlBinlogSplitReader(jobConf, 0, 1L);
     BinlogSplit split = new BinlogSplit("split-1", BinlogOffset.earliest(), BinlogOffset.boundless());
     reader.readSplit(split);
     int maxPeriod = 0;

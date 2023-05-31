@@ -50,7 +50,7 @@ public class MysqlConfigTest {
     jobConf.set(MysqlConfig.DEBEZIUM_PREFIX + "key1", "value1");
     jobConf.set(MysqlConfig.DEBEZIUM_PREFIX + "key2", "value2");
 
-    MysqlConfig mysqlConfig = MysqlConfig.fromBitSailConf(jobConf);
+    MysqlConfig mysqlConfig = MysqlConfig.fromBitSailConf(jobConf, 1L);
     Assert.assertEquals(HOST_NAME, mysqlConfig.getHostname());
     Assert.assertEquals(PORT, mysqlConfig.getPort());
     Assert.assertEquals(USERNAME, mysqlConfig.getUsername());

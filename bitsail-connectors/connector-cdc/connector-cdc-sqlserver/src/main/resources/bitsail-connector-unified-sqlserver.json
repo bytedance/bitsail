@@ -1,0 +1,9 @@
+{
+  "name": "bitsail-connector-unified-sqlserver",
+  "classes": [
+    "com.bytedance.bitsail.connector.cdc.sqlserver.source.SqlServerCDCSource"
+  ],
+  "libs": [
+    "connector-cdc-sqlserver-${version}.jar"
+  ]
+}

@@ -17,6 +17,7 @@
 package com.bytedance.bitsail.connector.cdc.mysql.source.reader;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.cdc.mysql.source.debezium.DebeziumHelper;
 import com.bytedance.bitsail.connector.cdc.mysql.source.debezium.MysqlBinlogSplitReader;
@@ -56,6 +57,6 @@ public class MysqlCDCSourceReader extends BaseCDCSourceReader {
 
   @Override
   public BinlogSplitReader<Row> getReader() {
-    return new MysqlBinlogSplitReader(readerConf, readerContext.getIndexOfSubtask());
+    return new MysqlBinlogSplitReader(readerConf, readerContext.getIndexOfSubtask(), commonConf.get(CommonOptions.INSTANCE_ID));
   }
 }

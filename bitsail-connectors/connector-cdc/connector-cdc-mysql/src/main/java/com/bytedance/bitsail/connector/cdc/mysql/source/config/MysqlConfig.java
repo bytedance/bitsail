@@ -47,13 +47,14 @@ public class MysqlConfig implements Serializable {
   private final int port;
   private final String username;
   private final String password;
+  private final long instantId;
 
   // debezium configuration
   private final Properties dbzProperties;
   private final Configuration dbzConfiguration;
   private final MySqlConnectorConfig dbzMySqlConnectorConfig;
 
-  public static MysqlConfig fromBitSailConf(BitSailConfiguration jobConf) {
+  public static MysqlConfig fromBitSailConf(BitSailConfiguration jobConf, long instantId) {
     List<ClusterInfo> clusterInfo = jobConf.getNecessaryOption(BinlogReaderOptions.CONNECTIONS, BinlogReaderErrorCode.REQUIRED_VALUE);
     //Only support one DB
     assert (clusterInfo.size() == 1);
@@ -65,7 +66,7 @@ public class MysqlConfig implements Serializable {
 
     String username = jobConf.getNecessaryOption(BinlogReaderOptions.USER_NAME, BinlogReaderErrorCode.REQUIRED_VALUE);
     String password = jobConf.getNecessaryOption(BinlogReaderOptions.PASSWORD, BinlogReaderErrorCode.REQUIRED_VALUE);
-    fillConnectionInfo(props, connectionInfo, username, password);
+    fillConnectionInfo(props, connectionInfo, username, password, instantId);
 
     Configuration config = Configuration.from(props);
     return MysqlConfig.builder()
@@ -73,6 +74,7 @@ public class MysqlConfig implements Serializable {
         .port(connectionInfo.getPort())
         .username(username)
         .password(password)
+        .instantId(instantId)
         .dbzProperties(props)
         .dbzConfiguration(config)
         .dbzMySqlConnectorConfig(new MySqlConnectorConfig(config))
@@ -88,6 +90,7 @@ public class MysqlConfig implements Serializable {
         .port(0)
         .username("username")
         .password("password")
+        .instantId(1L)
         .dbzProperties(props)
         .dbzConfiguration(config)
         .dbzMySqlConnectorConfig(new MySqlConnectorConfig(config))
@@ -111,13 +114,13 @@ public class MysqlConfig implements Serializable {
   /**
    * Set connection information to debezium properties.
    */
-  public static void fillConnectionInfo(Properties props, ConnectionInfo connectionInfo, String username, String password) {
+  public static void fillConnectionInfo(Properties props, ConnectionInfo connectionInfo, String username, String password, long instantId) {
     props.put("database.hostname", connectionInfo.getHost());
     props.put("database.port", String.valueOf(connectionInfo.getPort()));
     props.put("database.user", username);
     props.put("database.password", password);
-    props.put("database.server.name", connectionInfo.getHost());
-    props.put("database.server.id", String.valueOf(connectionInfo.getPort()));
+    props.put("database.server.name", String.valueOf(instantId));
+    props.put("database.server.id", String.valueOf(instantId));
   }
 
   /**
