@@ -33,6 +33,7 @@ import com.bytedance.bitsail.flink.core.typeutils.ColumnFlinkTypeInfoUtil;
 
 import com.github.javafaker.Faker;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.RateLimiter;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.io.DefaultInputSplitAssigner;
@@ -42,7 +43,6 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.core.io.InputSplit;
 import org.apache.flink.core.io.InputSplitAssigner;
-import org.apache.flink.shaded.guava18.com.google.common.util.concurrent.RateLimiter;
 import org.apache.flink.types.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

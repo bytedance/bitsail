@@ -52,20 +52,6 @@
         <!-- connectors  -->
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-streamingfile-core</artifactId>
-            <version>${revision}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-hudi</artifactId>
-            <version>${revision}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-connector-jdbc</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
@@ -109,13 +95,6 @@
         <dependency>
             <groupId>com.bytedance.bitsail</groupId>
             <artifactId>bitsail-connector-hive</artifactId>
-            <version>${revision}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bytedance.bitsail</groupId>
-            <artifactId>bitsail-connector-kafka</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>
@@ -327,6 +306,29 @@
                     <version>${revision}</version>
                     <scope>provided</scope>
                 </dependency>
+
+                <!--    only support flink 1.11             -->
+                <dependency>
+                    <groupId>com.bytedance.bitsail</groupId>
+                    <artifactId>bitsail-connector-hudi</artifactId>
+                    <version>${revision}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.bytedance.bitsail</groupId>
+                    <artifactId>bitsail-connector-kafka</artifactId>
+                    <version>${revision}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.bytedance.bitsail</groupId>
+                    <artifactId>bitsail-connector-streamingfile-core</artifactId>
+                    <version>${revision}</version>
+                    <scope>provided</scope>
+                </dependency>
+
             </dependencies>
             <activation>
                 <activeByDefault>true</activeByDefault>

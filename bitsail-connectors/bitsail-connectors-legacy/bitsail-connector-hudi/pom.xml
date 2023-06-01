@@ -34,6 +34,7 @@
         <junit.version>5.7.2</junit.version>
         <hudi.version>0.11.1</hudi.version>
         <orc.core.version>1.6.0</orc.core.version>
+        <enforcer.skip>true</enforcer.skip>
     </properties>
 
     <dependencyManagement>
