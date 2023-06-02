@@ -16,10 +16,10 @@
 
 package com.bytedance.bitsail.connector.cdc.sqlserver.source.reader;
 
+import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.row.BinlogRow;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.component.format.debezium.JsonDebeziumSerializationSchema;
+import com.bytedance.bitsail.component.format.debezium.deserialization.DebeziumDeserializationSchema;
 import com.bytedance.bitsail.connector.cdc.source.reader.BinlogSplitReader;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 import com.bytedance.bitsail.connector.cdc.sqlserver.source.config.SqlServerConfig;
@@ -45,12 +45,11 @@ import io.debezium.relational.TableId;
 import io.debezium.schema.TopicSelector;
 import io.debezium.util.Clock;
 import io.debezium.util.SchemaNameAdjuster;
-import org.apache.kafka.connect.data.Field;
-import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,7 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 public class SqlServerBinlogSplitReader implements BinlogSplitReader<Row> {
 
@@ -97,23 +95,26 @@ public class SqlServerBinlogSplitReader implements BinlogSplitReader<Row> {
 
   private final int subtaskId;
 
-  private final JsonDebeziumSerializationSchema serializer;
+  private final DebeziumDeserializationSchema deserializationSchema;
 
   private volatile SqlServerDatabaseSchema schema;
 
   private final BitSailConfiguration jobConf;
 
-  public SqlServerBinlogSplitReader(BitSailConfiguration jobConf, int subtaskId, long instantId) {
+  public SqlServerBinlogSplitReader(BitSailConfiguration jobConf,
+                                    DebeziumDeserializationSchema deserializationSchema,
+                                    int subtaskId,
+                                    long instantId) {
     this.jobConf = jobConf;
+    this.deserializationSchema = deserializationSchema;
     this.sqlserverConfig = SqlServerConfig.fromBitSailConf(jobConf, instantId);
     this.schemaNameAdjuster = SchemaNameAdjuster.create();
     this.connectorConfig = sqlserverConfig.getDbzSqlServerConnectorConfig();
     this.subtaskId = subtaskId;
-    ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("sqlserver-binlog-reader-" + this.subtaskId).build();
-    this.executorService = Executors.newSingleThreadExecutor(threadFactory);
     this.offset = new HashMap<>();
-    this.serializer = new JsonDebeziumSerializationSchema(jobConf);
+    this.executorService = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("sqlserver-binlog-reader-" + this.subtaskId).build());
     this.isRunning = false;
+    this.deserializationSchema.open();
   }
 
   @Override
@@ -227,21 +228,9 @@ public class SqlServerBinlogSplitReader implements BinlogSplitReader<Row> {
   }
 
   @Override
-  public Row poll() {
+  public void emit(SourcePipeline<Row> pipeline) throws IOException {
     SourceRecord record = this.recordIterator.next();
-    this.offset = record.sourceOffset();
-    byte[] serialized = this.serializer.serialize(record);
-    Struct val = (Struct) record.value();
-    Field keyField = record.keySchema().fields().get(0);
-    Row result = new Row(BinlogRow.ROW_SIZE);
-    result.setField(BinlogRow.DATABASE_INDEX, val.getStruct("source").getString("db"));
-    result.setField(BinlogRow.TABLE_INDEX, val.getStruct("source").getString("table"));
-    result.setField(BinlogRow.KEY_INDEX, ((Struct) record.key()).get(keyField).toString());
-    result.setField(BinlogRow.TIMESTAMP_INDEX, val.getStruct("source").getInt64("ts_ms").toString());
-    result.setField(BinlogRow.DDL_FLAG_INDEX, false);
-    result.setField(BinlogRow.VERSION_INDEX, 1);
-    result.setField(BinlogRow.VALUE_INDEX, serialized);
-    return result;
+    deserializationSchema.deserialize(record, pipeline);
   }
 
   @Override

@@ -21,14 +21,16 @@ import com.bytedance.bitsail.base.connector.reader.v1.Source;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
+import com.bytedance.bitsail.base.execution.Mode;
 import com.bytedance.bitsail.base.extension.ParallelismComputable;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.component.format.debezium.deserialization.DebeziumDeserializationSchema;
+import com.bytedance.bitsail.connector.cdc.schema.DebeziumDeserializationFactory;
 import com.bytedance.bitsail.connector.cdc.source.coordinator.CDCSourceSplitCoordinator;
 import com.bytedance.bitsail.connector.cdc.source.coordinator.state.AssignmentStateSerializer;
 import com.bytedance.bitsail.connector.cdc.source.coordinator.state.BaseAssignmentState;
@@ -46,21 +48,24 @@ public abstract class BaseCDCSource implements Source<Row, BaseCDCSplit, BaseAss
   protected BitSailConfiguration readerConf;
 
   protected BaseSplitSerializer splitSerializer;
+  protected DebeziumDeserializationSchema deserializationSchema;
+  protected Boundedness boundedness;
 
   @Override
   public void configure(ExecutionEnviron execution, BitSailConfiguration readerConfiguration) throws IOException {
+    this.boundedness = Mode.STREAMING.equals(execution.getMode()) ?
+        Boundedness.UNBOUNDEDNESS :
+        Boundedness.BOUNDEDNESS;
     this.readerConf = readerConfiguration;
     this.commonConf = execution.getCommonConfiguration();
     this.splitSerializer = createSplitSerializer();
+    this.deserializationSchema = DebeziumDeserializationFactory.getDebeziumDeserializationSchema(readerConf, createTypeInfoConverter());
+
   }
 
   @Override
   public Boundedness getSourceBoundedness() {
-    if (commonConf.get(CommonOptions.JOB_TYPE).equalsIgnoreCase("streaming")) {
-      return Boundedness.UNBOUNDEDNESS;
-    } else {
-      return Boundedness.BOUNDEDNESS;
-    }
+    return boundedness;
   }
 
   public abstract BaseSplitSerializer createSplitSerializer();

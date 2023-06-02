@@ -16,9 +16,11 @@
 
 package com.bytedance.bitsail.connector.cdc.mysql.source.reader;
 
+import com.bytedance.bitsail.base.connector.reader.v1.Boundedness;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.component.format.debezium.deserialization.DebeziumDeserializationSchema;
 import com.bytedance.bitsail.connector.cdc.mysql.source.debezium.DebeziumHelper;
 import com.bytedance.bitsail.connector.cdc.mysql.source.debezium.MysqlBinlogSplitReader;
 import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
@@ -37,8 +39,12 @@ import java.util.Map;
 public class MysqlCDCSourceReader extends BaseCDCSourceReader {
   private static final Logger LOG = LoggerFactory.getLogger(MysqlCDCSourceReader.class);
 
-  public MysqlCDCSourceReader(BitSailConfiguration readerConf, BitSailConfiguration commonConf, Context readerContext) {
-    super(readerConf, commonConf, readerContext);
+  public MysqlCDCSourceReader(BitSailConfiguration readerConf,
+                              BitSailConfiguration commonConf,
+                              Context readerContext,
+                              DebeziumDeserializationSchema deserializationSchema,
+                              Boundedness boundedness) {
+    super(readerConf, commonConf, readerContext, deserializationSchema, boundedness);
   }
 
   @Override
@@ -57,6 +63,9 @@ public class MysqlCDCSourceReader extends BaseCDCSourceReader {
 
   @Override
   public BinlogSplitReader<Row> getReader() {
-    return new MysqlBinlogSplitReader(readerConf, readerContext.getIndexOfSubtask(), commonConf.get(CommonOptions.INSTANCE_ID));
+    return new MysqlBinlogSplitReader(readerConf,
+        deserializationSchema,
+        readerContext.getIndexOfSubtask(),
+        commonConf.get(CommonOptions.INSTANCE_ID));
   }
 }

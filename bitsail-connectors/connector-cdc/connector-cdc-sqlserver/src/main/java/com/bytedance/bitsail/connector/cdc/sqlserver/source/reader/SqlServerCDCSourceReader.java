@@ -16,9 +16,11 @@
 
 package com.bytedance.bitsail.connector.cdc.sqlserver.source.reader;
 
+import com.bytedance.bitsail.base.connector.reader.v1.Boundedness;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.component.format.debezium.deserialization.DebeziumDeserializationSchema;
 import com.bytedance.bitsail.connector.cdc.source.offset.BinlogOffset;
 import com.bytedance.bitsail.connector.cdc.source.reader.BaseCDCSourceReader;
 import com.bytedance.bitsail.connector.cdc.source.reader.BinlogSplitReader;
@@ -37,8 +39,11 @@ public class SqlServerCDCSourceReader extends BaseCDCSourceReader {
   private static final Logger LOG = LoggerFactory.getLogger(SqlServerCDCSourceReader.class);
 
   public SqlServerCDCSourceReader(BitSailConfiguration readerConf,
-                                  BitSailConfiguration commonConf, Context readerContext) {
-    super(readerConf, commonConf, readerContext);
+                                  BitSailConfiguration commonConf,
+                                  Context readerContext,
+                                  DebeziumDeserializationSchema deserializationSchema,
+                                  Boundedness boundedness) {
+    super(readerConf, commonConf, readerContext, deserializationSchema, boundedness);
   }
 
   @Override
@@ -57,6 +62,9 @@ public class SqlServerCDCSourceReader extends BaseCDCSourceReader {
 
   @Override
   public BinlogSplitReader<Row> getReader() {
-    return new SqlServerBinlogSplitReader(readerConf, readerContext.getIndexOfSubtask(), commonConf.get(CommonOptions.INSTANCE_ID));
+    return new SqlServerBinlogSplitReader(readerConf,
+        deserializationSchema,
+        readerContext.getIndexOfSubtask(),
+        commonConf.get(CommonOptions.INSTANCE_ID));
   }
 }
