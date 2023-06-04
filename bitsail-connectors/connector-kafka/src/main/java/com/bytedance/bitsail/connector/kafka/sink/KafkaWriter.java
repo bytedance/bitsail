@@ -22,7 +22,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.connector.kafka.common.KafkaErrorCode;
-import com.bytedance.bitsail.connector.kafka.discoverer.FixedPartitionDiscoverer;
+import com.bytedance.bitsail.connector.kafka.discoverer.FixedTopicPartitionDiscoverer;
 import com.bytedance.bitsail.connector.kafka.discoverer.PartitionDiscoverer;
 import com.bytedance.bitsail.connector.kafka.format.ProducerRecordRowSerializationSchema;
 import com.bytedance.bitsail.connector.kafka.format.ProducerRecordSerializationSchemaFactory;
@@ -59,7 +59,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     this.rowTypeInfo = context.getRowTypeInfo();
     this.properties = prepareSenderProperties(writerConf);
     this.sender = new KafkaSender(properties);
-    this.partitionDiscoverer = new FixedPartitionDiscoverer(sender.partitionFor(writerConf.get(KafkaOptions.TOPIC_NAME)));
+    this.partitionDiscoverer = new FixedTopicPartitionDiscoverer(sender.partitionFor(writerConf.get(KafkaOptions.TOPIC_NAME)));
     this.serializationSchema = ProducerRecordSerializationSchemaFactory.getRowSerializationSchema(writerConf, rowTypeInfo, partitionDiscoverer);
     this.callbackWrapper = new CallbackWrapper(writerConf, context);
   }

@@ -21,11 +21,11 @@ import org.apache.kafka.common.PartitionInfo;
 import java.io.IOException;
 import java.util.List;
 
-public class FixedPartitionDiscoverer implements PartitionDiscoverer {
+public class FixedTopicPartitionDiscoverer implements PartitionDiscoverer {
 
   private final List<PartitionInfo> partitionInfos;
 
-  public FixedPartitionDiscoverer(List<PartitionInfo> partitionInfos) {
+  public FixedTopicPartitionDiscoverer(List<PartitionInfo> partitionInfos) {
     this.partitionInfos = partitionInfos;
   }
 
