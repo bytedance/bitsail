@@ -15,75 +15,16 @@
     "reader": {
       "class": "com.bytedance.bitsail.connector.cdc.mysql.source.MysqlCDCSource",
       "db_name": "test",
+      "format_type": "debezium_json",
       "table_name": "jdbc_source_test",
       "connections": [
       ],
       "user_name": "root",
-      "password": "pw",
-      "columns": [
-        {
-          "name": "db",
-          "type": "string"
-        },
-        {
-          "name": "table",
-          "type": "string"
-        },
-        {
-          "name": "id",
-          "type": "string"
-        },
-        {
-          "name": "timestamp",
-          "type": "string"
-        },
-        {
-          "name": "ddl",
-          "type": "boolean"
-        },
-        {
-          "name": "version",
-          "type": "int"
-        },
-        {
-          "name": "value",
-          "type": "binary"
-        }
-      ]
+      "password": "pw"
     },
     "writer": {
       "class": "com.bytedance.bitsail.connector.kafka.sink.KafkaSink",
-      "content_type": "debezium",
-      "columns": [
-        {
-          "name": "db",
-          "type": "string"
-        },
-        {
-          "name": "table",
-          "type": "string"
-        },
-        {
-          "name": "id",
-          "type": "string"
-        },
-        {
-          "name": "timestamp",
-          "type": "string"
-        },
-        {
-          "name": "ddl",
-          "type": "boolean"
-        },
-        {
-          "name": "version",
-          "type": "int"
-        },
-        {
-          "name": "value",
-          "type": "binary"
-        }
-      ]
+      "content_type": "debezium_json"
     }
   }
 }

@@ -33,7 +33,7 @@ import java.util.Map;
 @NoArgsConstructor
 @ToString(of = {"key", "value", "partitionId"})
 public class KafkaRecord {
-  private String key;
+  private Object key;
   @NonNull
   private Object value;
 

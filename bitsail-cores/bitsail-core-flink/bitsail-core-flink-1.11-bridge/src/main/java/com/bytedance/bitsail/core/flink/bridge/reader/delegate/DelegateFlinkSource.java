@@ -18,6 +18,7 @@ package com.bytedance.bitsail.core.flink.bridge.reader.delegate;
 
 import com.bytedance.bitsail.base.connector.reader.v1.SourceSplit;
 import com.bytedance.bitsail.base.dirty.AbstractDirtyCollector;
+import com.bytedance.bitsail.base.extension.SupportProducedType;
 import com.bytedance.bitsail.base.messenger.Messenger;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.model.ColumnInfo;
@@ -62,11 +63,15 @@ public class DelegateFlinkSource<T, SplitT extends SourceSplit, StateT extends S
     this.source = source;
     this.commonConfiguration = commonConfiguration;
     this.readerConfiguration = readerConfiguration;
-    List<ColumnInfo> columnInfos = readerConfiguration
-        .get(ReaderOptions.BaseReaderOptions.COLUMNS);
+    if (source instanceof SupportProducedType) {
+      this.rowTypeInfo = ((SupportProducedType) source).getProducedType();
+    } else {
+      List<ColumnInfo> columnInfos = readerConfiguration
+          .get(ReaderOptions.BaseReaderOptions.COLUMNS);
 
-    this.rowTypeInfo = TypeInfoUtils
-        .getRowTypeInfo(source.createTypeInfoConverter(), columnInfos);
+      this.rowTypeInfo = TypeInfoUtils
+          .getRowTypeInfo(source.createTypeInfoConverter(), columnInfos);
+    }
     this.dirtyCollector = dirtyCollector;
     this.messenger = messenger;
   }

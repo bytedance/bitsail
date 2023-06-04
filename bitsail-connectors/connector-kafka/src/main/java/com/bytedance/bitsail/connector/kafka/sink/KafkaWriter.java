@@ -19,11 +19,10 @@ package com.bytedance.bitsail.connector.kafka.sink;
 import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.model.ColumnInfo;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.common.row.BinlogRow;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
+import com.bytedance.bitsail.component.format.debezium.deserialization.DebeziumJsonDeserializationSchema;
 import com.bytedance.bitsail.component.format.json.RowToJsonConverter;
 import com.bytedance.bitsail.connector.kafka.common.KafkaErrorCode;
 import com.bytedance.bitsail.connector.kafka.model.KafkaRecord;
@@ -74,10 +73,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
 
   private final transient Writer.Context context;
 
-  private final TypeInfo<?>[] typeInfos;
-
-  //TODO: move fieldNames to writer context
-  private final List<String> fieldNames;
+  private final RowTypeInfo rowTypeInfo;
 
   private final String format;
 
@@ -85,9 +81,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
 
   public KafkaWriter(BitSailConfiguration commonConf, BitSailConfiguration writerConf, Context<EmptyState> context) {
     this.context = context;
-    List<ColumnInfo> columns = writerConf.getNecessaryOption(KafkaWriterOptions.COLUMNS, KafkaErrorCode.REQUIRED_VALUE);
-    this.typeInfos = context.getRowTypeInfo().getTypeInfos();
-    this.fieldNames = columns.stream().map(ColumnInfo::getName).collect(Collectors.toList());
+    this.rowTypeInfo = context.getRowTypeInfo();
     this.jsonConverter = new RowToJsonConverter(context.getRowTypeInfo());
     this.bootstrapServers = writerConf.getNecessaryOption(KafkaWriterOptions.BOOTSTRAP_SERVERS, KafkaErrorCode.REQUIRED_VALUE);
     this.kafkaTopic = writerConf.getNecessaryOption(KafkaWriterOptions.TOPIC_NAME, KafkaErrorCode.REQUIRED_VALUE);
@@ -102,10 +96,11 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     String partitionField = writerConf.get(KafkaWriterOptions.PARTITION_FIELD);
     if (StringUtils.isNotEmpty(partitionField)) {
       List<String> partitionFieldsNames = Arrays.asList(partitionField.split(",\\s*"));
-      partitionFieldsIndices = getPartitionFieldsIndices(fieldNames, partitionFieldsNames);
+      partitionFieldsIndices = getPartitionFieldsIndices(context.getRowTypeInfo().getFieldNames(), partitionFieldsNames);
     }
 
-    if (format.equals("debezium")) {
+    if (format.contains("debezium")) {
+      optionalConfig.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArraySerializer");
       optionalConfig.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArraySerializer");
     }
     this.kafkaProducer = new KafkaProducer(this.bootstrapServers, this.kafkaTopic, optionalConfig);
@@ -128,7 +123,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   public void write(Row record) throws IOException {
     checkErroneous();
     //TODO: refactor this as a format factory
-    if (format.equals("debezium")) {
+    if (format.contains("debezium")) {
       writeDebezium(record);
     } else {
       String result = jsonConverter.convert(record).toString();
@@ -149,17 +144,11 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
 
   @SuppressWarnings("checkstyle:MagicNumber")
   public void writeDebezium(Row record) {
-    String[] partitionFieldsValues = new String[1];
-    String key = record.getString(BinlogRow.KEY_INDEX);
-    partitionFieldsValues[0] = key;
-    int partitionId = choosePartitionIdByFields(partitionFieldsValues);
-    Map<String, String> headers = new HashMap<>(4);
-    headers.put("db", record.getString(BinlogRow.DATABASE_INDEX));
-    headers.put("table", record.getString(BinlogRow.TABLE_INDEX));
-    headers.put("ddl_flag", String.valueOf(record.getBoolean(BinlogRow.DDL_FLAG_INDEX)));
-    headers.put("version", String.valueOf(record.getInt(BinlogRow.VERSION_INDEX)));
-    byte[] value = record.getBinary(BinlogRow.VALUE_INDEX);
-    sendWithHeaders(key, value, partitionId, headers);
+    byte[] key = record.getBinary(DebeziumJsonDeserializationSchema.KEY_NAME_INDEX);
+    byte[] value = record.getBinary(DebeziumJsonDeserializationSchema.VALUE_NAME_INDEX);
+    String partition = Objects.isNull(key) ? null : new String(key);
+    int partitionId = choosePartitionIdByFields(new String[] {partition});
+    sendWithHeaders(key, value, partitionId, null);
   }
 
   @Override
@@ -207,11 +196,11 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   /**
    * get all partition fields indices according to their name
    */
-  private List<Integer> getPartitionFieldsIndices(List<String> fieldNames, List<String> partitionFieldsNames) {
+  private List<Integer> getPartitionFieldsIndices(String[] fieldNames, List<String> partitionFieldsNames) {
     return partitionFieldsNames.stream()
         .map(partitionFieldsName -> {
-          for (int i = 0; i < fieldNames.size(); i++) {
-            String columnName = fieldNames.get(i);
+          for (int i = 0; i < fieldNames.length; i++) {
+            String columnName = fieldNames[i];
             if (columnName.equals(partitionFieldsName)) {
               return i;
             }
@@ -261,7 +250,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     kafkaProducer.send(KafkaRecord.builder().key(key).value(value).headers(headers).build(), callback);
   }
 
-  private void sendWithHeaders(String key, Object value, int partitionId, Map<String, String> headers) {
+  private void sendWithHeaders(Object key, Object value, Integer partitionId, Map<String, String> headers) {
     kafkaProducer.send(KafkaRecord.builder().key(key).value(value).partitionId(partitionId).headers(headers).build(), callback);
   }
 
