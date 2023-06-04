@@ -36,7 +36,7 @@ public class MysqlCDCSource extends BaseCDCSource {
   @Override
   public SourceReader<Row, BaseCDCSplit> createReader(SourceReader.Context readerContext) {
     LOG.info("Create Mysql CDC Source");
-    return new MysqlCDCSourceReader(readerConf, commonConf, readerContext);
+    return new MysqlCDCSourceReader(readerConf, commonConf, readerContext, deserializationSchema, boundedness);
   }
 
   @Override

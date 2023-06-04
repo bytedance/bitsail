@@ -33,7 +33,7 @@ public class SqlServerCDCSource extends BaseCDCSource {
   @Override
   public SourceReader<Row, BaseCDCSplit> createReader(SourceReader.Context readerContext) {
     LOG.info("Create SqlServer CDC Source");
-    return new SqlServerCDCSourceReader(readerConf, commonConf, readerContext);
+    return new SqlServerCDCSourceReader(readerConf, commonConf, readerContext, deserializationSchema, boundedness);
   }
 
   @Override

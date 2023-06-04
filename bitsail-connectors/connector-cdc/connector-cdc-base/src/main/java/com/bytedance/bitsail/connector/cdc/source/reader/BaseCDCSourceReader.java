@@ -16,16 +16,18 @@
 
 package com.bytedance.bitsail.connector.cdc.source.reader;
 
+import com.bytedance.bitsail.base.connector.reader.v1.Boundedness;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceEvent;
 import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
 import com.bytedance.bitsail.base.connector.reader.v1.SourceReader;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.option.CommonOptions;
 import com.bytedance.bitsail.common.row.Row;
+import com.bytedance.bitsail.component.format.debezium.deserialization.DebeziumDeserializationSchema;
 import com.bytedance.bitsail.connector.cdc.source.event.BinlogCompleteAckEvent;
 import com.bytedance.bitsail.connector.cdc.source.split.BaseCDCSplit;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 
+import org.apache.kafka.connect.source.SourceRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,34 +39,40 @@ public abstract class BaseCDCSourceReader implements SourceReader<Row, BaseCDCSp
 
   private static final Logger LOG = LoggerFactory.getLogger(BaseCDCSourceReader.class);
 
-  protected BitSailConfiguration readerConf;
-
-  protected BitSailConfiguration commonConf;
-
-  protected Context readerContext;
-
   private final Queue<BaseCDCSplit> remainSplits;
-
-  protected final BinlogSplitReader<Row> reader;
 
   private boolean splitSubmitted;
 
-  private boolean isStreaming;
+  protected final BitSailConfiguration readerConf;
+
+  protected final BitSailConfiguration commonConf;
+
+  protected final Context readerContext;
+
+  protected final DebeziumDeserializationSchema deserializationSchema;
+
+  protected final BinlogSplitReader<SourceRecord> reader;
+
+  private final Boundedness boundedness;
 
   public BaseCDCSourceReader(BitSailConfiguration readerConf,
                              BitSailConfiguration commonConf,
-                             SourceReader.Context readerContext) {
+                             SourceReader.Context readerContext,
+                             DebeziumDeserializationSchema deserializationSchema,
+                             Boundedness boundedness) {
     this.readerConf = readerConf;
     this.commonConf = commonConf;
     this.readerContext = readerContext;
     this.remainSplits = new ArrayDeque<>();
     this.reader = getReader();
     this.splitSubmitted = false;
-    this.isStreaming = commonConf.get(CommonOptions.JOB_TYPE).equalsIgnoreCase("streaming");
-    LOG.info("Is streaming task: " + isStreaming);
+    this.deserializationSchema = deserializationSchema;
+    this.boundedness = boundedness;
+
+    this.deserializationSchema.open();
   }
 
-  public abstract BinlogSplitReader<Row> getReader();
+  public abstract BinlogSplitReader<SourceRecord> getReader();
 
   @Override
   public void start() {
@@ -74,9 +82,9 @@ public abstract class BaseCDCSourceReader implements SourceReader<Row, BaseCDCSp
   @Override
   public void pollNext(SourcePipeline<Row> pipeline) throws Exception {
     // poll from reader
-    if (this.reader.isRunning() && this.reader.hasNext()) {
-      Row record = this.reader.poll();
-      pipeline.output(record);
+    if (reader.isRunning() && reader.hasNext()) {
+      SourceRecord sourceRecord = reader.poll();
+      deserializationSchema.deserialize(sourceRecord, pipeline);
     }
   }
 
@@ -93,7 +101,7 @@ public abstract class BaseCDCSourceReader implements SourceReader<Row, BaseCDCSp
 
   @Override
   public boolean hasMoreElements() {
-    if (isStreaming) {
+    if (Boundedness.UNBOUNDEDNESS.equals(boundedness)) {
       return true;
     }
     if (!splitSubmitted) {

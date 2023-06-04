@@ -16,40 +16,11 @@
       "class": "com.bytedance.bitsail.connector.cdc.mysql.source.MysqlCDCSource",
       "db_name": "test",
       "table_name": "jdbc_source_test",
+      "format_type": "debezium_json",
       "connections": [
       ],
       "user_name": "root",
-      "password": "pw",
-      "columns": [
-        {
-          "name": "db",
-          "type": "string"
-        },
-        {
-          "name": "table",
-          "type": "string"
-        },
-        {
-          "name": "id",
-          "type": "string"
-        },
-        {
-          "name": "timestamp",
-          "type": "string"
-        },
-        {
-          "name": "ddl",
-          "type": "boolean"
-        },
-        {
-          "name": "version",
-          "type": "int"
-        },
-        {
-          "name": "value",
-          "type": "binary"
-        }
-      ]
+      "password": "pw"
     },
     "writer": {
       "class": "com.bytedance.bitsail.connector.print.sink.PrintSink"

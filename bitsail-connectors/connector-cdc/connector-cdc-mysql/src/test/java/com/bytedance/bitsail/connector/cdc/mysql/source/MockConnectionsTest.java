@@ -17,7 +17,6 @@
 package com.bytedance.bitsail.connector.cdc.mysql.source;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.cdc.model.ClusterInfo;
 import com.bytedance.bitsail.connector.cdc.model.ConnectionInfo;
 import com.bytedance.bitsail.connector.cdc.mysql.source.container.MySQLContainerMariadbAdapter;
@@ -35,6 +34,7 @@ import io.debezium.connector.mysql.MysqlTextProtocolFieldReader;
 import io.debezium.relational.Table;
 import io.debezium.relational.TableId;
 import io.debezium.relational.history.TableChanges;
+import org.apache.kafka.connect.source.SourceRecord;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -47,7 +47,6 @@ import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -135,8 +134,8 @@ public class MockConnectionsTest {
     int maxPeriod = 0;
     while (maxPeriod <= 5) {
       if (reader.hasNext()) {
-        Row row = reader.poll();
-        Arrays.stream(row.getFields()).forEach(o -> LOG.info(o.toString()));
+        SourceRecord sourceRecord = reader.poll();
+        LOG.info("source record: {}.", sourceRecord);
         maxPeriod++;
       }
       TimeUnit.SECONDS.sleep(1);
