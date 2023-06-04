@@ -16,10 +16,7 @@
 
 package com.bytedance.bitsail.connector.cdc.mysql.source.debezium;
 
-import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.component.format.debezium.deserialization.DebeziumDeserializationSchema;
 import com.bytedance.bitsail.connector.cdc.mysql.source.config.MysqlConfig;
 import com.bytedance.bitsail.connector.cdc.mysql.source.schema.SchemaUtils;
 import com.bytedance.bitsail.connector.cdc.mysql.source.schema.TableChangeConverter;
@@ -72,7 +69,7 @@ import java.util.concurrent.ThreadFactory;
  * Reader that actually execute the Debezium task.
  * This reader is stateless and will read binlog starting from the given begin offset.
  */
-public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
+public class MysqlBinlogSplitReader implements BinlogSplitReader<SourceRecord> {
 
   private static final Logger LOG = LoggerFactory.getLogger(MysqlBinlogSplitReader.class);
 
@@ -113,12 +110,9 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
 
   private final int subtaskId;
 
-  private final DebeziumDeserializationSchema deserializationSchema;
-
   private final BitSailConfiguration jobConf;
 
   public MysqlBinlogSplitReader(BitSailConfiguration jobConf,
-                                DebeziumDeserializationSchema deserializationSchema,
                                 int subtaskId,
                                 long instantId) {
     this.jobConf = jobConf;
@@ -130,7 +124,6 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
     ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("mysql-binlog-reader-" + this.subtaskId).build();
     this.executorService = Executors.newSingleThreadExecutor(threadFactory);
     this.offset = new HashMap<>();
-    this.deserializationSchema = deserializationSchema;
     this.isRunning = false;
   }
 
@@ -278,8 +271,8 @@ public class MysqlBinlogSplitReader implements BinlogSplitReader<Row> {
   }
 
   @Override
-  public void emit(SourcePipeline<Row> pipeline) throws IOException {
-    deserializationSchema.deserialize(recordIterator.next(), pipeline);
+  public SourceRecord poll() {
+    return recordIterator.next();
   }
 
   @Override

@@ -27,6 +27,7 @@ import com.bytedance.bitsail.connector.cdc.source.event.BinlogCompleteAckEvent;
 import com.bytedance.bitsail.connector.cdc.source.split.BaseCDCSplit;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 
+import org.apache.kafka.connect.source.SourceRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,7 @@ public abstract class BaseCDCSourceReader implements SourceReader<Row, BaseCDCSp
 
   protected final DebeziumDeserializationSchema deserializationSchema;
 
-  protected final BinlogSplitReader<Row> reader;
+  protected final BinlogSplitReader<SourceRecord> reader;
 
   private final Boundedness boundedness;
 
@@ -69,7 +70,7 @@ public abstract class BaseCDCSourceReader implements SourceReader<Row, BaseCDCSp
     this.boundedness = boundedness;
   }
 
-  public abstract BinlogSplitReader<Row> getReader();
+  public abstract BinlogSplitReader<SourceRecord> getReader();
 
   @Override
   public void start() {
@@ -79,9 +80,9 @@ public abstract class BaseCDCSourceReader implements SourceReader<Row, BaseCDCSp
   @Override
   public void pollNext(SourcePipeline<Row> pipeline) throws Exception {
     // poll from reader
-    if (this.reader.isRunning() && this.reader.hasNext()) {
-      Row record = this.reader.poll();
-      pipeline.output(record);
+    if (reader.isRunning() && reader.hasNext()) {
+      SourceRecord sourceRecord = reader.poll();
+      deserializationSchema.deserialize(sourceRecord, pipeline);
     }
   }
 

@@ -16,10 +16,7 @@
 
 package com.bytedance.bitsail.connector.cdc.sqlserver.source.reader;
 
-import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.component.format.debezium.deserialization.DebeziumDeserializationSchema;
 import com.bytedance.bitsail.connector.cdc.source.reader.BinlogSplitReader;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 import com.bytedance.bitsail.connector.cdc.sqlserver.source.config.SqlServerConfig;
@@ -49,7 +46,6 @@ import org.apache.kafka.connect.source.SourceRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,7 +55,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SqlServerBinlogSplitReader implements BinlogSplitReader<Row> {
+public class SqlServerBinlogSplitReader implements BinlogSplitReader<SourceRecord> {
 
   private static final Logger LOG = LoggerFactory.getLogger(SqlServerBinlogSplitReader.class);
 
@@ -95,18 +91,14 @@ public class SqlServerBinlogSplitReader implements BinlogSplitReader<Row> {
 
   private final int subtaskId;
 
-  private final DebeziumDeserializationSchema deserializationSchema;
-
   private volatile SqlServerDatabaseSchema schema;
 
   private final BitSailConfiguration jobConf;
 
   public SqlServerBinlogSplitReader(BitSailConfiguration jobConf,
-                                    DebeziumDeserializationSchema deserializationSchema,
                                     int subtaskId,
                                     long instantId) {
     this.jobConf = jobConf;
-    this.deserializationSchema = deserializationSchema;
     this.sqlserverConfig = SqlServerConfig.fromBitSailConf(jobConf, instantId);
     this.schemaNameAdjuster = SchemaNameAdjuster.create();
     this.connectorConfig = sqlserverConfig.getDbzSqlServerConnectorConfig();
@@ -114,7 +106,6 @@ public class SqlServerBinlogSplitReader implements BinlogSplitReader<Row> {
     this.offset = new HashMap<>();
     this.executorService = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("sqlserver-binlog-reader-" + this.subtaskId).build());
     this.isRunning = false;
-    this.deserializationSchema.open();
   }
 
   @Override
@@ -228,9 +219,8 @@ public class SqlServerBinlogSplitReader implements BinlogSplitReader<Row> {
   }
 
   @Override
-  public void emit(SourcePipeline<Row> pipeline) throws IOException {
-    SourceRecord record = this.recordIterator.next();
-    deserializationSchema.deserialize(record, pipeline);
+  public SourceRecord poll() {
+    return this.recordIterator.next();
   }
 
   @Override

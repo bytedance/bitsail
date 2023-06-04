@@ -17,7 +17,6 @@
 package com.bytedance.bitsail.connector.cdc.sqlserver.source.reader;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.connector.cdc.model.ClusterInfo;
 import com.bytedance.bitsail.connector.cdc.model.ConnectionInfo;
 import com.bytedance.bitsail.connector.cdc.option.BinlogReaderOptions;
@@ -26,6 +25,7 @@ import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.apache.kafka.connect.source.SourceRecord;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,7 +39,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -129,8 +128,8 @@ public class SqlServerBinlogSplitReaderTest {
     int maxPeriod = 0;
     while (maxPeriod <= 5) {
       if (reader.hasNext()) {
-        Row row = reader.poll();
-        Arrays.stream(row.getFields()).forEach(o -> LOG.info(o.toString()));
+        SourceRecord sourceRecord = reader.poll();
+        LOG.info("source record: {}.", sourceRecord);
         maxPeriod++;
       }
       TimeUnit.SECONDS.sleep(1);

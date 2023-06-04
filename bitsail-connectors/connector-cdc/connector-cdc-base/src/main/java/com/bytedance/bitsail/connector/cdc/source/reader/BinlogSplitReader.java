@@ -16,10 +16,8 @@
 
 package com.bytedance.bitsail.connector.cdc.source.reader;
 
-import com.bytedance.bitsail.base.connector.reader.v1.SourcePipeline;
 import com.bytedance.bitsail.connector.cdc.source.split.BinlogSplit;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -33,7 +31,7 @@ public interface BinlogSplitReader<T> extends Serializable {
 
   void close();
 
-  void emit(SourcePipeline<T> pipeline) throws IOException;
+  T poll();
 
   boolean hasNext();
 

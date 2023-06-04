@@ -44,7 +44,7 @@ public class DebeziumJsonDeserializationSchema implements DebeziumDeserializatio
 
   public static final RowTypeInfo DEBEZIUM_JSON_ROW_TYPE =
       new RowTypeInfo(
-          new String[] {"topic", "key", "value", "timestamp"},
+          new String[] {TOPIC_NAME, KEY_NAME, VALUE_NAME, TIMESTAMP_NAME},
           new TypeInfo<?>[] {
               TypeInfos.STRING_TYPE_INFO, BasicArrayTypeInfo.BINARY_TYPE_INFO, BasicArrayTypeInfo.BINARY_TYPE_INFO, TypeInfos.LONG_TYPE_INFO
           });
