@@ -23,12 +23,14 @@ import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
 import com.bytedance.bitsail.base.execution.ExecutionEnviron;
 import com.bytedance.bitsail.base.execution.Mode;
 import com.bytedance.bitsail.base.extension.ParallelismComputable;
+import com.bytedance.bitsail.base.extension.SupportProducedType;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.base.serializer.BinarySerializer;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.component.format.debezium.deserialization.DebeziumDeserializationSchema;
 import com.bytedance.bitsail.connector.cdc.schema.DebeziumDeserializationFactory;
 import com.bytedance.bitsail.connector.cdc.source.coordinator.CDCSourceSplitCoordinator;
@@ -42,7 +44,7 @@ import java.io.IOException;
 /**
  * Source to read mysql binlog.
  */
-public abstract class BaseCDCSource implements Source<Row, BaseCDCSplit, BaseAssignmentState>, ParallelismComputable {
+public abstract class BaseCDCSource implements Source<Row, BaseCDCSplit, BaseAssignmentState>, ParallelismComputable, SupportProducedType {
 
   protected BitSailConfiguration commonConf;
   protected BitSailConfiguration readerConf;
@@ -101,5 +103,13 @@ public abstract class BaseCDCSource implements Source<Row, BaseCDCSplit, BaseAss
         .adviceParallelism(1)
         .enforceDownStreamChain(false)
         .build();
+  }
+
+  @Override
+  public RowTypeInfo getProducedType() {
+    if (deserializationSchema instanceof SupportProducedType) {
+      return ((SupportProducedType) deserializationSchema).getProducedType();
+    }
+    return null;
   }
 }
