@@ -84,6 +84,6 @@ public interface BinlogReaderOptions extends ReaderOptions.BaseReaderOptions {
 
   ConfigOption<String> FORMAT_TYPE =
       key(READER_PREFIX + "format_type")
-          .defaultValue("debezium-json")
+          .defaultValue("debezium_json")
           .withAlias("format");
 }
