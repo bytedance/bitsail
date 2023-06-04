@@ -70,7 +70,8 @@ public interface KafkaOptions extends WriterOptions.BaseWriterOptions, ReaderOpt
 
   ConfigOption<String> FORMAT_TYPE =
       key("format_type")
-          .defaultValue("json");
+          .defaultValue("json")
+          .withAlias("content_type");
 
   ConfigOption<Map<String, String>> PROPERTIES =
       key("format_type")
