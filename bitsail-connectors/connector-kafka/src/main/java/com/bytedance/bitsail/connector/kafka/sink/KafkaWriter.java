@@ -22,6 +22,8 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.connector.kafka.common.KafkaErrorCode;
+import com.bytedance.bitsail.connector.kafka.discoverer.FixedPartitionDiscoverer;
+import com.bytedance.bitsail.connector.kafka.discoverer.PartitionDiscoverer;
 import com.bytedance.bitsail.connector.kafka.format.ProducerRecordRowSerializationSchema;
 import com.bytedance.bitsail.connector.kafka.format.ProducerRecordSerializationSchemaFactory;
 import com.bytedance.bitsail.connector.kafka.option.KafkaOptions;
@@ -49,6 +51,7 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   private final RowTypeInfo rowTypeInfo;
   private final ProducerRecordRowSerializationSchema<byte[], byte[]> serializationSchema;
   private final CallbackWrapper callbackWrapper;
+  private final PartitionDiscoverer partitionDiscoverer;
   private final transient Writer.Context<EmptyState> context;
 
   public KafkaWriter(BitSailConfiguration commonConfiguration, BitSailConfiguration writerConf, Context<EmptyState> context) {
@@ -56,7 +59,8 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     this.rowTypeInfo = context.getRowTypeInfo();
     this.properties = prepareSenderProperties(writerConf);
     this.sender = new KafkaSender(properties);
-    this.serializationSchema = ProducerRecordSerializationSchemaFactory.getRowSerializationSchema(writerConf, rowTypeInfo);
+    this.partitionDiscoverer = new FixedPartitionDiscoverer(sender.partitionFor(writerConf.get(KafkaOptions.TOPIC_NAME)));
+    this.serializationSchema = ProducerRecordSerializationSchemaFactory.getRowSerializationSchema(writerConf, rowTypeInfo, partitionDiscoverer);
     this.callbackWrapper = new CallbackWrapper(writerConf, context);
   }
 
@@ -112,6 +116,10 @@ public class KafkaWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
 
   @Override
   public void close() throws IOException {
+    if (Objects.nonNull(partitionDiscoverer)) {
+      partitionDiscoverer.close();
+    }
+
     if (Objects.nonNull(sender)) {
       this.sender.close();
     }

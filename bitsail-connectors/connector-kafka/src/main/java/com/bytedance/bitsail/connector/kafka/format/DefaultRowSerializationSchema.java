@@ -26,13 +26,15 @@ import com.bytedance.bitsail.component.format.debezium.deserialization.DebeziumJ
 import com.bytedance.bitsail.component.format.debezium.serialization.DebeziumJsonSerializationSchema;
 import com.bytedance.bitsail.component.format.json.JsonRowSerializationSchema;
 import com.bytedance.bitsail.connector.kafka.constants.FormatType;
-import com.bytedance.bitsail.connector.kafka.option.KafkaOptions;
+import com.bytedance.bitsail.connector.kafka.discoverer.PartitionDiscoverer;
 
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.PartitionInfo;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -53,7 +55,22 @@ public class DefaultRowSerializationSchema implements ProducerRecordRowSerializa
         (row) -> topic,
         createKeyFunction(keyFieldNames, format, rowTypeInfo, jobConf),
         createValueFunction(format, rowTypeInfo, jobConf),
-        createPartitionFunction(format, rowTypeInfo, jobConf)
+        createPartitionFunction(format, rowTypeInfo, null, null)
+    );
+  }
+
+  public static DefaultRowSerializationSchema fixedTopic(FormatType format,
+                                                         String topic,
+                                                         String[] keyFieldNames,
+                                                         RowTypeInfo rowTypeInfo,
+                                                         String partitionField,
+                                                         PartitionDiscoverer partitionDiscoverer,
+                                                         BitSailConfiguration jobConf) {
+    return new DefaultRowSerializationSchema(
+        (row) -> topic,
+        createKeyFunction(keyFieldNames, format, rowTypeInfo, jobConf),
+        createValueFunction(format, rowTypeInfo, jobConf),
+        createPartitionFunction(format, rowTypeInfo, partitionField, partitionDiscoverer)
     );
   }
 
@@ -95,40 +112,47 @@ public class DefaultRowSerializationSchema implements ProducerRecordRowSerializa
 
   private static Function<Row, Integer> createPartitionFunction(FormatType format,
                                                                 RowTypeInfo rowTypeInfo,
-                                                                BitSailConfiguration jobConf) {
+                                                                String partitionFields,
+                                                                PartitionDiscoverer partitionDiscoverer) {
     if (FormatType.DEBEZIUM_JSON.equals(format)) {
       //default use topic field hash value.
       int i = rowTypeInfo.indexOf(DebeziumJsonDeserializationSchema.TOPIC_NAME);
       return (row -> Math.abs(row.getField(i).hashCode()));
     }
 
-    String partitionFields = jobConf.get(KafkaOptions.PARTITION_FIELD);
     if (StringUtils.isEmpty(partitionFields)) {
       return row -> null;
     }
 
     if (FormatType.JSON.equals(format)) {
-      String[] splits = StringUtils.split(partitionFields);
-      final int[] partitionFieldIndices = new int[splits.length];
-      for (int index = 0; index < splits.length; index++) {
-        int indexOf = rowTypeInfo.indexOf(splits[index]);
-        if (indexOf < 0) {
-          throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR, String.format("Partition field %s not exists.", splits[index]));
-        }
-        partitionFieldIndices[index] = indexOf;
-      }
-
-      return row -> {
-        int hashcode = 0;
-        for (int index = 0; index < partitionFieldIndices.length; index++) {
-          Object field = row.getField(partitionFieldIndices[index]);
-          hashcode = hashcode + Objects.hashCode(field);
-        }
-        return Math.abs(hashcode);
-      };
+      return createFixedPartitionFunction(StringUtils.split(partitionFields, ","), rowTypeInfo, partitionDiscoverer);
     }
+
     throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR,
         String.format("Format type %s not support for partition function", format));
+  }
+
+  private static Function<Row, Integer> createFixedPartitionFunction(String[] partitionFields,
+                                                                     RowTypeInfo rowTypeInfo,
+                                                                     PartitionDiscoverer partitionDiscoverer) {
+    final int[] partitionFieldIndices = new int[partitionFields.length];
+    List<PartitionInfo> partitionInfos = partitionDiscoverer.discoverPartitions();
+    for (int index = 0; index < partitionFields.length; index++) {
+      int indexOf = rowTypeInfo.indexOf(partitionFields[index]);
+      if (indexOf < 0) {
+        throw BitSailException.asBitSailException(CommonErrorCode.CONFIG_ERROR, String.format("Partition field %s not exists.", partitionFields[index]));
+      }
+      partitionFieldIndices[index] = indexOf;
+    }
+
+    return row -> {
+      int hashcode = 0;
+      for (int partitionFieldIndex : partitionFieldIndices) {
+        Object field = row.getField(partitionFieldIndex);
+        hashcode = hashcode + Objects.hashCode(field);
+      }
+      return Math.abs(hashcode) % partitionInfos.size();
+    };
   }
 
   private static RowTypeInfo slice(RowTypeInfo rowTypeInfo, String[] keyFiledNames) {

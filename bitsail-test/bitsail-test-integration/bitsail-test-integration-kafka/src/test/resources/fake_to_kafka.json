@@ -30,20 +30,7 @@
     "writer": {
       "class": "com.bytedance.bitsail.connector.kafka.sink.KafkaSink",
       "content_type": "json",
-      "columns": [
-        {
-          "name": "varchar_type",
-          "type": "string"
-        },
-        {
-          "name": "text_type",
-          "type": "string"
-        },
-        {
-          "name": "bigint_type",
-          "type": "long"
-        }
-      ]
+      "partition_field": "text_type"
     }
   }
 }

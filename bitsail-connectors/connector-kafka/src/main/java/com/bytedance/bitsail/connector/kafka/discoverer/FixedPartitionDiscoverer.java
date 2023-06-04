@@ -14,32 +14,28 @@
  *       limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.kafka.sink.partitioner;
+package com.bytedance.bitsail.connector.kafka.discoverer;
 
-import org.apache.kafka.clients.producer.Partitioner;
-import org.apache.kafka.common.Cluster;
+import org.apache.kafka.common.PartitionInfo;
 
-import java.util.Map;
+import java.io.IOException;
+import java.util.List;
 
-public class RowFieldPartitioner implements Partitioner {
+public class FixedPartitionDiscoverer implements PartitionDiscoverer {
 
-  @Override
-  public int partition(String topic,
-                       Object key,
-                       byte[] keyBytes,
-                       Object value,
-                       byte[] valueBytes,
-                       Cluster cluster) {
-    return 0;
+  private final List<PartitionInfo> partitionInfos;
+
+  public FixedPartitionDiscoverer(List<PartitionInfo> partitionInfos) {
+    this.partitionInfos = partitionInfos;
   }
 
   @Override
-  public void close() {
-
+  public List<PartitionInfo> discoverPartitions() {
+    return partitionInfos;
   }
 
   @Override
-  public void configure(Map<String, ?> configs) {
-
+  public void close() throws IOException {
+    //ignore
   }
 }

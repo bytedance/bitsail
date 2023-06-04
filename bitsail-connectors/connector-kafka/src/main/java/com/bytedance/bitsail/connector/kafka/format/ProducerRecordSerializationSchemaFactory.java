@@ -19,18 +19,33 @@ package com.bytedance.bitsail.connector.kafka.format;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
 import com.bytedance.bitsail.connector.kafka.constants.FormatType;
+import com.bytedance.bitsail.connector.kafka.discoverer.PartitionDiscoverer;
 import com.bytedance.bitsail.connector.kafka.option.KafkaOptions;
 
 import org.apache.commons.lang3.StringUtils;
 
 public class ProducerRecordSerializationSchemaFactory {
 
-  public static ProducerRecordRowSerializationSchema<byte[], byte[]> getRowSerializationSchema(BitSailConfiguration jobConf, RowTypeInfo rowTypeInfo) {
+  public static ProducerRecordRowSerializationSchema<byte[], byte[]> getRowSerializationSchema(BitSailConfiguration jobConf,
+                                                                                               RowTypeInfo rowTypeInfo,
+                                                                                               PartitionDiscoverer partitionDiscoverer) {
 
     String topic = jobConf.get(KafkaOptions.TOPIC_NAME);
     FormatType formatType = FormatType.valueOf(StringUtils.upperCase(jobConf.get(KafkaOptions.FORMAT_TYPE)));
     String keyFields = jobConf.get(KafkaOptions.KEY_FIELDS);
 
+    String partitionFields = jobConf.get(KafkaOptions.PARTITION_FIELD);
+    if (StringUtils.isEmpty(partitionFields)) {
+      return DefaultRowSerializationSchema.fixedTopic(
+          formatType,
+          topic,
+          StringUtils.isEmpty(keyFields) ?
+              null :
+              StringUtils.split(keyFields, ","),
+          rowTypeInfo,
+          jobConf
+      );
+    }
     return DefaultRowSerializationSchema.fixedTopic(
         formatType,
         topic,
@@ -38,6 +53,8 @@ public class ProducerRecordSerializationSchemaFactory {
             null :
             StringUtils.split(keyFields, ","),
         rowTypeInfo,
+        partitionFields,
+        partitionDiscoverer,
         jobConf
     );
   }

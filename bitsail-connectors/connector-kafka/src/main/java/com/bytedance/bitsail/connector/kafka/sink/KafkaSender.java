@@ -20,9 +20,11 @@ import com.bytedance.bitsail.connector.kafka.sink.callback.CallbackWrapper;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.PartitionInfo;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
 public class KafkaSender implements Closeable {
@@ -45,5 +47,9 @@ public class KafkaSender implements Closeable {
   @Override
   public void close() throws IOException {
     producer.close();
+  }
+
+  public List<PartitionInfo> partitionFor(String topic) {
+    return producer.partitionsFor(topic);
   }
 }

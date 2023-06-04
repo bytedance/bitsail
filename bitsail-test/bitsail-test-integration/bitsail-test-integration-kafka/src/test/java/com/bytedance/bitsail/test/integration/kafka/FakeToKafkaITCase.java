@@ -62,7 +62,7 @@ public class FakeToKafkaITCase extends AbstractIntegrationTest {
   }
 
   protected void updateConfiguration(BitSailConfiguration jobConfiguration) {
-    jobConfiguration.set(KafkaOptions.BOOTSTRAP_SERVERS, KafkaCluster.getBootstrapServer());
-    jobConfiguration.set(KafkaOptions.TOPIC_NAME, topicName);
+    jobConfiguration.setWriter(KafkaOptions.BOOTSTRAP_SERVERS, KafkaCluster.getBootstrapServer());
+    jobConfiguration.setWriter(KafkaOptions.TOPIC_NAME, topicName);
   }
 }
