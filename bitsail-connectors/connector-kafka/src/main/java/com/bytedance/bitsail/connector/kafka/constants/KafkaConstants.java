@@ -87,4 +87,16 @@ public class KafkaConstants {
   public static final String DISABLE_CURRENT_OFFSET_RATE_METRICS = "disableCurrentOffsetsRateMetrics";
   public static final int MAX_PARALLELISM = 5;
   public static final int REQUEST_TIMEOUT_MS_CONFIG = 1200 * 1000;
+
+  public static final String JSON_FORMAT = "json";
+
+  public static final String CONSUMER_OFFSET_LATEST_KEY = "latest";
+
+  public static final String CONSUMER_OFFSET_EARLIEST_KEY = "earliest";
+
+  public static final String CONSUMER_OFFSET_TIMESTAMP_KEY = "timestamp";
+
+  public static final Long CONSUMER_STOPPING_OFFSET = Long.MAX_VALUE;
+
+  public static final String DEFAULT_CLIENT_ID = "-coordinator-admin-client-";
 }

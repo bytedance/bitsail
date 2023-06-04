@@ -1,0 +1,10 @@
+{
+  "name": "bitsail-connector-unified-kafka",
+  "classes": [
+    "com.bytedance.bitsail.connector.kafka.source.KafkaSource",
+    "com.bytedance.bitsail.connector.kafka.sink.KafkaSink"
+  ],
+  "libs": [
+    "connector-kafka-${version}.jar"
+  ]
+}
