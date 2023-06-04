@@ -21,6 +21,7 @@ import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.base.connector.writer.v1.WriterCommitter;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
@@ -48,7 +49,7 @@ public class KafkaSink<CommitT extends Serializable> implements Sink<Row, Commit
 
   @Override
   public Writer<Row, CommitT, EmptyState> createWriter(Writer.Context<EmptyState> context) throws IOException {
-    return new KafkaWriter<>(commonConf, writerConf, context);
+    return new KafkaWriter<>(commonConf, writerConf.getSubConfiguration(WriterOptions.JOB_WRITER), context);
   }
 
   @Override
