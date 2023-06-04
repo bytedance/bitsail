@@ -68,6 +68,8 @@ public abstract class BaseCDCSourceReader implements SourceReader<Row, BaseCDCSp
     this.splitSubmitted = false;
     this.deserializationSchema = deserializationSchema;
     this.boundedness = boundedness;
+
+    this.deserializationSchema.open();
   }
 
   public abstract BinlogSplitReader<SourceRecord> getReader();
