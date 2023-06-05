@@ -18,49 +18,63 @@ package com.bytedance.bitsail.connector.kafka.option;
 
 import com.bytedance.bitsail.common.annotation.Essential;
 import com.bytedance.bitsail.common.option.ConfigOption;
+import com.bytedance.bitsail.common.option.ReaderOptions;
 import com.bytedance.bitsail.common.option.WriterOptions;
 
-import static com.bytedance.bitsail.common.option.ConfigOptions.key;
-import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
+import com.alibaba.fastjson.TypeReference;
 
-public interface KafkaWriterOptions extends WriterOptions.BaseWriterOptions {
+import java.util.Map;
+
+import static com.bytedance.bitsail.common.option.ConfigOptions.key;
+
+public interface KafkaOptions extends WriterOptions.BaseWriterOptions, ReaderOptions.BaseReaderOptions {
   ConfigOption<String> BOOTSTRAP_SERVERS =
-      key(WRITER_PREFIX + "bootstrap_servers")
+      key("bootstrap_servers")
           .noDefaultValue(String.class)
-          .withAlias(WRITER_PREFIX + "kafka_servers");
+          .withAlias("kafka_servers");
 
   @Essential
   ConfigOption<String> TOPIC_NAME =
-      key(WRITER_PREFIX + "topic_name")
+      key("topic_name")
+          .noDefaultValue(String.class);
+
+  ConfigOption<String> KEY_FIELDS =
+      key("key_fields")
           .noDefaultValue(String.class);
 
   ConfigOption<String> PARTITION_FIELD =
-      key(WRITER_PREFIX + "partition_field")
+      key("partition_field")
           .noDefaultValue(String.class);
 
   ConfigOption<Boolean> LOG_FAILURES_ONLY =
-      key(WRITER_PREFIX + "log_failures_only")
+      key("log_failures_only")
           .defaultValue(false);
 
   ConfigOption<Integer> RETRIES =
-      key(WRITER_PREFIX + "retries")
+      key("retries")
           .defaultValue(10);
 
   /**
    * retry.backoff.ms
    */
   ConfigOption<Long> RETRY_BACKOFF_MS =
-      key(WRITER_PREFIX + "retry_backoff_ms")
+      key("retry_backoff_ms")
           .defaultValue(1000L);
 
   /**
    * linger.ms
    */
   ConfigOption<Long> LINGER_MS =
-      key(WRITER_PREFIX + "linger_ms")
+      key("linger_ms")
           .defaultValue(5000L);
 
-  ConfigOption<String> CONTENT_TYPE =
-      key(WRITER_PREFIX + "content_type")
-          .defaultValue("json");
+  ConfigOption<String> FORMAT_TYPE =
+      key("format_type")
+          .defaultValue("json")
+          .withAlias("content_type");
+
+  ConfigOption<Map<String, String>> PROPERTIES =
+      key("format_type")
+          .onlyReference(new TypeReference<Map<String, String>>() {
+          });
 }

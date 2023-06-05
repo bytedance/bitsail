@@ -20,7 +20,7 @@ import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.cdc.model.ClusterInfo;
 import com.bytedance.bitsail.connector.cdc.model.ConnectionInfo;
 import com.bytedance.bitsail.connector.cdc.option.BinlogReaderOptions;
-import com.bytedance.bitsail.connector.kafka.option.KafkaWriterOptions;
+import com.bytedance.bitsail.connector.kafka.option.KafkaOptions;
 import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
 import com.bytedance.bitsail.test.integration.cdc.mysql.container.MySQLContainerMariadbAdapter;
 import com.bytedance.bitsail.test.integration.kafka.container.KafkaCluster;
@@ -100,8 +100,8 @@ public class MysqlCDCSourceITCase extends AbstractIntegrationTest {
     // set mysql connections info
     jobConf.set(BinlogReaderOptions.CONNECTIONS, Lists.newArrayList(clusterInfo));
     // set kafka config
-    jobConf.set(KafkaWriterOptions.BOOTSTRAP_SERVERS, KafkaCluster.getBootstrapServer());
-    jobConf.set(KafkaWriterOptions.TOPIC_NAME, TOPIC_NAME);
+    jobConf.setWriter(KafkaOptions.BOOTSTRAP_SERVERS, KafkaCluster.getBootstrapServer());
+    jobConf.setWriter(KafkaOptions.TOPIC_NAME, TOPIC_NAME);
     submitJob(jobConf);
   }
 }

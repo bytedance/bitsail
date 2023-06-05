@@ -24,6 +24,6 @@ import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
 
 public interface DebeziumWriterOptions extends WriterOptions.BaseWriterOptions {
   ConfigOption<Boolean> DEBEZIUM_JSON_INCLUDE_SCHEMA =
-      key(WRITER_PREFIX + "DEBEZIUM_JSON_INCLUDE_SCHEMA")
-          .defaultValue(false);
+      key(WRITER_PREFIX + "debezium_json_include_schema")
+          .defaultValue(true);
 }

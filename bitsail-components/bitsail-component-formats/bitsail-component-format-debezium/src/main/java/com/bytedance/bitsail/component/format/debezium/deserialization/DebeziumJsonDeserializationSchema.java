@@ -42,9 +42,6 @@ public class DebeziumJsonDeserializationSchema implements DebeziumDeserializatio
   public static final String VALUE_NAME = "value";
   public static final String TIMESTAMP_NAME = "timestamp";
 
-  public static final int KEY_NAME_INDEX = 1;
-  public static final int VALUE_NAME_INDEX = 2;
-
   public static final RowTypeInfo DEBEZIUM_JSON_ROW_TYPE =
       new RowTypeInfo(
           new String[] {TOPIC_NAME, KEY_NAME, VALUE_NAME, TIMESTAMP_NAME},
