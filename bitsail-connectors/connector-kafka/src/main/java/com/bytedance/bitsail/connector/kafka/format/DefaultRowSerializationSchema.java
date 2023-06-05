@@ -50,12 +50,13 @@ public class DefaultRowSerializationSchema implements ProducerRecordRowSerializa
                                                          String topic,
                                                          String[] keyFieldNames,
                                                          RowTypeInfo rowTypeInfo,
+                                                         PartitionDiscoverer partitionDiscoverer,
                                                          BitSailConfiguration jobConf) {
     return new DefaultRowSerializationSchema(
         (row) -> topic,
         createKeyFunction(keyFieldNames, format, rowTypeInfo, jobConf),
         createValueFunction(format, rowTypeInfo, jobConf),
-        createPartitionFunction(format, rowTypeInfo, null, null)
+        createPartitionFunction(format, rowTypeInfo, null, partitionDiscoverer)
     );
   }
 
@@ -116,8 +117,9 @@ public class DefaultRowSerializationSchema implements ProducerRecordRowSerializa
                                                                 PartitionDiscoverer partitionDiscoverer) {
     if (FormatType.DEBEZIUM_JSON.equals(format)) {
       //default use topic field hash value.
+      final List<PartitionInfo> partitionInfos = partitionDiscoverer.discoverPartitions();
       int i = rowTypeInfo.indexOf(DebeziumJsonDeserializationSchema.TOPIC_NAME);
-      return (row -> Math.abs(row.getField(i).hashCode()));
+      return (row -> Math.abs(row.getField(i).hashCode()) % partitionInfos.size());
     }
 
     if (StringUtils.isEmpty(partitionFields)) {

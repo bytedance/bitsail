@@ -43,6 +43,7 @@ public class ProducerRecordSerializationSchemaFactory {
               null :
               StringUtils.split(keyFields, ","),
           rowTypeInfo,
+          partitionDiscoverer,
           jobConf
       );
     }
