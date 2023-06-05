@@ -20,6 +20,7 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.exception.ErrorCode;
 import com.bytedance.bitsail.common.option.ConfigOption;
+import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.util.FastJsonUtil;
 import com.bytedance.bitsail.common.util.JsonSerializer;
 import com.bytedance.bitsail.common.util.StrUtil;
@@ -456,6 +457,14 @@ public class BitSailConfiguration implements Serializable {
     checkPath(key.key());
 
     setObject(key.key(), extractConfiguration(value));
+
+    return this;
+  }
+
+  public <T> BitSailConfiguration setWriter(final ConfigOption<T> key, final T value) {
+    checkPath(WriterOptions.WRITER_PREFIX + key.key());
+
+    setObject(WriterOptions.WRITER_PREFIX + key.key(), extractConfiguration(value));
 
     return this;
   }
