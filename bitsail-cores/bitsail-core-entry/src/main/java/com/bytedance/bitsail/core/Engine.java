@@ -20,6 +20,7 @@ import com.bytedance.bitsail.base.execution.Mode;
 import com.bytedance.bitsail.base.packages.PluginFinder;
 import com.bytedance.bitsail.base.packages.PluginFinderFactory;
 import com.bytedance.bitsail.base.statistics.VMInfo;
+import com.bytedance.bitsail.base.version.VersionHolder;
 import com.bytedance.bitsail.client.api.command.CommandArgsParser;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
@@ -59,6 +60,7 @@ public class Engine {
     if (null != vmInfo) {
       LOG.info(vmInfo.toString());
     }
+    VersionHolder.print();
     try {
       run();
     } catch (Throwable e) {
