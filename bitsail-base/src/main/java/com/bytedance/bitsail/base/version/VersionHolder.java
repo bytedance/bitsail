@@ -35,6 +35,7 @@ public class VersionHolder {
 
   private String gitCommitId = UNKNOWN_COMMIT_ID;
   private String gitBuildVersion = UNKNOWN;
+  private String gitBuildTime = UNKNOWN;
 
   private VersionHolder() {
     ClassLoader classLoader = VersionHolder.class.getClassLoader();
@@ -45,6 +46,7 @@ public class VersionHolder {
 
         gitCommitId = getProperty(properties, "git.commit.id", UNKNOWN_COMMIT_ID);
         gitBuildVersion = getProperty(properties, "git.build.version", UNKNOWN);
+        gitBuildTime = getProperty(properties, "git.build.time", UNKNOWN);
       }
     } catch (Exception e) {
       LOG.info("Cannot determine code revision: Unable to read version property file.", e);
@@ -90,5 +92,15 @@ public class VersionHolder {
 
   public String getBuildVersion() {
     return gitBuildVersion;
+  }
+
+  public String getGitBuildTime() {
+    return gitBuildTime;
+  }
+
+  public static void print() {
+    LOG.info("BitSail Build Version: {}.", VersionHolder.getHolder().getBuildVersion());
+    LOG.info("BitSail Build Time: {}.", VersionHolder.getHolder().getGitBuildTime());
+    LOG.info("BitSail Build Commit: {}.", VersionHolder.getHolder().getGitCommitId());
   }
 }
