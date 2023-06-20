@@ -70,6 +70,13 @@ public class KuduSourceSplit implements SourceSplit {
     serializedPredicates.add(KuduPredicate.serialize(Collections.singletonList(predicate)));
   }
 
+  public void addSerializedPredicates(byte[] predicates) {
+    if (serializedPredicates == null) {
+      serializedPredicates = new ArrayList<>();
+    }
+    serializedPredicates.add(predicates);
+  }
+
   public void bindScanner(KuduScanner.KuduScannerBuilder builder, Schema schema) {
     List<KuduPredicate> kuduPredicates = deserializePredicates(schema);
     kuduPredicates.forEach(builder::addPredicate);
