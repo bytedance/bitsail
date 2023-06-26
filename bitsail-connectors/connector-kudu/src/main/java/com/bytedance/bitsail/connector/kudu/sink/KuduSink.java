@@ -27,16 +27,39 @@ import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverte
 import com.bytedance.bitsail.connector.kudu.core.KuduConstants;
 import com.bytedance.bitsail.connector.kudu.core.KuduFactory;
 import com.bytedance.bitsail.connector.kudu.option.KuduWriterOptions;
+import com.bytedance.bitsail.connector.kudu.sink.schema.KuduSchemaAlignment;
 import com.bytedance.bitsail.connector.kudu.util.KuduSchemaUtils;
 
+import org.apache.kudu.ColumnSchema;
+import org.apache.kudu.Type;
 import org.apache.kudu.client.KuduTable;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class KuduSink<CommitT extends Serializable> implements Sink<Row, CommitT, EmptyState> {
 
   private BitSailConfiguration writerConf;
+
+  private static final HashMap<String, Type> TYPE_MAPPINGS = new HashMap<>();
+
+  static {
+    TYPE_MAPPINGS.put("int8", Type.INT8);
+    TYPE_MAPPINGS.put("int16", Type.INT16);
+    TYPE_MAPPINGS.put("int32", Type.INT32);
+    TYPE_MAPPINGS.put("int64", Type.INT64);
+    TYPE_MAPPINGS.put("binary", Type.BINARY);
+    TYPE_MAPPINGS.put("string", Type.STRING);
+    TYPE_MAPPINGS.put("bool", Type.BOOL);
+    TYPE_MAPPINGS.put("float", Type.FLOAT);
+    TYPE_MAPPINGS.put("double", Type.DOUBLE);
+    TYPE_MAPPINGS.put("unixtime_micros", Type.UNIXTIME_MICROS);
+    TYPE_MAPPINGS.put("decimal", Type.DECIMAL);
+    TYPE_MAPPINGS.put("varchar", Type.VARCHAR);
+    TYPE_MAPPINGS.put("date", Type.DATE);
+  }
 
   @Override
   public String getWriterName() {
@@ -51,9 +74,20 @@ public class KuduSink<CommitT extends Serializable> implements Sink<Row, CommitT
     KuduFactory kuduFactory = KuduFactory.initWriterFactory(writerConf);
     KuduTable kuduTable = kuduFactory.getTable(tableName);
 
-    // todo: add schema ddl
     List<ColumnInfo> columns = writerConf.get(KuduWriterOptions.COLUMNS);
-    KuduSchemaUtils.checkColumnsExist(kuduTable, columns);
+    Boolean schemaAlign = writerConf.get(KuduWriterOptions.SCHEMA_ALIGN);
+    if (schemaAlign) {
+      List<ColumnSchema> targetSchema = columns.stream().map(column -> new ColumnSchema.ColumnSchemaBuilder(column.getName(),
+          TYPE_MAPPINGS.get(column.getType().trim().toLowerCase()))
+          .defaultValue(column.getDefaultValue())
+          .comment(column.getComment())
+          .build()).collect(Collectors.toList());
+      KuduSchemaAlignment kuduSchemaAlignment = new KuduSchemaAlignment(kuduFactory.getClient(), kuduTable);
+      kuduSchemaAlignment.align(kuduTable.getSchema().getColumns(), targetSchema);
+    } else {
+      KuduSchemaUtils.checkColumnsExist(kuduTable, columns);
+    }
+
   }
 
   @Override
