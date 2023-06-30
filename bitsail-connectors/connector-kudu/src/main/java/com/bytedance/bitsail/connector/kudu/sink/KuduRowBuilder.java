@@ -93,6 +93,7 @@ public class KuduRowBuilder {
     String typeName = columnInfo.getType().trim().toUpperCase();
 
     switch (typeName) {
+      case "BOOL":
       case "BOOLEAN": // BOOLEAN_TYPE_INFO
         return (PartialRow kuduRow, Object value) -> kuduRow.addBoolean(columnName, (boolean) value);
       case "INT8":    // BYTE_TYPE_INFO
