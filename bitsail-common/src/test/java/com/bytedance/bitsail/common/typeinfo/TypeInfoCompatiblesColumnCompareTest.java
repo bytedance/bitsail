@@ -42,6 +42,7 @@ public class TypeInfoCompatiblesColumnCompareTest {
   @Before
   public void before() {
     typeInfoCompatibles = new TypeInfoCompatibles(BitSailConfiguration.newDefault());
+    ColumnCast.refresh();
     ColumnCast.initColumnCast(BitSailConfiguration.newDefault());
   }
 
