@@ -153,4 +153,16 @@ public class Row implements Serializable {
     return this.fields[pos] == null;
   }
 
+  public java.time.LocalTime getLocalTime(int pos) {
+    return (java.time.LocalTime) this.fields[pos];
+  }
+
+  public java.time.LocalDateTime getLocalDateTime(int pos) {
+    return (java.time.LocalDateTime) this.fields[pos];
+  }
+
+  public java.time.LocalDate getLocalDate(int pos) {
+    return (java.time.LocalDate) this.fields[pos];
+  }
+
 }

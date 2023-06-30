@@ -73,11 +73,11 @@ public class KuduRowDeserializer {
     if (TypeInfos.LONG_TYPE_INFO.getTypeClass() == curClass) {
       return rowResult -> rowResult.getLong(columnName);
     }
-    if (TypeInfos.SQL_DATE_TYPE_INFO.getTypeClass() == curClass) {
-      return rowResult -> rowResult.getDate(columnName);
+    if (TypeInfos.LOCAL_DATE_TYPE_INFO.getTypeClass() == curClass) {
+      return rowResult -> rowResult.getDate(columnName).toLocalDate();
     }
-    if (TypeInfos.SQL_TIMESTAMP_TYPE_INFO.getTypeClass() == curClass) {
-      return rowResult -> rowResult.getTimestamp(columnName);
+    if (TypeInfos.LOCAL_DATE_TIME_TYPE_INFO.getTypeClass() == curClass) {
+      return rowResult -> rowResult.getTimestamp(columnName).toLocalDateTime();
     }
     if (TypeInfos.FLOAT_TYPE_INFO.getTypeClass() == curClass) {
       return rowResult -> rowResult.getFloat(columnName);

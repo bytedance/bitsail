@@ -20,23 +20,19 @@ import com.bytedance.bitsail.base.connector.reader.v1.SourceSplitCoordinator;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
-import com.bytedance.bitsail.connector.kudu.core.KuduFactory;
 import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
-import com.bytedance.bitsail.connector.kudu.source.split.AbstractKuduSplitConstructor;
 import com.bytedance.bitsail.connector.kudu.source.split.KuduSourceSplit;
-import com.bytedance.bitsail.connector.kudu.source.split.KuduSplitFactory;
+import com.bytedance.bitsail.connector.kudu.source.split.strategy.SimpleDivideSplitConstructor;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.kudu.client.KuduClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -60,19 +56,18 @@ public class KuduSourceSplitCoordinator implements SourceSplitCoordinator<KuduSo
 
   @Override
   public void start() {
-    List<KuduSourceSplit> splitList;
-    try (KuduFactory kuduFactory = KuduFactory.initReaderFactory(jobConf)) {
-      KuduClient client = kuduFactory.getClient();
-      AbstractKuduSplitConstructor splitConstructor = KuduSplitFactory.getSplitConstructor(jobConf, client);
-      splitList = splitConstructor.construct(client);
-    } catch (IOException e) {
-      throw new BitSailException(KuduErrorCode.SPLIT_ERROR, "Failed to create splits.");
-    }
+    List<KuduSourceSplit> splitList = SimpleDivideSplitConstructor.getInstance(jobConf).construct();
 
     int readerNum = context.totalParallelism();
     LOG.info("Found {} readers and {} splits.", readerNum, splitList.size());
     if (readerNum > splitList.size()) {
       LOG.error("Reader number {} is larger than split number {}.", readerNum, splitList.size());
+    }
+
+    if (splitList.isEmpty()) {
+      String errorMsg = "empty kudu split";
+      LOG.error(errorMsg);
+      throw new BitSailException(KuduErrorCode.SPLIT_ERROR, errorMsg);
     }
 
     for (KuduSourceSplit split : splitList) {

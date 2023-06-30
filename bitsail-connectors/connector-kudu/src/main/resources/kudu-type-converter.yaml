@@ -24,10 +24,13 @@ engine.type.to.bitsail.type.converter:
     target.type: long
 
   - source.type: date
-    target.type: date.date
+    target.type: date
 
   - source.type: timestamp
-    target.type: date.datetime
+    target.type: timestamp
+
+  - source.type: unixtime_micros
+    target.type: timestamp
 
   - source.type: float
     target.type: float
@@ -66,11 +69,11 @@ bitsail.type.to.engine.type.converter:
   - source.type: long
     target.type: long
 
-  - source.type: date.date
+  - source.type: date
     target.type: date
 
-  - source.type: date.datetime
-    target.type: timestamp
+  - source.type: timestamp
+    target.type: unixtime_micros
 
   - source.type: float
     target.type: float

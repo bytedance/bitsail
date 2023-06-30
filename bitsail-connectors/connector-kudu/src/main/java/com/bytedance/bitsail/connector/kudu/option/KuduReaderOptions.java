@@ -113,22 +113,18 @@ public interface KuduReaderOptions extends ReaderOptions.BaseReaderOptions {
 
   ConfigOption<Boolean> CACHE_BLOCKS =
       key(READER_PREFIX + "enable_cache_blocks")
-          .defaultValue(true);
+          .defaultValue(false);
 
   ConfigOption<Long> SCAN_TIMEOUT =
       key(READER_PREFIX + "scan_timeout_ms")
           .defaultValue(30000L);
-
   ConfigOption<Long> SCAN_ALIVE_PERIOD_MS =
       key(READER_PREFIX + "scan_keep_alive_period_ms")
           .noDefaultValue(Long.class);
-
-  // Split configurations.
-  ConfigOption<String> SPLIT_STRATEGY =
-      key(READER_PREFIX + "split_strategy")
-          .defaultValue("SIMPLE_DIVIDE");
-
-  ConfigOption<String> SPLIT_CONFIGURATION =
-      key(READER_PREFIX + "split_config")
+  ConfigOption<Long> SCAN_SPLIT_SIZE_BYTES =
+      key(READER_PREFIX + "scan_split_size_bytes")
+          .defaultValue(-1L);
+  ConfigOption<String> PREDICATES_CONFIGURATION =
+      key(READER_PREFIX + "predicates")
           .noDefaultValue(String.class);
 }

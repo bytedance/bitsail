@@ -103,6 +103,9 @@ public class FakeRowGenerator {
     } else if (TypeInfos.SHORT_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
       return Long.valueOf(faker.number().randomNumber()).shortValue();
 
+    } else if (TypeInfos.BYTE_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
+      return Long.valueOf(faker.number().randomNumber()).byteValue();
+
     } else if (TypeInfos.STRING_TYPE_INFO.getTypeClass() == typeInfo.getTypeClass()) {
       return faker.name().fullName();
 
