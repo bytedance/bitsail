@@ -108,6 +108,7 @@ public class KuduDataSource {
         TypeInfos.BOOLEAN_TYPE_INFO,
         TypeInfos.BYTE_TYPE_INFO,
         TypeInfos.INT_TYPE_INFO,
+        TypeInfos.FLOAT_TYPE_INFO,
         TypeInfos.DOUBLE_TYPE_INFO,
         TypeInfos.BIG_DECIMAL_TYPE_INFO,
         TypeInfos.LOCAL_DATE_TIME_TYPE_INFO,
@@ -128,8 +129,8 @@ public class KuduDataSource {
       partialRow.addBoolean("field_boolean", randomRow.getBoolean(0));
       partialRow.addByte("field_int8", randomRow.getByte(1));
       partialRow.addInt("field_int32", randomRow.getInt(2));
-      partialRow.addDouble("field_double", randomRow.getDouble(3));
-      partialRow.addDate("field_date", randomRow.getSqlDate(4));
+      partialRow.addFloat("field_float", randomRow.getFloat(3));
+      partialRow.addDouble("field_double", randomRow.getDouble(4));
       BigDecimal decimal = randomRow.getDecimal(5, DECIMAL_TYPE_PRECISION, DECIMAL_TYPE_SCALE);
       partialRow.addDecimal("field_decimal", decimal.setScale(DECIMAL_TYPE_SCALE, RoundingMode.DOWN));
       partialRow.addTimestamp("field_unix_timestamp", java.sql.Timestamp.valueOf(randomRow.getLocalDateTime(6)));
