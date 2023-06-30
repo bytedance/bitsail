@@ -46,6 +46,27 @@ public class KuduPredicateUtil {
     KUDU_COMP_PREDICATE_MAP.put(">", KuduPredicate.ComparisonOp.GREATER);
   }
 
+  /**
+   *  predicates (Query predicates on columns. Unlike traditional SQL syntax,
+   *   the scan tool's simple query predicates are represented in a simple JSON
+   *   syntax. Three types of predicates are supported, including 'Comparison',
+   *   'InList' and 'IsNull'.
+   *    * The 'Comparison' type support <=, <, =, > and >=,
+   *      which can be represented as '[operator, column_name, value]',
+   *      e.g. '[">=", "col1", "value"]'
+   *    * The 'InList' type can be represented as
+   *      '["IN", column_name, [value1, value2, ...]]'
+   *      e.g. '["IN", "col2", ["value1", "value2"]]'
+   *    * The 'IsNull' type determine whether the value is NULL or not,
+   *      which can be represented as '[operator, column_name]'
+   *      e.g. '["NULL", "col1"]', or '["NOTNULL", "col2"]'
+   *    Predicates can be combined together with predicate operators using the
+   *    syntax
+   *       [operator, predicate, predicate, ..., predicate].
+   *    For example,
+   *       ["AND", [">=", "col1", "value"], ["NOTNULL", "col2"]]
+   *    The only supported predicate operator is `AND`.) type: string default: ""
+   */
   public static List<KuduPredicate> parseFromConfig(final String predicateConfigJson, final Schema schema) {
     JSONArray operatorJsonArray = JSON.parseArray(predicateConfigJson);
     List<KuduPredicate> predicates = new ArrayList<>();

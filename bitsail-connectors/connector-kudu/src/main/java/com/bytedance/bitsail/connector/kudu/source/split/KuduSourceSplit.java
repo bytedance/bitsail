@@ -42,6 +42,14 @@ public class KuduSourceSplit implements SourceSplit {
 
   private final String splitId;
 
+  private List<byte[]> serializedPredicates = new ArrayList<>();
+
+  /** The scan token that the split will use to scan the Kudu table. */
+  private byte[] serializedScanToken;
+
+  /** Tablet server locations which host the tablet to be scanned. */
+  private String[] locations;
+
   public byte[] getSerializedScanToken() {
     return serializedScanToken;
   }
@@ -57,14 +65,6 @@ public class KuduSourceSplit implements SourceSplit {
   public void setLocations(String[] locations) {
     this.locations = locations;
   }
-
-  private List<byte[]> serializedPredicates = new ArrayList<>();
-
-  /** The scan token that the split will use to scan the Kudu table. */
-  private byte[] serializedScanToken;
-
-  /** Tablet server locations which host the tablet to be scanned. */
-  private String[] locations;
 
   public KuduSourceSplit(int splitId) {
     this.splitId = KUDU_SOURCE_SPLIT_PREFIX + splitId;
