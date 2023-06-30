@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.kudu;
+package com.bytedance.bitsail.connector.kudu.util;
 
 import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.model.ColumnInfo;

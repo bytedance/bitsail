@@ -18,12 +18,10 @@ package com.bytedance.bitsail.test.integration.kudu;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
-import com.bytedance.bitsail.connector.kudu.source.split.strategy.SimpleDivideSplitConstructor;
 import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
 import com.bytedance.bitsail.test.integration.kudu.container.KuduDataSource;
 import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.test.KuduTestHarness;
 import org.apache.kudu.test.cluster.MiniKuduCluster;
@@ -39,9 +37,7 @@ import java.util.stream.Collectors;
 public class KuduSourceITCase extends AbstractIntegrationTest {
 
   private static final String TABLE_NAME = "test_kudu_table";
-  private static final int TOTAL_COUNT = 1000;
-  private static final int SPLIT_NUM = 3;
-
+  private static final int TOTAL_COUNT = 1010;
   /**
    * Note that the tablet server number should be larger than hash buckets number.
    */
@@ -61,17 +57,10 @@ public class KuduSourceITCase extends AbstractIntegrationTest {
     submitJob(jobConf);
   }
 
-  private void updateJobConf(BitSailConfiguration jobConf) throws Exception {
+  private void updateJobConf(BitSailConfiguration jobConf) {
     String masterAddressString = harness.getMasterAddressesAsString();
     List<String> masterAddressList = Arrays.stream(masterAddressString.split(",")).collect(Collectors.toList());
     jobConf.set(KuduReaderOptions.MASTER_ADDRESS_LIST, masterAddressList);
     jobConf.set(KuduReaderOptions.KUDU_TABLE_NAME, TABLE_NAME);
-
-    SimpleDivideSplitConstructor.SplitConfiguration splitConf = new SimpleDivideSplitConstructor.SplitConfiguration();
-    splitConf.setName("key");
-    splitConf.setSplitNum(SPLIT_NUM);
-    splitConf.setLower((long) (TOTAL_COUNT / 2));
-    splitConf.setUpper((long) (TOTAL_COUNT / 2) + 10);
-    jobConf.set(KuduReaderOptions.SPLIT_CONFIGURATION, new ObjectMapper().writeValueAsString(splitConf));
   }
 }

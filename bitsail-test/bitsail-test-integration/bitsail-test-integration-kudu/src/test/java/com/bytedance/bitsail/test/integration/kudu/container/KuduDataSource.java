@@ -24,6 +24,7 @@ import com.bytedance.bitsail.connector.fake.source.FakeRowGenerator;
 
 import com.google.common.collect.Lists;
 import org.apache.kudu.ColumnSchema;
+import org.apache.kudu.ColumnTypeAttributes;
 import org.apache.kudu.Schema;
 import org.apache.kudu.Type;
 import org.apache.kudu.client.CreateTableOptions;
@@ -42,6 +43,8 @@ import org.apache.kudu.client.RowResultIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,15 +59,26 @@ public class KuduDataSource {
   private static final List<ColumnSchema> COLUMNS;
   private static final Schema SCHEMA;
 
+  private static final int DECIMAL_TYPE_PRECISION = 30;
+  private static final int DECIMAL_TYPE_SCALE = 4;
+  private static final int VARCHAR_TYPE_LENGTH = 16;
+
   static {
     COLUMNS = new ArrayList<>();
     COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("key", Type.INT64).key(true).build());
     COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_boolean", Type.BOOL).build());
-    COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_int", Type.INT32).build());
+    COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_int8", Type.INT8).build());
+    COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_int32", Type.INT32).build());
+    COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_float", Type.FLOAT).build());
     COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_double", Type.DOUBLE).build());
+    COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_decimal", Type.DECIMAL).typeAttributes(
+        new ColumnTypeAttributes.ColumnTypeAttributesBuilder().precision(DECIMAL_TYPE_PRECISION).scale(DECIMAL_TYPE_SCALE).build()).build());
+    COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_unix_timestamp", Type.UNIXTIME_MICROS).build());
     COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_date", Type.DATE).build());
     COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_string", Type.STRING).nullable(true).build());
     COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_binary", Type.BINARY).nullable(true).build());
+    COLUMNS.add(new ColumnSchema.ColumnSchemaBuilder("field_varchar", Type.VARCHAR).nullable(true).typeAttributes(
+        new ColumnTypeAttributes.ColumnTypeAttributesBuilder().length(VARCHAR_TYPE_LENGTH).build()).build());
     SCHEMA = new Schema(COLUMNS);
   }
 
@@ -74,6 +88,9 @@ public class KuduDataSource {
     cto.addHashPartitions(hashKeys, BUCKET_NUM);
 
     try {
+      if (client.tableExists(tableName)) {
+        client.deleteTable(tableName);
+      }
       client.createTable(tableName, SCHEMA, cto);
     } catch (KuduException e) {
       throw new RuntimeException("Failed to create kudu table for test.", e);
@@ -89,11 +106,16 @@ public class KuduDataSource {
     FakeRowGenerator fakeRowGenerator = new FakeRowGenerator(BitSailConfiguration.newDefault(), 1);
     TypeInfo<?>[] typeInfos = {
         TypeInfos.BOOLEAN_TYPE_INFO,
+        TypeInfos.BYTE_TYPE_INFO,
         TypeInfos.INT_TYPE_INFO,
+        TypeInfos.FLOAT_TYPE_INFO,
         TypeInfos.DOUBLE_TYPE_INFO,
-        TypeInfos.SQL_DATE_TYPE_INFO,
+        TypeInfos.BIG_DECIMAL_TYPE_INFO,
+        TypeInfos.LOCAL_DATE_TIME_TYPE_INFO,
+        TypeInfos.LOCAL_DATE_TYPE_INFO,
         TypeInfos.STRING_TYPE_INFO,
-        TypeInfos.STRING_TYPE_INFO      // getBytes()
+        TypeInfos.STRING_TYPE_INFO,      // getBytes()
+        TypeInfos.STRING_TYPE_INFO
     };
 
     KuduTable kuduTable = client.openTable(tableName);
@@ -105,18 +127,28 @@ public class KuduDataSource {
 
       partialRow.addLong("key", i);
       partialRow.addBoolean("field_boolean", randomRow.getBoolean(0));
-      partialRow.addInt("field_int", randomRow.getInt(1));
-      partialRow.addDouble("field_double", randomRow.getDouble(2));
-      partialRow.addDate("field_date", randomRow.getSqlDate(3));
+      partialRow.addByte("field_int8", randomRow.getByte(1));
+      partialRow.addInt("field_int32", randomRow.getInt(2));
+      partialRow.addFloat("field_float", randomRow.getFloat(3));
+      partialRow.addDouble("field_double", randomRow.getDouble(4));
+      BigDecimal decimal = randomRow.getDecimal(5, DECIMAL_TYPE_PRECISION, DECIMAL_TYPE_SCALE);
+      partialRow.addDecimal("field_decimal", decimal.setScale(DECIMAL_TYPE_SCALE, RoundingMode.DOWN));
+      partialRow.addTimestamp("field_unix_timestamp", java.sql.Timestamp.valueOf(randomRow.getLocalDateTime(6)));
+      partialRow.addDate("field_date", java.sql.Date.valueOf(randomRow.getLocalDate(7)));
       if (i % 10 == 1) {
         partialRow.setNull("field_string");
       } else {
-        partialRow.addString("field_string", randomRow.getString(4));
+        partialRow.addString("field_string", randomRow.getString(8));
       }
       if (i % 10 == 2) {
         partialRow.setNull("field_binary");
       } else {
-        partialRow.addBinary("field_binary", randomRow.getString(5).getBytes());
+        partialRow.addBinary("field_binary", randomRow.getString(9).getBytes());
+      }
+      if (i % 10 == 3) {
+        partialRow.addVarchar("field_varchar", randomRow.getString(10));
+      } else {
+        partialRow.setNull("field_varchar");
       }
 
       session.apply(insert);
@@ -188,7 +220,7 @@ public class KuduDataSource {
     List<Object> result = new ArrayList<>();
     result.add(kuduRow.getLong("key"));
     result.add(kuduRow.getBoolean("field_boolean"));
-    result.add(kuduRow.getInt("field_int"));
+    result.add(kuduRow.getInt("field_int32"));
     result.add(kuduRow.getDouble("field_double"));
     result.add(kuduRow.getDate("field_date"));
 

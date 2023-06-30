@@ -49,7 +49,7 @@
           "type":"binary"
         }
       ],
-      "split_config":"{\"complete\":false,\"lower_bound\":500,\"name\":\"key\",\"split_num\":3}",
+      "predicates": "[\"AND\", [\">=\", \"key\", 1000], [\"IN\", \"key\", [999, 1001, 1003, 1005, 1007, 1009]], [\"NULL\", \"field_varchar\"], [\"NOTNULL\",\"field_binary\"]]",
       "class":"com.bytedance.bitsail.connector.kudu.source.KuduSource"
     },
     "writer":{

@@ -69,35 +69,40 @@ Kudu通过scanner扫描数据表，支持常见的Kudu数据类型:
 
 
 #### KuduScanner相关参数
-| 参数名称              | 是否必填 | 参数枚举值 | 参数含义                                                                                      |
-|:------------------|:-----|:------|:------------------------------------------------------------------------------------------|
-| read_mode | 否 | READ_LATEST<br/>READ_AT_SNAPSHOT | 读取模式 |
-| snapshot_timestamp_us | read_mode=READ_AT_SNAPSHOT时必需 |  | 指定要读取哪个时间点的snapshot |
-| enable_fault_tolerant | 否 | | 是否允许fault tolerant |
-| scan_batch_size_bytes | 否 | | 单batch内拉取的最大数据量 |
-| scan_max_count | 否 | | 最多拉取多少条数据 |
-| enable_cache_blocks| 否 |  | 是否启用cache blocks, 默认true |
-| scan_timeout_ms | 否 | | scan超时时间, 单位ms, 默认30000ms |
-| scan_keep_alive_period_ms | 否 | | |
+| 参数名称              | 是否必填                          | 参数枚举值 | 参数含义                      |
+|:------------------|:------------------------------|:------|:--------------------------|
+| read_mode | 否                             | READ_LATEST<br/>READ_AT_SNAPSHOT | 读取模式                      |
+| snapshot_timestamp_us | read_mode=READ_AT_SNAPSHOT时必需 |  | 指定要读取哪个时间点的snapshot       |
+| enable_fault_tolerant | 否                             | | 是否允许fault tolerant        |
+| scan_batch_size_bytes | 否                             | | 单batch内拉取的最大数据量           |
+| scan_max_count | 否                             | | 最多拉取多少条数据                 |
+| enable_cache_blocks| 否                             |  | 是否启用cache blocks, 默认true  |
+| scan_timeout_ms | 否                             | | scan超时时间, 单位ms, 默认30000ms |
+| scan_keep_alive_period_ms | 否                             | |                           |
+| predicates | 否                              | | predicate json 字符串        |
 
-#### 分片相关参数
-| 参数名称              | 是否必填 | 参数枚举值 | 参数含义                                                                                      |
-|:------------------|:-----|:------|:------------------------------------------------------------------------------------------|
-| split_strategy | 否 | SIMPLE_DIVIDE | 分片策略, 目前只支持 SIMPLE_DIVIDE |
-| split_config | 是 | | 各个分片策略对应的配置 |
+#### predicates 参数说明
 
-##### SIMPLE_DIVIDE分片策略
-SIMPLE_DIVIDE对应的split_config格式如下:
-```text
-"{\"name\": \"key\", \"lower_bound\": 0, \"upper_bound\": \"10000\", \"split_num\": 3}"
-```
- - `name`: 用于分片的列(只能有一列), 只支持 int8, int16, int32, int64类型的列
- - `lower_bound`: 要读取列的最小值（若不设置, 则通过扫表获取）
- - `upper_bound`: 要读取列的最大值（若不设置, 则通过扫表获取）
- - `split_num`: 分片数量（若不设置，则与读并发一致）
+列上的查询谓词。与传统的 SQL 语法不同，
+简单查询谓词以简单的 JSON 表示
+句法。支持三种类型的谓词，包括 'Comparison',
+'InList' and 'IsNull'.
+* 'Comparison' 支持 <=, <, =, > 以及 >=,
+  格式为'[operator, column_name, value]',
 
-SIMPLE_DIVIDE分片策略将lower_bound和upper_bound之间的范围均分成split_num份，每一份即为一个分片。
+  `举例. '[">=", "col1", "value"]'`
+* 'InList' 格式 '["IN", column_name, [value1, value2, ...]]'
 
+  `举例. '["IN", "col2", ["value1", "value2"]]'`
+* 'IsNull' 表示目标列是否可以为 NULL 或者不可以是 NULL, 格式'[operator, column_name]'
+
+  `举例. '["NULL", "col1"]', or '["NOTNULL", "col2"]'`
+
+谓词可以用如下的方式进行组合
+`[operator, predicate, predicate, ..., predicate].`
+举例如下,
+`["AND", [">=", "col1", "value"], ["NOTNULL", "col2"]]`
+目前只支持 `AND` 组合方式
 -----
 
 ## Kudu写入

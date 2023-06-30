@@ -25,6 +25,7 @@ import com.bytedance.bitsail.connector.kudu.error.KuduErrorCode;
 import com.bytedance.bitsail.connector.kudu.option.KuduReaderOptions;
 import com.bytedance.bitsail.connector.kudu.source.split.KuduSourceSplit;
 
+import org.apache.kudu.client.KuduScanToken;
 import org.apache.kudu.client.KuduScanner;
 import org.apache.kudu.client.RowResult;
 import org.apache.kudu.client.RowResultIterator;
@@ -44,14 +45,10 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
   private final String tableName;
 
   private final KuduFactory kuduFactory;
-  private final KuduScannerConstructor scannerConstructor;
-
   private int totalSplitNum = 0;
   private boolean hasNoMoreSplits = false;
-
   private final Deque<KuduSourceSplit> splits;
   private final transient KuduRowDeserializer rowDeserializer;
-
   private KuduSourceSplit currentSplit;
   private KuduScanner currentScanner;
   private long currentScanCount;
@@ -61,7 +58,6 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
     this.tableName = jobConf.getNecessaryOption(KuduReaderOptions.KUDU_TABLE_NAME, KuduErrorCode.REQUIRED_VALUE);
 
     this.kuduFactory = KuduFactory.initReaderFactory(jobConf);
-    this.scannerConstructor = new KuduScannerConstructor(jobConf);
     this.rowDeserializer = new KuduRowDeserializer(readerContext.getRowTypeInfo());
     this.splits = new LinkedList<>();
     LOG.info("KuduReader is initialized.");
@@ -79,7 +75,7 @@ public class KuduSourceReader implements SourceReader<Row, KuduSourceSplit> {
     if (currentScanner == null) {
       this.currentSplit = splits.poll();
       LOG.info("Task {} begins to read split: {}=[{}]", subTaskId, currentSplit.uniqSplitId(), currentSplit.toFormatString(kuduFactory.getSchema(tableName)));
-      this.currentScanner = scannerConstructor.createScanner(kuduFactory.getClient(), tableName, currentSplit);
+      this.currentScanner = KuduScanToken.deserializeIntoScanner(currentSplit.getSerializedScanToken(), kuduFactory.getClient());
       this.currentScanCount = 0;
     }
 
