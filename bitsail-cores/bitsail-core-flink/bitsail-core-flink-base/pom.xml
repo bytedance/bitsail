@@ -88,20 +88,11 @@
                 <!-- Flink -->
                 <dependency>
                     <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-clients_${scala.binary.version}</artifactId>
+                    <artifactId>flink-core</artifactId>
                     <version>${flink.version}</version>
                     <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.xerial.snappy</groupId>
-                            <artifactId>snappy-java</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.objenesis</groupId>
-                            <artifactId>objenesis</artifactId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
+
                 <dependency>
                     <groupId>org.apache.flink</groupId>
                     <artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
@@ -111,47 +102,6 @@
                         <exclusion>
                             <groupId>org.xerial.snappy</groupId>
                             <artifactId>snappy-java</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-table-api-java-bridge_${scala.binary.version}</artifactId>
-                    <version>${flink.version}</version>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.yaml</groupId>
-                            <artifactId>snakeyaml</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.apache.commons</groupId>
-                            <artifactId>commons-pool2</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.eclipse.jetty</groupId>
-                            <artifactId>jetty-http</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-table-api-scala-bridge_${scala.binary.version}</artifactId>
-                    <version>${flink.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-scala_${scala.binary.version}</artifactId>
-                    <version>${flink.version}</version>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.scala-lang.modules</groupId>
-                            <artifactId>scala-parser-combinators_${scala.binary.version}</artifactId>
                         </exclusion>
                     </exclusions>
                 </dependency>
@@ -218,29 +168,20 @@
                 <!-- Flink -->
                 <dependency>
                     <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-clients</artifactId>
+                    <artifactId>flink-core</artifactId>
                     <version>${flink.version}</version>
                     <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.xerial.snappy</groupId>
-                            <artifactId>snappy-java</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.objenesis</groupId>
-                            <artifactId>objenesis</artifactId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
+
                 <dependency>
                     <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
+                    <artifactId>flink-streaming-java</artifactId>
                     <version>${flink.version}</version>
                     <scope>provided</scope>
                     <exclusions>
                         <exclusion>
-                            <groupId>org.xerial.snappy</groupId>
-                            <artifactId>snappy-java</artifactId>
+                            <groupId>com.esotericsoftware.kryo</groupId>
+                            <artifactId>kryo</artifactId>
                         </exclusion>
                     </exclusions>
                 </dependency>
@@ -264,13 +205,6 @@
                             <artifactId>jetty-http</artifactId>
                         </exclusion>
                     </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-table-api-scala-bridge_${scala.binary.version}</artifactId>
-                    <version>${flink.version}</version>
-                    <scope>provided</scope>
                 </dependency>
 
                 <dependency>
@@ -303,13 +237,6 @@
                 <dependency>
                     <groupId>org.apache.flink</groupId>
                     <artifactId>flink-metrics-dropwizard</artifactId>
-                    <version>${flink.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-table-planner_${scala.binary.version}</artifactId>
                     <version>${flink.version}</version>
                     <scope>provided</scope>
                 </dependency>
