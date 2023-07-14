@@ -14,21 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.flink.core.operator;
+package com.bytedance.bitsail.core.flink.bridge.writer.bounded;
 
-import org.apache.flink.streaming.api.functions.sink.SinkFunction;
-import org.apache.flink.streaming.api.operators.BoundedOneInput;
+import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.operators.StreamSink;
 
-public class BoundedStreamSinkOperator<IN> extends StreamSink<IN> implements BoundedOneInput {
-  public BoundedStreamSinkOperator(SinkFunction<IN> sinkFunction) {
-    super(sinkFunction);
-  }
+public class BoundedDataStreamSink<IN> extends DataStreamSink<IN> {
 
-  @Override
-  public void endInput() throws Exception {
-    if (userFunction instanceof BoundedOneInput) {
-      ((BoundedOneInput) userFunction).endInput();
-    }
+  public BoundedDataStreamSink(DataStream<IN> inputStream, StreamSink<IN> operator) {
+    super(inputStream, operator);
   }
 }
