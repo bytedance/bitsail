@@ -111,6 +111,12 @@
                     <artifactId>flink-streaming-scala_${scala.binary.version}</artifactId>
                     <version>${flink.version}</version>
                     <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.scala-lang.modules</groupId>
+                            <artifactId>scala-parser-combinators_2.11</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
 
                 <dependency>
