@@ -67,29 +67,11 @@
             <version>${revision}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.bytedance.bitsail</groupId>
+            <artifactId>bitsail-core-flink-bridge-provider</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>flink-1.11</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.bytedance.bitsail</groupId>
-                    <artifactId>bitsail-core-flink-1.11-bridge</artifactId>
-                    <version>${revision}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>flink-1.16</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.bytedance.bitsail</groupId>
-                    <artifactId>bitsail-core-flink-1.16-bridge</artifactId>
-                    <version>${revision}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

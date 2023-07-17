@@ -21,8 +21,7 @@ import com.bytedance.bitsail.base.extension.ParallelismComputable;
 import com.bytedance.bitsail.base.parallelism.ParallelismAdvice;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.WriterOptions;
-import com.bytedance.bitsail.flink.core.operator.BoundedDataStreamSink;
-import com.bytedance.bitsail.flink.core.operator.BoundedStreamSinkOperator;
+import com.bytedance.bitsail.flink.core.writer.bounded.BoundedDataStreamSinkFactory;
 
 import org.apache.flink.api.java.typeutils.InputTypeConfigurable;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -46,8 +45,7 @@ public abstract class FlinkDataWriterDAGBuilder<T> implements DataWriterDAGBuild
       if (sinkFunction instanceof InputTypeConfigurable) {
         ((InputTypeConfigurable) sinkFunction).setInputType(source.getType(), source.getExecutionConfig());
       }
-      BoundedStreamSinkOperator<T> sinkOperator = new BoundedStreamSinkOperator<>(sinkFunction);
-      BoundedDataStreamSink<T> sink = new BoundedDataStreamSink<>(source, sinkOperator);
+      DataStreamSink<T> sink = BoundedDataStreamSinkFactory.wrapperAsBoundedDataStreamSink(source, sinkFunction);
       source.getExecutionEnvironment().addOperator(sink.getTransformation());
       dataStreamSink = sink;
     } else {
