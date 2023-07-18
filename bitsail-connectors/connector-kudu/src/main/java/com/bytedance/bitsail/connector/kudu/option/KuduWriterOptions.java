@@ -104,7 +104,7 @@ public interface KuduWriterOptions extends WriterOptions.BaseWriterOptions {
    */
   ConfigOption<Integer> MUTATION_BUFFER_SIZE =
       key(WRITER_PREFIX + "kudu_mutation_buffer_size")
-          .noDefaultValue(Integer.class);
+          .defaultValue(1024);
 
   ConfigOption<Integer> SESSION_FLUSH_INTERVAL =
       key(WRITER_PREFIX + "kudu_session_flush_interval")

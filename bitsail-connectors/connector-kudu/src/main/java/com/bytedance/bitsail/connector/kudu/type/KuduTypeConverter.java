@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.flink.core.operator;
+package com.bytedance.bitsail.connector.kudu.type;
 
-import org.apache.flink.streaming.api.functions.sink.SinkFunction;
-import org.apache.flink.streaming.api.operators.BoundedOneInput;
-import org.apache.flink.streaming.api.operators.StreamSink;
+import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
 
-public class BoundedStreamSinkOperator<IN> extends StreamSink<IN> implements BoundedOneInput {
-  public BoundedStreamSinkOperator(SinkFunction<IN> sinkFunction) {
-    super(sinkFunction);
-  }
-
-  @Override
-  public void endInput() throws Exception {
-    if (userFunction instanceof BoundedOneInput) {
-      ((BoundedOneInput) userFunction).endInput();
-    }
+public class KuduTypeConverter extends FileMappingTypeInfoConverter {
+  public KuduTypeConverter() {
+    super("kudu");
   }
 }

@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.flink.core.operator;
+package com.bytedance.bitsail.core.flink.bridge.writer.bounded;
 
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.operators.StreamSink;
 
 public class BoundedDataStreamSink<IN> extends DataStreamSink<IN> {
+
   public BoundedDataStreamSink(DataStream<IN> inputStream, StreamSink<IN> operator) {
     super(inputStream, operator);
   }

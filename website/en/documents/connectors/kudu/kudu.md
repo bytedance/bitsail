@@ -70,35 +70,40 @@ The following mentioned parameters should be added to `job.reader` block when us
 
 #### KuduScanner related parameters
 
-| Param name                   | Required | Optional value | Description                                                                                                    |
-|:-----------------------------|:---------|:---------------|:---------------------------------------------------------------------------------------------------------------|
-| read_mode | no | READ_LATEST<br/>READ_AT_SNAPSHOT | read mode |
-| snapshot_timestamp_us | yes if read_mode=READ_AT_SNAPSHOT |  | specify which snapshot to read |
-| enable_fault_tolerant | no | | If to enable fault tolerant |
-| scan_batch_size_bytes | no | | Max bytes number in single batch |
-| scan_max_count | no | | Max number of rows to scan |
-| enable_cache_blocks| no |  | If to enable cache blocks, default true |
+| Param name                   | Required | Optional value | Description                               |
+|:-----------------------------|:---------|:---------------|:------------------------------------------|
+| read_mode | no | READ_LATEST<br/>READ_AT_SNAPSHOT | read mode                                 |
+| snapshot_timestamp_us | yes if read_mode=READ_AT_SNAPSHOT |  | specify which snapshot to read            |
+| enable_fault_tolerant | no | | If to enable fault tolerant               |
+| scan_batch_size_bytes | no | | Max bytes number in single batch          |
+| scan_max_count | no | | Max number of rows to scan                |
+| enable_cache_blocks| no |  | If to enable cache blocks, default false  |
 | scan_timeout_ms | no | | scan timeout. Unit is ms, default 30000ms |
-| scan_keep_alive_period_ms | no | | |
+| scan_keep_alive_period_ms | no | |                                           |
+ | predicates | no | | predicate json string|
 
-#### Split related parameters
+#### predicates
 
-| Param name                   | Required | Optional value | Description                                                                                                    |
-|:-----------------------------|:---------|:---------------|:---------------------------------------------------------------------------------------------------------------|
-| split_strategy | no | SIMPLE_DIVIDE | Split strategy. Only support SIMPLE_DIVIDE now. |
-| split_config | yes | | Split configuration for each strategy. |
+Query predicates on columns. Unlike traditional SQL syntax,
+the simple query predicates are represented in a simple JSON 
+syntax. Three types of predicates are supported, including 'Comparison',
+'InList' and 'IsNull'.
+* The 'Comparison' type support <=, <, =, > and >=,
+     which can be represented as '[operator, column_name, value]',
 
-##### SIMPLE_DIVIDE split strategy 
-SIMPLE_DIVIDE strategy uses the following format of split_config:
-```text
-"{\"name\": \"key\", \"lower_bound\": 0, \"upper_bound\": \"10000\", \"split_num\": 3}"
-```
-- `name`: the name of split column, only support int8, int16, int32, int64 type.
-- `lower_bound`: The min value of the split column (Scan table to get the min value if it is not set).
-- `upper_bound`: The max value of the split column (Scan table to get the max value if it is not set).
-- `split_num`: Number of split (Use the reader parallelism if it is not set).
+     `e.g. '[">=", "col1", "value"]'`
+* The 'InList' type can be represented as '["IN", column_name, [value1, value2, ...]]'
 
-SIMPLE_DIVIDE strategy will evenly divide the range `[lower_bound, upper_bound]` into split_num sub ranges, and each range is a split.
+     `e.g. '["IN", "col2", ["value1", "value2"]]'`
+* The 'IsNull' type determine whether the value is NULL or not, which can be represented as '[operator, column_name]'
+     
+     `e.g. '["NULL", "col1"]', or '["NOTNULL", "col2"]'`
+
+Predicates can be combined together with predicate operators using the syntax 
+`[operator, predicate, predicate, ..., predicate].`
+For example,
+`["AND", [">=", "col1", "value"], ["NOTNULL", "col2"]]` 
+The only supported predicate operator is `AND`.) type: string default: ""
 
 
 -----

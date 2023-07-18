@@ -127,6 +127,7 @@ public class KuduFactory implements Closeable, Serializable {
 
       if (sessionConfig.getMutationBufferSize() != null) {
         kuduSession.setMutationBufferSpace(sessionConfig.getMutationBufferSize());
+        kuduSession.setErrorCollectorSpace(sessionConfig.getMutationBufferSize());
       }
 
       if (sessionConfig.getFlushInterval() != null) {

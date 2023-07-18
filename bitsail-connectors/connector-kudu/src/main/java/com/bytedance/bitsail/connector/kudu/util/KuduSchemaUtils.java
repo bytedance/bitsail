@@ -36,6 +36,9 @@ public class KuduSchemaUtils {
    * @param columns Columns in configuration.
    */
   public static void checkColumnsExist(KuduTable kuduTable, List<ColumnInfo> columns) {
+    if (columns == null) {
+      return;
+    }
     Schema schema = kuduTable.getSchema();
 
     boolean hasUnknownColumns = false;

@@ -83,6 +83,8 @@ public class KuduWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
     }
 
     handleOperationResponse(response);
+    // if back_ground_flush need check
+    handleSessionPendingErrors(kuduSession);
   }
 
   @Override

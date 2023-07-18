@@ -22,16 +22,32 @@
           "type": "boolean"
         },
         {
-          "name": "fake_int",
+          "name": "fake_int8",
+          "type": "byte"
+        },
+        {
+          "name": "fake_int32",
           "type": "int"
+        },
+        {
+          "name": "fake_float",
+          "type": "float"
         },
         {
           "name": "fake_double",
           "type": "double"
         },
         {
+          "name": "fake_decimal",
+          "type": "bigdecimal"
+        },
+        {
+          "name": "fake_unix_timestamp",
+          "type": "timestamp"
+        },
+        {
           "name": "fake_date",
-          "type": "date.date"
+          "type": "date"
         },
         {
           "name": "fake_string",
@@ -40,12 +56,17 @@
         {
           "name": "fake_binary",
           "type": "binary"
+        },
+        {
+          "name": "fake_varchar",
+          "type": "string"
         }
       ]
     },
     "writer": {
       "class": "com.bytedance.bitsail.connector.kudu.sink.KuduSink",
       "kudu_worker_count": 2,
+      "kudu_table_name": "kudu_test_table_sink",
       "columns": [
         {
           "name": "key",
@@ -57,12 +78,28 @@
           "type": "boolean"
         },
         {
-          "name": "field_int",
+          "name": "field_int8",
+          "type": "int8"
+        },
+        {
+          "name": "field_int32",
           "type": "int"
+        },
+        {
+          "name": "field_float",
+          "type": "float"
         },
         {
           "name": "field_double",
           "type": "double"
+        },
+        {
+          "name": "field_decimal",
+          "type": "decimal"
+        },
+        {
+          "name": "field_unix_timestamp",
+          "type": "unixtime_micros"
         },
         {
           "name": "field_date",
@@ -76,6 +113,11 @@
         {
           "name": "field_binary",
           "type": "binary",
+          "properties": "nullable"
+        },
+        {
+          "name": "field_varchar",
+          "type": "varchar",
           "properties": "nullable"
         }
       ]
