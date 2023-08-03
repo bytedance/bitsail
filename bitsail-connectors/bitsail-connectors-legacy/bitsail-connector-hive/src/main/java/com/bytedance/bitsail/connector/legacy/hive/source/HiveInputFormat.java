@@ -115,6 +115,7 @@ public class HiveInputFormat extends HadoopInputFormatBasePlugin<Void, ArrayWrit
     this.rowBuilder = new HiveGeneralRowBuilder(getMappingFromMetastore(hiveConf, inputSliceConfig),
         db,
         table,
+        inputSliceConfig.get(HiveReaderOptions.HIVE_CONF_LOCATION),
         JsonSerializer.parseToMap(inputSliceConfig.get(HiveReaderOptions.HIVE_METASTORE_PROPERTIES)));
 
     setMapredInputJobConf();
@@ -157,8 +158,12 @@ public class HiveInputFormat extends HadoopInputFormatBasePlugin<Void, ArrayWrit
   }
 
   private HiveConf getHiveConf(BitSailConfiguration readerConfiguration) {
-    Map<String, String> hiveProperties =
-        JsonSerializer.parseToMap(readerConfiguration.getNecessaryOption(HiveReaderOptions.HIVE_METASTORE_PROPERTIES, CommonErrorCode.CONFIG_ERROR));
-    return HiveMetaClientUtil.getHiveConf(hiveProperties);
+    if (readerConfiguration.fieldExists(HiveReaderOptions.HIVE_CONF_LOCATION)) {
+      return HiveMetaClientUtil.getHiveConf(readerConfiguration.get(HiveReaderOptions.HIVE_CONF_LOCATION));
+    } else {
+      Map<String, String> hiveProperties =
+          JsonSerializer.parseToMap(readerConfiguration.getNecessaryOption(HiveReaderOptions.HIVE_METASTORE_PROPERTIES, CommonErrorCode.CONFIG_ERROR));
+      return HiveMetaClientUtil.getHiveConf(hiveProperties);
+    }
   }
 }

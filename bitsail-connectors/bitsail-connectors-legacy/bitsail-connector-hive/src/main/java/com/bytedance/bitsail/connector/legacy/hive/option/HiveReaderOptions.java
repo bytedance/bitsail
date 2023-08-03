@@ -21,6 +21,7 @@ import com.bytedance.bitsail.common.option.ReaderOptions;
 
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
 import static com.bytedance.bitsail.common.option.ReaderOptions.READER_PREFIX;
+import static com.bytedance.bitsail.common.option.WriterOptions.WRITER_PREFIX;
 
 /**
  * Created 2022/8/16
@@ -33,5 +34,9 @@ public interface HiveReaderOptions extends ReaderOptions.BaseReaderOptions {
 
   ConfigOption<String> HIVE_METASTORE_PROPERTIES =
       key(READER_PREFIX + "metastore_properties")
+          .noDefaultValue(String.class);
+
+  ConfigOption<String> HIVE_CONF_LOCATION =
+      key(WRITER_PREFIX + "hive_conf_location")
           .noDefaultValue(String.class);
 }

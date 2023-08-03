@@ -271,9 +271,13 @@ public class HiveOutputFormat<E extends Row> extends FileOutputFormatPlugin<E> {
   }
 
   public HiveConf getHiveConf() {
-    Map<String, String> hiveProperties =
-        JsonSerializer.parseToMap(outputSliceConfig.getNecessaryOption(HiveWriterOptions.HIVE_METASTORE_PROPERTIES, CommonErrorCode.CONFIG_ERROR));
-    return HiveMetaClientUtil.getHiveConf(hiveProperties);
+    if (outputSliceConfig.fieldExists(HiveWriterOptions.HIVE_CONF_LOCATION)) {
+      return HiveMetaClientUtil.getHiveConf(outputSliceConfig.get(HiveWriterOptions.HIVE_CONF_LOCATION));
+    } else {
+      Map<String, String> hiveProperties =
+          JsonSerializer.parseToMap(outputSliceConfig.getNecessaryOption(HiveWriterOptions.HIVE_METASTORE_PROPERTIES, CommonErrorCode.CONFIG_ERROR));
+      return HiveMetaClientUtil.getHiveConf(hiveProperties);
+    }
   }
 
   public JobConf initHadoopJobConf() {

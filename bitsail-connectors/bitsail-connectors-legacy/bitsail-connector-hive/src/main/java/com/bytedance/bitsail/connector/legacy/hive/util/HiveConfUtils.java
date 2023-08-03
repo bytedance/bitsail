@@ -33,7 +33,7 @@ public class HiveConfUtils {
     return HiveMetaClientUtil.getHiveConf(hiveProperties);
   }
 
-  public HiveConf fromHiveConfPath(String location) {
+  public static HiveConf fromHiveConfPath(String location) {
     HiveConf hiveConf = new HiveConf();
     hiveConf.addResource(new Path(location));
     return hiveConf;

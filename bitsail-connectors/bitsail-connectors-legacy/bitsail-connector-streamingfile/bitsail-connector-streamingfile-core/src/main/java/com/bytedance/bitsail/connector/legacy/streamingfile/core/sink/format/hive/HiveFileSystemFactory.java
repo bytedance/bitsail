@@ -49,8 +49,9 @@ public class HiveFileSystemFactory<IN extends Row> extends AbstractFileSystemFac
     String dbName = jobConf.get(FileSystemSinkOptions.DB_NAME);
     String tableName = jobConf.get(FileSystemSinkOptions.TABLE_NAME);
     String metaStoreProperties = jobConf.get(FileSystemSinkOptions.HIVE_METASTORE_PROPERTIES);
+    String hiveConfLocation = jobConf.get(FileSystemSinkOptions.HIVE_CONF_LOCATION);
 
-    return new HiveTableMetaStoreFactory(dbName, tableName, metaStoreProperties);
+    return new HiveTableMetaStoreFactory(dbName, tableName, metaStoreProperties, hiveConfLocation);
   }
 
   @Override
