@@ -16,10 +16,12 @@
 
 package com.bytedance.bitsail.test.integration.elasticsearch;
 
+import com.bytedance.bitsail.base.execution.Mode;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
-import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchWriterOptions;
-import com.bytedance.bitsail.connector.elasticsearch.rest.EsRestClientBuilder;
+import com.bytedance.bitsail.common.option.WriterOptions;
+import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchOptions;
+import com.bytedance.bitsail.connector.elasticsearch.utils.ElasticsearchUtils;
 import com.bytedance.bitsail.connector.fake.option.FakeReaderOptions;
 import com.bytedance.bitsail.test.integration.AbstractIntegrationTest;
 import com.bytedance.bitsail.test.integration.elasticsearch.container.ElasticsearchCluster;
@@ -36,77 +38,75 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Collections;
-
 @SuppressWarnings("checkstyle:MagicNumber")
 public class ElasticsearchSinkITCase extends AbstractIntegrationTest {
 
-  private final int totalCount = 300;
+  private static final int TOTAL_COUNT = 300;
   private static final String INDEX = "es_index_test";
-  private static ElasticsearchCluster esCluster;
+  private static ElasticsearchCluster cluster;
 
   private final CountRequest countRequest = new CountRequest(INDEX);
   private RestHighLevelClient client;
 
   @BeforeClass
-  public static void prepareEsCluster() throws Exception {
-    esCluster = new ElasticsearchCluster();
-    esCluster.startService();
-    esCluster.checkClusterHealth();
+  public static void beforeClass() throws Exception {
+    cluster = new ElasticsearchCluster();
+    cluster.startService();
+    cluster.checkClusterHealth();
   }
 
   @Before
-  public void initIndex() {
-    esCluster.resetIndex(INDEX);
+  public void before() {
+    cluster.resetIndex(INDEX);
     BitSailConfiguration jobConf = BitSailConfiguration.newDefault();
-    jobConf.set(ElasticsearchWriterOptions.ES_HOSTS,
-        Collections.singletonList(esCluster.getHttpHostAddress()));
-    client = new EsRestClientBuilder(jobConf).build();
+    jobConf.setWriter(ElasticsearchOptions.HOSTS,
+        cluster.getHttpHostAddress());
+    client = new RestHighLevelClient(ElasticsearchUtils
+        .prepareRestClientBuilder(jobConf.getSubConfiguration(WriterOptions.JOB_WRITER)));
   }
 
   @After
-  public void closeClient() throws Exception {
+  public void after() throws Exception {
     client.close();
   }
 
   @AfterClass
-  public static void closeEsCluster() {
-    esCluster.close();
+  public static void afterClass() {
+    cluster.close();
   }
 
   @Test
   public void testBatch() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("es_sink_test.json");
 
-    jobConf.set(FakeReaderOptions.TOTAL_COUNT, totalCount);
+    jobConf.set(FakeReaderOptions.TOTAL_COUNT, TOTAL_COUNT);
     jobConf.set(FakeReaderOptions.RATE, 1000);
-    jobConf.set(ElasticsearchWriterOptions.ES_INDEX, INDEX);
-    jobConf.set(ElasticsearchWriterOptions.ES_HOSTS,
-        Collections.singletonList(esCluster.getHttpHostAddress()));
+    jobConf.setWriter(ElasticsearchOptions.INDEX, INDEX);
+    jobConf.setWriter(ElasticsearchOptions.HOSTS, cluster.getHttpHostAddress());
 
     submitJob(jobConf);
 
-    esCluster.flush();
+    cluster.flush();
     CountResponse countResponse = client.count(countRequest, RequestOptions.DEFAULT);
-    Assert.assertEquals(totalCount, countResponse.getCount());
+    Assert.assertEquals(TOTAL_COUNT, countResponse.getCount());
   }
 
   @Test
   public void testStreaming() throws Exception {
     BitSailConfiguration jobConf = JobConfUtils.fromClasspath("es_sink_test.json");
 
-    jobConf.set(CommonOptions.JOB_TYPE, "STREAMING");
+    jobConf.set(CommonOptions.JOB_TYPE, Mode.STREAMING.name());
     jobConf.set(CommonOptions.CheckPointOptions.CHECKPOINT_ENABLE, true);
-    jobConf.set(FakeReaderOptions.TOTAL_COUNT, totalCount);
-    jobConf.set(FakeReaderOptions.RATE, totalCount / 10);
-    jobConf.set(ElasticsearchWriterOptions.ES_INDEX, INDEX);
-    jobConf.set(ElasticsearchWriterOptions.ES_HOSTS,
-        Collections.singletonList(esCluster.getHttpHostAddress()));
+    jobConf.set(FakeReaderOptions.TOTAL_COUNT, TOTAL_COUNT);
+    jobConf.set(FakeReaderOptions.RATE, TOTAL_COUNT / 10);
+
+    jobConf.setWriter(ElasticsearchOptions.INDEX, INDEX);
+    jobConf.setWriter(ElasticsearchOptions.HOSTS, cluster.getHttpHostAddress());
 
     submitJob(jobConf);
 
-    esCluster.flush();
+    cluster.flush();
     CountResponse countResponse = client.count(countRequest, RequestOptions.DEFAULT);
-    Assert.assertEquals(totalCount, countResponse.getCount());
+    Assert.assertEquals(TOTAL_COUNT, countResponse.getCount());
   }
 }

@@ -20,14 +20,12 @@ import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.connector.elasticsearch.rest.EsRequestEmitter;
-import com.bytedance.bitsail.connector.elasticsearch.rest.EsRestClientBuilder;
-import com.bytedance.bitsail.connector.elasticsearch.rest.bulk.EsBulkListener;
-import com.bytedance.bitsail.connector.elasticsearch.rest.bulk.EsBulkProcessorBuilder;
-import com.bytedance.bitsail.connector.elasticsearch.rest.bulk.EsBulkRequestFailureHandler;
+import com.bytedance.bitsail.connector.elasticsearch.format.DefaultRowSerializationSchema;
+import com.bytedance.bitsail.connector.elasticsearch.sink.listener.DefaultBulkListener;
+import com.bytedance.bitsail.connector.elasticsearch.sink.sender.ElasticsearchSender;
+import com.bytedance.bitsail.connector.elasticsearch.utils.ElasticsearchUtils;
 
-import org.elasticsearch.action.ActionRequest;
-import org.elasticsearch.action.bulk.BulkProcessor;
+import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,89 +33,55 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ElasticsearchWriter<CommitT> implements Writer<Row, CommitT, EmptyState> {
   private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchWriter.class);
 
-  private final RestHighLevelClient restClient;
-  private final AtomicReference<Throwable> failureThrowable;
-  private final EsBulkRequestFailureHandler failureHandler;
-  private final BulkProcessor bulkProcessor;
-  private final EsRequestEmitter emitter;
-  private final AtomicInteger pendingActions;
+  private final DefaultRowSerializationSchema serializationSchema;
+  private final ElasticsearchSender elasticsearchSender;
+  private final DefaultBulkListener bulkListener;
+  private final RestHighLevelClient client;
 
-  public ElasticsearchWriter(BitSailConfiguration jobConf) {
-    this.restClient = new EsRestClientBuilder(jobConf).build();
-    this.failureThrowable = new AtomicReference<>();
-    this.failureHandler = new EsBulkRequestFailureHandler(jobConf);
-    this.pendingActions = new AtomicInteger(0);
-
-    EsBulkProcessorBuilder builder = new EsBulkProcessorBuilder(jobConf);
-    builder.setRestClient(restClient);
-    builder.setListener(new EsBulkListener(failureHandler, failureThrowable, pendingActions));
-    this.bulkProcessor = builder.build();
-
-    this.emitter = new EsRequestEmitter(jobConf);
+  public ElasticsearchWriter(Context<EmptyState> context,
+                             BitSailConfiguration commonConfiguration,
+                             BitSailConfiguration writerConfiguration) {
+    this.bulkListener = new DefaultBulkListener(context.getIndexOfSubTaskId());
+    this.client = new RestHighLevelClient(ElasticsearchUtils.prepareRestClientBuilder(writerConfiguration));
+    this.elasticsearchSender = new ElasticsearchSender(writerConfiguration, bulkListener, client);
+    this.serializationSchema = new DefaultRowSerializationSchema(commonConfiguration,
+        writerConfiguration,
+        context.getRowTypeInfo());
   }
 
   @Override
   public void write(Row element) {
-    synchronized (this) {
-      checkAsyncErrorsAndRequests();
-      emitter.emit(element, bulkProcessor);
-      pendingActions.getAndIncrement();
-    }
+    bulkListener.checkErroneous();
+    DocWriteRequest<?> serialize = serializationSchema.serialize(element);
+    elasticsearchSender.bulkRequest(serialize);
   }
 
-  @SuppressWarnings("checkstyle:MagicNumber")
   @Override
-  public void flush(boolean endOfInput) {
-    synchronized (this) {
-      checkAsyncErrorsAndRequests();
-      while (pendingActions.get() != 0) {
-        bulkProcessor.flush();
-        checkAsyncErrorsAndRequests();
-        try {
-          TimeUnit.MILLISECONDS.sleep(10);
-        } catch (Exception ignored) {
-          //ignore
-        }
-      }
-    }
+  public void flush(boolean endOfInput) throws IOException {
+    bulkListener.checkErroneous();
+    elasticsearchSender.flush();
+  }
+
+  @Override
+  public void close() throws IOException {
+    elasticsearchSender.close();
+    client.close();
+    bulkListener.checkErroneous();
   }
 
   @Override
   public List<CommitT> prepareCommit() {
+    bulkListener.checkErroneous();
     return Collections.emptyList();
   }
 
   @Override
   public List<EmptyState> snapshotState(long checkpointId) {
-    this.flush(false);
+    bulkListener.checkErroneous();
     return Collections.emptyList();
-  }
-
-  @Override
-  public void close() throws IOException {
-    bulkProcessor.close();
-    restClient.close();
-    checkErrorAndRethrow();
-  }
-
-  private void checkErrorAndRethrow() {
-    Throwable cause = failureThrowable.get();
-    if (Objects.nonNull(cause)) {
-      throw new RuntimeException("An error occurred in ElasticsearchWriter.", cause);
-    }
-  }
-
-  private void checkAsyncErrorsAndRequests() {
-    checkErrorAndRethrow();
-    List<ActionRequest> failedRequest = failureHandler.getBufferedFailedRequest();
-    failedRequest.forEach(actionRequest -> emitter.emit(actionRequest, bulkProcessor));
   }
 }

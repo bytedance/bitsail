@@ -16,24 +16,28 @@
 
 package com.bytedance.bitsail.test.integration.elasticsearch;
 
+import com.bytedance.bitsail.base.connector.writer.v1.Writer;
+import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.row.Row;
-import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchWriterOptions;
-import com.bytedance.bitsail.connector.elasticsearch.rest.EsRestClientBuilder;
-import com.bytedance.bitsail.connector.elasticsearch.rest.bulk.EsBulkListener;
-import com.bytedance.bitsail.connector.elasticsearch.rest.bulk.EsBulkProcessorBuilder;
-import com.bytedance.bitsail.connector.elasticsearch.rest.bulk.EsBulkRequestFailureHandler;
+import com.bytedance.bitsail.common.row.RowKind;
+import com.bytedance.bitsail.common.type.BitSailTypeInfoConverter;
+import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.typeinfo.RowTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.TypeInfoUtils;
+import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchOptions;
 import com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchWriter;
+import com.bytedance.bitsail.connector.elasticsearch.utils.ElasticsearchUtils;
 import com.bytedance.bitsail.test.integration.elasticsearch.container.ElasticsearchCluster;
 import com.bytedance.bitsail.test.integration.utils.JobConfUtils;
 
-import org.elasticsearch.action.bulk.BulkProcessor;
+import com.google.common.collect.Maps;
+import org.apache.commons.collections.MapUtils;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -41,114 +45,129 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ElasticsearchWriterITCase {
 
-  private final String docString = "{\n" +
-      "    \"date\":\"20220810\",\n" +
-      "    \"text_type\":\"text\",\n" +
-      "    \"varchar_type\":\"varchar\",\n" +
-      "    \"bigint_type\":\"bigint\",\n" +
-      "    \"id\":100\n" +
-      "}";
-  private final Row row = new Row(new Object[] {
-      "test_id", "varchar", "text", "bigint", "20220810"
-  });
-  private final String id = "test_id";
-  private final String index = "es_index_test";
+  private static ElasticsearchCluster cluster;
+  private static final String INDEX_NAME = "elasticsearch_index";
 
-  private static ElasticsearchCluster esCluster;
   private RestHighLevelClient client;
-
   private BitSailConfiguration jobConf;
-  private IndexRequest indexRequest = new IndexRequest().index(index).id(id);
-  private GetRequest getRequest = new GetRequest().index(index).id(id);
 
   @BeforeClass
-  public static void prepareEsCluster() throws Exception {
-    esCluster = new ElasticsearchCluster();
-    esCluster.startService();
-    esCluster.checkClusterHealth();
+  public static void beforeClass() throws Exception {
+    cluster = new ElasticsearchCluster();
+    cluster.startService();
+    cluster.checkClusterHealth();
   }
 
   @Before
-  public void initIndex() {
-    esCluster.resetIndex(index);
-
+  public void before() {
+    cluster.resetIndex(INDEX_NAME);
     jobConf = BitSailConfiguration.newDefault();
-    jobConf.set(ElasticsearchWriterOptions.ES_HOSTS,
-        Collections.singletonList(esCluster.getHttpHostAddress()));
-
-    client = new EsRestClientBuilder(jobConf).build();
+    jobConf.setWriter(ElasticsearchOptions.HOSTS, cluster.getHttpHostAddress());
+    client = new RestHighLevelClient(ElasticsearchUtils.prepareRestClientBuilder(jobConf.getSubConfiguration(WriterOptions.JOB_WRITER)));
   }
 
   @After
-  public void closeClient() throws Exception {
+  public void after() throws Exception {
     client.close();
   }
 
   @AfterClass
-  public static void closeEsCluster() {
-    esCluster.close();
+  public static void afterClass() {
+    cluster.close();
   }
 
   @Test
-  public void testRestClientBuilder() throws Exception {
-    indexRequest.source(docString, XContentType.JSON);
-    client.index(indexRequest, RequestOptions.DEFAULT);
-    check(client, 100);
-  }
+  public <CommitT, WriterStateT> void testWriteWithRowKind() throws Exception {
+    BitSailConfiguration writerConfiguration = JobConfUtils.fromClasspath("es_writer_parameter_test.json");
+    writerConfiguration.merge(jobConf, true);
+    writerConfiguration.setWriter(ElasticsearchOptions.INDEX, INDEX_NAME);
+    TypeInfoConverter fileMappingTypeInfoConverter = new BitSailTypeInfoConverter();
+    RowTypeInfo rowTypeInfo = TypeInfoUtils.getRowTypeInfo(fileMappingTypeInfoConverter, writerConfiguration.get(WriterOptions.BaseWriterOptions.COLUMNS));
+    ElasticsearchWriter<CommitT> writer = new ElasticsearchWriter<>(
+        new WriterMockContext(rowTypeInfo),
+        BitSailConfiguration.newDefault(),
+        writerConfiguration.getSubConfiguration(WriterOptions.JOB_WRITER));
 
-  @Test
-  public void testBulkProcessor() throws Exception {
-    AtomicReference<Throwable> failureThrowable = new AtomicReference<>();
-    EsBulkRequestFailureHandler failureHandler = new EsBulkRequestFailureHandler(jobConf);
-    AtomicInteger pendingActions = new AtomicInteger(0);
-
-    EsBulkProcessorBuilder builder = new EsBulkProcessorBuilder(jobConf);
-    builder.setRestClient(client);
-    builder.setListener(new EsBulkListener(failureHandler, failureThrowable, pendingActions));
-    BulkProcessor bulkProcessor = builder.build();
-
-    indexRequest.source(docString, XContentType.JSON);
-    pendingActions.incrementAndGet();
-    bulkProcessor.add(indexRequest);
-    bulkProcessor.flush();
-    while (pendingActions.get() > 0) {
-      bulkProcessor.awaitClose(10, TimeUnit.SECONDS);
-    }
-    Assert.assertEquals(0, pendingActions.get());
-    check(client, 100);
-  }
-
-  @Test
-  public <CommitT, WriterStateT> void testEsWriter() throws Exception {
-    BitSailConfiguration bitSailConf = JobConfUtils.fromClasspath("es_writer_parameter_test.json");
-    bitSailConf.merge(jobConf, true);
-    bitSailConf.set(ElasticsearchWriterOptions.ES_INDEX, index);
-
-    ElasticsearchWriter<CommitT> writer = new ElasticsearchWriter<>(bitSailConf);
-    writer.write(row);
+    long id = 1;
+    writer.write(mockRow(RowKind.INSERT, id));
     writer.flush(false);
-    writer.close();
+    checkDocumentExistsOrNot(client, INDEX_NAME, id, true);
+    writer.write(mockRow(RowKind.DELETE, id));
+    writer.flush(false);
+    checkDocumentExistsOrNot(client, INDEX_NAME, id, false);
+    id = 2;
+    writer.write(mockRow(RowKind.UPDATE_AFTER, id));
+    writer.flush(false);
+    checkDocumentExistsOrNot(client, INDEX_NAME, id, true);
+    writer.write(mockRow(RowKind.UPDATE_BEFORE, id));
+    writer.flush(false);
+    checkDocumentExistsOrNot(client, INDEX_NAME, id, false);
 
-    check(client, id);
+    //Null value could write in INSERT MODE
+    Object nullId = null;
+    writer.write(mockRow(RowKind.INSERT, nullId));
+    writer.flush(false);
   }
 
-  private void check(RestHighLevelClient client, Object id) throws Exception {
+  private static void checkDocumentExistsOrNot(RestHighLevelClient client,
+                                               String index,
+                                               Object id,
+                                               boolean exists) throws Exception {
+    GetRequest getRequest = new GetRequest()
+        .index(index)
+        .id(id.toString());
     GetResponse response = client.get(getRequest, RequestOptions.DEFAULT);
 
-    Map<String, Object> source = response.getSource();
-    Assert.assertEquals("20220810", source.get("date"));
-    Assert.assertEquals("text", source.get("text_type"));
-    Assert.assertEquals("varchar", source.get("varchar_type"));
-    Assert.assertEquals("bigint", source.get("bigint_type"));
-    Assert.assertEquals(id, source.get("id"));
+    Map<String, Object> source = response.getSourceAsMap();
+    if (exists) {
+      Assert.assertTrue(MapUtils.isNotEmpty(source));
+    } else {
+      Assert.assertTrue(MapUtils.isEmpty(source));
+    }
+  }
+
+  private static Row mockRow(RowKind rowKind, Object id) {
+    Map<String, String> values = Maps.newHashMap();
+    values.put("k", "v");
+    Row row = new Row(new Object[] {
+        id, "varchar", "text", "bigint", "20220810"
+    });
+    row.setKind(rowKind);
+    return row;
+  }
+
+  public static class WriterMockContext implements Writer.Context<EmptyState> {
+
+    private RowTypeInfo rowTypeInfo;
+
+    public WriterMockContext(RowTypeInfo rowTypeInfo) {
+      this.rowTypeInfo = rowTypeInfo;
+    }
+
+    @Override
+    public RowTypeInfo getRowTypeInfo() {
+      return rowTypeInfo;
+    }
+
+    @Override
+    public int getIndexOfSubTaskId() {
+      return 0;
+    }
+
+    @Override
+    public boolean isRestored() {
+      return false;
+    }
+
+    @Override
+    public List<EmptyState> getRestoreStates() {
+      return null;
+    }
   }
 }
 

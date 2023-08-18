@@ -20,7 +20,7 @@ import com.bytedance.bitsail.common.BitSailException;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.exception.CommonErrorCode;
 import com.bytedance.bitsail.common.option.WriterOptions;
-import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchWriterOptions;
+import com.bytedance.bitsail.connector.elasticsearch.option.ElasticsearchOptions;
 import com.bytedance.bitsail.connector.elasticsearch.sink.ElasticsearchSink;
 
 import lombok.SneakyThrows;
@@ -46,7 +46,6 @@ import org.testcontainers.utility.DockerImageName;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
 
 public class ElasticsearchDataSource extends AbstractDataSource {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractDataSource.class);
@@ -91,9 +90,9 @@ public class ElasticsearchDataSource extends AbstractDataSource {
 
   @Override
   public void modifyJobConf(BitSailConfiguration jobConf) {
-    jobConf.set(ElasticsearchWriterOptions.ES_HOSTS,
-        Collections.singletonList(getInternalHttpHostAddress()));
-    jobConf.set(ElasticsearchWriterOptions.ES_INDEX, ES_INDEX);
+    jobConf.setWriter(ElasticsearchOptions.HOSTS,
+        getInternalHttpHostAddress());
+    jobConf.setWriter(ElasticsearchOptions.INDEX, ES_INDEX);
   }
 
   @SuppressWarnings("checkstyle:MagicNumber")
