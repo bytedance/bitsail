@@ -21,10 +21,10 @@ import com.bytedance.bitsail.base.connector.writer.v1.Writer;
 import com.bytedance.bitsail.base.connector.writer.v1.WriterCommitter;
 import com.bytedance.bitsail.base.connector.writer.v1.state.EmptyState;
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
+import com.bytedance.bitsail.common.option.WriterOptions;
 import com.bytedance.bitsail.common.row.Row;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
 import com.bytedance.bitsail.common.type.filemapping.FileMappingTypeInfoConverter;
-import com.bytedance.bitsail.connector.elasticsearch.base.EsConstants;
 
 import java.io.Serializable;
 import java.util.Optional;
@@ -32,20 +32,24 @@ import java.util.Optional;
 public class ElasticsearchSink<CommitT extends Serializable> implements Sink<Row, CommitT, EmptyState> {
 
   private BitSailConfiguration writerConf;
+  private BitSailConfiguration commonConfiguration;
 
   @Override
   public String getWriterName() {
-    return EsConstants.ES_CONNECTOR_NAME;
+    return "elasticsearch";
   }
 
   @Override
   public void configure(BitSailConfiguration commonConfiguration, BitSailConfiguration writerConfiguration) {
-    writerConf = writerConfiguration;
+    this.commonConfiguration = commonConfiguration;
+    this.writerConf = writerConfiguration;
   }
 
   @Override
   public Writer<Row, CommitT, EmptyState> createWriter(Writer.Context<EmptyState> context) {
-    return new ElasticsearchWriter<>(writerConf);
+    return new ElasticsearchWriter<>(context,
+        commonConfiguration,
+        writerConf.getSubConfiguration(WriterOptions.JOB_WRITER));
   }
 
   @Override
