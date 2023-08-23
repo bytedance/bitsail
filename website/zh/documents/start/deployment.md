@@ -284,7 +284,7 @@ bash ${BITSAIL_HOME}/bin/bitsail run \
    --target kubernetes-application \
    --deployment-mode kubernetes-application \
    --execution-mode run-application \
-   -p kubernetes.kubernetes.jobmanager.service-account=<self-defined-service-account> \
+   -p kubernetes.jobmanager.service-account=<self-defined-service-account> \
    -p kubernetes.container.image=<CustomImage> \
    -p kubernetes.jobmanager.cpu=0.25 \
    -p kubernetes.taskmanager.cpu=0.5 \
