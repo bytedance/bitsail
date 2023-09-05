@@ -34,6 +34,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
@@ -332,6 +333,9 @@ public class HiveMetaClientUtil {
   public static void dropPartition(HiveConf hiveConf,
                                    String db, String tableName, String partition)
       throws TException {
+    if (StringUtils.isEmpty(partition)) {
+      return;
+    }
     try {
       RETRYER.call(() -> {
         long st = System.currentTimeMillis();
@@ -395,6 +399,9 @@ public class HiveMetaClientUtil {
   public static boolean hasPartition(HiveConf hiveConf,
                                      String db, String tableName, String partition)
       throws TException {
+    if (StringUtils.isEmpty(partition)) {
+      return false;
+    }
     try {
       return (Boolean) RETRYER.call(() -> {
         IMetaStoreClient client = null;
