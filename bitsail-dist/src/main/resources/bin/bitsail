@@ -35,6 +35,11 @@ BITSAIL_CLIENT_CLASSPATH=${BITSAIL_HOME}/libs/clients
 if [ -n "$HADOOP_HOME" ]; then
   export HADOOP_CLASSPATH=$($HADOOP_HOME/bin/hadoop classpath)
 fi
+
+if [ -z "$BITSAIL_JAVA_OPTS" ]; then
+  export BITSAIL_JAVA_OPTS="-Xmx128M"
+fi
+
 export BITSAIL_HOME=${BITSAIL_HOME}
 
-exec java -cp ${BITSAIL_CLIENT_CLASSPATH}/*:${HADOOP_CLASSPATH}:${BITSAIL_CONF_DIR}/* com.bytedance.bitsail.client.entry.Entry ${args}
+exec java ${BITSAIL_JAVA_OPTS} -cp ${BITSAIL_CLIENT_CLASSPATH}/*:${HADOOP_CLASSPATH}:${BITSAIL_CONF_DIR}/* com.bytedance.bitsail.client.entry.Entry ${args}
