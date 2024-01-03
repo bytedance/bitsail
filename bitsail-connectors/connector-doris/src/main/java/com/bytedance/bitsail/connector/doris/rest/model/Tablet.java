@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Bytedance Ltd. and/or its affiliates.
+ * Copyright 2022 Bytedance Ltd. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.connector.doris.constant;
+package com.bytedance.bitsail.connector.doris.rest.model;
 
-public class DorisConstants {
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-  public static String DORIS_CONNECTOR_NAME = "doris";
-  public static final String NULL_VALUE = "\\N";
-  public static final String DORIS_DELETE_SIGN = "__DORIS_DELETE_SIGN__";
+import java.util.List;
+
+@Getter
+@Setter
+@EqualsAndHashCode
+public class Tablet {
+  private List<String> routings;
+  private int version;
+  private long versionHash;
+  private long schemaHash;
+
 }
-

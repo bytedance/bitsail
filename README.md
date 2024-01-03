@@ -112,7 +112,7 @@ In the Runtime layer, it supports multiple execution modes, such as yarn, local,
   <tr>
     <td>Doris</td>
     <td>-</td>
-    <td> </td>
+    <td>✅</td>
     <td>✅</td>
   </tr>
   <tr>

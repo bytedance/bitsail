@@ -1,7 +1,8 @@
 {
   "name": "bitsail-connector-unified-doris",
   "classes": [
-    "com.bytedance.bitsail.connector.doris.sink.DorisSink"
+    "com.bytedance.bitsail.connector.doris.sink.DorisSink",
+    "com.bytedance.bitsail.connector.doris.source.DorisSource"
   ],
   "libs": [
     "bitsail-connector-doris-${version}.jar"

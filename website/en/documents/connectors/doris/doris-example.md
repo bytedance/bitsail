@@ -42,6 +42,41 @@ PROPERTIES
 )
 ```
 
+## Doris Reader
+Assuming there is a test doris cluster, then we can use the following configuration to read `test_doris_table` table.
+```json
+{
+  "job": {
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.doris.source.DorisSource",
+      "fe_hosts": "127.0.0.1:1234",
+      "mysql_hosts": "127.0.0.1:4321",
+      "user": "test_user",
+      "password": "1234567",
+      "db_name": "test_db",
+      "table_name": "test_doris_table",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint"
+        },
+        {
+          "name": "bigint_type",
+          "type": "bigint"
+        },
+        {
+          "name": "string_type",
+          "type": "string"
+        },
+        {
+          "name": "double_type",
+          "type": "double"
+        }
+      ]
+    }
+  }
+}
+```
 
 ## Doris writer
 

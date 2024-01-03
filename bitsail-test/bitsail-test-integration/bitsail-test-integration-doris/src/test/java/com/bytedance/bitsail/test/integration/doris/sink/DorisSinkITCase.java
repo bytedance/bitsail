@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytedance.bitsail.test.integration.doris;
+package com.bytedance.bitsail.test.integration.doris.sink;
 
 import com.bytedance.bitsail.common.configuration.BitSailConfiguration;
 import com.bytedance.bitsail.common.option.CommonOptions;
@@ -48,12 +48,12 @@ public class DorisSinkITCase extends AbstractIntegrationTest {
    * Below codes are just example.
    */
   public void addDorisInfo(BitSailConfiguration jobConf) {
-    jobConf.set(DorisWriterOptions.FE_HOSTS, "127.0.0.1:1234");
-    jobConf.set(DorisWriterOptions.MYSQL_HOSTS, "127.0.0.1:4321");
-    jobConf.set(DorisWriterOptions.USER, "test_user");
-    jobConf.set(DorisWriterOptions.PASSWORD, "password");
-    jobConf.set(DorisWriterOptions.DB_NAME, "test_db");
-    jobConf.set(DorisWriterOptions.TABLE_NAME, "test_table");
+    jobConf.set(DorisWriterOptions.FE_HOSTS, "127.0.0.1:8030");
+    jobConf.set(DorisWriterOptions.MYSQL_HOSTS, "127.0.0.1:9030");
+    jobConf.set(DorisWriterOptions.USER, "root");
+    jobConf.set(DorisWriterOptions.PASSWORD, "");
+    jobConf.set(DorisWriterOptions.DB_NAME, "test");
+    jobConf.set(DorisWriterOptions.TABLE_NAME, "test_bitsails");
     jobConf.set(CommonOptions.CheckPointOptions.CHECKPOINT_ENABLE, true);
     jobConf.set(CommonOptions.CheckPointOptions.CHECKPOINT_INTERVAL, 5000L);
     jobConf.set(DorisWriterOptions.SINK_ENABLE_2PC, false);

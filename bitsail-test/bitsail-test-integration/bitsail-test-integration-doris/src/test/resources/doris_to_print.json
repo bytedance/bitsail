@@ -1,0 +1,40 @@
+{
+  "job": {
+    "common": {
+      "job_id": -31198,
+      "instance_id": -31198,
+      "job_name": "bitsail_doris_to_print_test",
+      "user_name": "test"
+    },
+    "reader": {
+      "class": "com.bytedance.bitsail.connector.doris.source.DorisSource",
+      "fe_hosts": "127.0.0.1:8030",
+      "mysql_hosts": "127.0.0.1:9030",
+      "user": "root",
+      "password": "",
+      "db_name": "test",
+      "table_name": "doris_table",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int"
+        },
+        {
+          "name": "bigint_type",
+          "type": "bigint"
+        },
+        {
+          "name": "string_type",
+          "type": "string"
+        },
+        {
+          "name": "double_type",
+          "type": "double"
+        }
+      ]
+    },
+    "writer": {
+      "class": "com.bytedance.bitsail.connector.legacy.print.sink.PrintSink"
+    }
+  }
+}

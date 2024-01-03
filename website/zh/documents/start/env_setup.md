@@ -16,6 +16,7 @@ order: 2
 - maven 3.6+
 - [Docker desktop](https://www.docker.com/products/docker-desktop/)
 
+
 在安装上述必需组件后，您可以在本地的IDE上直接运行已有的集成测试。
 
 ## 从源代码编译
