@@ -37,7 +37,7 @@ public class GenericExecutorSettingTest {
     GenericExecutorSetting setting = GenericExecutorSetting.initFromFile(settingFilePath);
 
     Assert.assertEquals("test-executor", setting.getExecutorName());
-    Assert.assertEquals("test-image", setting.getExecutorImage());
+    Assert.assertEquals("testcontainers/ryuk", setting.getExecutorImage());
 
     List<TransferableFile> transferableFileList = setting.getAdditionalFiles();
     Assert.assertEquals(2, transferableFileList.size());
@@ -46,9 +46,9 @@ public class GenericExecutorSettingTest {
     Assert.assertTrue(transferableFileList.contains(file1));
     Assert.assertTrue(transferableFileList.contains(file2));
 
-    Assert.assertEquals("pwd && sleep 5000",
+    Assert.assertEquals("pwd && sleep 1",
         String.join(" ", setting.getExecCommands()));
-    Assert.assertEquals("pwd && sleep 1000",
+    Assert.assertEquals("pwd && sleep 2",
         String.join(" ", setting.getFailureHandleCommands()));
 
     BitSailConfiguration globalJobConf = setting.getGlobalJobConf();

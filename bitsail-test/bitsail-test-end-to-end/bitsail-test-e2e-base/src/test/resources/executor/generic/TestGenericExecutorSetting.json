@@ -1,11 +1,11 @@
 {
   "name": "test-executor",
-  "executor-image": "test-image",
+  "executor-image": "testcontainers/ryuk",
   "exec-commands": [
-    "pwd", "&&", "sleep 5000"
+    "pwd", "&&", "sleep 1"
   ],
   "failure-handle-commands": [
-    "pwd", "&&", "sleep 1000"
+    "pwd", "&&", "sleep 2"
   ],
   "global-job-config": "{\"job\":{\"reader\":{\"reader_parallelism_num\":1},\"writer\":{\"writer_parallelism_num\":2}}}",
   "additional-files": [
