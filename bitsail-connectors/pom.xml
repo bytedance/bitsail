@@ -52,6 +52,7 @@
         <module>connector-cdc</module>
         <module>connector-kafka</module>
         <module>connector-mongodb</module>
+        <module>connector-oss</module>
     </modules>
 
     <dependencyManagement>
