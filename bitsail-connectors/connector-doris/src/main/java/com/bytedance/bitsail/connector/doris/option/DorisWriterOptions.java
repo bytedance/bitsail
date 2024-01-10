@@ -19,10 +19,10 @@ package com.bytedance.bitsail.connector.doris.option;
 import com.bytedance.bitsail.common.annotation.Essential;
 import com.bytedance.bitsail.common.option.ConfigOption;
 import com.bytedance.bitsail.common.option.WriterOptions;
+import com.bytedance.bitsail.connector.doris.partition.DorisPartitionTemplate;
 
 import com.alibaba.fastjson.TypeReference;
 
-import java.util.List;
 import java.util.Map;
 
 import static com.bytedance.bitsail.common.option.ConfigOptions.key;
@@ -60,10 +60,9 @@ public interface DorisWriterOptions extends WriterOptions.BaseWriterOptions {
       key(WRITER_PREFIX + "table_has_partition")
           .defaultValue(true);
 
-  ConfigOption<List<Map<String, Object>>> PARTITIONS =
+  ConfigOption<DorisPartitionTemplate> PARTITIONS =
       key(WRITER_PREFIX + "partitions")
-          .onlyReference(new TypeReference<List<Map<String, Object>>>() {
-          });
+          .onlyReference(new TypeReference<DorisPartitionTemplate>() {});
 
   ConfigOption<Integer> SINK_FLUSH_INTERVAL_MS =
       key(WRITER_PREFIX + "sink_flush_interval_ms")

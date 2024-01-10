@@ -21,6 +21,8 @@ import com.bytedance.bitsail.common.column.StringColumn;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Date;
+
 public class DateUtilTest {
   @Test
   public void testConvertStringToSeconds() {
@@ -29,4 +31,12 @@ public class DateUtilTest {
     Assert.assertEquals(1575734400L, DateUtil.convertStringToSeconds(new StringColumn("2020-08-01")));
     Assert.assertEquals(1596214923L, DateUtil.convertStringToSeconds(new StringColumn("2020-08-01 01:02:03")));
   }
+
+  @Test
+  public void testGetDatesBetweenTwoDate() {
+    Date start = new Date();
+    Date end = new Date();
+    Assert.assertEquals(1, DateUtil.getDatesBetweenTwoDate(start, end).size());
+  }
+
 }
