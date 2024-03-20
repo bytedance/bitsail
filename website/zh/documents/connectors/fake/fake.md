@@ -9,9 +9,9 @@
 
 ```xml
 <dependency>
-   <groupId>com.bytedance.bitsail</groupId>
-   <artifactId>bitsail-connector-fake</artifactId>
-   <version>${revision}</version>
+  <groupId>com.bytedance.bitsail</groupId>
+  <artifactId>connector-fake</artifactId>
+  <version>${revision}</version>
 </dependency>
 ```
 
@@ -39,10 +39,13 @@
     - 字符类型:
         - string
     - 布尔类型:
-        - 不支持
+        - boolean
     - 二进制类型:
         - binary
         - bytes
+    - 复杂类型:
+        - list
+        - map
 
 
 ### 主要参数
@@ -53,11 +56,16 @@
 {
   "job": {
     "reader": {
-      "class": "com.bytedance.bitsail.connector.legacy.fake.source.FakeSource",
+      "class": "com.bytedance.bitsail.connector.fake.source.FakeSource",
       "total_count": 300,
       "rate": 100,
       "random_null_rate": 0.1,
       "columns": [
+        {
+          "name": "id",
+          "type": "long",
+          "properties": "unique"
+        },
         {
           "name": "name",
           "type": "string"
@@ -78,15 +86,10 @@
 
 | 参数名称              | 是否必填 | 参数枚举值 | 参数含义                                                                                      |
 |:------------------|:-----|:------|:------------------------------------------------------------------------------------------|
-| class             | 是  |       | Fake读连接器类型, `com.bytedance.bitsail.connector.legacy.fake.source.FakeSource` |
+| class             | 是  |       | Fake读连接器类型, `com.bytedance.bitsail.connector.fake.source.FakeSource` |
 | total_count       | 是 | | 生成数据的总条数 |
 
 #### 可选参数
-   
-    
-    
-  
-    
 
 | 参数名称                                    | 是否必填  | 参数枚举值 | 参数含义                                                 |
 |:----------------------------------------|:------|:------|:-----------------------------------------------------|
@@ -96,6 +99,8 @@
 | from_timestamp |  否 | | 与 to_timestamp 一起作为生成时间类型字段的种子,并非字段值的边界 |
 | to_timestamp | 否 | | 与 from_timestamp 一起作为生成时间类型字段的种子,并非字段值的边界 |
 
+#### 设置常量值
+你可以为每个字段设置常量值, 更多信息见 [fake-connector-example](./fake-example.md)
 
 ## 相关文档
 
