@@ -41,7 +41,25 @@ public class BitSailTypeParser {
   private static final String SPLIT_TOKEN = ",";
 
   public static String fromTypeInfo(TypeInfo<?> typeInfo) {
-    return TypeInfoBridge.bridgeTypes(typeInfo);
+    Preconditions.checkNotNull(typeInfo, "typeInfo can not be null.");
+
+    if (typeInfo instanceof ListTypeInfo || typeInfo instanceof MapTypeInfo) {
+
+      if (typeInfo instanceof MapTypeInfo) {
+        MapTypeInfo mapTypeInfo = (MapTypeInfo) typeInfo;
+        return String.format("%s<%s, %s>", Types.MAP.name(), fromTypeInfo(mapTypeInfo.getKeyTypeInfo()), fromTypeInfo(mapTypeInfo.getValueTypeInfo()));
+      } else {
+
+        ListTypeInfo listTypeInfo = (ListTypeInfo) typeInfo;
+        return String.format("%s<%s>", Types.LIST.name(), fromTypeInfo(listTypeInfo.getElementTypeInfo()));
+      }
+    }
+    String typeString = TypeInfoBridge.bridgeTypes(typeInfo);
+    if (StringUtils.isEmpty(typeString)) {
+      throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,
+        String.format("Not support type typeInfo %s.", typeInfo));
+    }
+    return typeString;
   }
 
   public static List<TypeProperty> fromTypePropertyString(String typePropertyString) {

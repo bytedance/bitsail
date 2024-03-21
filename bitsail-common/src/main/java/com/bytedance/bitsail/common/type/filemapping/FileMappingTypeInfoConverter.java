@@ -16,11 +16,19 @@
 
 package com.bytedance.bitsail.common.type.filemapping;
 
+import com.bytedance.bitsail.common.BitSailException;
+import com.bytedance.bitsail.common.exception.CommonErrorCode;
+import com.bytedance.bitsail.common.type.BitSailTypeParser;
 import com.bytedance.bitsail.common.type.TypeInfoConverter;
+import com.bytedance.bitsail.common.typeinfo.ListTypeInfo;
+import com.bytedance.bitsail.common.typeinfo.MapTypeInfo;
 import com.bytedance.bitsail.common.typeinfo.TypeInfo;
+import com.bytedance.bitsail.common.typeinfo.Types;
 
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Objects;
 
 public class FileMappingTypeInfoConverter implements TypeInfoConverter {
   @Getter
@@ -52,11 +60,53 @@ public class FileMappingTypeInfoConverter implements TypeInfoConverter {
 
   @Override
   public TypeInfo<?> fromTypeString(String typeString) {
-    return reader.getToTypeInformation().get(typeString);
+    TypeInfo<?> typeInfo = reader.getToTypeInformation().get(typeString);
+
+    if (!Objects.isNull(typeInfo)) {
+      return typeInfo;
+    }
+
+    String engineMapStr = reader.customToEngineTypeStringMap.get(Types.MAP.name().toLowerCase());
+    String engineListStr = reader.customToEngineTypeStringMap.get(Types.LIST.name().toLowerCase());
+    if (StringUtils.isNotBlank(engineMapStr) && typeString.contains(engineMapStr)
+        || StringUtils.isNotBlank(engineListStr) && typeString.contains(engineListStr)) {
+      String customTypeString = this.toCustomTypeString(typeString);
+      return BitSailTypeParser.fromTypeString(customTypeString);
+    }
+
+    throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,
+      String.format("Not support type string %s.", typeString));
   }
 
   @Override
   public String fromTypeInfo(TypeInfo<?> typeInfo) {
-    return reader.getFromTypeInformation().get(typeInfo);
+    String typeStr = reader.getFromTypeInformation().get(typeInfo);
+
+    if (StringUtils.isNotBlank(typeStr)) {
+      return typeStr;
+    }
+
+    if (typeInfo instanceof ListTypeInfo || typeInfo instanceof MapTypeInfo) {
+      String customTypeString = BitSailTypeParser.fromTypeInfo(typeInfo);
+      return this.toEngineTypeString(customTypeString);
+    }
+
+    throw BitSailException.asBitSailException(CommonErrorCode.INTERNAL_ERROR,
+      String.format("Not support typeInfo %s.", typeInfo));
+  }
+
+  private String toEngineTypeString(String customTypeString) {
+    customTypeString = customTypeString.toLowerCase();
+    for (String key : reader.customToEngineTypeStringMap.keySet()) {
+      customTypeString = customTypeString.replace(key, reader.customToEngineTypeStringMap.get(key));
+    }
+    return customTypeString;
+  }
+
+  private String toCustomTypeString(String engineTypeString) {
+    for (String key : reader.engineToCustomTypeStringMap.keySet()) {
+      engineTypeString = engineTypeString.replace(key, reader.engineToCustomTypeStringMap.get(key));
+    }
+    return engineTypeString.toLowerCase();
   }
 }
